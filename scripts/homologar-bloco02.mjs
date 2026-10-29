@@ -20,8 +20,8 @@ const tests = [
     return r.status === 0 && r.stdout.includes('PASSOU:');
   }],
   ['Compilação do aplicativo', () => {
-    const cmd=process.platform==='win32'?'npm.cmd':'npm';
-    const r=spawnSync(cmd,['run','build'],{stdio:'ignore',shell:process.platform==='win32'});
+    const cmd=process.platform==='win32'?'cmd.exe':'npm';
+    const r=spawnSync(cmd,process.platform==='win32'?['/d','/s','/c','npm.cmd run build']:['run','build'],{stdio:'ignore',shell:false});
     return r.status===0;
   }],
   ['Auditoria de dependências de produção', () => {
