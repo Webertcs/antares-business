@@ -5,7 +5,7 @@ export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
 export async function POST(request: NextRequest) {
-  const denied = assertSensitiveWriteAllowed(request);
+  const denied = await assertSensitiveWriteAllowed(request);
   if (denied) return denied;
   const owner = await requireOwner();
   if (!owner) return NextResponse.json({ error: 'Apenas o proprietário pode suspender colaboradores.' }, { status: 403 });
