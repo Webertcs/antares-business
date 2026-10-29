@@ -1,7 +1,7 @@
 'use client';
 import { useEffect, useState } from 'react';
 type Member = { id: string; full_name: string; email: string | null; role: string; active: boolean };
-export default function EquipeClient() {
+export default function EquipeClient({ writesEnabled }: { writesEnabled: boolean }) {
   const [members, setMembers] = useState<Member[]>([]);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(true);
@@ -20,7 +20,7 @@ export default function EquipeClient() {
     return () => { alive = false; };
   }, []);
   async function suspend(member: Member) {
-    if (member.role !== 'collaborator' || !member.active || !window.confirm('Suspender acesso de ' + member.full_name + '?')) return;
+    if (!writesEnabled || member.role !== 'collaborator' || !member.active || !window.confirm('Suspender acesso de ' + member.full_name + '?')) return;
     try {
       const response = await fetch('/api/equipe/suspender', {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
@@ -34,6 +34,7 @@ export default function EquipeClient() {
   }
   async function invite(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    if (!writesEnabled) return;
     setSending(true); setFeedback(''); setLink('');
     try {
       const response = await fetch('/api/equipe/convites', {
@@ -55,20 +56,21 @@ export default function EquipeClient() {
     {loading ? <p>Carregando...</p> : error ? <p role="alert">{error}</p> : <table style={{width:'100%',textAlign:'left',borderCollapse:'collapse'}}>
       <thead><tr><th>Nome</th><th>E-mail</th><th>Perfil</th><th>Situação</th><th>Ações</th></tr></thead>
       <tbody>{members.map(m => <tr key={m.id}><td>{m.full_name}</td><td>{m.email||'—'}</td>
-        <td>{m.role==='owner'?'Proprietário':'Colaborador'}</td><td>{m.active?'Ativo':'Inativo'}</td><td>{m.role==='collaborator' && m.active ? <button onClick={()=>suspend(m)} style={{padding:8,borderRadius:8,color:'#fff',background:'#9f1239'}}>Suspender</button> : '—'}</td></tr>)}</tbody>
+        <td>{m.role==='owner'?'Proprietário':'Colaborador'}</td><td>{m.active?'Ativo':'Inativo'}</td><td>{writesEnabled && m.role==='collaborator' && m.active ? <button onClick={()=>suspend(m)} style={{padding:8,borderRadius:8,color:'#fff',background:'#9f1239'}}>Suspender</button> : '—'}</td></tr>)}</tbody>
     </table>}
     <section style={{marginTop:30,padding:24,border:'1px solid #64748b',borderRadius:14}}>
       <h2 style={{fontSize:21,fontWeight:700}}>Convidar colaborador</h2>
+      {!writesEnabled && <p role="status" style={{color:'#92400e',fontWeight:700}}>Convites temporariamente indisponíveis: configuração de segurança em andamento.</p>}
       <p>O convidado precisa entrar com o mesmo e-mail e confirmar a conta. Não é possível convidar outro proprietário.</p>
       <form onSubmit={invite} style={{display:'grid',gap:12,maxWidth:460}}>
-        <label>Nome completo<input required minLength={2} maxLength={160} value={name} onChange={e=>setName(e.target.value)} style={{display:'block',width:'100%',padding:10,color:'#111',background:'#fff'}}/></label>
-        <label>E-mail do colaborador<input required type="email" maxLength={254} value={email} onChange={e=>setEmail(e.target.value)} style={{display:'block',width:'100%',padding:10,color:'#111',background:'#fff'}}/></label>
-        <button type="submit" disabled={sending} style={{padding:12,borderRadius:10,color:'#fff',background:'#2563eb'}}>{sending?'Gerando convite...':'Gerar convite de 48 horas'}</button>
+        <label>Nome completo<input disabled={!writesEnabled} required minLength={2} maxLength={160} value={name} onChange={e=>setName(e.target.value)} style={{display:'block',width:'100%',padding:10,color:'#111',background:'#fff'}}/></label>
+        <label>E-mail do colaborador<input disabled={!writesEnabled} required type="email" maxLength={254} value={email} onChange={e=>setEmail(e.target.value)} style={{display:'block',width:'100%',padding:10,color:'#111',background:'#fff'}}/></label>
+        <button type="submit" disabled={!writesEnabled || sending} style={{padding:12,borderRadius:10,color:'#fff',background:'#2563eb'}}>{sending?'Gerando convite...':'Gerar convite de 48 horas'}</button>
       </form>
       {feedback && <p role="status">{feedback}</p>}
       {link && <div><input readOnly aria-label="Link do convite" value={link} style={{width:'100%',padding:10,color:'#111',background:'#fff'}}/>
         <button onClick={async()=>{try{await navigator.clipboard.writeText(link);setFeedback('Link copiado.')}catch{setFeedback('Selecione e copie o link acima.')}}} style={{padding:10,marginTop:8,borderRadius:8,background:'#334155',color:'#fff'}}>Copiar link</button></div>}
     </section>
-    <p style={{marginTop:24,opacity:.75}}>Suspensão disponível para teste após a migração SQL 02D. A transferência de propriedade ainda não está habilitada.</p>
+    <p style={{marginTop:24,opacity:.75}}>Suspensão e convites serão habilitados após validação de permissões. Transferência de propriedade ainda não está disponível.</p>
   </main>;
 }
