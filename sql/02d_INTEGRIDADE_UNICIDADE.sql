@@ -21,8 +21,8 @@ CREATE UNIQUE INDEX IF NOT EXISTS team_members_unique_active_subject
 ON public.team_members (auth_subject)
 WHERE active = true AND auth_subject IS NOT NULL;
 
--- Um único convite pendente por organização+endereço; convites expirados
--- continuam pendentes até revogados, portanto revogue antes de reenviar.
+-- Um único convite pendente por organização+endereço. Convites expirados
+-- devem ser revogados explicitamente no fluxo de emissão antes de um novo convite.
 CREATE UNIQUE INDEX IF NOT EXISTS team_invitations_unique_pending_email
 ON public.team_invitations (organization_id, invited_email)
 WHERE accepted_at IS NULL AND revoked_at IS NULL;
