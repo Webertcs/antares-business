@@ -1,7 +1,7 @@
 import { assertSensitiveWriteAllowed } from '@/lib/equipe/write-guard';
 import { NextRequest, NextResponse } from 'next/server';
 import { randomBytes, createHash } from 'node:crypto';
-import { requireOwner, getDb } from '@/lib/equipe/auth';
+import { requireOwner, getTeamWriteDb } from '@/lib/equipe/auth';
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export async function POST(request: NextRequest) {
@@ -17,7 +17,7 @@ export async function POST(request: NextRequest) {
     const name = typeof body.name === 'string' ? body.name.trim() : '';
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || email.length > 254 || name.length < 2 || name.length > 160)
       return NextResponse.json({ error: 'Informe nome e e-mail válidos' }, { status: 400 });
-    const sql = getDb();
+    const sql = getTeamWriteDb();
     const already = await sql`SELECT id FROM team_members WHERE organization_id = ${owner.organizationId} AND lower(email) = ${email} AND active = true LIMIT 1`;
     if (already.length) return NextResponse.json({ error: 'Integrante já ativo nesta organização' }, { status: 409 });
     const token = randomBytes(32).toString('hex');
