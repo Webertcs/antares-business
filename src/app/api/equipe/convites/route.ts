@@ -26,9 +26,8 @@ export async function POST(request: NextRequest) {
     `;
     // Não enviamos e-mails automaticamente. Proprietário compartilha o link com o destinatário correto.
     // Jamais guardar o token bruto no banco nem escrever o link em logs.
-    const url = new URL('/convite', request.nextUrl.origin);
-    url.searchParams.set('token', token);
-    return NextResponse.json({ invitation: created[0], link: url.toString() }, { status: 201, headers: { 'Cache-Control': 'no-store' } });
+    const link = '/convite?token=' + encodeURIComponent(token);
+    return NextResponse.json({ invitation: created[0], link }, { status: 201, headers: { 'Cache-Control': 'no-store' } });
   } catch {
     return NextResponse.json({ error: 'Não foi possível emitir o convite. Confirme a migração SQL 02D.' }, { status: 500 });
   }
