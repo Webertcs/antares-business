@@ -1,9 +1,22 @@
--- ANTARES BUSINESS / BLOCO 03 / MIGRACAO UNICA
--- SOMENTE apos backup do banco neondb e homologacao em ambiente de teste.
--- Nao executar scripts 03 anteriores separadamente.
--- A criacao de tabelas e funcoes sera revertida se ocorrer erro.
-BEGIN;
-
+-- ANTARES BUSINESS — BLOCO 03 — INSTALACAO ATOMICA NO NEON
+-- Execute no SQL Editor de neondb, como neondb_owner, APOS ponto de recuperacao.
+-- Um unico comando DO: em caso de erro, PostgreSQL reverte toda a instalacao.
+-- Nao requer BEGIN, COMMIT nem ROLLBACK manual.
+-- Nao executa INSERT e nao habilita HTTP / flags de escrita.
+DO $install_crm_03$
+DECLARE
+  v_tables integer;
+  v_functions integer;
+BEGIN
+  IF current_user <> 'neondb_owner' THEN
+    RAISE EXCEPTION 'Execute com neondb_owner, usuario atual: %', current_user;
+  END IF;
+  IF to_regclass('public.organizations') IS NULL
+    OR to_regclass('public.team_members') IS NULL
+    OR to_regrole('antares_team_runtime') IS NULL THEN
+    RAISE EXCEPTION 'Dependencias do Bloco 02 ausentes';
+  END IF;
+  EXECUTE $statement_0$
 CREATE TABLE IF NOT EXISTS public.crm_clients (
  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
  organization_id uuid NOT NULL REFERENCES public.organizations(id),
@@ -14,9 +27,15 @@ CREATE TABLE IF NOT EXISTS public.crm_clients (
  status text NOT NULL DEFAULT 'prospect' CHECK(status IN ('prospect','active','inactive')),
  created_at timestamptz NOT NULL DEFAULT now(), updated_at timestamptz NOT NULL DEFAULT now(),
  UNIQUE(id,organization_id)
-);
-CREATE INDEX IF NOT EXISTS crm_clients_org_name_idx ON public.crm_clients(organization_id,name);
-CREATE INDEX IF NOT EXISTS crm_clients_org_kind_idx ON public.crm_clients(organization_id,kind);
+)
+  $statement_0$;
+  EXECUTE $statement_1$
+CREATE INDEX IF NOT EXISTS crm_clients_org_name_idx ON public.crm_clients(organization_id,name)
+  $statement_1$;
+  EXECUTE $statement_2$
+CREATE INDEX IF NOT EXISTS crm_clients_org_kind_idx ON public.crm_clients(organization_id,kind)
+  $statement_2$;
+  EXECUTE $statement_3$
 CREATE TABLE IF NOT EXISTS public.crm_contacts (
  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
  organization_id uuid NOT NULL REFERENCES public.organizations(id),
@@ -26,8 +45,12 @@ CREATE TABLE IF NOT EXISTS public.crm_contacts (
  is_primary boolean NOT NULL DEFAULT false,
  created_at timestamptz NOT NULL DEFAULT now(),
  FOREIGN KEY (client_id,organization_id) REFERENCES public.crm_clients(id,organization_id)
-);
-CREATE INDEX IF NOT EXISTS crm_contacts_org_client_idx ON public.crm_contacts(organization_id,client_id);
+)
+  $statement_3$;
+  EXECUTE $statement_4$
+CREATE INDEX IF NOT EXISTS crm_contacts_org_client_idx ON public.crm_contacts(organization_id,client_id)
+  $statement_4$;
+  EXECUTE $statement_5$
 CREATE TABLE IF NOT EXISTS public.crm_events (
  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
  organization_id uuid NOT NULL REFERENCES public.organizations(id),
@@ -43,16 +66,28 @@ CREATE TABLE IF NOT EXISTS public.crm_events (
    CHECK(status IN ('lead','quoted','reserved','confirmed','completed','cancelled')),
  venue text, notes text, created_at timestamptz NOT NULL DEFAULT now(),
  FOREIGN KEY (client_id,organization_id) REFERENCES public.crm_clients(id,organization_id)
-);
-CREATE INDEX IF NOT EXISTS crm_events_org_date_idx ON public.crm_events(organization_id,event_date);
-ALTER TABLE public.crm_clients ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.crm_contacts ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.crm_events ENABLE ROW LEVEL SECURITY;
+)
+  $statement_5$;
+  EXECUTE $statement_6$
+CREATE INDEX IF NOT EXISTS crm_events_org_date_idx ON public.crm_events(organization_id,event_date)
+  $statement_6$;
+  EXECUTE $statement_7$
+ALTER TABLE public.crm_clients ENABLE ROW LEVEL SECURITY
+  $statement_7$;
+  EXECUTE $statement_8$
+ALTER TABLE public.crm_contacts ENABLE ROW LEVEL SECURITY
+  $statement_8$;
+  EXECUTE $statement_9$
+ALTER TABLE public.crm_events ENABLE ROW LEVEL SECURITY
+  $statement_9$;
+  EXECUTE $statement_10$
 -- Falha fechada para papeis nao proprietarios: nenhuma policy liberada nesta fase.
-REVOKE ALL ON public.crm_clients,public.crm_contacts,public.crm_events FROM PUBLIC;
-REVOKE ALL ON public.crm_clients,public.crm_contacts,public.crm_events FROM antares_team_runtime;
-
-
+REVOKE ALL ON public.crm_clients,public.crm_contacts,public.crm_events FROM PUBLIC
+  $statement_10$;
+  EXECUTE $statement_11$
+REVOKE ALL ON public.crm_clients,public.crm_contacts,public.crm_events FROM antares_team_runtime
+  $statement_11$;
+  EXECUTE $statement_12$
 CREATE OR REPLACE FUNCTION public.crm_save_client(
  p_subject text,p_id uuid,p_kind text,p_name text,p_email text,
  p_phone text,p_city text,p_notes text,p_status text
@@ -79,7 +114,9 @@ BEGIN
   IF v_id IS NULL THEN RAISE EXCEPTION 'Cliente nao encontrado nesta organizacao'; END IF;
  END IF;
  RETURN v_id;
-END $$;
+END $$
+  $statement_12$;
+  EXECUTE $statement_13$
 CREATE OR REPLACE FUNCTION public.crm_save_contact(
  p_subject text,p_client uuid,p_name text,p_position text,p_email text,
  p_phone text,p_whatsapp boolean,p_primary boolean
@@ -100,7 +137,9 @@ BEGIN
  nullif(btrim(p_phone),''),coalesce(p_whatsapp,false),coalesce(p_primary,false))
  RETURNING id INTO v_id;
  RETURN v_id;
-END $$;
+END $$
+  $statement_13$;
+  EXECUTE $statement_14$
 CREATE OR REPLACE FUNCTION public.crm_save_event(
  p_subject text,p_client uuid,p_title text,p_kind text,p_event_date date,
  p_attendees integer,p_pricing text,p_price numeric,p_fixed numeric,
@@ -125,21 +164,38 @@ BEGIN
  p_price,p_fixed,p_status,nullif(btrim(p_venue),''),nullif(btrim(p_notes),''))
  RETURNING id INTO v_id;
  RETURN v_id;
-END $$;
-REVOKE ALL ON FUNCTION public.crm_save_client(text,uuid,text,text,text,text,text,text,text) FROM PUBLIC;
-REVOKE ALL ON FUNCTION public.crm_save_contact(text,uuid,text,text,text,text,boolean,boolean) FROM PUBLIC;
-REVOKE ALL ON FUNCTION public.crm_save_event(text,uuid,text,text,date,integer,text,numeric,numeric,text,text,text) FROM PUBLIC;
-GRANT EXECUTE ON FUNCTION public.crm_save_client(text,uuid,text,text,text,text,text,text,text) TO antares_team_runtime;
-GRANT EXECUTE ON FUNCTION public.crm_save_contact(text,uuid,text,text,text,text,text,boolean,boolean) TO antares_team_runtime;
-GRANT EXECUTE ON FUNCTION public.crm_save_event(text,uuid,text,text,date,integer,text,numeric,numeric,text,text,text) TO antares_team_runtime;
-
-COMMIT;
--- CHECK FINAL (esperado: 3 tabelas e 3 funcoes):
-SELECT
- (SELECT count(*) FROM pg_class WHERE oid IN (
- 'public.crm_clients'::regclass, 'public.crm_contacts'::regclass,'public.crm_events'::regclass)) AS tabelas,
- (SELECT count(*) FROM pg_proc WHERE oid IN (
- 'public.crm_save_client(text,uuid,text,text,text,text,text,text,text)'::regprocedure,
- 'public.crm_save_contact(text,uuid,text,text,text,text,boolean,boolean)'::regprocedure,
- 'public.crm_save_event(text,uuid,text,text,date,integer,text,numeric,numeric,text,text,text)'::regprocedure
- ) AND prosecdef) AS funcoes_restritas;
+END $$
+  $statement_14$;
+  EXECUTE $statement_15$
+REVOKE ALL ON FUNCTION public.crm_save_client(text,uuid,text,text,text,text,text,text,text) FROM PUBLIC
+  $statement_15$;
+  EXECUTE $statement_16$
+REVOKE ALL ON FUNCTION public.crm_save_contact(text,uuid,text,text,text,text,boolean,boolean) FROM PUBLIC
+  $statement_16$;
+  EXECUTE $statement_17$
+REVOKE ALL ON FUNCTION public.crm_save_event(text,uuid,text,text,date,integer,text,numeric,numeric,text,text,text) FROM PUBLIC
+  $statement_17$;
+  EXECUTE $statement_18$
+GRANT EXECUTE ON FUNCTION public.crm_save_client(text,uuid,text,text,text,text,text,text,text) TO antares_team_runtime
+  $statement_18$;
+  EXECUTE $statement_19$
+GRANT EXECUTE ON FUNCTION public.crm_save_contact(text,uuid,text,text,text,text,text,boolean,boolean) TO antares_team_runtime
+  $statement_19$;
+  EXECUTE $statement_20$
+GRANT EXECUTE ON FUNCTION public.crm_save_event(text,uuid,text,text,date,integer,text,numeric,numeric,text,text,text) TO antares_team_runtime
+  $statement_20$;
+  SELECT count(*) INTO v_tables FROM pg_class
+  WHERE oid IN (to_regclass('public.crm_clients'),
+    to_regclass('public.crm_contacts'), to_regclass('public.crm_events'));
+  SELECT count(*) INTO v_functions FROM pg_proc
+  WHERE oid IN (
+    to_regprocedure('public.crm_save_client(text,uuid,text,text,text,text,text,text,text)'),
+    to_regprocedure('public.crm_save_contact(text,uuid,text,text,text,text,boolean,boolean)'),
+    to_regprocedure('public.crm_save_event(text,uuid,text,text,date,integer,text,numeric,numeric,text,text,text)')
+  ) AND prosecdef;
+  IF v_tables <> 3 OR v_functions <> 3 THEN
+    RAISE EXCEPTION 'Instalacao incompleta: tabelas %, funcoes %',v_tables,v_functions;
+  END IF;
+  RAISE NOTICE 'BLOCO 03 INSTALADO: % tabelas e % funcoes restritas',v_tables,v_functions;
+END
+$install_crm_03$;
