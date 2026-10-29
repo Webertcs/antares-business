@@ -30,7 +30,7 @@ export default function EquipeClient() {
       });
       const result = await response.json();
       if (!response.ok) throw new Error(result.error || 'Não foi possível gerar o convite');
-      setLink(result.link);
+      setLink(new URL(result.link, window.location.origin).toString());
       setFeedback('Convite gerado. Copie o link e envie somente ao endereço convidado. Válido por 48 horas.');
     } catch (e) { setFeedback(e instanceof Error ? e.message : 'Falha ao gerar convite'); }
     finally { setSending(false); }
