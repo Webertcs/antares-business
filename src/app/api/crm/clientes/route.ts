@@ -44,15 +44,9 @@ export async function POST(request: import('next/server').NextRequest) {
   try {
     const { getTeamWriteDb } = await import('@/lib/equipe/auth');
     const sql = getTeamWriteDb();
-    const permitted = await sql`SELECT
-      current_user='antares_team_runtime' AS ok_role,
-      has_function_privilege(current_user,'public.crm_save_client(text,uuid,text,text,text,text,text,text,text)','EXECUTE') AS ok_client,
-      has_function_privilege(current_user,'public.crm_save_contact(text,uuid,text,text,text,text,boolean,boolean)','EXECUTE') AS ok_contact,
-      has_function_privilege(current_user,'public.crm_save_event(text,uuid,text,text,date,integer,text,numeric,numeric,text,text,text)','EXECUTE') AS ok_event`;
-    if(!permitted[0]?.ok_role || !permitted[0]?.ok_client || !permitted[0]?.ok_contact || !permitted[0]?.ok_event)
-      return NextResponse.json({error:'Permissões CRM não homologadas.'},{status:503});
     const safety = await sql`SELECT
-      NOT rolsuper AND NOT rolbypassrls AND rolcanlogin AS safe_role,
+      current_user = 'antares_team_runtime' AND
+      r.rolcanlogin AND NOT r.rolsuper AND NOT r.rolbypassrls AS safe_role,
       (SELECT count(*) = 3 FROM pg_class c
         WHERE c.oid IN ('public.crm_clients'::regclass,
           'public.crm_contacts'::regclass,'public.crm_events'::regclass)
@@ -71,8 +65,8 @@ export async function POST(request: import('next/server').NextRequest) {
             SELECT 1 FROM aclexplode(coalesce(p.proacl,acldefault('f',p.proowner))) acl
             WHERE acl.grantee=0 AND acl.privilege_type='EXECUTE'
           )) AS safe_functions
-      FROM pg_roles WHERE rolname=current_user`;
-    if(!safety[0]?.safe_role || !safety[0]?.safe_tables || !safety[0]?.safe_functions)
+      FROM pg_roles r WHERE r.rolname=current_user`;
+    if (!safety[0]?.safe_role || !safety[0]?.safe_tables || !safety[0]?.safe_functions)
       return NextResponse.json({error:'Isolamento do CRM não verificado.'},{status:503});
     const body = await request.json();
     const str=(v:unknown,max=4000)=>typeof v==='string'?v.trim().slice(0,max):'';
