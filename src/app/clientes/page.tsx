@@ -16,6 +16,34 @@ export default function ClientsPage() {
  const [query,setQuery]=useState('');
  const [kind,setKind]=useState('all');
  const [selected,setSelected]=useState<string|null>(null);
+ const [form,setForm]=useState<'client'|'contact'|'event'|null>(null);
+ const [editing,setEditing]=useState<string|null>(null);
+ const [fields,setFields]=useState<Record<string,string>>({});
+ const [feedback,setFeedback]=useState('');
+ const writesEnabled=false; // liberado apenas após verificação E2E e segurança multitenant
+ function openForm(type:'client'|'contact'|'event',client?:Client){
+   setForm(type);setEditing(type==='client'?client?.id||null:null);
+   setFields(type==='client'?{name:client?.name||'',kind:client?.kind||'school',
+    email:client?.email||'',phone:client?.phone||'',city:client?.city||'',
+    notes:client?.notes||'',status:client?.status||'prospect'}:
+    type==='contact'?{name:'',position:'',email:'',phone:''}:
+    {title:'',kind:'presentation',date:'',attendees:'',pricing:'per_student',price:'',fixed:'',
+      status:'lead',venue:'',notes:''});
+ }
+ const setField=(key:string,value:string)=>setFields(f=>({...f,[key]:value}));
+ async function submit(e:React.FormEvent<HTMLFormElement>){
+   e.preventDefault();if(!writesEnabled || !form)return;
+   const body={...fields,action:form,id:editing,clientId:selected,
+     whatsapp:fields.whatsapp==='true',primary:fields.primary==='true'};
+   setFeedback('');
+   try {
+     const r=await fetch('/api/crm/clientes',{method:'POST',
+       headers:{'Content-Type':'application/json'},cache:'no-store',body:JSON.stringify(body)});
+     const data=await r.json();
+     if(!r.ok)throw new Error(data.error||'Falha ao salvar');
+     setFeedback('Registro salvo. Atualize para consultar.');setForm(null);
+   } catch(err){setFeedback(err instanceof Error?err.message:'Falha ao salvar');}
+ }
  useEffect(()=>{
    const ctrl=new AbortController();
    fetch('/api/crm/clientes',{cache:'no-store',signal:ctrl.signal})
@@ -38,7 +66,9 @@ export default function ClientsPage() {
    <div><p style={{letterSpacing:2,fontSize:12}}>ANTARES BUSINESS · BLOCO 03</p>
     <h1 style={{fontSize:30,fontWeight:750}}>Clientes e Eventos</h1>
     <p>Escolas, empresas, associações e apresentações em um só lugar.</p></div>
+   <div style={{display:'flex',gap:8,alignItems:'center',flexWrap:'wrap'}}>
    <span style={{border:'1px solid #eab308',padding:'8px 12px',borderRadius:10}}>Cadastros em homologação</span>
+   <button type="button" disabled={!writesEnabled} onClick={()=>openForm('client')} style={{padding:12,borderRadius:9,background:'#2563eb',color:'#fff',opacity:writesEnabled?1:.5}}>+ Novo cliente</button></div>
   </div>
   <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(160px,1fr))',gap:12,marginBottom:20}}>
    {[['Clientes',clients.length],['Escolas',countBy('school')],['Empresas',countBy('company')],['Associações',countBy('association')],['Eventos',events.length]].map(([t,n])=>
@@ -60,22 +90,51 @@ export default function ClientsPage() {
     <thead><tr>{['Cliente','Tipo','Cidade','Situação','Detalhes'].map(x=><th key={x} style={{padding:'12px 8px',borderBottom:'1px solid #94a3b8'}}>{x}</th>)}</tr></thead>
     <tbody>{filtered.map(c=><tr key={c.id}><td style={{padding:10,borderBottom:'1px solid #94a3b8'}}><strong>{c.name}</strong></td>
     <td>{kinds[c.kind]||c.kind}</td><td>{c.city||'—'}</td><td>{statuses[c.status]||c.status}</td>
-    <td><button onClick={()=>setSelected(c.id===selected?null:c.id)} style={{padding:8,borderRadius:8,background:'#2563eb',color:'white'}}>{c.id===selected?'Fechar':'Ver histórico'}</button></td></tr>)}</tbody></table></div>}
+    <td><button onClick={()=>setSelected(c.id===selected?null:c.id)} style={{padding:8,borderRadius:8,background:'#2563eb',color:'white'}} >{c.id===selected?'Fechar':'Ver histórico'}</button> {writesEnabled&&<button onClick={()=>openForm('client',c)}>Editar</button>}</td></tr>)}</tbody></table></div>}
   </section>
   {active&&<section style={{border:'1px solid #94a3b8',borderRadius:14,padding:20}}>
    <h2 style={{fontSize:23,fontWeight:700}}>{active.name}</h2>
    <p>{kinds[active.kind]} · {active.city||'Cidade não informada'} · {statuses[active.status]||active.status}</p>
    <p>{active.email||'Sem e-mail'} · {active.phone||'Sem telefone'}</p>
    {active.notes&&<p>Observações: {active.notes}</p>}
-   <h3 style={{fontSize:18,marginTop:20}}>Contatos ({selectedContacts.length})</h3>
+   <h3 style={{fontSize:18,marginTop:20}}>Contatos ({selectedContacts.length}) {writesEnabled&&<button onClick={()=>openForm('contact')}>+ Contato</button>}</h3>
    {selectedContacts.length===0?<p>Sem contatos cadastrados.</p>:
     <ul>{selectedContacts.map(c=><li key={c.id}>{c.full_name}{c.position?' · '+c.position:''}
      {c.is_primary?' · Principal':''} · {c.phone||c.email||'Sem contato'}</li>)}</ul>}
-   <h3 style={{fontSize:18,marginTop:20}}>Apresentações e oportunidades ({selectedEvents.length})</h3>
+   <h3 style={{fontSize:18,marginTop:20}}>Apresentações e oportunidades ({selectedEvents.length}) {writesEnabled&&<button onClick={()=>openForm('event')}>+ Evento</button>}</h3>
    {selectedEvents.length===0?<p>Sem eventos registrados.</p>:
     <ul>{selectedEvents.map(e=><li key={e.id}>{e.title} · {e.event_date||'Sem data'} · {eventStatuses[e.status]||e.status}
     {e.expected_attendees!=null?' · '+e.expected_attendees+' participantes':''}</li>)}</ul>}
   </section>}
+  {feedback&&<p role="status">{feedback}</p>}
+  {form&&<section style={{border:'1px solid #94a3b8',borderRadius:14,padding:20,marginTop:20}}>
+   <h2 style={{fontSize:22}}>{form==='client'?(editing?'Editar cliente':'Novo cliente'):form==='contact'?'Novo contato':'Nova apresentação'}</h2>
+   <form onSubmit={submit} style={{display:'grid',gap:12}}>
+    {(form==='client'?[
+      ['name','Nome'],['kind','Tipo'],['email','E-mail'],['phone','Telefone'],['city','Cidade'],['status','Situação'],['notes','Observações']
+    ]:form==='contact'?[
+      ['name','Nome'],['position','Cargo/Função'],['email','E-mail'],['phone','Telefone'],['whatsapp','WhatsApp'],['primary','Contato principal']
+    ]:[
+      ['title','Título'],['kind','Tipo de evento'],['date','Data'],['attendees','Participantes'],
+      ['pricing','Cobrança'],['price','Valor por participante'],['fixed','Valor fechado'],
+      ['status','Situação'],['venue','Local'],['notes','Observações']
+    ]).map(([key,label])=><label key={key}>{label}
+      {(key==='kind'||key==='status'||key==='pricing'||key==='whatsapp'||key==='primary')?
+       <select value={fields[key]||''} onChange={e=>setField(key,e.target.value)} style={{display:'block',padding:10,width:'100%'}}>
+        {(key==='kind'?(form==='client'?Object.entries(kinds):
+         [['presentation','Apresentação'],['corporate','Corporativo'],['private','Particular'],['other','Outro']]):
+         key==='status'?(form==='client'?Object.entries(statuses):Object.entries(eventStatuses)):
+         key==='pricing'?[['per_student','Por participante'],['fixed','Valor fechado'],['complimentary','Gratuito']]:
+         [['false','Não'],['true','Sim']]).map(([v,l])=><option key={v} value={v}>{l}</option>)}
+       </select>:
+       <input value={fields[key]||''} onChange={e=>setField(key,e.target.value)}
+        type={key==='date'?'date':key==='email'?'email':key==='attendees'||key==='price'||key==='fixed'?'number':'text'}
+        step={key==='price'||key==='fixed'?'0.01':undefined}
+        required={key==='name'||key==='title'}
+        style={{display:'block',padding:10,width:'100%',color:'#111',background:'#fff'}}/>}</label>)}
+    <div><button type="submit" disabled={!writesEnabled}>Salvar</button>
+    <button type="button" onClick={()=>setForm(null)} style={{marginLeft:12}}>Cancelar</button></div>
+   </form></section>}
   <p style={{marginTop:20,fontSize:13,opacity:.8}}>Dados consultados por organização autenticada. Gravações permanecem bloqueadas até o teste de isolamento multempresa.</p>
  </main>;
 }
