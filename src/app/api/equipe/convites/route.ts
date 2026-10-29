@@ -1,9 +1,12 @@
+import { assertSensitiveWriteAllowed } from '@/lib/equipe/write-guard';
 import { NextRequest, NextResponse } from 'next/server';
 import { randomBytes, createHash } from 'node:crypto';
 import { requireOwner, getDb } from '@/lib/equipe/auth';
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export async function POST(request: NextRequest) {
+  const denied = assertSensitiveWriteAllowed(request);
+  if (denied) return denied;
   const owner = await requireOwner();
   if (!owner) return NextResponse.json({ error: 'Acesso exclusivo do proprietário' }, { status: 403 });
   const contentLength = Number(request.headers.get('content-length') || '0');
