@@ -1,3 +1,4 @@
+import { assertSensitiveWriteAllowed } from '@/lib/equipe/write-guard';
 import { NextRequest, NextResponse } from 'next/server';
 import { createHash } from 'node:crypto';
 import { auth } from '@/lib/auth/server';
@@ -5,6 +6,8 @@ import { getDb } from '@/lib/equipe/auth';
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export async function POST(request: NextRequest) {
+  const denied = assertSensitiveWriteAllowed(request);
+  if (denied) return denied;
   const { data: session } = await auth.getSession();
   const user = session?.user;
   if (!user?.id || !user.email || user.emailVerified !== true)
