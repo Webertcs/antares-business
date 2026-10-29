@@ -1,9 +1,12 @@
+import { assertSensitiveWriteAllowed } from '@/lib/equipe/write-guard';
 import { NextRequest, NextResponse } from 'next/server';
 import { requireOwner, getDb } from '@/lib/equipe/auth';
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
 export async function POST(request: NextRequest) {
+  const denied = assertSensitiveWriteAllowed(request);
+  if (denied) return denied;
   const owner = await requireOwner();
   if (!owner) return NextResponse.json({ error: 'Apenas o proprietário pode suspender colaboradores.' }, { status: 403 });
   if (Number(request.headers.get('content-length') || 0) > 1024) return NextResponse.json({ error: 'Requisição grande demais' }, { status: 413 });
