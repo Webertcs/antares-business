@@ -2,6 +2,11 @@ import 'server-only';
 import { auth } from '@/lib/auth/server';
 import { neon } from '@neondatabase/serverless';
 
+export function getTeamWriteDb() {
+  if (!process.env.DATABASE_URL_TEAM_RUNTIME) throw new Error('DATABASE_URL_TEAM_RUNTIME ausente');
+  return neon(process.env.DATABASE_URL_TEAM_RUNTIME);
+}
+
 export function getDb() {
   if (!process.env.DATABASE_URL) throw new Error('DATABASE_URL ausente');
   return neon(process.env.DATABASE_URL);
