@@ -29,3 +29,8 @@ Cadeia de dependências observada:
 2. Verificar atualização oficial do SDK Neon Auth que remova dependências inseguras.
 3. Caso não exista correção compatível, documentar arquitetura alternativa de autenticação e migração controlada sem interromper acesso.
 4. Testar login, senha, recuperação, validação de e-mail, conta desativada, isolamento de tenant e build.
+
+## Esclarecimento sobre falha crítica (29/10/2026)
+O repositório oficial Better Auth lista **GHSA-965c-763c-88jm** como falha crítica relacionada ao uso de OAuth state como magic link. Não é possível afirmar, apenas com o resumo do `npm audit`, se ela é precisamente a falha crítica instalada neste lockfile, nem se o fluxo Neon gerenciado expõe a condição de exploração.
+
+Para atribuição sem conjectura, conferir localmente o campo `vulnerabilities.better-auth.via` em `npm audit --json` e mapear a versão instalada de `better-auth`, bem como o uso efetivo de OAuth. Não publicar até a correção ou mitigação validada.
