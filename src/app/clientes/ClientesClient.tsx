@@ -20,6 +20,8 @@ export default function ClientsPage({ writesEnabled }: { writesEnabled: boolean 
  const [editing,setEditing]=useState<string|null>(null);
  const [fields,setFields]=useState<Record<string,string>>({});
  const [feedback,setFeedback]=useState('');
+ const [revision,setRevision]=useState(0);
+ const [saving,setSaving]=useState(false);
  function openForm(type:'client'|'contact'|'event',client?:Client){
    setForm(type);setEditing(type==='client'?client?.id||null:null);
    setFields(type==='client'?{name:client?.name||'',kind:client?.kind||'school',
@@ -34,25 +36,26 @@ export default function ClientsPage({ writesEnabled }: { writesEnabled: boolean 
    e.preventDefault();if(!writesEnabled || !form)return;
    const body={...fields,action:form,id:editing,clientId:selected,
      whatsapp:fields.whatsapp==='true',primary:fields.primary==='true'};
-   setFeedback('');
+   setFeedback('');setSaving(true);
    try {
      const r=await fetch('/api/crm/clientes',{method:'POST',
        headers:{'Content-Type':'application/json'},cache:'no-store',body:JSON.stringify(body)});
      const data=await r.json();
      if(!r.ok)throw new Error(data.error||'Falha ao salvar');
-     setFeedback('Registro salvo. Atualize para consultar.');setForm(null);
+     setFeedback('Registro salvo com sucesso.');setForm(null);setRevision(n=>n+1);
    } catch(err){setFeedback(err instanceof Error?err.message:'Falha ao salvar');}
+   finally {setSaving(false);}
  }
  useEffect(()=>{
    const ctrl=new AbortController();
    fetch('/api/crm/clientes',{cache:'no-store',signal:ctrl.signal})
     .then(async res=>{const d=await res.json();if(!res.ok)throw new Error(d.error||'Não foi possível carregar clientes.');
-      setClients(d.clients||[]);setContacts(d.contacts||[]);setEvents(d.events||[]);
+      setClients(d.clients||[]);setContacts(d.contacts||[]);setEvents(d.events||[]);setError('');
     })
     .catch(e=>{if(e.name!=='AbortError')setError(e instanceof Error?e.message:'Erro de consulta')})
     .finally(()=>setLoading(false));
    return ()=>ctrl.abort();
- },[]);
+ },[revision]);
  const filtered=useMemo(()=>clients.filter(c=>(kind==='all'||c.kind===kind)&&
    (c.name+' '+(c.city||'')+' '+(c.email||'')).toLocaleLowerCase('pt-BR').includes(query.toLocaleLowerCase('pt-BR'))),[clients,kind,query]);
  const active=clients.find(c=>c.id===selected);
@@ -66,7 +69,7 @@ export default function ClientsPage({ writesEnabled }: { writesEnabled: boolean 
     <h1 style={{fontSize:30,fontWeight:750}}>Clientes e Eventos</h1>
     <p>Escolas, empresas, associações e apresentações em um só lugar.</p></div>
    <div style={{display:'flex',gap:8,alignItems:'center',flexWrap:'wrap'}}>
-   <span style={{border:'1px solid #eab308',padding:'8px 12px',borderRadius:10}}>Cadastros em homologação</span>
+   <span style={{border:'1px solid #eab308',padding:'8px 12px',borderRadius:10}}>{writesEnabled?"Cadastros liberados":"Cadastros em homologação"}</span>
    <button type="button" disabled={!writesEnabled} onClick={()=>openForm('client')} style={{padding:12,borderRadius:9,background:'#2563eb',color:'#fff',opacity:writesEnabled?1:.5}}>+ Novo cliente</button></div>
   </div>
   <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(160px,1fr))',gap:12,marginBottom:20}}>
@@ -131,9 +134,9 @@ export default function ClientsPage({ writesEnabled }: { writesEnabled: boolean 
         step={key==='price'||key==='fixed'?'0.01':undefined}
         required={key==='name'||key==='title'}
         style={{display:'block',padding:10,width:'100%',color:'#111',background:'#fff'}}/>}</label>)}
-    <div><button type="submit" disabled={!writesEnabled}>Salvar</button>
+    <div><button type="submit" disabled={!writesEnabled||saving}>{saving?"Salvando...":"Salvar"}</button>
     <button type="button" onClick={()=>setForm(null)} style={{marginLeft:12}}>Cancelar</button></div>
    </form></section>}
-  <p style={{marginTop:20,fontSize:13,opacity:.8}}>Dados consultados por organização autenticada. Gravações permanecem bloqueadas até o teste de isolamento multempresa.</p>
+  <p style={{marginTop:20,fontSize:13,opacity:.8}}>Dados restritos à organização autenticada. {writesEnabled?"Apenas o proprietário pode cadastrar e alterar registros.":"Gravações bloqueadas até a homologação de segurança."}</p>
  </main>;
 }
