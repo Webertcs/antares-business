@@ -7,6 +7,7 @@ DO $install_crm_03$
 DECLARE
   v_tables integer;
   v_functions integer;
+  v_func record;
 BEGIN
   IF current_user <> 'neondb_owner' THEN
     RAISE EXCEPTION 'Execute com neondb_owner, usuario atual: %', current_user;
@@ -166,33 +167,26 @@ BEGIN
  RETURN v_id;
 END $$
   $statement_14$;
-  EXECUTE $statement_15$
-REVOKE ALL ON FUNCTION public.crm_save_client(text,uuid,text,text,text,text,text,text,text) FROM PUBLIC
-  $statement_15$;
-  EXECUTE $statement_16$
-REVOKE ALL ON FUNCTION public.crm_save_contact(text,uuid,text,text,text,text,boolean,boolean) FROM PUBLIC
-  $statement_16$;
-  EXECUTE $statement_17$
-REVOKE ALL ON FUNCTION public.crm_save_event(text,uuid,text,text,date,integer,text,numeric,numeric,text,text,text) FROM PUBLIC
-  $statement_17$;
-  EXECUTE $statement_18$
-GRANT EXECUTE ON FUNCTION public.crm_save_client(text,uuid,text,text,text,text,text,text,text) TO antares_team_runtime
-  $statement_18$;
-  EXECUTE $statement_19$
-GRANT EXECUTE ON FUNCTION public.crm_save_contact(text,uuid,text,text,text,text,text,boolean,boolean) TO antares_team_runtime
-  $statement_19$;
-  EXECUTE $statement_20$
-GRANT EXECUTE ON FUNCTION public.crm_save_event(text,uuid,text,text,date,integer,text,numeric,numeric,text,text,text) TO antares_team_runtime
-  $statement_20$;
+  -- Nao presumir assinaturas: validar as funcoes criadas nesta transacao.
+  SELECT count(*) INTO v_functions FROM pg_proc p
+  WHERE p.pronamespace='public'::regnamespace AND p.prosecdef
+    AND p.proname IN ('crm_save_client','crm_save_contact','crm_save_event');
+  IF v_functions <> 3 THEN
+    RAISE EXCEPTION 'Esperadas 3 funcoes CRM SECURITY DEFINER; encontradas %',v_functions;
+  END IF;
+  FOR v_func IN
+    SELECT p.oid::regprocedure AS signature FROM pg_proc p
+    WHERE p.pronamespace='public'::regnamespace
+      AND p.prosecdef
+      AND p.proname IN ('crm_save_client','crm_save_contact','crm_save_event')
+  LOOP
+    EXECUTE format('REVOKE ALL ON FUNCTION %s FROM PUBLIC', v_func.signature);
+    EXECUTE format('GRANT EXECUTE ON FUNCTION %s TO antares_team_runtime',v_func.signature);
+  END LOOP;
   SELECT count(*) INTO v_tables FROM pg_class
   WHERE oid IN (to_regclass('public.crm_clients'),
     to_regclass('public.crm_contacts'), to_regclass('public.crm_events'));
-  SELECT count(*) INTO v_functions FROM pg_proc
-  WHERE oid IN (
-    to_regprocedure('public.crm_save_client(text,uuid,text,text,text,text,text,text,text)'),
-    to_regprocedure('public.crm_save_contact(text,uuid,text,text,text,text,boolean,boolean)'),
-    to_regprocedure('public.crm_save_event(text,uuid,text,text,date,integer,text,numeric,numeric,text,text,text)')
-  ) AND prosecdef;
+  -- A contagem de funcoes foi validada acima, sem usar assinaturas manuais.
   IF v_tables <> 3 OR v_functions <> 3 THEN
     RAISE EXCEPTION 'Instalacao incompleta: tabelas %, funcoes %',v_tables,v_functions;
   END IF;
