@@ -1,33 +1,55 @@
 import 'server-only';
 import { NextRequest, NextResponse } from 'next/server';
+import { getDb } from './auth';
 
-/** Fail closed by default until Neon migrations, roles, RLS and audit are homologated. */
-export function assertSensitiveWriteAllowed(request: NextRequest): NextResponse | null {
-  if (process.env.ANTARES_TEAM_WRITES_ENABLED !== 'true') {
-    return NextResponse.json(
-      { error: 'Gestão de equipe ainda não homologada neste ambiente.' },
-      { status: 503, headers: { 'Cache-Control': 'no-store' } }
-    );
-  }
+/**
+ * Fail closed until the deployment uses a restricted runtime role and
+ * tenant policies. An environment flag alone cannot bypass this check.
+ */
+export async function assertSensitiveWriteAllowed(request: NextRequest): Promise<NextResponse | null> {
+  const deny = (message: string, status = 503) =>
+    NextResponse.json({ error: message }, { status, headers: { 'Cache-Control': 'no-store' } });
 
-  // Use a fixed configured origin in production; never trust Host/X-Forwarded-Host.
+  if (process.env.ANTARES_TEAM_WRITES_ENABLED !== 'true')
+    return deny('Gestão de equipe ainda não homologada.');
+
+  const expectedRole = process.env.ANTARES_DB_RUNTIME_ROLE;
   const configured = process.env.ANTARES_APP_ORIGIN;
-  if (process.env.NODE_ENV === 'production' && !configured) {
-    return NextResponse.json({ error: 'Origem da aplicação não configurada.' }, { status: 503 });
-  }
-  let expected: string;
+  if (!expectedRole || !configured) return deny('Configuração segura de aplicação incompleta.');
+
+  let expectedOrigin: string;
+  try { expectedOrigin = new URL(configured).origin; }
+  catch { return deny('Origem da aplicação inválida.'); }
+
+  if (request.headers.get('origin') !== expectedOrigin) return deny('Origem não autorizada.', 403);
+  if (request.headers.get('content-type')?.split(';')[0].trim().toLowerCase() !== 'application/json')
+    return deny('Envie JSON.', 415);
+
   try {
-    expected = new URL(configured || request.nextUrl.origin).origin;
+    const sql = getDb();
+    const rows = await sql`
+      SELECT
+        current_user AS runtime_role,
+        r.rolsuper,
+        r.rolbypassrls,
+        bool_and(c.relrowsecurity AND c.relowner <> r.oid) AS rls_enforced,
+        count(DISTINCT p.polname) AS policy_count
+      FROM pg_roles r
+      JOIN pg_class c ON c.oid IN (
+        'public.team_members'::regclass,
+        'public.team_invitations'::regclass,
+        'public.team_security_events'::regclass
+      )
+      LEFT JOIN pg_policy p ON p.polrelid = c.oid
+      WHERE r.rolname = current_user
+      GROUP BY r.oid, r.rolsuper, r.rolbypassrls
+    `;
+    const row = rows[0];
+    if (!row || row.runtime_role !== expectedRole || row.rolsuper ||
+        row.rolbypassrls || row.rls_enforced !== true || Number(row.policy_count) === 0)
+      return deny('Permissões e RLS do banco ainda não homologados.');
   } catch {
-    return NextResponse.json({ error: 'Origem da aplicação inválida.' }, { status: 503 });
-  }
-  const origin = request.headers.get('origin');
-  if (!origin || origin !== expected) {
-    return NextResponse.json({ error: 'Origem não autorizada.' }, { status: 403 });
-  }
-  const contentType = request.headers.get('content-type')?.split(';')[0]?.trim().toLowerCase();
-  if (contentType !== 'application/json') {
-    return NextResponse.json({ error: 'Envie JSON.' }, { status: 415 });
+    return deny('Não foi possível validar as permissões do banco.');
   }
   return null;
 }
