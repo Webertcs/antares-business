@@ -33,7 +33,23 @@ if (!url) {
       x.can_issue===true && x.can_accept===true && x.can_revoke===true && x.can_suspend===true;
     console.log(ok ? 'PASSOU: role restrita e funções autorizadas; nenhuma escrita foi realizada.' :
       'BLOQUEADO: permissões da conexão não correspondem à política restrita.');
-    if(!ok)process.exitCode=1;
+    if (!ok) {
+      const checks = {
+        role_correta: x?.role_name === 'antares_team_runtime',
+        login_ativo: x?.login_enabled === true,
+        sem_bypass_rls: x?.bypass_rls === false,
+        sem_superusuario: x?.superuser === false,
+        sem_select_direto: x?.can_read_members === false,
+        sem_update_direto: x?.can_update_members === false,
+        executar_emitir: x?.can_issue === true,
+        executar_aceitar: x?.can_accept === true,
+        executar_revogar: x?.can_revoke === true,
+        executar_suspender: x?.can_suspend === true
+      };
+      for (const [name, passed] of Object.entries(checks))
+        console.log((passed ? 'OK: ' : 'FALHA: ') + name);
+      process.exitCode=1;
+    }
   } catch {
     console.error('BLOQUEADO: conexão falhou ou o papel não tem permissão de inspeção.');
     process.exitCode=1;
