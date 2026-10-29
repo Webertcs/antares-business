@@ -51,6 +51,29 @@ export async function POST(request: import('next/server').NextRequest) {
       has_function_privilege(current_user,'public.crm_save_event(text,uuid,text,text,date,integer,text,numeric,numeric,text,text,text)','EXECUTE') AS ok_event`;
     if(!permitted[0]?.ok_role || !permitted[0]?.ok_client || !permitted[0]?.ok_contact || !permitted[0]?.ok_event)
       return NextResponse.json({error:'Permissões CRM não homologadas.'},{status:503});
+    const safety = await sql`SELECT
+      NOT rolsuper AND NOT rolbypassrls AND rolcanlogin AS safe_role,
+      (SELECT count(*) = 3 FROM pg_class c
+        WHERE c.oid IN ('public.crm_clients'::regclass,
+          'public.crm_contacts'::regclass,'public.crm_events'::regclass)
+          AND c.relrowsecurity
+          AND NOT has_table_privilege(current_user,c.oid,'SELECT')
+          AND NOT has_table_privilege(current_user,c.oid,'INSERT')
+          AND NOT has_table_privilege(current_user,c.oid,'UPDATE')
+          AND NOT has_table_privilege(current_user,c.oid,'DELETE')) AS safe_tables,
+      (SELECT count(*) = 3 FROM pg_proc p
+        WHERE p.pronamespace='public'::regnamespace
+          AND p.proname IN ('crm_save_client','crm_save_contact','crm_save_event')
+          AND p.prosecdef
+          AND pg_get_userbyid(p.proowner)='neondb_owner'
+          AND has_function_privilege(current_user,p.oid,'EXECUTE')
+          AND NOT EXISTS (
+            SELECT 1 FROM aclexplode(coalesce(p.proacl,acldefault('f',p.proowner))) acl
+            WHERE acl.grantee=0 AND acl.privilege_type='EXECUTE'
+          )) AS safe_functions
+      FROM pg_roles WHERE rolname=current_user`;
+    if(!safety[0]?.safe_role || !safety[0]?.safe_tables || !safety[0]?.safe_functions)
+      return NextResponse.json({error:'Isolamento do CRM não verificado.'},{status:503});
     const body = await request.json();
     const str=(v:unknown,max=4000)=>typeof v==='string'?v.trim().slice(0,max):'';
     const uuid=(v:unknown)=>typeof v==='string' && /^[a-f0-9]{8}(-[a-f0-9]{4}){3}-[a-f0-9]{12}$/i.test(v)?v:null;
