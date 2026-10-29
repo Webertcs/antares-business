@@ -27,10 +27,14 @@ export async function GET() {
 }
 export async function POST(request: import('next/server').NextRequest) {
   // Habilitar separadamente dos convites do Bloco 02, após homologação.
-  if (process.env.ANTARES_CRM_WRITES_ENABLED !== 'true')
+  if (process.env.ANTARES_CRM_WRITES_ENABLED !== 'true' ||
+      process.env.ANTARES_CRM_SECURITY_APPROVED !== 'true')
     return NextResponse.json({ error: 'Cadastro ainda em homologação.' }, {status:503});
   const origin = process.env.ANTARES_APP_ORIGIN;
-  if (!origin || request.headers.get('origin') !== new URL(origin).origin ||
+  let expectedOrigin: string;
+  try { expectedOrigin = new URL(origin || '').origin; }
+  catch { return NextResponse.json({error:'Origem da aplicação não configurada.'},{status:503}); }
+  if (request.headers.get('origin') !== expectedOrigin ||
       request.headers.get('content-type')?.split(';')[0]?.trim().toLowerCase() !== 'application/json')
     return NextResponse.json({error:'Origem ou conteúdo não autorizado.'},{status:403});
   if (Number(request.headers.get('content-length')||'0') > 10000)
