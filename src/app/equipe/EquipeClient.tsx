@@ -19,6 +19,19 @@ export default function EquipeClient() {
       .finally(() => { if (alive) setLoading(false); });
     return () => { alive = false; };
   }, []);
+  async function suspend(member: Member) {
+    if (member.role !== 'collaborator' || !member.active || !window.confirm('Suspender acesso de ' + member.full_name + '?')) return;
+    try {
+      const response = await fetch('/api/equipe/suspender', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ memberId: member.id }), cache: 'no-store'
+      });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error || 'Falha ao suspender');
+      setMembers(previous => previous.map(item => item.id === member.id ? { ...item, active: false } : item));
+      setFeedback('Acesso suspenso. A conta permanece registrada para auditoria.');
+    } catch (error) { setFeedback(error instanceof Error ? error.message : 'Falha ao suspender acesso'); }
+  }
   async function invite(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setSending(true); setFeedback(''); setLink('');
@@ -40,9 +53,9 @@ export default function EquipeClient() {
     <h1 style={{fontSize:28,fontWeight:750}}>Equipe e permissões</h1>
     <p>Gerencie colaboradores vinculados ao seu planetário.</p>
     {loading ? <p>Carregando...</p> : error ? <p role="alert">{error}</p> : <table style={{width:'100%',textAlign:'left',borderCollapse:'collapse'}}>
-      <thead><tr><th>Nome</th><th>E-mail</th><th>Perfil</th><th>Situação</th></tr></thead>
+      <thead><tr><th>Nome</th><th>E-mail</th><th>Perfil</th><th>Situação</th><th>Ações</th></tr></thead>
       <tbody>{members.map(m => <tr key={m.id}><td>{m.full_name}</td><td>{m.email||'—'}</td>
-        <td>{m.role==='owner'?'Proprietário':'Colaborador'}</td><td>{m.active?'Ativo':'Inativo'}</td></tr>)}</tbody>
+        <td>{m.role==='owner'?'Proprietário':'Colaborador'}</td><td>{m.active?'Ativo':'Inativo'}</td><td>{m.role==='collaborator' && m.active ? <button onClick={()=>suspend(m)} style={{padding:8,borderRadius:8,color:'#fff',background:'#9f1239'}}>Suspender</button> : '—'}</td></tr>)}</tbody>
     </table>}
     <section style={{marginTop:30,padding:24,border:'1px solid #64748b',borderRadius:14}}>
       <h2 style={{fontSize:21,fontWeight:700}}>Convidar colaborador</h2>
@@ -56,6 +69,6 @@ export default function EquipeClient() {
       {link && <div><input readOnly aria-label="Link do convite" value={link} style={{width:'100%',padding:10,color:'#111',background:'#fff'}}/>
         <button onClick={async()=>{try{await navigator.clipboard.writeText(link);setFeedback('Link copiado.')}catch{setFeedback('Selecione e copie o link acima.')}}} style={{padding:10,marginTop:8,borderRadius:8,background:'#334155',color:'#fff'}}>Copiar link</button></div>}
     </section>
-    <p style={{marginTop:24,opacity:.75}}>Suspensão de acessos e transferência de propriedade exigem auditoria e serão liberadas depois da homologação.</p>
+    <p style={{marginTop:24,opacity:.75}}>Suspensão disponível para teste após a migração SQL 02D. A transferência de propriedade ainda não está habilitada.</p>
   </main>;
 }
