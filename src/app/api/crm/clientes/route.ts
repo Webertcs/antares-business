@@ -25,6 +25,62 @@ export async function GET() {
       {status:503,headers:{'Cache-Control':'no-store'}});
   }
 }
-export async function POST() {
- return NextResponse.json({error:'Cadastros bloqueados até homologação da escrita multempresa.'},{status:503});
+export async function POST(request: import('next/server').NextRequest) {
+  // Habilitar separadamente dos convites do Bloco 02, após homologação.
+  if (process.env.ANTARES_CRM_WRITES_ENABLED !== 'true')
+    return NextResponse.json({ error: 'Cadastro ainda em homologação.' }, {status:503});
+  const origin = process.env.ANTARES_APP_ORIGIN;
+  if (!origin || request.headers.get('origin') !== new URL(origin).origin ||
+      request.headers.get('content-type')?.split(';')[0]?.trim().toLowerCase() !== 'application/json')
+    return NextResponse.json({error:'Origem ou conteúdo não autorizado.'},{status:403});
+  if (Number(request.headers.get('content-length')||'0') > 10000)
+    return NextResponse.json({error:'Requisição grande demais.'},{status:413});
+  const ctx = await requireMember();
+  if (!ctx || ctx.role!=='owner') return NextResponse.json({error:'Somente proprietário.'},{status:403});
+  try {
+    const { getTeamWriteDb } = await import('@/lib/equipe/auth');
+    const sql = getTeamWriteDb();
+    const permitted = await sql`SELECT
+      current_user='antares_team_runtime' AS ok_role,
+      has_function_privilege(current_user,'public.crm_save_client(text,uuid,text,text,text,text,text,text,text)','EXECUTE') AS ok_client,
+      has_function_privilege(current_user,'public.crm_save_contact(text,uuid,text,text,text,text,boolean,boolean)','EXECUTE') AS ok_contact,
+      has_function_privilege(current_user,'public.crm_save_event(text,uuid,text,text,date,integer,text,numeric,numeric,text,text,text)','EXECUTE') AS ok_event`;
+    if(!permitted[0]?.ok_role || !permitted[0]?.ok_client || !permitted[0]?.ok_contact || !permitted[0]?.ok_event)
+      return NextResponse.json({error:'Permissões CRM não homologadas.'},{status:503});
+    const body = await request.json();
+    const str=(v:unknown,max=4000)=>typeof v==='string'?v.trim().slice(0,max):'';
+    const uuid=(v:unknown)=>typeof v==='string' && /^[a-f0-9]{8}(-[a-f0-9]{4}){3}-[a-f0-9]{12}$/i.test(v)?v:null;
+    if (body.action==='client') {
+      const rows=await sql`SELECT public.crm_save_client(
+        ${ctx.user.id},${uuid(body.id)}::uuid,${str(body.kind,30)},${str(body.name,180)},
+        ${str(body.email,254)},${str(body.phone,40)},${str(body.city,120)},
+        ${str(body.notes)},${str(body.status,30)}) AS id`;
+      return NextResponse.json({id:rows[0]?.id},{status:201});
+    }
+    if(body.action==='contact' && uuid(body.clientId)){
+      const rows=await sql`SELECT public.crm_save_contact(
+        ${ctx.user.id},${uuid(body.clientId)}::uuid,${str(body.name,160)},
+        ${str(body.position,120)},${str(body.email,254)},${str(body.phone,40)},
+        ${body.whatsapp===true},${body.primary===true}) AS id`;
+      return NextResponse.json({id:rows[0]?.id},{status:201});
+    }
+    if(body.action==='event' && uuid(body.clientId)){
+      const date=str(body.date,10);
+      if(date && !/^\\d{4}-\\d{2}-\\d{2}$/.test(date))
+        return NextResponse.json({error:'Data inválida.'},{status:400});
+      const participants=body.attendees===null||body.attendees===''?null:Number(body.attendees);
+      const price=body.price===null||body.price===''?null:Number(body.price);
+      const fixed=body.fixed===null||body.fixed===''?null:Number(body.fixed);
+      if([participants,price,fixed].some(v=>v!==null&&!Number.isFinite(v)))
+        return NextResponse.json({error:'Valores inválidos.'},{status:400});
+      const rows=await sql`SELECT public.crm_save_event(
+        ${ctx.user.id},${uuid(body.clientId)}::uuid,${str(body.title,180)},${str(body.kind,30)},
+        ${date||null}::date,${participants},${str(body.pricing,30)},
+        ${price},${fixed},${str(body.status,30)},${str(body.venue,200)},${str(body.notes)}) AS id`;
+      return NextResponse.json({id:rows[0]?.id},{status:201});
+    }
+    return NextResponse.json({error:'Operação inválida.'},{status:400});
+  } catch {
+    return NextResponse.json({error:'Operação não realizada. Confira dados e permissões.'},{status:409});
+  }
 }
