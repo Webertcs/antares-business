@@ -1,6 +1,6 @@
 import 'server-only';
 import { NextRequest, NextResponse } from 'next/server';
-import { getDb } from './auth';
+import { getTeamWriteDb } from './auth';
 
 /**
  * Fail closed until the deployment uses a restricted runtime role and
@@ -26,7 +26,7 @@ export async function assertSensitiveWriteAllowed(request: NextRequest): Promise
     return deny('Envie JSON.', 415);
 
   try {
-    const sql = getDb();
+    const sql = getTeamWriteDb();
     const rows = await sql`
       SELECT
         current_user AS runtime_role,
