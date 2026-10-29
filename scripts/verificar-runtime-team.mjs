@@ -1,5 +1,6 @@
 // ANTARES - teste de conexão restrita sem exibir credenciais nem consultar dados.
-import { loadEnvConfig } from '@next/env';
+import nextEnv from '@next/env';
+const { loadEnvConfig } = nextEnv;
 import { neon } from '@neondatabase/serverless';
 loadEnvConfig(process.cwd());
 const url = process.env.DATABASE_URL_TEAM_RUNTIME;
