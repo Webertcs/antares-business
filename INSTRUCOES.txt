@@ -1,0 +1,9 @@
+ANTARES BUSINESS - Ajuste 01F
+
+1. Faça backup da pasta antares-crm.
+2. Copie os dois arquivos de src/app deste ZIP para C:\desenvolvimento\antares-crm\src\app, substituindo os arquivos de mesmo nome.
+3. Mantenha public/images/logo-antares.png sem mudanças.
+4. Com o servidor rodando, abra http://localhost:3000 e confira o contraste.
+5. A vitrine e a agenda nao foram alteradas.
+
+Este ajuste sobrepoe uma copia da marca com o trecho do texto branco na barra lateral, usando CSS; o simbolo azul original e preservado.

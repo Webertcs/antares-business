@@ -1,0 +1,25 @@
+ANTARES BUSINESS — BLOCO 02D / ETAPA SEGURA (STAGING)
+
+Este pacote NÃO implementa convites, alteração de função, exclusão de usuários,
+ou correção automática das dependências vulneráveis. Essas ações exigem revisão do
+código local completo para não abrir falhas de autorização. O pacote acrescenta
+uma tela de consulta isolada por organization_id e uma API restrita a owner.
+
+INSTALAÇÃO
+1. Faça backup do projeto e mantenha .env.local fora de qualquer ZIP.
+2. Copie a pasta src deste pacote para o projeto (merge, sem substituir arquivos
+   atuais). Nenhum arquivo existente deverá ser sobrescrito.
+3. Execute npm.cmd run build.
+4. Execute npm.cmd run dev e abra http://localhost:3000/equipe.
+5. Rode VERIFICAR-SEGURANCA.ps1 na pasta raiz do projeto para coletar auditoria.
+6. Rode sql/01_readonly_auditoria.sql no Neon, sem incluir dados confidenciais em capturas.
+
+LIMITES / PRÓXIMO FECHAMENTO
+- Fluxo de convite pendente: requer token de uso único, hash no banco,
+  expiração, identidade confirmada e rate limit.
+- Mutação de membros pendente: requer transações, validação no servidor,
+  defesa contra last-owner e registro de auditoria.
+- Auditoria npm pendente: 10 alertas previamente identificados, incluindo 1 crítico;
+  não liberar produção enquanto não corrigidos/testados.
+- Para fechar o bloco com segurança é necessário o ZIP atualizado do código-fonte
+  LOCAL (src, package.json, package-lock.json, next.config.*, sem .env/.git/node_modules).

@@ -1,0 +1,30 @@
+# Credenciais e variáveis de ambiente
+.env
+.env.*
+!.env.example
+
+# Dependências e arquivos gerados
+node_modules/
+.next/
+out/
+
+# Arquivos temporários
+*.log
+*.tsbuildinfo
+# Credenciais
+.env
+.env.*
+!.env.example
+!.env.sample
+.neon
+
+# Dependencias e compilacao
+node_modules/
+.next/
+out/
+dist/
+*.tsbuildinfo
+
+# Arquivos temporarios
+*.log
+*.zip
