@@ -1,7 +1,7 @@
 import { assertSensitiveWriteAllowed } from '@/lib/equipe/write-guard';
 import { NextRequest, NextResponse } from 'next/server';
 import { randomBytes, createHash } from 'node:crypto';
-import { requireOwner, getTeamWriteDb } from '@/lib/equipe/auth';
+import { requireOwner, getTeamWriteDb, getDb } from '@/lib/equipe/auth';
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export async function POST(request: NextRequest) {
@@ -33,5 +33,24 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ invitation: created[0], link }, { status: 201, headers: { 'Cache-Control': 'no-store' } });
   } catch {
     return NextResponse.json({ error: 'Não foi possível emitir o convite. Confirme a migração SQL 02D.' }, { status: 500 });
+  }
+}
+
+export async function GET() {
+  const owner = await requireOwner();
+  if (!owner) return NextResponse.json({ error: 'Sem autorização.' }, { status: 403 });
+  try {
+    const sql = getDb();
+    const invitations = await sql`
+      SELECT id, invited_email, invited_name, expires_at, created_at
+      FROM public.team_invitations
+      WHERE organization_id = ${owner.organizationId}
+        AND accepted_at IS NULL AND revoked_at IS NULL
+        AND expires_at > now()
+      ORDER BY created_at DESC LIMIT 100
+    `;
+    return NextResponse.json({ invitations }, { headers: { 'Cache-Control': 'no-store' } });
+  } catch {
+    return NextResponse.json({ error: 'Falha ao consultar convites.' }, { status: 500 });
   }
 }
