@@ -1,8 +1,10 @@
 'use client';
 import { useEffect, useState } from 'react';
+type Invitation = { id: string; invited_name: string; invited_email: string; expires_at: string };
 type Member = { id: string; full_name: string; email: string | null; role: string; active: boolean };
 export default function EquipeClient({ writesEnabled }: { writesEnabled: boolean }) {
   const [members, setMembers] = useState<Member[]>([]);
+  const [invitations, setInvitations] = useState<Invitation[]>([]);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(true);
   const [name, setName] = useState('');
@@ -19,6 +21,29 @@ export default function EquipeClient({ writesEnabled }: { writesEnabled: boolean
       .finally(() => { if (alive) setLoading(false); });
     return () => { alive = false; };
   }, []);
+  async function refreshInvitations() {
+    try {
+      const response = await fetch('/api/equipe/convites', { cache: 'no-store' });
+      if (!response.ok) return;
+      const data = await response.json();
+      setInvitations(Array.isArray(data.invitations) ? data.invitations : []);
+    } catch { /* Não impede a listagem de membros. */ }
+  }
+  useEffect(() => { void refreshInvitations(); }, []);
+  async function revoke(invitation: Invitation) {
+    if (!writesEnabled || !window.confirm('Revogar o convite para ' + invitation.invited_email + '?')) return;
+    setFeedback('');
+    try {
+      const response = await fetch('/api/equipe/convites/revogar', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        cache: 'no-store', body: JSON.stringify({ invitationId: invitation.id })
+      });
+      const result = await response.json();
+      if (!response.ok) throw new Error(result.error || 'Falha ao revogar convite');
+      setInvitations(current => current.filter(item => item.id !== invitation.id));
+      setFeedback('Convite revogado com sucesso.');
+    } catch (e) { setFeedback(e instanceof Error ? e.message : 'Erro ao revogar convite'); }
+  }
   async function suspend(member: Member) {
     if (!writesEnabled || member.role !== 'collaborator' || !member.active || !window.confirm('Suspender acesso de ' + member.full_name + '?')) return;
     try {
@@ -45,6 +70,7 @@ export default function EquipeClient({ writesEnabled }: { writesEnabled: boolean
       const result = await response.json();
       if (!response.ok) throw new Error(result.error || 'Não foi possível gerar o convite');
       setLink(new URL(result.link, window.location.origin).toString());
+      void refreshInvitations();
       setFeedback('Convite gerado. Copie o link e envie somente ao endereço convidado. Válido por 48 horas.');
     } catch (e) { setFeedback(e instanceof Error ? e.message : 'Falha ao gerar convite'); }
     finally { setSending(false); }
@@ -70,6 +96,14 @@ export default function EquipeClient({ writesEnabled }: { writesEnabled: boolean
       {feedback && <p role="status">{feedback}</p>}
       {link && <div><input readOnly aria-label="Link do convite" value={link} style={{width:'100%',padding:10,color:'#111',background:'#fff'}}/>
         <button onClick={async()=>{try{await navigator.clipboard.writeText(link);setFeedback('Link copiado.')}catch{setFeedback('Selecione e copie o link acima.')}}} style={{padding:10,marginTop:8,borderRadius:8,background:'#334155',color:'#fff'}}>Copiar link</button></div>}
+    </section>
+    <section style={{marginTop:24}}>
+      <h2 style={{fontSize:21,fontWeight:700}}>Convites pendentes</h2>
+      {invitations.length === 0 ? <p>Nenhum convite pendente.</p> :
+        <ul style={{display:'grid',gap:12}}>{invitations.map(inv => <li key={inv.id}>
+          <strong>{inv.invited_name}</strong> — {inv.invited_email} (até {new Date(inv.expires_at).toLocaleDateString('pt-BR')})
+          {writesEnabled && <button onClick={()=>revoke(inv)} style={{marginLeft:12,padding:8,borderRadius:8,color:'#fff',background:'#9f1239'}}>Revogar</button>}
+        </li>)}</ul>}
     </section>
     <p style={{marginTop:24,opacity:.75}}>Suspensão e convites serão habilitados após validação de permissões. Transferência de propriedade ainda não está disponível.</p>
   </main>;
