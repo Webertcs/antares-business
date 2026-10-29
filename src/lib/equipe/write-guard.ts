@@ -45,9 +45,14 @@ export async function assertSensitiveWriteAllowed(request: NextRequest): Promise
           FROM pg_proc p
           WHERE p.pronamespace='public'::regnamespace AND p.prosecdef
             AND pg_get_userbyid(p.proowner)='neondb_owner'
-            AND p.proname IN ('issue_team_invitation','accept_team_invitation',
-                              'revoke_team_invitation','suspend_team_collaborator')
+            AND p.oid IN (
+              'public.issue_team_invitation(text,text,text,text)'::regprocedure,
+              'public.accept_team_invitation(text,text,text)'::regprocedure,
+              'public.revoke_team_invitation(text,uuid)'::regprocedure,
+              'public.suspend_team_collaborator(text,uuid)'::regprocedure
+            )
             AND has_function_privilege(r.oid,p.oid,'EXECUTE')
+            AND NOT has_function_privilege('public',p.oid,'EXECUTE')
         ) AS allowed_functions
       FROM pg_roles r WHERE r.rolname=current_user
     `;
