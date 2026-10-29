@@ -66,7 +66,7 @@ export async function POST(request: import('next/server').NextRequest) {
     }
     if(body.action==='event' && uuid(body.clientId)){
       const date=str(body.date,10);
-      if(date && !/^\\d{4}-\\d{2}-\\d{2}$/.test(date))
+      if(date && !/^\d{4}-\d{2}-\d{2}$/.test(date))
         return NextResponse.json({error:'Data inválida.'},{status:400});
       const participants=body.attendees===null||body.attendees===''?null:Number(body.attendees);
       const price=body.price===null||body.price===''?null:Number(body.price);
