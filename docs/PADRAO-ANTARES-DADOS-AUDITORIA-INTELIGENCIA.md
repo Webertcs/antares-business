@@ -55,3 +55,41 @@ Entrada de navegação: **Relatórios & Inteligência** (visível ao proprietár
 - Dados ausentes causam aviso claro, não números inferidos.
 - Auditoria registra geração e exportação quando pertinente, sem despejar PII em logs.
 - Desempenho e acessibilidade adequados em celular e desktop.
+
+## Especificação aprovada — tela Relatórios (29/10/2026)
+
+### Filtros globais
+- Período: este mês, últimos três meses, ano atual, datas personalizadas.
+- Comparação: período imediatamente anterior, mesmo período do ano anterior.
+- Região/cidade, tipo de cliente (escola pública, particular, empresa e outros), escola, cúpula e tipo de evento.
+- Os filtros devem ser aplicados também às exportações, respeitando fuso da organização e isolamento por tenant.
+
+### Indicadores de topo
+Receita no período (com seletor de base: contratada, faturada, recebida), apresentações **realizadas**, ticket médio (definir denominador), conversão de propostas e **margem de contribuição** com custos classificados. Não denominar margem de contribuição de lucro líquido.
+
+### Relatórios
+1. Receita & vendas: série temporal, receita por escola, ranking de clientes e segmento.
+2. Agenda & ocupação: disponibilidade registrada, utilização, dias mais cheios e ociosidade.
+3. Performance por escola: ranking, recorrência, comparação por período e margem por atendimento.
+4. Funil de vendas: etapas, quantidades, conversão e tempo médio com critérios de coorte.
+5. Financeiro detalhado: entradas/saídas, categorias, estornos, margem, contas pendentes e conciliação.
+6. Contratos: fechados, em negociação, pendentes, cancelados e valores por estado.
+7. Equipe/deslocamento: opcional conforme dados; custo de viagens por evento, por km e região quando documentado.
+8. Qualidade dos dados: métricas incompletas, custos não atribuídos, duplicidades e alertas de confiabilidade.
+
+### Interação e exports
+- Gráficos selecionáveis, filtros compartilhados com tabelas detalhadas, navegação até registros de origem.
+- PDF de apresentação com logo do planetário e data/filtros/fonte, gerado no servidor.
+- Excel (.xlsx) com abas, dados tabulares, fórmulas auditáveis e metadados dos filtros.
+- Histórico de exportações por usuário/organização quando pertinente, com retenção conforme LGPD.
+
+### Diferenciais para planetário móvel
+- Rentabilidade por apresentação/rota/cúpula, distinguindo receita e custos diretos.
+- Sazonalidade escolar, campanhas e oportunidades por cidade.
+- Explicações/alertas com indicadores verificáveis; IA não preenche lacunas nem inventa causalidade.
+
+### Ordem de implementação
+- Blocos 02D–06: captura padronizada, isolamento de organizações, auditoria e qualidade de dados.
+- **07A:** filtros, KPIs e relatórios determinísticos conectados aos dados reais.
+- **07B:** comparação, exportação PDF/Excel e insights baseados em regras transparentes.
+- **10:** IA avançada e previsões após histórico suficiente e validação.
