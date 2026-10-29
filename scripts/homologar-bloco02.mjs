@@ -10,7 +10,7 @@ const tests = [
     const keys=['DATABASE_URL','NEON_AUTH_BASE_URL','NEON_AUTH_COOKIE_SECRET'];
     return keys.every(key => {
       const val=process.env[key];
-      return Boolean(val && !/^(SUA_|SEU_|SENHA_|HOST$)/.test(val));
+      return Boolean(val && !/^(SUA_|SEU_|SENHA_|HOST$)/.test(val.trim()));
     });
   }],
   ['Convites bloqueados durante homologação', () =>
@@ -25,10 +25,11 @@ const tests = [
     return r.status===0;
   }],
   ['Auditoria de dependências de produção', () => {
-    const cmd=process.platform==='win32'?'npm.cmd':'npm';
-    const r=spawnSync(cmd,['audit','--omit=dev','--audit-level=high'],{
-      stdio:'ignore',shell:process.platform==='win32'
-    });
+    const cmd=process.platform==='win32'?'cmd.exe':'npm';
+    const args=process.platform==='win32'
+      ? ['/d','/s','/c','npm.cmd audit --omit=dev --audit-level=high']
+      : ['audit','--omit=dev','--audit-level=high'];
+    const r=spawnSync(cmd,args,{stdio:'ignore',shell:false});
     return r.status===0;
   }]
 ];
