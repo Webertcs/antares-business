@@ -52,7 +52,13 @@ export async function assertSensitiveWriteAllowed(request: NextRequest): Promise
               'public.suspend_team_collaborator(text,uuid)'::regprocedure
             )
             AND has_function_privilege(r.oid,p.oid,'EXECUTE')
-            AND NOT has_function_privilege('public',p.oid,'EXECUTE')
+            AND NOT EXISTS (
+              SELECT 1 FROM aclexplode(
+                coalesce(p.proacl,acldefault('f',p.proowner))
+              ) privilege
+              WHERE privilege.grantee = 0
+                AND privilege.privilege_type = 'EXECUTE'
+            )
         ) AS allowed_functions
       FROM pg_roles r WHERE r.rolname=current_user
     `;
