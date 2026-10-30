@@ -40,6 +40,22 @@ export default function OficinaV1(){
  .then(data=>{setSnapshot(data);setDbStatus('Leitura do Neon disponível — dados reais, somente consulta');})
  .catch(e=>{if(e?.name!=='AbortError')setDbStatus('Banco comercial ainda não implantado — demonstração local isolada');});
  return()=>controller.abort();},[]);
+ const [realView,setRealView]=useState(false);
+ const realItems=useMemo(()=>{
+  if(!snapshot)return [] as {label:string;items:{label:string;detail:string}[]}[];
+  const arr=(v:unknown)=>Array.isArray(v)?v as Record<string,unknown>[]:[];
+  const name=(v:unknown)=>v==null?'':String(v);
+  return [
+   {label:'Clientes',items:arr(snapshot.clients).map(x=>({label:name(x.name),detail:name(x.kind)+' · '+name(x.city)}))},
+   {label:'Contatos',items:arr(snapshot.contacts).map(x=>({label:name(x.full_name),detail:name(x.position)}))},
+   {label:'Eventos',items:arr(snapshot.events).map(x=>({label:name(x.title),detail:name(x.event_date)}))},
+   {label:'Propostas',items:arr(snapshot.proposals).map(x=>({label:name(x.title),detail:name(x.status)+' · R$ '+name(x.total)}))},
+   {label:'Contratos',items:arr(snapshot.contracts).map(x=>({label:name(x.proposal_id),detail:name(x.status)}))},
+   {label:'Cúpulas',items:arr(snapshot.domes).map(x=>({label:name(x.name),detail:x.active?'Ativa':'Inativa'}))},
+   {label:'Reservas',items:arr(snapshot.bookings).map(x=>({label:name(x.starts_at),detail:name(x.status)}))},
+   {label:'Lançamentos',items:arr(snapshot.ledger).map(x=>({label:name(x.description),detail:name(x.status)+' · R$ '+name(x.amount)}))}
+  ];
+ },[snapshot]);
  const [module,setModule]=useState<Module>('visao');
  const [records,setRecords]=useState<Record<Module,Row[]>>(initial);
  const [editing,setEditing]=useState<string|null>(null);
@@ -119,6 +135,10 @@ export default function OficinaV1(){
     <div className="oficina-heading"><div><p>FLUXOS DO PRODUTO</p><h1>{fieldInfo?.title||names[module]}</h1><span>{fieldInfo?.description||(module==='visao'?'Todos os módulos da etapa 1 em um só lugar':module==='relatorios'?'Indicadores e exportações para conferência':'Vitrine e captação de orçamentos')}</span></div>{fieldInfo&&<button className="oficina-primary" onClick={()=>start()}><Plus size={17}/> Novo registro</button>}</div>
     <div className="oficina-warning" role="status"><strong>Estado do banco:</strong> {dbStatus}. Nenhuma gravação é enviada ao Neon nesta oficina.</div>
     <div className="oficina-warning" role="status"><strong>Etapa 1 — Demonstração funcional:</strong> os registros permanecem apenas nesta tela enquanto ela estiver aberta. Recarregar a página apaga os rascunhos. Não há envio ao Neon, convites reais ou pagamentos.</div>
+    {module==='visao'&&snapshot&&<section className="oficina-panel" style={{marginBottom:16}}>
+    <button className="oficina-secondary" onClick={()=>setRealView(x=>!x)}>{realView?'Ocultar registros do Neon':'Consultar registros reais do Neon'}</button>
+    {realView&&<div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(240px,1fr))',gap:16,marginTop:16}}>{realItems.map(group=><div key={group.label}><h3>{group.label} ({group.items.length})</h3><div className="oficina-records">{group.items.slice(0,15).map((entry,i)=><div key={i}><div><strong>{entry.label}</strong><span>{entry.detail}</span></div></div>)}{group.items.length===0&&<p>Sem registros</p>}</div></div>)}</div>}
+   </section>}
     {module==='visao'&&snapshot&&<section className="oficina-panel" style={{marginBottom:16}}><h2>Retrato real do Neon · somente leitura</h2><p>Consulta autenticada e isolada por organização. Os registros abaixo não são misturados com a demonstração temporária.</p><div className="oficina-stats">{[['Clientes reais',snapshot.clients.length],['Contatos',snapshot.contacts.length],['Propostas reais',snapshot.proposals.length],['Reservas reais',snapshot.bookings.length]].map(([label,value])=><div key={label}><small>{label}</small><strong>{value}</strong></div>)}</div><Link href="/operacoes">Abrir operações persistidas →</Link></section>}
     {module==='visao'&&<>
      <div className="oficina-stats">{[['Clientes',records.clientes.length],['Propostas',records.propostas.length],['Próximas apresentações',future],['Saldo realizado',money(received-spent)]].map(([k,v])=><div key={k}><small>{k}</small><strong>{v}</strong></div>)}</div>
