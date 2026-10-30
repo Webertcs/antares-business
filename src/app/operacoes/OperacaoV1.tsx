@@ -7,15 +7,43 @@ const empty:State={clients:[],proposals:[],contracts:[],domes:[],bookings:[],led
 const money=(value:unknown)=>new Intl.NumberFormat('pt-BR',{style:'currency',currency:'BRL'}).format(Number(value)||0);
 const date=(value:unknown)=>value?new Intl.DateTimeFormat('pt-BR',{dateStyle:'short',timeZone:'America/Sao_Paulo'}).format(new Date(String(value))):'—';
 const dateTime=(value:unknown)=>value?new Intl.DateTimeFormat('pt-BR',{dateStyle:'short',timeStyle:'short',timeZone:'America/Sao_Paulo'}).format(new Date(String(value))):'—';
-export default function OperacaoV1(){
+export default function OperacaoV1({writesEnabled}:{writesEnabled:boolean}){
  const [data,setData]=useState<State>(empty),[error,setError]=useState(''),[loading,setLoading]=useState(true);
  const [tab,setTab]=useState<'comercial'|'contratos'|'agenda'|'financeiro'|'auditoria'>('comercial');
  const [term,setTerm]=useState('');
+ const [revision,setRevision]=useState(0);
+ const [form,setForm]=useState<'proposal'|'contract'|null>(null);
+ const [fields,setFields]=useState<Record<string,string>>({});
+ const [busy,setBusy]=useState(false);
+ const [feedback,setFeedback]=useState('');
+ function openForm(type:'proposal'|'contract'){
+  setForm(type);setFeedback('');
+  setFields(type==='proposal'?{clientId:'',title:'',model:'per_student',attendees:'30',
+    unitPrice:'10',fixedPrice:'0',discount:'0',deposit:'0',validUntil:'',notes:''}:
+    {proposalId:'',mode:'written',terms:''});
+ }
+ function field(k:string,v:string){setFields(old=>({...old,[k]:v}));}
+ async function submit(e:React.FormEvent<HTMLFormElement>){
+  e.preventDefault();if(!writesEnabled||!form||busy)return;
+  const n=(k:string)=>Number(fields[k]||0);
+  const body=form==='proposal'?{action:'proposal',...fields,
+    attendees:n('attendees'),unitPrice:n('unitPrice'),fixedPrice:n('fixedPrice'),
+    discount:n('discount'),deposit:n('deposit')}: {action:'contract',...fields};
+  setBusy(true);setFeedback('');
+  try{
+   const response=await fetch('/api/business/gravar',{method:'POST',
+    headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+   const result=await response.json();
+   if(!response.ok)throw Error(result.error||'Não foi possível salvar');
+   setForm(null);setRevision(v=>v+1);setFeedback('Registro comercial salvo com sucesso.');
+  }catch(e){setFeedback(e instanceof Error?e.message:'Erro ao salvar');}
+  finally{setBusy(false);}
+ }
  useEffect(()=>{const ctrl=new AbortController();
   fetch('/api/business',{cache:'no-store',signal:ctrl.signal}).then(async r=>{const b=await r.json();if(!r.ok)throw Error(b.error||'Falha na consulta');setData(b);})
   .catch(e=>{if(e.name!=='AbortError')setError(e instanceof Error?e.message:'Consulta indisponível');})
   .finally(()=>setLoading(false));return()=>ctrl.abort();
- },[]);
+ },[revision]);
  const filtered=useMemo(()=>data.proposals.filter(x=>String(x.title||'').toLowerCase().includes(term.toLowerCase())||String(x.client_name||'').toLowerCase().includes(term.toLowerCase())),[data.proposals,term]);
  const forecast=data.proposals.filter(p=>['accepted','sent','negotiating'].includes(String(p.status))).reduce((sum,p)=>sum+Number(p.total||0),0);
  const cash=data.ledger.filter(x=>x.status==='settled').reduce((sum,x)=>sum+(x.category==='income'?1:-1)*Number(x.amount||0),0);
@@ -37,11 +65,11 @@ export default function OperacaoV1(){
  {([['comercial','Propostas'],['contratos','Contratos'],['agenda','Agenda e cúpulas'],['financeiro','Financeiro'],['auditoria','Auditoria']] as const).map(([k,l])=>
  <button key={k} onClick={()=>setTab(k)} aria-current={tab===k?'page':undefined}
  style={{padding:'10px 15px',borderRadius:10,background:tab===k?'#1d4ed8':'#e2e8f0',color:tab===k?'#fff':'#0f172a'}}>{l}</button>)}</nav>
- {tab==='comercial'&&<section style={base}><h2 style={{fontSize:21,fontWeight:650}}>Propostas e orçamentos</h2><p>Valores previstos, negociação e condições comerciais por cliente.</p>
+ {tab==='comercial'&&<section style={base}><h2 style={{fontSize:21,fontWeight:650}}>Propostas e orçamentos</h2>{writesEnabled&&<button onClick={()=>openForm('proposal')} style={{padding:10,background:'#2563eb',color:'#fff',borderRadius:8}}>+ Nova proposta</button>}<p>Valores previstos, negociação e condições comerciais por cliente.</p>
   <input aria-label="Pesquisar proposta" placeholder="Pesquisar proposta ou cliente" value={term} onChange={e=>setTerm(e.target.value)} style={{padding:11,border:'1px solid #94a3b8',borderRadius:8,width:'100%',margin:'10px 0'}}/>
   <Rows heads={['Proposta','Cliente','Total','Situação','Validade']}
    rows={filtered.map(p=>[p.title,p.client_name,money(p.total),p.status,date(p.valid_until)])}/></section>}
- {tab==='contratos'&&<section style={base}><h2 style={{fontSize:21,fontWeight:650}}>Contratos e confirmações</h2>
+ {tab==='contratos'&&<section style={base}><h2 style={{fontSize:21,fontWeight:650}}>Contratos e confirmações</h2>{writesEnabled&&<button onClick={()=>openForm('contract')} style={{padding:10,background:'#2563eb',color:'#fff',borderRadius:8}}>+ Novo contrato</button>}
   <p>Confirmação documental, verbal ou pelo WhatsApp, vinculada à proposta.</p>
   <Rows heads={['Proposta','Modalidade','Situação','Confirmação']}
   rows={data.contracts.map(c=>[c.proposal_title,c.confirmation_mode,c.status,dateTime(c.confirmed_at)])}/></section>}
@@ -58,7 +86,42 @@ export default function OperacaoV1(){
   <Rows heads={['Quando','Ação','Entidade','ID']}
   rows={data.audit.map(x=>[dateTime(x.created_at),x.action,x.entity_type,x.entity_id])}/></section>}
  </>}
- <p style={{fontSize:13,marginTop:18,opacity:.8}}>Módulos V1 em implantação. Nenhum botão de gravação será apresentado antes da validação da segurança e da migração.</p>
+ {feedback&&<p role="status" style={{marginTop:12}}>{feedback}</p>}
+ {form&&<section style={{...base,marginTop:18}}>
+  <h2 style={{fontWeight:700,fontSize:21}}>{form==='proposal'?'Nova proposta comercial':'Novo contrato'}</h2>
+  <form onSubmit={submit} style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(220px,1fr))',gap:12,marginTop:14}}>
+   {form==='proposal'?<>
+    <Field label="Cliente" field="clientId" value={fields.clientId} onChange={field} options={data.clients.map(c=>({value:String(c.id),label:String(c.name)}))}/>
+    <Field label="Título" field="title" value={fields.title} onChange={field} required/>
+    <Field label="Cobrança" field="model" value={fields.model} onChange={field} options={[
+     {value:'per_student',label:'Por aluno'},{value:'fixed',label:'Valor fechado'},
+     {value:'complimentary',label:'Gratuito'}]}/>
+    <Field label="Participantes" field="attendees" value={fields.attendees} onChange={field} type="number"/>
+    <Field label="Preço por aluno (R$)" field="unitPrice" value={fields.unitPrice} onChange={field} type="number"/>
+    <Field label="Preço fechado (R$)" field="fixedPrice" value={fields.fixedPrice} onChange={field} type="number"/>
+    <Field label="Desconto (R$)" field="discount" value={fields.discount} onChange={field} type="number"/>
+    <Field label="Sinal (R$)" field="deposit" value={fields.deposit} onChange={field} type="number"/>
+    <Field label="Validade" field="validUntil" value={fields.validUntil} onChange={field} type="date"/>
+    <Field label="Observações" field="notes" value={fields.notes} onChange={field}/>
+    <div style={{gridColumn:'1/-1'}}>Total estimado: <strong>{money(Math.max(0,
+      (fields.model==='per_student'?Number(fields.attendees||0)*Number(fields.unitPrice||0):
+       fields.model==='fixed'?Number(fields.fixedPrice||0):0)-Number(fields.discount||0)))}</strong></div>
+   </>:<>
+    <Field label="Proposta" field="proposalId" value={fields.proposalId} onChange={field}
+     options={data.proposals.map(p=>({value:String(p.id),label:String(p.title)}))}/>
+    <Field label="Modalidade" field="mode" value={fields.mode} onChange={field} options={[
+     {value:'written',label:'Formal por escrito'},{value:'verbal',label:'Acordo verbal'},
+     {value:'whatsapp',label:'WhatsApp'}]}/>
+    <Field label="Condições" field="terms" value={fields.terms} onChange={field}/>
+   </>}
+   <div style={{gridColumn:'1/-1',display:'flex',gap:10}}>
+    <button type="submit" disabled={busy||!writesEnabled}
+     style={{padding:12,borderRadius:8,background:'#2563eb',color:'white'}}>{busy?'Salvando...':'Salvar'}</button>
+    <button type="button" onClick={()=>setForm(null)}>Cancelar</button>
+   </div>
+  </form>
+ </section>}
+ <p style={{fontSize:13,marginTop:18,opacity:.8}}>Módulo comercial em implantação. Gravações liberadas somente após migração e aprovação de segurança.</p>
  </main>;
 }
 function Rows({heads,rows}:{heads:string[];rows:unknown[][]}){
@@ -67,4 +130,17 @@ function Rows({heads,rows}:{heads:string[];rows:unknown[][]}){
  <thead><tr>{heads.map(h=><th key={h} style={{textAlign:'left',padding:12,borderBottom:'1px solid #94a3b8'}}>{h}</th>)}</tr></thead>
  <tbody>{rows.map((row,i)=><tr key={i}>{row.map((v,j)=><td key={j} style={{padding:12,borderBottom:'1px solid #e2e8f0'}}>{String(v??'—')}</td>)}</tr>)}</tbody>
  </table></div>;
+}
+function Field({label,field,value,onChange,options,type='text',required=false}:{
+ label:string;field:string;value:string;onChange:(key:string,value:string)=>void;
+ options?:{value:string,label:string}[];type?:string;required?:boolean
+}){
+ const style:React.CSSProperties={width:'100%',padding:11,border:'1px solid #94a3b8',
+ borderRadius:8,background:'#fff',color:'#111827'};
+ return <label style={{fontSize:14}}>{label}
+ {options?<select required value={value||''} onChange={e=>onChange(field,e.target.value)} style={style}>
+ <option value="">Selecione</option>{options.map(o=><option key={o.value} value={o.value}>{o.label}</option>)}
+ </select>:<input type={type} required={required} value={value||''}
+ onChange={e=>onChange(field,e.target.value)} min={type==='number'?'0':undefined}
+ step={type==='number'?'0.01':undefined} style={style}/>}</label>;
 }
