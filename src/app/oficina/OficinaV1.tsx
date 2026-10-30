@@ -84,7 +84,22 @@ export default function OficinaV1(){
    financeiro:{Previsto:['Liquidado'],Liquidado:[]}
   };
   if(!allowed[area][current.status||'']?.includes(status)){setMessage('Mudança de situação não permitida neste fluxo.');return;}
-  if(area==='agenda'&&status==='Realizada'&&!records.contratos.some(c=>{
+  if(area==='contratos'&&status==='Confirmado'){
+   const proposal=records.propostas.find(p=>p.id===current.proposal);
+   if(!proposal||proposal.status!=='Aceita'){setMessage('Aceite a proposta antes de confirmar o contrato.');return;}
+  }
+  if(area==='financeiro'&&status==='Liquidado'){
+   const proposal=records.propostas.find(p=>p.id===current.proposal);
+   if(current.proposal&&(!proposal||proposal.status!=='Aceita')){setMessage('O recebimento vinculado exige uma proposta aceita.');return;}
+  }
+  if(area==='agenda'&&status==='Confirmada'){
+   const contract=records.contratos.find(c=>{
+    const proposal=records.propostas.find(p=>p.id===c.proposal);
+    return proposal?.client===current.client&&['Confirmado','Cumprido'].includes(c.status);
+   });
+   if(!contract){setMessage('Confirme um contrato do cliente antes de confirmar a reserva.');return;}
+  }
+    if(area==='agenda'&&status==='Realizada'&&!records.contratos.some(c=>{
    const proposal=records.propostas.find(p=>p.id===c.proposal);
    return proposal?.client===current.client&&['Confirmado','Cumprido'].includes(c.status);
   })){setMessage('Confirme o contrato do cliente antes de realizar a apresentação.');return;}
