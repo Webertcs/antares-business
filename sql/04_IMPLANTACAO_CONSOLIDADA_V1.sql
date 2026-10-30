@@ -215,8 +215,18 @@ GRANT EXECUTE ON FUNCTION public.business_create_dome(text,text) TO antares_team
 GRANT EXECUTE ON FUNCTION public.business_create_booking(text,uuid,uuid,timestamptz,timestamptz) TO antares_team_runtime;
 GRANT EXECUTE ON FUNCTION public.business_create_ledger_entry(text,uuid,text,text,text,numeric,date) TO antares_team_runtime;
 COMMIT;
--- Verificacao sem dados sensiveis
-SELECT (SELECT count(*) FROM information_schema.tables
- WHERE table_schema='public' AND table_name IN
- ('business_proposals','business_contracts','business_domes',
- 'business_bookings','business_ledger','business_audit')) AS tabelas_v1;
+-- Verificação final: nenhum dado sensível é exposto.
+SELECT
+ (SELECT count(*) FROM information_schema.tables
+  WHERE table_schema='public' AND table_name IN
+  ('business_proposals','business_contracts','business_domes',
+   'business_bookings','business_ledger','business_audit')) AS tabelas_v1,
+ (SELECT count(*) FROM pg_proc p
+  WHERE p.pronamespace='public'::regnamespace AND p.prosecdef
+  AND pg_get_userbyid(p.proowner)='neondb_owner'
+  AND p.proname IN ('business_create_proposal','business_create_contract',
+    'business_create_dome','business_create_booking','business_create_ledger_entry')) AS funcoes_v1,
+ (SELECT count(*) FROM pg_constraint
+  WHERE conname='business_booking_no_overlap'
+  AND conrelid='public.business_bookings'::regclass) AS protecao_conflito;
+-- Esperado: 6 tabelas, 5 funções e 1 proteção contra conflito.
