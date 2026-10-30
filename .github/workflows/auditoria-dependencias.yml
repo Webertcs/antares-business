@@ -1,0 +1,29 @@
+name: ANTARES - relatorio de dependencias
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - feature/bloco-02d-seguranca
+    paths:
+      - 'package-lock.json'
+      - '.github/workflows/auditoria-dependencias.yml'
+permissions:
+  contents: read
+jobs:
+  auditar:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: npm ci --ignore-scripts --no-fund
+      - name: Gerar resultado para auditoria
+        run: npm audit --omit=dev --json > auditoria.json || true
+      - uses: actions/upload-artifact@v4
+        with:
+          name: relatorio-antare-v1
+          path: auditoria.json
+          retention-days: 7
+      - name: Manter vulnerabilidades bloqueantes
+        run: npm audit --omit=dev --audit-level=high
