@@ -24,7 +24,7 @@ const groups:{label:string;items:{id:Module;icon:typeof Users}[]}[]=[
  {label:'Comercial e operação',items:[{id:'propostas',icon:FileText},{id:'contratos',icon:ClipboardList},{id:'agenda',icon:CalendarDays},{id:'cupulas',icon:Presentation}]},
  {label:'Administração',items:[{id:'financeiro',icon:Wallet},{id:'fidelizacao',icon:HeartHandshake},{id:'equipe',icon:ShieldCheck},{id:'relatorios',icon:HandCoins},{id:'vitrine',icon:Globe},{id:'ajustes',icon:Settings}]}
 ];
-const initial=Object.fromEntries(Object.keys(names).map(k=>[k,[]])) as Record<Module,Row[]>;
+const initial=Object.fromEntries(Object.keys(names).map(k=>[k,[] as Row[]])) as unknown as Record<Module,Row[]>;
 const money=(n:number)=>new Intl.NumberFormat('pt-BR',{style:'currency',currency:'BRL'}).format(n);
 const csvEscape=(v:string)=>'"'+(/^[=+@-]/.test(v)?"'"+v:v).replace(/"/g,'""')+'"';
 export default function OficinaV1(){
