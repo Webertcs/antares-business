@@ -2,7 +2,7 @@
 import {useEffect,useMemo,useState} from 'react';
 import Link from 'next/link';
 type RecordRow=Record<string,unknown>;
-type Balance={monthly:RecordRow[];proposals:RecordRow[];clients:RecordRow[]};
+type Balance={monthly:RecordRow[];annual:RecordRow[];proposals:RecordRow[];clients:RecordRow[]};
 type State={clients:RecordRow[];proposals:RecordRow[];contracts:RecordRow[];domes:RecordRow[];bookings:RecordRow[];ledger:RecordRow[];audit:RecordRow[]};
 const empty:State={clients:[],proposals:[],contracts:[],domes:[],bookings:[],ledger:[],audit:[]};
 const money=(value:unknown)=>new Intl.NumberFormat('pt-BR',{style:'currency',currency:'BRL'}).format(Number(value)||0);
@@ -142,6 +142,10 @@ export default function OperacaoV1({writesEnabled}:{writesEnabled:boolean}){
   <Rows heads={['Mês','Recebido','Despesas pagas','A receber','A pagar','Saldo realizado']}
    rows={(balance?.monthly||[]).map(m=>[date(m.mes),money(m.recebido),money(m.despesas),
     money(m.a_receber),money(m.a_pagar),money(Number(m.recebido||0)-Number(m.despesas||0))])}/>
+  <h3 style={{fontSize:18,fontWeight:650,marginTop:18}}>Balanço anual</h3>
+  <Rows heads={['Ano','Receitas recebidas','Despesas pagas','Resultado','A receber','A pagar']}
+   rows={(balance?.annual||[]).map(y=>[y.ano,money(y.recebido),money(y.despesas),
+     money(Number(y.recebido||0)-Number(y.despesas||0)),money(y.a_receber),money(y.a_pagar)])}/>
   <h3 style={{fontSize:18,fontWeight:650,marginTop:18}}>Funil comercial por situação</h3>
   <Rows heads={['Situação','Quantidade','Valor total']}
     rows={(balance?.proposals||[]).map(p=>[p.status,p.quantidade,money(p.valor)])}/>
