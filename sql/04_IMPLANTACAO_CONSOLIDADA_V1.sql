@@ -90,13 +90,22 @@ REVOKE ALL ON public.business_proposals,public.business_contracts,public.busines
 
 -- PARTE 2: sql/04A_AGENDA_SEM_CONFLITOS.sql
 CREATE EXTENSION IF NOT EXISTS btree_gist;
-ALTER TABLE public.business_bookings
- ADD CONSTRAINT business_booking_no_overlap
- EXCLUDE USING gist (
-  organization_id WITH =,
-  dome_id WITH =,
-  tstzrange(starts_at,ends_at,'[)') WITH &&
- ) WHERE (status IN ('reserved','confirmed'));
+DO $guard$
+BEGIN
+ IF NOT EXISTS (
+  SELECT 1 FROM pg_constraint
+  WHERE conrelid='public.business_bookings'::regclass
+    AND conname='business_booking_no_overlap'
+ ) THEN
+  ALTER TABLE public.business_bookings
+   ADD CONSTRAINT business_booking_no_overlap
+   EXCLUDE USING gist (
+    organization_id WITH =,
+    dome_id WITH =,
+    tstzrange(starts_at,ends_at,'[)') WITH &&
+   ) WHERE (status IN ('reserved','confirmed'));
+ END IF;
+END $guard$;
 CREATE INDEX IF NOT EXISTS business_proposals_org_status_idx
  ON public.business_proposals(organization_id,status,created_at);
 CREATE INDEX IF NOT EXISTS business_contracts_org_status_idx
