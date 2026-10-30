@@ -11,16 +11,17 @@ export default function OperacaoV1({writesEnabled}:{writesEnabled:boolean}){
  const [data,setData]=useState<State>(empty),[error,setError]=useState(''),[loading,setLoading]=useState(true);
  const [tab,setTab]=useState<'comercial'|'contratos'|'agenda'|'financeiro'|'auditoria'>('comercial');
  const [term,setTerm]=useState('');
+ const [dataEvents,setDataEvents]=useState<RecordRow[]>([]);
  const [revision,setRevision]=useState(0);
- const [form,setForm]=useState<'proposal'|'contract'|null>(null);
+ const [form,setForm]=useState<'proposal'|'contract'|'dome'|'booking'|'ledger'|null>(null);
  const [fields,setFields]=useState<Record<string,string>>({});
  const [busy,setBusy]=useState(false);
  const [feedback,setFeedback]=useState('');
- function openForm(type:'proposal'|'contract'){
+ function openForm(type:'proposal'|'contract'|'dome'|'booking'|'ledger'){
   setForm(type);setFeedback('');
   setFields(type==='proposal'?{clientId:'',title:'',model:'per_student',attendees:'30',
     unitPrice:'10',fixedPrice:'0',discount:'0',deposit:'0',validUntil:'',notes:''}:
-    {proposalId:'',mode:'written',terms:''});
+    type==='contract'?{proposalId:'',mode:'written',terms:''}:type==='dome'?{name:''}:type==='booking'?{eventId:'',domeId:'',start:'',end:''}:{description:'',amount:'',date:'',category:'income',status:'planned'});
  }
  function field(k:string,v:string){setFields(old=>({...old,[k]:v}));}
  async function submit(e:React.FormEvent<HTMLFormElement>){
@@ -28,7 +29,7 @@ export default function OperacaoV1({writesEnabled}:{writesEnabled:boolean}){
   const n=(k:string)=>Number(fields[k]||0);
   const body=form==='proposal'?{action:'proposal',...fields,
     attendees:n('attendees'),unitPrice:n('unitPrice'),fixedPrice:n('fixedPrice'),
-    discount:n('discount'),deposit:n('deposit')}: {action:'contract',...fields};
+    discount:n('discount'),deposit:n('deposit')}:form==='ledger'?{action:'ledger',...fields,amount:n('amount')}:form==='booking'?{action:'booking',...fields,start:new Date(fields.start).toISOString(),end:new Date(fields.end).toISOString()}:{action:form,...fields};
   setBusy(true);setFeedback('');
   try{
    const response=await fetch('/api/business/gravar',{method:'POST',
@@ -44,6 +45,7 @@ export default function OperacaoV1({writesEnabled}:{writesEnabled:boolean}){
   .catch(e=>{if(e.name!=='AbortError')setError(e instanceof Error?e.message:'Consulta indisponível');})
   .finally(()=>setLoading(false));return()=>ctrl.abort();
  },[revision]);
+ useEffect(()=>{fetch('/api/crm/clientes',{cache:'no-store'}).then(r=>r.ok?r.json():null).then(d=>{if(d?.events)setDataEvents(d.events);}).catch(()=>{});},[revision]);
  const filtered=useMemo(()=>data.proposals.filter(x=>String(x.title||'').toLowerCase().includes(term.toLowerCase())||String(x.client_name||'').toLowerCase().includes(term.toLowerCase())),[data.proposals,term]);
  const forecast=data.proposals.filter(p=>['accepted','sent','negotiating'].includes(String(p.status))).reduce((sum,p)=>sum+Number(p.total||0),0);
  const cash=data.ledger.filter(x=>x.status==='settled').reduce((sum,x)=>sum+(x.category==='income'?1:-1)*Number(x.amount||0),0);
@@ -73,11 +75,11 @@ export default function OperacaoV1({writesEnabled}:{writesEnabled:boolean}){
   <p>Confirmação documental, verbal ou pelo WhatsApp, vinculada à proposta.</p>
   <Rows heads={['Proposta','Modalidade','Situação','Confirmação']}
   rows={data.contracts.map(c=>[c.proposal_title,c.confirmation_mode,c.status,dateTime(c.confirmed_at)])}/></section>}
- {tab==='agenda'&&<section style={base}><h2 style={{fontSize:21,fontWeight:650}}>Cúpulas e apresentações</h2>
+ {tab==='agenda'&&<section style={base}><h2 style={{fontSize:21,fontWeight:650}}>Cúpulas e apresentações</h2>{writesEnabled&&<div style={{display:'flex',gap:8}}><button onClick={()=>openForm('dome')}>+ Cúpula</button><button onClick={()=>openForm('booking')}>+ Reserva</button></div>}
   <p>Equipamentos cadastrados: {data.domes.map(d=>String(d.name)).join(' · ')||'nenhum'}.</p>
   <Rows heads={['Apresentação','Cúpula','Início','Término','Situação']}
   rows={data.bookings.map(b=>[b.event_title,b.dome_name,dateTime(b.starts_at),dateTime(b.ends_at),b.status])}/></section>}
- {tab==='financeiro'&&<section style={base}><h2 style={{fontSize:21,fontWeight:650}}>Extrato operacional</h2>
+ {tab==='financeiro'&&<section style={base}><h2 style={{fontSize:21,fontWeight:650}}>Extrato operacional</h2>{writesEnabled&&<button onClick={()=>openForm('ledger')}>+ Lançamento</button>}
   <p>Somente lançamentos liquidados compõem o saldo. Previsto não é recebido.</p>
   <Rows heads={['Data','Descrição','Tipo','Valor','Situação']}
    rows={data.ledger.map(x=>[date(x.occurred_on),x.description,x.category,money(x.amount),x.status])}/></section>}
@@ -88,7 +90,7 @@ export default function OperacaoV1({writesEnabled}:{writesEnabled:boolean}){
  </>}
  {feedback&&<p role="status" style={{marginTop:12}}>{feedback}</p>}
  {form&&<section style={{...base,marginTop:18}}>
-  <h2 style={{fontWeight:700,fontSize:21}}>{form==='proposal'?'Nova proposta comercial':'Novo contrato'}</h2>
+  <h2 style={{fontWeight:700,fontSize:21}}>{({proposal:'Nova proposta comercial',contract:'Novo contrato',dome:'Nova cúpula',booking:'Nova reserva',ledger:'Novo lançamento financeiro'} as Record<string,string>)[form]}</h2>
   <form onSubmit={submit} style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(220px,1fr))',gap:12,marginTop:14}}>
    {form==='proposal'?<>
     <Field label="Cliente" field="clientId" value={fields.clientId} onChange={field} options={data.clients.map(c=>({value:String(c.id),label:String(c.name)}))}/>
@@ -106,13 +108,29 @@ export default function OperacaoV1({writesEnabled}:{writesEnabled:boolean}){
     <div style={{gridColumn:'1/-1'}}>Total estimado: <strong>{money(Math.max(0,
       (fields.model==='per_student'?Number(fields.attendees||0)*Number(fields.unitPrice||0):
        fields.model==='fixed'?Number(fields.fixedPrice||0):0)-Number(fields.discount||0)))}</strong></div>
-   </>:<>
+   </>:form==='contract'?<>
     <Field label="Proposta" field="proposalId" value={fields.proposalId} onChange={field}
      options={data.proposals.map(p=>({value:String(p.id),label:String(p.title)}))}/>
     <Field label="Modalidade" field="mode" value={fields.mode} onChange={field} options={[
      {value:'written',label:'Formal por escrito'},{value:'verbal',label:'Acordo verbal'},
      {value:'whatsapp',label:'WhatsApp'}]}/>
     <Field label="Condições" field="terms" value={fields.terms} onChange={field}/>
+   </>:form==='dome'?<Field label="Nome da cúpula" field="name" value={fields.name} onChange={field} required/>:
+   form==='booking'?<>
+    <Field label="Apresentação" field="eventId" value={fields.eventId} onChange={field}
+     options={dataEvents.map(e=>({value:String(e.id),label:String(e.title)}))}/>
+    <Field label="Cúpula" field="domeId" value={fields.domeId} onChange={field}
+     options={data.domes.filter(d=>d.active).map(d=>({value:String(d.id),label:String(d.name)}))}/>
+    <Field label="Início" field="start" value={fields.start} onChange={field} type="datetime-local" required/>
+    <Field label="Término" field="end" value={fields.end} onChange={field} type="datetime-local" required/>
+   </>:<>
+    <Field label="Descrição" field="description" value={fields.description} onChange={field} required/>
+    <Field label="Valor (R$)" field="amount" value={fields.amount} onChange={field} type="number" required/>
+    <Field label="Data" field="date" value={fields.date} onChange={field} type="date" required/>
+    <Field label="Tipo" field="category" value={fields.category} onChange={field}
+     options={[{value:'income',label:'Receita'},{value:'expense',label:'Despesa'}]}/>
+    <Field label="Situação" field="status" value={fields.status} onChange={field}
+     options={[{value:'planned',label:'Previsto'},{value:'settled',label:'Liquidado'}]}/>
    </>}
    <div style={{gridColumn:'1/-1',display:'flex',gap:10}}>
     <button type="submit" disabled={busy||!writesEnabled}
