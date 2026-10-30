@@ -1,5 +1,5 @@
 'use client';
-import {useMemo,useState} from 'react';
+import {useEffect,useMemo,useState} from 'react';
 import Link from 'next/link';
 import {CalendarDays,ClipboardList,FileText,GraduationCap,HandCoins,HeartHandshake,LayoutDashboard,Presentation,Settings,ShieldCheck,Users,Wallet,Globe,Download,Plus,Trash2,Search} from 'lucide-react';
 type Row={id:string;[key:string]:string};
@@ -32,6 +32,14 @@ const relationLabel=(module:Module,key:string,row:Row,records:Record<Module,Row[
 const money=(n:number)=>new Intl.NumberFormat('pt-BR',{style:'currency',currency:'BRL'}).format(n);
 const csvEscape=(v:string)=>'"'+(/^[=+@-]/.test(v)?"'"+v:v).replace(/"/g,'""')+'"';
 export default function OficinaV1(){
+ const [snapshot,setSnapshot]=useState<{clients:unknown[];contacts:unknown[];events:unknown[];proposals:unknown[];contracts:unknown[];domes:unknown[];bookings:unknown[];ledger:unknown[]}|null>(null);
+ const [dbStatus,setDbStatus]=useState('Consultando disponibilidade do Neon...');
+ useEffect(()=>{const controller=new AbortController();
+ fetch('/api/oficina/snapshot',{cache:'no-store',signal:controller.signal})
+ .then(async res=>{if(!res.ok)throw Error('Migração comercial ainda não disponível');return res.json();})
+ .then(data=>{setSnapshot(data);setDbStatus('Leitura do Neon disponível — dados reais, somente consulta');})
+ .catch(e=>{if(e?.name!=='AbortError')setDbStatus('Banco comercial ainda não implantado — demonstração local isolada');});
+ return()=>controller.abort();},[]);
  const [module,setModule]=useState<Module>('visao');
  const [records,setRecords]=useState<Record<Module,Row[]>>(initial);
  const [editing,setEditing]=useState<string|null>(null);
@@ -109,7 +117,9 @@ export default function OficinaV1(){
    <header className="oficina-top"><button onClick={()=>setMobile(v=>!v)} className="oficina-toggle" aria-label="Abrir menu">☰</button><div><strong>ANTARES BUSINESS</strong><span>Oficina V1 · pré-integração</span></div><span className="oficina-pill">Dados locais temporários</span></header>
    <div className="oficina-content">
     <div className="oficina-heading"><div><p>FLUXOS DO PRODUTO</p><h1>{fieldInfo?.title||names[module]}</h1><span>{fieldInfo?.description||(module==='visao'?'Todos os módulos da etapa 1 em um só lugar':module==='relatorios'?'Indicadores e exportações para conferência':'Vitrine e captação de orçamentos')}</span></div>{fieldInfo&&<button className="oficina-primary" onClick={()=>start()}><Plus size={17}/> Novo registro</button>}</div>
+    <div className="oficina-warning" role="status"><strong>Estado do banco:</strong> {dbStatus}. Nenhuma gravação é enviada ao Neon nesta oficina.</div>
     <div className="oficina-warning" role="status"><strong>Etapa 1 — Demonstração funcional:</strong> os registros permanecem apenas nesta tela enquanto ela estiver aberta. Recarregar a página apaga os rascunhos. Não há envio ao Neon, convites reais ou pagamentos.</div>
+    {module==='visao'&&snapshot&&<section className="oficina-panel" style={{marginBottom:16}}><h2>Retrato real do Neon · somente leitura</h2><p>Consulta autenticada e isolada por organização. Os registros abaixo não são misturados com a demonstração temporária.</p><div className="oficina-stats">{[['Clientes reais',snapshot.clients.length],['Contatos',snapshot.contacts.length],['Propostas reais',snapshot.proposals.length],['Reservas reais',snapshot.bookings.length]].map(([label,value])=><div key={label}><small>{label}</small><strong>{value}</strong></div>)}</div><Link href="/operacoes">Abrir operações persistidas →</Link></section>}
     {module==='visao'&&<>
      <div className="oficina-stats">{[['Clientes',records.clientes.length],['Propostas',records.propostas.length],['Próximas apresentações',future],['Saldo realizado',money(received-spent)]].map(([k,v])=><div key={k}><small>{k}</small><strong>{v}</strong></div>)}</div>
      <div className="oficina-panels"><section><h2>Operação completa</h2><p>Cadastre clientes, vincule propostas e contratos, reserve cúpulas, registre pagamentos e consulte os relatórios. Tudo pode ser explorado antes da implantação.</p><div className="oficina-actions">{(['clientes','propostas','agenda','financeiro'] as Module[]).map(id=><button key={id} onClick={()=>go(id)}>{names[id]} →</button>)}</div></section><section><h2>Próxima implantação</h2><p>Esta oficina é uma experiência isolada. Os módulos reais já iniciados permanecem em <Link href="/clientes">Clientes</Link> e <Link href="/operacoes">Central de Operações</Link>. A ligação integral ao Neon será feita na Etapa 2.</p></section></div>
