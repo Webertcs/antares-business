@@ -7,6 +7,7 @@ type Event = {id:string;client_id:string;title:string;event_kind:string;event_da
 const kinds:Record<string,string>={school:'Escola',company:'Empresa',association:'Associação',private:'Particular',other:'Outro'};
 const statuses:Record<string,string>={prospect:'Prospecto',active:'Ativo',inactive:'Inativo'};
 const eventStatuses:Record<string,string>={lead:'Oportunidade',quoted:'Orçado',reserved:'Reservado',confirmed:'Confirmado',completed:'Realizado',cancelled:'Cancelado'};
+const formatDateBR=(value:string|null)=>value?new Intl.DateTimeFormat('pt-BR',{timeZone:'UTC'}).format(new Date(value)):'Sem data';
 export default function ClientsPage({ writesEnabled }: { writesEnabled: boolean }) {
  const [clients,setClients]=useState<Client[]>([]);
  const [contacts,setContacts]=useState<Contact[]>([]);
@@ -105,7 +106,7 @@ export default function ClientsPage({ writesEnabled }: { writesEnabled: boolean 
      {c.is_primary?' · Principal':''} · {c.phone||c.email||'Sem contato'}</li>)}</ul>}
    <h3 style={{fontSize:18,marginTop:20}}>Apresentações e oportunidades ({selectedEvents.length}) {writesEnabled&&<button onClick={()=>openForm('event')}>+ Evento</button>}</h3>
    {selectedEvents.length===0?<p>Sem eventos registrados.</p>:
-    <ul>{selectedEvents.map(e=><li key={e.id}>{e.title} · {e.event_date||'Sem data'} · {eventStatuses[e.status]||e.status}
+    <ul>{selectedEvents.map(e=><li key={e.id}>{e.title} · {formatDateBR(e.event_date)} · {eventStatuses[e.status]||e.status}
     {e.expected_attendees!=null?' · '+e.expected_attendees+' participantes':''}</li>)}</ul>}
   </section>}
   {feedback&&<p role="status">{feedback}</p>}
