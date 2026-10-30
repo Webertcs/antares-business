@@ -9,10 +9,10 @@ export async function GET(){
  try{
   const db=getDb();
   const [clients,contacts,events,proposals,contracts,domes,bookings,ledger]=await Promise.all([
-   db`SELECT id,name,kind,city,email,phone,status FROM public.crm_clients WHERE organization_id=${owner.organizationId} ORDER BY created_at DESC LIMIT 500`,
-   db`SELECT id,client_id,full_name,position,phone,email FROM public.crm_contacts WHERE organization_id=${owner.organizationId} ORDER BY created_at DESC LIMIT 500`,
-   db`SELECT id,client_id,title,event_date,expected_attendees,status FROM public.crm_events WHERE organization_id=${owner.organizationId} ORDER BY event_date DESC NULLS LAST LIMIT 500`,
-   db`SELECT id,client_id,title,pricing_model,expected_attendees,unit_price,fixed_price,discount,deposit,total,status FROM public.business_proposals WHERE organization_id=${owner.organizationId} ORDER BY created_at DESC LIMIT 500`,
+   db`SELECT id,name,kind,city,email,phone,status,notes FROM public.crm_clients WHERE organization_id=${owner.organizationId} ORDER BY created_at DESC LIMIT 500`,
+   db`SELECT id,client_id,full_name,position,phone,email,whatsapp,is_primary FROM public.crm_contacts WHERE organization_id=${owner.organizationId} ORDER BY created_at DESC LIMIT 500`,
+   db`SELECT id,client_id,title,event_kind,event_date,expected_attendees,pricing_model,price_per_person,fixed_amount,status,venue,notes FROM public.crm_events WHERE organization_id=${owner.organizationId} ORDER BY event_date DESC NULLS LAST LIMIT 500`,
+   db`SELECT id,client_id,title,pricing_model,expected_attendees,unit_price,fixed_price,discount,deposit,total,status,valid_until FROM public.business_proposals WHERE organization_id=${owner.organizationId} ORDER BY created_at DESC LIMIT 500`,
    db`SELECT id,proposal_id,confirmation_mode,status,terms FROM public.business_contracts WHERE organization_id=${owner.organizationId} ORDER BY created_at DESC LIMIT 500`,
    db`SELECT id,name,active FROM public.business_domes WHERE organization_id=${owner.organizationId} ORDER BY name`,
    db`SELECT id,event_id,dome_id,starts_at,ends_at,status FROM public.business_bookings WHERE organization_id=${owner.organizationId} ORDER BY starts_at DESC LIMIT 500`,
