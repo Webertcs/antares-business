@@ -1,0 +1,32 @@
+name: ANTARES V1 - diagnostico temporario
+on:
+  push:
+    branches:
+      - feature/bloco-02d-seguranca
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  diagnostico:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Regenerar lock APENAS no runner para diagnostico
+        run: npm install --package-lock-only --ignore-scripts --no-fund
+      - name: Instalar dependencias sem alterar fontes
+        run: npm ci --no-fund
+      - name: Conferir TypeScript
+        run: npx tsc --noEmit
+      - name: Compilar Next.js
+        run: npm run build
+      - name: Auditar dependencias de producao
+        run: npm audit --omit=dev --audit-level=high
+
+# Este diagnostico nao substitui o workflow de qualidade bloqueante.
+# O package-lock.json versionado continua precisando de correcao reproduzivel.
