@@ -1,4 +1,4 @@
-name: ANTARES V1 - corrigir lock e verificar compilacao
+name: ANTARES V1 - diagnostico compilacao
 on:
   push:
     branches:
@@ -10,7 +10,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
   diagnostico:
@@ -23,19 +23,8 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - name: Reconciliar lockfile sem executar scripts de dependencias
-        run: npm install --package-lock-only --ignore-scripts --no-fund
       - name: Conferir integridade do lockfile
         run: npm ci --ignore-scripts --no-fund
-      - name: Registrar lock reconciliado somente na branch de desenvolvimento
-        run: |
-          if ! git diff --quiet -- package-lock.json; then
-            git config user.name "github-actions[bot]"
-            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-            git add package-lock.json
-            git commit -m "fix(deps): reconcile npm lockfile for reproducible CI"
-            git push origin HEAD:feature/bloco-02d-seguranca
-          fi
       - name: Conferir TypeScript
         run: npx tsc --noEmit
       - name: Compilar Next.js
