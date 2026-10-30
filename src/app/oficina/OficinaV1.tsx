@@ -74,6 +74,22 @@ export default function OficinaV1(){
  const benefit=(clientId:string)=>records.fidelizacao.filter(f=>f.client===clientId&&f.status==='Ativo'&&visits(clientId)>=Number(f.threshold||Infinity));
  const proposalTotal=(r:Row)=>Math.max(0,(r.mode==='Por aluno'?Number(r.qty||0)*Number(r.unit||0):r.mode==='Preço fechado'?Number(r.fixed||0):0)-Number(r.discount||0));
  const future=records.agenda.filter(r=>r.start&&new Date(r.start).getTime()>Date.now()&&r.status!=='Cancelada').length;
+ function loadScenario(){
+  if(Object.values(records).some(items=>items.length)&&!confirm('Substituir rascunhos locais pelo cenário de teste?'))return;
+  const day=new Date();day.setDate(day.getDate()+7);const d=day.toLocaleDateString('en-CA');
+  setRecords({...initial,
+   clientes:[{id:'demo-c',name:'Escola Estrela do Cerrado',type:'Escola',city:'Brasília',status:'Ativo'}],
+   contatos:[{id:'demo-k',name:'Maria · Coordenação',client:'demo-c',role:'Coordenadora'}],
+   professores:[{id:'demo-t',name:'Professora Ana',school:'demo-c',classroom:'5º ano'}],
+   propostas:[{id:'demo-p',name:'Viagem pelo Sistema Solar',client:'demo-c',mode:'Por aluno',qty:'30',unit:'10',discount:'0',deposit:'100',status:'Aceita'}],
+   contratos:[{id:'demo-a',name:'Contrato da sessão',proposal:'demo-p',mode:'WhatsApp',status:'Confirmado'}],
+   cupulas:[{id:'demo-d',name:'Cúpula Orion',capacity:'30',status:'Disponível'}],
+   agenda:[{id:'demo-b',name:'Sessão Sistema Solar',client:'demo-c',dome:'demo-d',start:d+'T09:00',end:d+'T09:30',students:'30',status:'Confirmada'}],
+   financeiro:[{id:'demo-l1',name:'Sinal da escola',category:'Receita',amount:'100',status:'Liquidado',proposal:'demo-p',date:d},{id:'demo-l2',name:'Saldo da apresentação',category:'Receita',amount:'200',status:'Previsto',proposal:'demo-p',date:d}],
+   fidelizacao:[{id:'demo-f',name:'Escola parceira',client:'demo-c',threshold:'3',discount:'10',status:'Ativo'}]
+  });
+  setMessage('Ciclo demonstrativo carregado. Dados locais; nenhuma gravação no Neon.');
+ }
  function go(id:Module){setModule(id);setFilter('');setMessage('');setOpen(false);setMobile(false);}
  function start(row?:Row){if(module==='visao'||module==='relatorios'||module==='vitrine')return;setForm(row?{...row}:{});setEditing(row?.id||null);setOpen(true);setMessage('');}
  function save(e:React.FormEvent){e.preventDefault();if(module==='visao'||module==='relatorios'||module==='vitrine')return;
@@ -156,7 +172,7 @@ export default function OficinaV1(){
     {module==='visao'&&snapshot&&<section className="oficina-panel" style={{marginBottom:16}}><h2>Retrato real do Neon · somente leitura</h2><p>Consulta autenticada e isolada por organização. Os registros abaixo não são misturados com a demonstração temporária.</p><div className="oficina-stats">{[['Clientes reais',snapshot.clients.length],['Contatos',snapshot.contacts.length],['Propostas reais',snapshot.proposals.length],['Reservas reais',snapshot.bookings.length]].map(([label,value])=><div key={label}><small>{label}</small><strong>{value}</strong></div>)}</div><Link href="/operacoes">Abrir operações persistidas →</Link></section>}
     {module==='visao'&&<>
      <div className="oficina-stats">{[['Clientes',records.clientes.length],['Propostas',records.propostas.length],['Próximas apresentações',future],['Saldo realizado',money(received-spent)]].map(([k,v])=><div key={k}><small>{k}</small><strong>{v}</strong></div>)}</div>
-     <div className="oficina-panels"><section><h2>Operação completa</h2><p>Cadastre clientes, vincule propostas e contratos, reserve cúpulas, registre pagamentos e consulte os relatórios. Tudo pode ser explorado antes da implantação.</p><div className="oficina-actions">{(['clientes','propostas','agenda','financeiro'] as Module[]).map(id=><button key={id} onClick={()=>go(id)}>{names[id]} →</button>)}</div></section><section><h2>Próxima implantação</h2><p>Esta oficina é uma experiência isolada. Os módulos reais já iniciados permanecem em <Link href="/clientes">Clientes</Link> e <Link href="/operacoes">Central de Operações</Link>. A ligação integral ao Neon será feita na Etapa 2.</p></section></div>
+     <div className="oficina-panels"><section><h2>Operação completa</h2><p>Cadastre clientes, vincule propostas e contratos, reserve cúpulas, registre pagamentos e consulte os relatórios. Tudo pode ser explorado antes da implantação.</p><div className="oficina-actions"><button onClick={loadScenario}>Carregar ciclo completo de demonstração</button>{(['clientes','propostas','agenda','financeiro'] as Module[]).map(id=><button key={id} onClick={()=>go(id)}>{names[id]} →</button>)}</div></section><section><h2>Próxima implantação</h2><p>Esta oficina é uma experiência isolada. Os módulos reais já iniciados permanecem em <Link href="/clientes">Clientes</Link> e <Link href="/operacoes">Central de Operações</Link>. A ligação integral ao Neon será feita na Etapa 2.</p></section></div>
     </>}
     {module==='relatorios'&&<>
      <div className="oficina-stats">{[['Recebido',money(received)],['Despesas pagas',money(spent)],['A receber',money(records.financeiro.filter(r=>r.status==='Previsto'&&r.category==='Receita').reduce((v,r)=>v+Number(r.amount||0),0))],['Contratos pendentes',records.contratos.filter(r=>r.status==='Pendente').length]].map(([k,v])=><div key={k}><small>{k}</small><strong>{v}</strong></div>)}</div>
