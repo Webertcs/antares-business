@@ -64,6 +64,19 @@ export default function OperacaoV1({writesEnabled}:{writesEnabled:boolean}){
  const forecast=data.proposals.filter(p=>['accepted','sent','negotiating'].includes(String(p.status))).reduce((sum,p)=>sum+Number(p.total||0),0);
  const cash=data.ledger.filter(x=>x.status==='settled').reduce((sum,x)=>sum+(x.category==='income'?1:-1)*Number(x.amount||0),0);
  const pending=data.ledger.filter(x=>x.status==='planned').reduce((sum,x)=>sum+(x.category==='income'?1:-1)*Number(x.amount||0),0);
+ const received=data.ledger.filter(x=>x.status==='settled'&&x.category==='income')
+  .reduce((v,x)=>v+Number(x.amount||0),0);
+ const expenses=data.ledger.filter(x=>x.status==='settled'&&x.category==='expense')
+  .reduce((v,x)=>v+Number(x.amount||0),0);
+ const outstanding=data.contracts.filter(x=>x.status==='pending').length;
+ const nextBookings=[...data.bookings].filter(x=>x.status!=='cancelled'&&
+  Date.parse(String(x.starts_at))>=Date.now()).sort((a,b)=>
+   Date.parse(String(a.starts_at))-Date.parse(String(b.starts_at))).slice(0,5);
+ const reportLink=(type:'propostas'|'agenda'|'financeiro')=>
+  <a href={'/api/business/exportar?tipo='+type}
+    style={{display:'inline-block',padding:'9px 12px',border:'1px solid #93c5fd',borderRadius:9,
+      color:'#1d4ed8',background:'#eff6ff',textDecoration:'none',fontWeight:600,fontSize:13}}>
+   Exportar {type} (CSV)</a>;
  const base:React.CSSProperties={border:'1px solid #cbd5e1',borderRadius:14,padding:18,background:'#f8fafc'};
  return <main style={{maxWidth:1250,margin:'0 auto',padding:'28px 18px',fontFamily:'system-ui',color:'#0f172a'}}>
  <Link href="/">← Painel</Link>
@@ -76,6 +89,21 @@ export default function OperacaoV1({writesEnabled}:{writesEnabled:boolean}){
  {!loading&&!error&&<>
  <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(175px,1fr))',gap:12,margin:'20px 0'}}>
   {([['Clientes',data.clients.length],['Propostas',data.proposals.length],['Valor proposto',money(forecast)],['Saldo realizado',money(cash)],['Fluxo previsto',money(pending)],['Reservas',data.bookings.length]] as [string,string|number][]).map(([t,v])=><div key={t} style={base}><small>{t}</small><div style={{fontSize:25,fontWeight:750}}>{v}</div></div>)}
+ </div>
+ <section style={{...base,margin:'16px 0'}} aria-label="Resumo gerencial">
+  <h2 style={{fontWeight:700,fontSize:20,marginBottom:8}}>Resumo gerencial</h2>
+  <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(165px,1fr))',gap:14}}>
+   <div><small>Receitas recebidas</small><div style={{fontWeight:700,fontSize:21}}>{money(received)}</div></div>
+   <div><small>Despesas pagas</small><div style={{fontWeight:700,fontSize:21}}>{money(expenses)}</div></div>
+   <div><small>Contratos pendentes</small><div style={{fontWeight:700,fontSize:21}}>{outstanding}</div></div>
+   <div><small>Próximas reservas</small><div style={{fontWeight:700,fontSize:21}}>{nextBookings.length}</div></div>
+  </div>
+  {nextBookings.length>0&&<div style={{marginTop:12}}><strong>Próximas apresentações</strong>
+   <ul style={{paddingLeft:20}}>{nextBookings.map(b=><li key={String(b.id)}>
+     {dateTime(b.starts_at)} · {String(b.event_title)} · {String(b.dome_name)}</li>)}</ul></div>}
+ </section>
+ <div style={{display:'flex',gap:8,flexWrap:'wrap',margin:'10px 0'}}>
+  {reportLink('propostas')}{reportLink('agenda')}{reportLink('financeiro')}
  </div>
  <nav aria-label="Áreas operacionais" style={{display:'flex',gap:8,flexWrap:'wrap',margin:'16px 0'}}>
  {([['comercial','Propostas'],['contratos','Contratos'],['agenda','Agenda e cúpulas'],['financeiro','Financeiro'],['auditoria','Auditoria']] as const).map(([k,l])=>
