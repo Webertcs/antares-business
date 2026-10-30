@@ -37,7 +37,7 @@ export default function OficinaV1(){
  useEffect(()=>{const controller=new AbortController();
  fetch('/api/oficina/snapshot',{cache:'no-store',signal:controller.signal})
  .then(async res=>{if(!res.ok)throw Error('Migração comercial ainda não disponível');return res.json();})
- .then(data=>{setSnapshot(data);setDbStatus('Leitura do Neon disponível — dados reais, somente consulta');})
+ .then(data=>{setSnapshot(data);setDbStatus(data.commercialReady?'CRM e comercial no Neon disponíveis — somente consulta':'CRM 03 disponível — comercial 04 aguardando migração');})
  .catch(e=>{if(e?.name!=='AbortError')setDbStatus('Banco comercial ainda não implantado — demonstração local isolada');});
  return()=>controller.abort();},[]);
  const [realView,setRealView]=useState(false);
