@@ -74,6 +74,32 @@ export default function OficinaV1(){
  const benefit=(clientId:string)=>records.fidelizacao.filter(f=>f.client===clientId&&f.status==='Ativo'&&visits(clientId)>=Number(f.threshold||Infinity));
  const proposalTotal=(r:Row)=>Math.max(0,(r.mode==='Por aluno'?Number(r.qty||0)*Number(r.unit||0):r.mode==='Preço fechado'?Number(r.fixed||0):0)-Number(r.discount||0));
  const future=records.agenda.filter(r=>r.start&&new Date(r.start).getTime()>Date.now()&&r.status!=='Cancelada').length;
+ function changeStatus(area:'propostas'|'contratos'|'agenda'|'financeiro',id:string,status:string){
+  const current=records[area].find(x=>x.id===id);
+  if(!current)return;
+  const allowed:Record<typeof area,Record<string,string[]>>={
+   propostas:{Rascunho:['Enviada','Recusada'],Enviada:['Negociação','Aceita','Recusada'],Negociação:['Aceita','Recusada'],Aceita:[],Recusada:[]},
+   contratos:{Pendente:['Confirmado','Cancelado'],Confirmado:['Cumprido','Cancelado'],Cumprido:[],Cancelado:[]},
+   agenda:{Reservada:['Confirmada','Cancelada'],Confirmada:['Realizada','Cancelada'],Realizada:[],Cancelada:[]},
+   financeiro:{Previsto:['Liquidado'],Liquidado:[]}
+  };
+  if(!allowed[area][current.status||'']?.includes(status)){setMessage('Mudança de situação não permitida neste fluxo.');return;}
+  if(area==='agenda'&&status==='Realizada'&&!records.contratos.some(c=>{
+   const proposal=records.propostas.find(p=>p.id===c.proposal);
+   return proposal?.client===current.client&&['Confirmado','Cumprido'].includes(c.status);
+  })){setMessage('Confirme o contrato do cliente antes de realizar a apresentação.');return;}
+  setRecords(prev=>({...prev,[area]:prev[area].map(x=>x.id===id?{...x,status}:x)}));
+  setMessage('Situação atualizada apenas na demonstração: '+status+'.');
+ }
+ function nextStatus(area:Module,row:Row){
+  const changes:Record<string,Record<string,string>>={
+   propostas:{Rascunho:'Enviada',Enviada:'Negociação',Negociação:'Aceita'},
+   contratos:{Pendente:'Confirmado',Confirmado:'Cumprido'},
+   agenda:{Reservada:'Confirmada',Confirmada:'Realizada'},
+   financeiro:{Previsto:'Liquidado'}
+  };
+  const status=changes[area]?.[row.status||''];if(status)changeStatus(area as 'propostas'|'contratos'|'agenda'|'financeiro',row.id,status);
+ }
  function loadScenario(){
   if(Object.values(records).some(items=>items.length)&&!confirm('Substituir rascunhos locais pelo cenário de teste?'))return;
   const day=new Date();day.setDate(day.getDate()+7);const d=day.toLocaleDateString('en-CA');
@@ -182,7 +208,12 @@ export default function OficinaV1(){
     {fieldInfo&&<>
      <div className="oficina-toolbar"><label><Search size={17}/><input placeholder="Pesquisar registros..." value={filter} onChange={e=>setFilter(e.target.value)}/></label><button className="oficina-secondary" onClick={()=>download(module)}><Download size={16}/> Exportar CSV</button></div>
      <section className="oficina-panel"><div className="oficina-panel-head"><h2>{fieldInfo.title}</h2><small>{rows.length} registro(s)</small></div><div className="oficina-records">{rows.map(row=><div key={row.id}><div><strong>{row.name||'Registro'}</strong><span>{fieldInfo.fields.filter(f=>f.key!=='name').slice(0,4).map(f=>relationLabel(module,f.key,row,records)).filter(Boolean).join(' · ')}</span>{module==='clientes'&&<small>Apresentações realizadas: {visits(row.id)} · Benefícios ativos: {benefit(row.id).length}</small>}
- {module==='propostas'&&<small>Total estimado: {money(Math.max(0,(row.mode==='Por aluno'?Number(row.qty||0)*Number(row.unit||0):row.mode==='Preço fechado'?Number(row.fixed||0):0)-Number(row.discount||0)))}</small>}</div><div className="oficina-record-actions">{module==='propostas'&&<button onClick={()=>printProposal(row)}>Prévia</button>}
+ {module==='propostas'&&<small>Total estimado: {money(Math.max(0,(row.mode==='Por aluno'?Number(row.qty||0)*Number(row.unit||0):row.mode==='Preço fechado'?Number(row.fixed||0):0)-Number(row.discount||0)))}</small>}</div><div className="oficina-record-actions">{(['propostas','contratos','agenda','financeiro'] as Module[]).includes(module)&&
+  ((module==='propostas'&&['Rascunho','Enviada','Negociação'].includes(row.status))||
+  (module==='contratos'&&['Pendente','Confirmado'].includes(row.status))||
+  (module==='agenda'&&['Reservada','Confirmada'].includes(row.status))||
+  (module==='financeiro'&&row.status==='Previsto'))&&
+  <button onClick={()=>nextStatus(module,row)}>Avançar situação</button>}{module==='propostas'&&<button onClick={()=>printProposal(row)}>Prévia</button>}
  {(['propostas','contratos','agenda'] as Module[]).includes(module)&&<button onClick={()=>advance(module,row)}>{module==='propostas'?'Contrato →':module==='contratos'?'Agenda →':'Recebimento →'}</button>}
  <button onClick={()=>start(row)}>Editar</button><button aria-label="Excluir registro" onClick={()=>remove(row.id)}><Trash2 size={16}/></button></div></div>)}{rows.length===0&&<div className="oficina-empty"><ClipboardList size={27}/><strong>Nenhum registro nesta área</strong><span>Crie o primeiro registro para experimentar o fluxo completo.</span></div>}</div></section>
     </>}
