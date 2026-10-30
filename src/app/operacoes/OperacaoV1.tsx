@@ -12,6 +12,7 @@ export default function OperacaoV1({writesEnabled}:{writesEnabled:boolean}){
  const [tab,setTab]=useState<'comercial'|'contratos'|'agenda'|'financeiro'|'auditoria'>('comercial');
  const [term,setTerm]=useState('');
  const [dataEvents,setDataEvents]=useState<RecordRow[]>([]);
+ const [eventError,setEventError]=useState('');
  const [revision,setRevision]=useState(0);
  const [form,setForm]=useState<'proposal'|'contract'|'dome'|'booking'|'ledger'|null>(null);
  const [fields,setFields]=useState<Record<string,string>>({});
@@ -49,7 +50,13 @@ export default function OperacaoV1({writesEnabled}:{writesEnabled:boolean}){
   .catch(e=>{if(e.name!=='AbortError')setError(e instanceof Error?e.message:'Consulta indisponível');})
   .finally(()=>setLoading(false));return()=>ctrl.abort();
  },[revision]);
- useEffect(()=>{fetch('/api/crm/clientes',{cache:'no-store'}).then(r=>r.ok?r.json():null).then(d=>{if(d?.events)setDataEvents(d.events);}).catch(()=>{});},[revision]);
+ useEffect(()=>{const controller=new AbortController();
+  fetch('/api/crm/clientes',{cache:'no-store',signal:controller.signal})
+   .then(async r=>{if(!r.ok)throw Error('Não foi possível consultar apresentações.');return r.json();})
+   .then(d=>{setDataEvents(Array.isArray(d.events)?d.events:[]);setEventError('');})
+   .catch(e=>{if(e?.name!=='AbortError')setEventError('Apresentações indisponíveis; confira o CRM.');});
+  return()=>controller.abort();
+ },[revision]);
  const filtered=useMemo(()=>data.proposals.filter(x=>String(x.title||'').toLowerCase().includes(term.toLowerCase())||String(x.client_name||'').toLowerCase().includes(term.toLowerCase())),[data.proposals,term]);
  const forecast=data.proposals.filter(p=>['accepted','sent','negotiating'].includes(String(p.status))).reduce((sum,p)=>sum+Number(p.total||0),0);
  const cash=data.ledger.filter(x=>x.status==='settled').reduce((sum,x)=>sum+(x.category==='income'?1:-1)*Number(x.amount||0),0);
@@ -80,7 +87,7 @@ export default function OperacaoV1({writesEnabled}:{writesEnabled:boolean}){
   <Rows heads={['Proposta','Modalidade','Situação','Confirmação']}
   rows={data.contracts.map(c=>[c.proposal_title,c.confirmation_mode,c.status,dateTime(c.confirmed_at)])}/></section>}
  {tab==='agenda'&&<section style={base}><h2 style={{fontSize:21,fontWeight:650}}>Cúpulas e apresentações</h2>{writesEnabled&&<div style={{display:'flex',gap:8}}><button onClick={()=>openForm('dome')}>+ Cúpula</button><button onClick={()=>openForm('booking')}>+ Reserva</button></div>}
-  <p>Equipamentos cadastrados: {data.domes.map(d=>String(d.name)).join(' · ')||'nenhum'}.</p>
+  <p>Equipamentos cadastrados: {data.domes.map(d=>String(d.name)).join(' · ')||'nenhum'}.</p>{eventError&&<p role="alert">{eventError}</p>}
   <Rows heads={['Apresentação','Cúpula','Início','Término','Situação']}
   rows={data.bookings.map(b=>[b.event_title,b.dome_name,dateTime(b.starts_at),dateTime(b.ends_at),b.status])}/></section>}
  {tab==='financeiro'&&<section style={base}><h2 style={{fontSize:21,fontWeight:650}}>Extrato operacional</h2>{writesEnabled&&<button onClick={()=>openForm('ledger')}>+ Lançamento</button>}
