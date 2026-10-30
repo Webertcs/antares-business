@@ -5,7 +5,7 @@ type RecordRow=Record<string,unknown>;
 type State={clients:RecordRow[];proposals:RecordRow[];contracts:RecordRow[];domes:RecordRow[];bookings:RecordRow[];ledger:RecordRow[];audit:RecordRow[]};
 const empty:State={clients:[],proposals:[],contracts:[],domes:[],bookings:[],ledger:[],audit:[]};
 const money=(value:unknown)=>new Intl.NumberFormat('pt-BR',{style:'currency',currency:'BRL'}).format(Number(value)||0);
-const date=(value:unknown)=>value?new Intl.DateTimeFormat('pt-BR',{dateStyle:'short',timeZone:'America/Sao_Paulo'}).format(new Date(String(value))):'—';
+const date=(value:unknown)=>{if(!value)return '—';const raw=String(value);const day=/^\d{4}-\d{2}-\d{2}$/.test(raw)?new Date(raw+'T12:00:00Z'):new Date(raw);return Number.isNaN(day.getTime())?'—':new Intl.DateTimeFormat('pt-BR',{dateStyle:'short',timeZone:'America/Sao_Paulo'}).format(day);};
 const dateTime=(value:unknown)=>value?new Intl.DateTimeFormat('pt-BR',{dateStyle:'short',timeStyle:'short',timeZone:'America/Sao_Paulo'}).format(new Date(String(value))):'—';
 export default function OperacaoV1({writesEnabled}:{writesEnabled:boolean}){
  const [data,setData]=useState<State>(empty),[error,setError]=useState(''),[loading,setLoading]=useState(true);
