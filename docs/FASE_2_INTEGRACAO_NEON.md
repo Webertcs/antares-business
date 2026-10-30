@@ -44,3 +44,21 @@ antispam antes de gravação de visitantes não autenticados.
   organização, validação de dados e auditoria verificadas.
 - Build e testes funcionais aprovados; pendências de dependências
   vulneráveis rastreadas como bloqueio de lançamento.
+
+## Gate para Fase 3 — verificação automatizada adicionada
+Executar `node scripts/verificar-fase2-integracao.mjs` apenas em ambiente
+seguro, com conexões existentes. O script é somente leitura e checa:
+CRM 03, comercial 04, controle de sobreposição, funções de gravação,
+papel operacional sem privilégios elevados e ausência de DML direto.
+
+**Bloqueio adicional identificado na revisão:** as funções SECURITY DEFINER
+recebem `p_subject` como argumento. Antes de disponibilizar a credencial
+de runtime a qualquer cliente ou terceiro, validar se o banco vincula
+criptograficamente a identidade à sessão; passar uma string de sujeito
+não é prova de identidade. A credencial deve permanecer exclusivamente
+no servidor. Revisar também os privilégios EXECUTE do papel restrito,
+e os limites de acesso do servidor, antes da homologação.
+
+O preflight estrutural não substitui teste de autorização de duas
+organizações, reserva simultânea, CSRF, transações, nem auditoria de
+dependências. Fase 3 somente após implantação 04 e provas de fluxo real.
