@@ -6,7 +6,8 @@ type State={clients:RecordRow[];proposals:RecordRow[];contracts:RecordRow[];dome
 const empty:State={clients:[],proposals:[],contracts:[],domes:[],bookings:[],ledger:[],audit:[]};
 const money=(value:unknown)=>new Intl.NumberFormat('pt-BR',{style:'currency',currency:'BRL'}).format(Number(value)||0);
 const date=(value:unknown)=>{if(!value)return '—';const raw=String(value);const day=/^\d{4}-\d{2}-\d{2}$/.test(raw)?new Date(raw+'T12:00:00Z'):new Date(raw);return Number.isNaN(day.getTime())?'—':new Intl.DateTimeFormat('pt-BR',{dateStyle:'short',timeZone:'America/Sao_Paulo'}).format(day);};
-const dateTime=(value:unknown)=>value?new Intl.DateTimeFormat('pt-BR',{dateStyle:'short',timeStyle:'short',timeZone:'America/Sao_Paulo'}).format(new Date(String(value))):'—';
+const dateTime=(value:unknown)=>{if(!value)return '—';const d=new Date(String(value));return Number.isNaN(d.getTime())?'—':new Intl.DateTimeFormat('pt-BR',{dateStyle:'short',timeStyle:'short',timeZone:'America/Sao_Paulo'}).format(d);};
+const localDay=()=>new Intl.DateTimeFormat('en-CA',{timeZone:'America/Sao_Paulo',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date());
 export default function OperacaoV1({writesEnabled}:{writesEnabled:boolean}){
  const [data,setData]=useState<State>(empty),[error,setError]=useState(''),[loading,setLoading]=useState(true);
  const [tab,setTab]=useState<'comercial'|'contratos'|'agenda'|'financeiro'|'auditoria'>('comercial');
@@ -22,7 +23,7 @@ export default function OperacaoV1({writesEnabled}:{writesEnabled:boolean}){
   setForm(type);setFeedback('');
   setFields(type==='proposal'?{clientId:'',title:'',model:'per_student',attendees:'30',
     unitPrice:'10',fixedPrice:'0',discount:'0',deposit:'0',validUntil:'',notes:''}:
-    type==='contract'?{proposalId:'',mode:'written',terms:''}:type==='dome'?{name:''}:type==='booking'?{eventId:'',domeId:'',start:'',end:''}:{description:'',amount:'',date:'',category:'income',status:'planned'});
+    type==='contract'?{proposalId:'',mode:'written',terms:''}:type==='dome'?{name:''}:type==='booking'?{eventId:'',domeId:'',start:'',end:''}:{description:'',amount:'',date:localDay(),category:'income',status:'planned'});
  }
  function field(k:string,v:string){setFields(old=>({...old,[k]:v}));}
  async function submit(e:React.FormEvent<HTMLFormElement>){
@@ -30,6 +31,8 @@ export default function OperacaoV1({writesEnabled}:{writesEnabled:boolean}){
   const n=(k:string)=>Number(fields[k]||0);
   setBusy(true);setFeedback('');
   try{
+   if(form==='ledger' && (!Number.isFinite(Number(fields.amount)) || Number(fields.amount)<=0 || !fields.date))
+     throw new Error('Informe uma data e um valor maior que zero.');
    if(form==='booking' && (!fields.start || !fields.end ||
      !Number.isFinite(Date.parse(fields.start)) || !Number.isFinite(Date.parse(fields.end)) ||
      Date.parse(fields.end)<=Date.parse(fields.start)))
