@@ -2,6 +2,7 @@
 import {useEffect,useMemo,useState} from 'react';
 import Link from 'next/link';
 type RecordRow=Record<string,unknown>;
+type Balance={monthly:RecordRow[];proposals:RecordRow[];clients:RecordRow[]};
 type State={clients:RecordRow[];proposals:RecordRow[];contracts:RecordRow[];domes:RecordRow[];bookings:RecordRow[];ledger:RecordRow[];audit:RecordRow[]};
 const empty:State={clients:[],proposals:[],contracts:[],domes:[],bookings:[],ledger:[],audit:[]};
 const money=(value:unknown)=>new Intl.NumberFormat('pt-BR',{style:'currency',currency:'BRL'}).format(Number(value)||0);
@@ -10,10 +11,12 @@ const dateTime=(value:unknown)=>{if(!value)return '—';const d=new Date(String(
 const localDay=()=>new Intl.DateTimeFormat('en-CA',{timeZone:'America/Sao_Paulo',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date());
 export default function OperacaoV1({writesEnabled}:{writesEnabled:boolean}){
  const [data,setData]=useState<State>(empty),[error,setError]=useState(''),[loading,setLoading]=useState(true);
- const [tab,setTab]=useState<'comercial'|'contratos'|'agenda'|'financeiro'|'auditoria'>('comercial');
+ const [tab,setTab]=useState<'comercial'|'contratos'|'agenda'|'financeiro'|'balanco'|'auditoria'>('comercial');
  const [term,setTerm]=useState('');
+ const [balance,setBalance]=useState<Balance|null>(null);
  const [dataEvents,setDataEvents]=useState<RecordRow[]>([]);
  const [eventError,setEventError]=useState('');
+ const [balanceError,setBalanceError]=useState('');
  const [revision,setRevision]=useState(0);
  const [form,setForm]=useState<'proposal'|'contract'|'dome'|'booking'|'ledger'|null>(null);
  const [fields,setFields]=useState<Record<string,string>>({});
@@ -58,6 +61,13 @@ export default function OperacaoV1({writesEnabled}:{writesEnabled:boolean}){
    .then(async r=>{if(!r.ok)throw Error('Não foi possível consultar apresentações.');return r.json();})
    .then(d=>{setDataEvents(Array.isArray(d.events)?d.events:[]);setEventError('');})
    .catch(e=>{if(e?.name!=='AbortError')setEventError('Apresentações indisponíveis; confira o CRM.');});
+  return()=>controller.abort();
+ },[revision]);
+ useEffect(()=>{const controller=new AbortController();
+  fetch('/api/business/balanco',{cache:'no-store',signal:controller.signal})
+   .then(async r=>{if(!r.ok)throw Error('Balanço indisponível');return r.json();})
+   .then(d=>{setBalance(d);setBalanceError('');})
+   .catch(e=>{if(e?.name!=='AbortError')setBalanceError('Balanço indisponível até implantação da V1.');});
   return()=>controller.abort();
  },[revision]);
  const filtered=useMemo(()=>data.proposals.filter(x=>String(x.title||'').toLowerCase().includes(term.toLowerCase())||String(x.client_name||'').toLowerCase().includes(term.toLowerCase())),[data.proposals,term]);
@@ -106,7 +116,7 @@ export default function OperacaoV1({writesEnabled}:{writesEnabled:boolean}){
   {reportLink('propostas')}{reportLink('agenda')}{reportLink('financeiro')}
  </div>
  <nav aria-label="Áreas operacionais" style={{display:'flex',gap:8,flexWrap:'wrap',margin:'16px 0'}}>
- {([['comercial','Propostas'],['contratos','Contratos'],['agenda','Agenda e cúpulas'],['financeiro','Financeiro'],['auditoria','Auditoria']] as const).map(([k,l])=>
+ {([['comercial','Propostas'],['contratos','Contratos'],['agenda','Agenda e cúpulas'],['financeiro','Financeiro'],['balanco','Balanço mensal'],['auditoria','Auditoria']] as const).map(([k,l])=>
  <button key={k} onClick={()=>setTab(k)} aria-current={tab===k?'page':undefined}
  style={{padding:'10px 15px',borderRadius:10,background:tab===k?'#1d4ed8':'#e2e8f0',color:tab===k?'#fff':'#0f172a'}}>{l}</button>)}</nav>
  {tab==='comercial'&&<section style={base}><h2 style={{fontSize:21,fontWeight:650}}>Propostas e orçamentos</h2>{writesEnabled&&<button onClick={()=>openForm('proposal')} style={{padding:10,background:'#2563eb',color:'#fff',borderRadius:8}}>+ Nova proposta</button>}<p>Valores previstos, negociação e condições comerciais por cliente.</p>
@@ -125,6 +135,19 @@ export default function OperacaoV1({writesEnabled}:{writesEnabled:boolean}){
   <p>Somente lançamentos liquidados compõem o saldo. Previsto não é recebido.</p>
   <Rows heads={['Data','Descrição','Tipo','Valor','Situação']}
    rows={data.ledger.map(x=>[date(x.occurred_on),x.description,x.category,money(x.amount),x.status])}/></section>}
+ {tab==='balanco'&&<section style={base}>
+  <h2 style={{fontSize:21,fontWeight:650}}>Balanço financeiro mensal</h2>
+  <p>Separação entre valores realizados e previstos; até 36 meses de histórico.</p>
+  {balanceError&&<p role="status">{balanceError}</p>}
+  <Rows heads={['Mês','Recebido','Despesas pagas','A receber','A pagar','Saldo realizado']}
+   rows={(balance?.monthly||[]).map(m=>[date(m.mes),money(m.recebido),money(m.despesas),
+    money(m.a_receber),money(m.a_pagar),money(Number(m.recebido||0)-Number(m.despesas||0))])}/>
+  <h3 style={{fontSize:18,fontWeight:650,marginTop:18}}>Funil comercial por situação</h3>
+  <Rows heads={['Situação','Quantidade','Valor total']}
+    rows={(balance?.proposals||[]).map(p=>[p.status,p.quantidade,money(p.valor)])}/>
+  <h3 style={{fontSize:18,fontWeight:650,marginTop:18}}>Clientes por categoria</h3>
+  <Rows heads={['Tipo','Quantidade']} rows={(balance?.clients||[]).map(c=>[c.kind,c.quantidade])}/>
+ </section>}
  {tab==='auditoria'&&<section style={base}><h2 style={{fontSize:21,fontWeight:650}}>Trilha de auditoria</h2>
   <p>Registros de alterações, disponíveis para conferência do proprietário.</p>
   <Rows heads={['Quando','Ação','Entidade','ID']}
