@@ -20,8 +20,9 @@ export async function POST(request:NextRequest){
   const db=getTeamWriteDb();
   const checks=await db`SELECT current_user='antares_team_runtime'
     AND NOT rolsuper AND NOT rolbypassrls AS safe_role,
-    (SELECT count(*)=2 FROM pg_proc p WHERE p.pronamespace='public'::regnamespace
-      AND p.proname IN ('business_create_proposal','business_create_contract')
+    (SELECT count(*)=5 FROM pg_proc p WHERE p.pronamespace='public'::regnamespace
+      AND p.proname IN ('business_create_proposal','business_create_contract',
+      'business_create_dome','business_create_booking','business_create_ledger_entry')
       AND p.prosecdef AND pg_get_userbyid(p.proowner)='neondb_owner'
       AND has_function_privilege(current_user,p.oid,'EXECUTE')
       AND NOT EXISTS (SELECT 1 FROM aclexplode(
@@ -62,6 +63,33 @@ export async function POST(request:NextRequest){
    const result=await db`SELECT public.business_create_contract(
      ${owner.user.id},${uuid(body.proposalId)}::uuid,
      ${str(body.mode,30)},${str(body.terms,8000)}) AS id`;
+   return NextResponse.json({id:result[0]?.id},{status:201});
+  }
+  if(body.action==='dome'){
+   const result=await db`SELECT public.business_create_dome(
+    ${owner.user.id},${str(body.name,100)}) AS id`;
+   return NextResponse.json({id:result[0]?.id},{status:201});
+  }
+  if(body.action==='booking'){
+   if(!uuid(body.eventId)||!uuid(body.domeId))return deny('Evento ou cúpula inválidos.',400);
+   const start=typeof body.start==='string'?body.start:'';
+   const end=typeof body.end==='string'?body.end:'';
+   if(!start||!end||!Number.isFinite(Date.parse(start))||!Number.isFinite(Date.parse(end)))
+    return deny('Datas inválidas.',400);
+   const result=await db`SELECT public.business_create_booking(
+    ${owner.user.id},${uuid(body.eventId)}::uuid,${uuid(body.domeId)}::uuid,
+    ${start}::timestamptz,${end}::timestamptz) AS id`;
+   return NextResponse.json({id:result[0]?.id},{status:201});
+  }
+  if(body.action==='ledger'){
+   if(body.proposalId&&!uuid(body.proposalId))return deny('Proposta inválida.',400);
+   const day=str(body.date,10);
+   if(!/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/.test(day))return deny('Data inválida.',400);
+   const amount=num(body.amount);
+   if(amount===null||amount<=0)return deny('Valor inválido.',400);
+   const result=await db`SELECT public.business_create_ledger_entry(
+    ${owner.user.id},${uuid(body.proposalId)}::uuid,${str(body.category,20)},
+    ${str(body.status,20)},${str(body.description,250)},${amount},${day}::date) AS id`;
    return NextResponse.json({id:result[0]?.id},{status:201});
   }
   return deny('Operação desconhecida.',400);
