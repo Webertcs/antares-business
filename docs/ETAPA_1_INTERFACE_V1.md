@@ -37,3 +37,17 @@ lançamento.
 
 O workflow npm verifica build/tipagem; a auditoria continua reprovada
 por dependências vulneráveis de autenticação. Não retirar o bloqueio.
+
+## Encerramento controlado da Fase 1 — 29/10/2026 (Brasília)
+**Estado: implementação da interface encerrada para passagem à Fase 2; homologação do produto pendente.**
+
+Verificação automatizada no commit `33872f5b866c314f7cbf34bb8e2b2b38570c514b`:
+- Instalação de dependências: aprovada.
+- Compilação de produção e checagem TypeScript: aprovadas.
+- Auditoria de dependências: reprovada, bloqueante para comercialização.
+
+O escopo de UI está congelado para a conexão consolidada ao banco. Não confundir
+este marco com aceitação do usuário ou validação de uso real: a oficina utiliza
+somente dados em memória; a conexão com o Neon, regras autoritativas do servidor,
+segurança de autenticação, privacidade, testes de ponta a ponta e revisão da
+vitrine pública serão avaliados nas fases seguintes. A branch `main` não foi alterada.
