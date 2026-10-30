@@ -1,32 +1,44 @@
-name: ANTARES V1 - diagnostico temporario
+name: ANTARES V1 - corrigir lock e verificar compilacao
 on:
   push:
     branches:
       - feature/bloco-02d-seguranca
+    paths:
+      - 'package.json'
+      - 'package-lock.json'
+      - '.github/workflows/v1-diagnostico.yml'
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   diagnostico:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - name: Regenerar lock APENAS no runner para diagnostico
+      - name: Reconciliar lockfile sem executar scripts de dependencias
         run: npm install --package-lock-only --ignore-scripts --no-fund
-      - name: Instalar dependencias sem alterar fontes
-        run: npm ci --no-fund
+      - name: Conferir integridade do lockfile
+        run: npm ci --ignore-scripts --no-fund
+      - name: Registrar lock reconciliado somente na branch de desenvolvimento
+        run: |
+          if ! git diff --quiet -- package-lock.json; then
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add package-lock.json
+            git commit -m "fix(deps): reconcile npm lockfile for reproducible CI"
+            git push origin HEAD:feature/bloco-02d-seguranca
+          fi
       - name: Conferir TypeScript
         run: npx tsc --noEmit
       - name: Compilar Next.js
         run: npm run build
       - name: Auditar dependencias de producao
         run: npm audit --omit=dev --audit-level=high
-
-# Este diagnostico nao substitui o workflow de qualidade bloqueante.
-# O package-lock.json versionado continua precisando de correcao reproduzivel.
