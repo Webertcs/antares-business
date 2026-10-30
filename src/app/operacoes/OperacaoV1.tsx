@@ -27,11 +27,15 @@ export default function OperacaoV1({writesEnabled}:{writesEnabled:boolean}){
  async function submit(e:React.FormEvent<HTMLFormElement>){
   e.preventDefault();if(!writesEnabled||!form||busy)return;
   const n=(k:string)=>Number(fields[k]||0);
-  const body=form==='proposal'?{action:'proposal',...fields,
-    attendees:n('attendees'),unitPrice:n('unitPrice'),fixedPrice:n('fixedPrice'),
-    discount:n('discount'),deposit:n('deposit')}:form==='ledger'?{action:'ledger',...fields,amount:n('amount')}:form==='booking'?{action:'booking',...fields,start:new Date(fields.start).toISOString(),end:new Date(fields.end).toISOString()}:{action:form,...fields};
   setBusy(true);setFeedback('');
   try{
+   if(form==='booking' && (!fields.start || !fields.end ||
+     !Number.isFinite(Date.parse(fields.start)) || !Number.isFinite(Date.parse(fields.end)) ||
+     Date.parse(fields.end)<=Date.parse(fields.start)))
+     throw new Error('Confira início e término da reserva.');
+   const body=form==='proposal'?{action:'proposal',...fields,
+    attendees:n('attendees'),unitPrice:n('unitPrice'),fixedPrice:n('fixedPrice'),
+    discount:n('discount'),deposit:n('deposit')}:form==='ledger'?{action:'ledger',...fields,amount:n('amount')}:form==='booking'?{action:'booking',...fields,start:new Date(fields.start).toISOString(),end:new Date(fields.end).toISOString()}:{action:form,...fields};
    const response=await fetch('/api/business/gravar',{method:'POST',
     headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
    const result=await response.json();
@@ -41,7 +45,7 @@ export default function OperacaoV1({writesEnabled}:{writesEnabled:boolean}){
   finally{setBusy(false);}
  }
  useEffect(()=>{const ctrl=new AbortController();
-  fetch('/api/business',{cache:'no-store',signal:ctrl.signal}).then(async r=>{const b=await r.json();if(!r.ok)throw Error(b.error||'Falha na consulta');setData(b);})
+  fetch('/api/business',{cache:'no-store',signal:ctrl.signal}).then(async r=>{const b=await r.json();if(!r.ok)throw Error(b.error||'Falha na consulta');setData(b);setError('');})
   .catch(e=>{if(e.name!=='AbortError')setError(e instanceof Error?e.message:'Consulta indisponível');})
   .finally(()=>setLoading(false));return()=>ctrl.abort();
  },[revision]);
