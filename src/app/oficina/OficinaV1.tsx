@@ -70,6 +70,9 @@ export default function OficinaV1(){
  const settled=records.financeiro.filter(r=>r.status==='Liquidado');
  const received=settled.filter(r=>r.category==='Receita').reduce((v,r)=>v+Number(r.amount||0),0);
  const spent=settled.filter(r=>r.category==='Despesa').reduce((v,r)=>v+Number(r.amount||0),0);
+ const visits=(clientId:string)=>records.agenda.filter(a=>a.client===clientId&&a.status==='Realizada').length;
+ const benefit=(clientId:string)=>records.fidelizacao.filter(f=>f.client===clientId&&f.status==='Ativo'&&visits(clientId)>=Number(f.threshold||Infinity));
+ const proposalTotal=(r:Row)=>Math.max(0,(r.mode==='Por aluno'?Number(r.qty||0)*Number(r.unit||0):r.mode==='Preço fechado'?Number(r.fixed||0):0)-Number(r.discount||0));
  const future=records.agenda.filter(r=>r.start&&new Date(r.start).getTime()>Date.now()&&r.status!=='Cancelada').length;
  function go(id:Module){setModule(id);setFilter('');setMessage('');setOpen(false);setMobile(false);}
  function start(row?:Row){if(module==='visao'||module==='relatorios'||module==='vitrine')return;setForm(row?{...row}:{});setEditing(row?.id||null);setOpen(true);setMessage('');}
@@ -83,14 +86,25 @@ export default function OficinaV1(){
     new Date(x.start)<new Date(form.end)&&new Date(x.end)>new Date(form.start));
    if(conflict){setMessage('Já existe uma apresentação nessa cúpula e nesse horário.');return;}
   }
-  if(module==='propostas'){
+  if(module==='fidelizacao'&&(Number(form.discount||0)>100||Number(form.threshold||0)<1)){setMessage('Desconto de 0 a 100% e mínimo de uma visita.');return;}
+  if(module==='propostas'&&form.client&&Number(form.discount||0)>0){
+   const discountLimit=benefit(form.client).reduce((max,f)=>Math.max(max,Number(f.discount||0)),0);
+   if(discountLimit===0){setMessage('Desconto informado sem benefício ativo por assiduidade. Cadastre ou ative a fidelização.');return;}
+   const gross=form.mode==='Por aluno'?Number(form.qty||0)*Number(form.unit||0):Number(form.fixed||0);
+   if(Number(form.discount||0)>gross*discountLimit/100){setMessage('Desconto supera o percentual aprovado na fidelização.');return;}
+  }
+    if(module==='propostas'){
    const total=Math.max(0,(form.mode==='Por aluno'?Number(form.qty||0)*Number(form.unit||0):form.mode==='Preço fechado'?Number(form.fixed||0):0)-Number(form.discount||0));
    if(Number(form.deposit||0)>total){setMessage('O sinal não pode ser maior que o valor da proposta.');return;}
   }
   for(const [key,target] of Object.entries(relations[module]||{}) as [string,Module][]){
    if(form[key]&&!records[target].some(r=>r.id===form[key])){setMessage('O vínculo selecionado não existe.');return;}
   }
-  const row:Row={...form,id:editing||('local-'+Date.now().toString(36)+'-'+Math.random().toString(36).slice(2,6))};
+  if(module==='agenda'&&Number(form.students||0)>0){
+   const dome=records.cupulas.find(x=>x.id===form.dome);
+   if(dome?.capacity&&Number(form.students)>Number(dome.capacity)){setMessage('Participantes acima da lotação da cúpula.');return;}
+  }
+    const row:Row={...form,id:editing||('local-'+Date.now().toString(36)+'-'+Math.random().toString(36).slice(2,6))};
   setRecords(prev=>({...prev,[module]:editing?prev[module].map(x=>x.id===editing?row:x):[row,...prev[module]]}));
   setOpen(false);setMessage('Registro atualizado nesta demonstração. Não foi enviado ao banco.');
  }
@@ -151,7 +165,8 @@ export default function OficinaV1(){
     {module==='vitrine'&&<div className="oficina-panels"><section><p className="oficina-kicker">PLANETÁRIO KIDS</p><h2>Descubra o universo sem sair da escola!</h2><p>Experiência infantil para escolas, associações, eventos e empresas. Sessões imersivas e programação educativa.</p><button className="oficina-primary" onClick={()=>go('propostas')}>Solicitar orçamento →</button><p className="oficina-muted">Fluxo de demonstração. A vitrine pública existente está disponível em <Link href="/vitrine">/vitrine</Link>.</p></section><section className="oficina-space">🪐<span>ASTRO · LUNNA · ESPAÇO</span></section></div>}
     {fieldInfo&&<>
      <div className="oficina-toolbar"><label><Search size={17}/><input placeholder="Pesquisar registros..." value={filter} onChange={e=>setFilter(e.target.value)}/></label><button className="oficina-secondary" onClick={()=>download(module)}><Download size={16}/> Exportar CSV</button></div>
-     <section className="oficina-panel"><div className="oficina-panel-head"><h2>{fieldInfo.title}</h2><small>{rows.length} registro(s)</small></div><div className="oficina-records">{rows.map(row=><div key={row.id}><div><strong>{row.name||'Registro'}</strong><span>{fieldInfo.fields.filter(f=>f.key!=='name').slice(0,4).map(f=>relationLabel(module,f.key,row,records)).filter(Boolean).join(' · ')}</span>{module==='propostas'&&<small>Total estimado: {money(Math.max(0,(row.mode==='Por aluno'?Number(row.qty||0)*Number(row.unit||0):row.mode==='Preço fechado'?Number(row.fixed||0):0)-Number(row.discount||0)))}</small>}</div><div className="oficina-record-actions">{module==='propostas'&&<button onClick={()=>printProposal(row)}>Prévia</button>}
+     <section className="oficina-panel"><div className="oficina-panel-head"><h2>{fieldInfo.title}</h2><small>{rows.length} registro(s)</small></div><div className="oficina-records">{rows.map(row=><div key={row.id}><div><strong>{row.name||'Registro'}</strong><span>{fieldInfo.fields.filter(f=>f.key!=='name').slice(0,4).map(f=>relationLabel(module,f.key,row,records)).filter(Boolean).join(' · ')}</span>{module==='clientes'&&<small>Apresentações realizadas: {visits(row.id)} · Benefícios ativos: {benefit(row.id).length}</small>}
+ {module==='propostas'&&<small>Total estimado: {money(Math.max(0,(row.mode==='Por aluno'?Number(row.qty||0)*Number(row.unit||0):row.mode==='Preço fechado'?Number(row.fixed||0):0)-Number(row.discount||0)))}</small>}</div><div className="oficina-record-actions">{module==='propostas'&&<button onClick={()=>printProposal(row)}>Prévia</button>}
  {(['propostas','contratos','agenda'] as Module[]).includes(module)&&<button onClick={()=>advance(module,row)}>{module==='propostas'?'Contrato →':module==='contratos'?'Agenda →':'Recebimento →'}</button>}
  <button onClick={()=>start(row)}>Editar</button><button aria-label="Excluir registro" onClick={()=>remove(row.id)}><Trash2 size={16}/></button></div></div>)}{rows.length===0&&<div className="oficina-empty"><ClipboardList size={27}/><strong>Nenhum registro nesta área</strong><span>Crie o primeiro registro para experimentar o fluxo completo.</span></div>}</div></section>
     </>}
