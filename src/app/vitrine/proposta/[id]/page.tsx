@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import Editor from '../Editor';
 import {redirect} from 'next/navigation';
 import {requireOwner,getDb} from '@/lib/equipe/auth';
 export const dynamic='force-dynamic';
@@ -44,10 +45,11 @@ export default async function Proposta({params}:{params:Promise<{id:string}>}){
    <p><b>Total calculado:</b> {money(proposal.total)}</p>
    <p style={{fontWeight:650}}>Valores iniciais em zero: revisar antes de qualquer envio ao cliente.</p>
   </section>
+  <Editor proposal={{id:String(proposal.id),status:String(proposal.status),pricing_model:String(proposal.pricing_model),expected_attendees:Number(proposal.expected_attendees??0),unit_price:Number(proposal.unit_price),fixed_price:Number(proposal.fixed_price),discount:Number(proposal.discount),deposit:Number(proposal.deposit)}} />
   <section style={{border:'1px solid #64748b',borderRadius:14,padding:20,marginTop:16}}>
    <h2 style={{fontSize:21,fontWeight:700}}>Observações</h2>
    <p style={{whiteSpace:'pre-wrap',overflowWrap:'anywhere'}}>{t(proposal.notes)}</p>
   </section>
-  <p style={{marginTop:22}}>Consulta somente leitura. Esta tela não envia propostas nem cria contratos, pagamentos ou reservas.</p>
+  <p style={{marginTop:22}}>Apenas valores de rascunhos podem ser editados. Após salvar, atualize a página para conferir o resumo persistido. Não há envio automático, contratos, pagamentos ou reservas.</p>
  </main>;
 }
