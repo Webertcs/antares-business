@@ -13,7 +13,7 @@ export default async function Proposta({params}:{params:Promise<{id:string}>}){
  try {
   const db=getDb();
   const rows=await db`SELECT p.id,p.title,p.status,p.pricing_model,p.expected_attendees,
-  p.unit_price,p.fixed_price,p.discount,p.deposit,p.total,p.notes,p.created_at,p.valid_until,p.payment_terms,
+  p.unit_price,p.fixed_price,p.discount,p.deposit,p.total,p.notes,p.created_at,to_char(p.valid_until, 'YYYY-MM-DD') AS valid_until,p.payment_terms,
   c.name AS client_name,c.kind AS client_kind,
   l.institution AS origin_institution,l.id AS lead_id
   FROM public.business_proposals p
@@ -46,7 +46,7 @@ export default async function Proposta({params}:{params:Promise<{id:string}>}){
    <p><b>Desconto:</b> {money(proposal.discount)}</p>
    <p><b>Sinal:</b> {money(proposal.deposit)}</p>
    <p><b>Total calculado:</b> {money(proposal.total)}</p>
-   <p style={{fontWeight:650}}>Valores iniciais em zero: revisar antes de qualquer envio ao cliente.</p>
+   {Number(proposal.total)<=0&&<p style={{fontWeight:650}}>Valores ainda não definidos: revisar antes de qualquer envio ao cliente.</p>}
   </section>
   <Editor proposal={{id:String(proposal.id),status:String(proposal.status),pricing_model:String(proposal.pricing_model),expected_attendees:Number(proposal.expected_attendees??0),unit_price:Number(proposal.unit_price),fixed_price:Number(proposal.fixed_price),discount:Number(proposal.discount),deposit:Number(proposal.deposit)}} />
   <Premium proposal={{id:String(proposal.id),status:String(proposal.status),valid_until:proposal.valid_until?String(proposal.valid_until):null,payment_terms:proposal.payment_terms?String(proposal.payment_terms):null,title:String(proposal.title),client_name:String(proposal.client_name),expected_attendees:Number(proposal.expected_attendees??0),total:Number(proposal.total),deposit:Number(proposal.deposit)}} history={history}/>
