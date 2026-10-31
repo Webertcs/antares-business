@@ -1,8 +1,10 @@
 'use client';
 import {useMemo,useState} from 'react';
+import {useRouter} from 'next/navigation';
 type Model='per_student'|'fixed'|'complimentary';
 type Data={id:string;status:string;pricing_model:string;expected_attendees:number|null;unit_price:number;fixed_price:number;discount:number;deposit:number};
 export default function Editor({proposal:p}:{proposal:Data}){
+ const router=useRouter();
  const [model,setModel]=useState<Model>((['per_student','fixed','complimentary'].includes(p.pricing_model)?p.pricing_model:'per_student') as Model);
  const [attendees,setAttendees]=useState(p.expected_attendees??0);
  const [unit,setUnit]=useState(Number(p.unit_price));
@@ -23,7 +25,7 @@ export default function Editor({proposal:p}:{proposal:Data}){
   try{
    const r=await fetch('/api/vitrine/proposta',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({id:p.id,model,attendees,unit,fixed,discount,deposit})});
    const d=await r.json();if(!r.ok)throw Error(d.error||'Falha ao salvar.');
-   setNotice('Rascunho salvo e alteração registrada na auditoria.'); 
+   setNotice('Rascunho salvo e alteração registrada na auditoria.');router.refresh(); 
   }catch(e){setNotice(e instanceof Error?e.message:'Erro ao salvar.');}
   finally{setBusy(false);}
  }
