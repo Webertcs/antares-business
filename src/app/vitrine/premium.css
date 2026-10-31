@@ -203,3 +203,15 @@
 .premium-kids .premium-speech-compact b{font-size:13px;color:#ffe3a0}
 .premium-kids .premium-speech-compact p{font-size:12px;line-height:1.55;margin:4px 0 0;color:#dceaff}
 @media(max-width:620px){.premium-kids .premium-speech-compact{flex:1 1 100px;min-width:92px;padding:8px}.premium-kids .premium-speech-compact b{font-size:11px}.premium-kids .premium-speech-compact p{font-size:10px;line-height:1.35}}
+
+/* Diálogo contextual: tripulação livre e balão apenas na interação. */
+.premium-kids .premium-crew{justify-content:center;gap:clamp(38px,10vw,150px);min-height:230px;overflow:visible}
+.premium-crew-member{position:relative;display:flex;align-items:center;justify-content:center;min-width:0}
+.premium-character-bubble{position:absolute;z-index:10;left:50%;bottom:calc(100% - 15px);transform:translateX(-50%);width:min(285px,78vw);padding:13px 29px 13px 16px;border:1.5px solid #add4ff;background:linear-gradient(140deg,#254779f5,#172e60f7);box-shadow:0 16px 35px #02091ca8,0 0 22px #83c4ff44;border-radius:19px;color:#fff;pointer-events:auto;text-align:left;animation:pk-bubble-in .22s ease-out}
+.premium-character-bubble::after{content:"";position:absolute;bottom:-9px;left:calc(50% - 9px);width:16px;height:16px;background:#203c73;border-right:1.5px solid #add4ff;border-bottom:1.5px solid #add4ff;transform:rotate(45deg)}
+.premium-character-bubble b{font-size:13px;color:#ffdf85;display:block}
+.premium-character-bubble p{font-size:12px;line-height:1.5;margin:5px 0 0;color:#eff6ff}
+.premium-bubble-close{position:absolute;right:8px;top:7px;width:24px;height:24px;border:1px solid #ffffff66;border-radius:50%;background:#ffffff22;color:#fff;line-height:1}
+@keyframes pk-bubble-in{from{opacity:0;transform:translate(-50%,8px)}to{opacity:1;transform:translate(-50%,0)}}
+@media(max-width:620px){.premium-kids .premium-crew{gap:clamp(16px,5vw,45px);min-height:125px}.premium-character-bubble{bottom:calc(100% - 5px);width:min(245px,85vw);padding:10px 25px 10px 12px}.premium-character-bubble p{font-size:11px}}
+@media(prefers-reduced-motion:reduce){.premium-character-bubble{animation:none!important}}
