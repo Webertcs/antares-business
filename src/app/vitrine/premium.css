@@ -105,3 +105,44 @@
 .premium-pluto summary{cursor:pointer;font-weight:800}
 .premium-pluto p{line-height:1.6;margin-top:9px}
 @media(prefers-reduced-motion:reduce){.premium-stars-layer.near,.premium-comet{animation:none!important}.premium-comet{display:none}}
+
+/* GRAN MASTER — cinematografia da primeira dobra e cartões espaciais premium */
+.premium-kids .premium-hero{position:relative;max-width:1400px;padding-top:64px;padding-bottom:98px}
+.premium-kids .premium-hero::before{content:"";position:absolute;left:50%;top:3%;width:min(1150px,94vw);height:580px;transform:translateX(-50%);pointer-events:none;background:radial-gradient(ellipse at 48% 50%,#365fc331,transparent 65%),radial-gradient(ellipse at 18% 32%,#a25fd91f,transparent 48%);filter:blur(28px)}
+.premium-kids .premium-copy{max-width:1000px}
+.premium-kids .premium-copy h1{font-weight:950;font-size:clamp(48px,6.5vw,88px);letter-spacing:-.055em;line-height:1.02;text-shadow:0 4px 34px #02091bb8}
+.premium-kids .premium-copy>p{font-size:clamp(17px,1.7vw,22px);line-height:1.75;max-width:770px}
+.premium-kids .premium-eyebrow{display:inline-block;border:1px solid #b0c8fa63;padding:10px 20px;border-radius:50px;letter-spacing:.18em;background:#162d6180;box-shadow:0 0 32px #6483db22}
+.premium-kids .premium-button{background:linear-gradient(115deg,#ffc544,#ffde75);color:#162451;border:2px solid #ffdc77;box-shadow:0 7px 28px #ffc8564a,0 0 28px #ffbb4921;transition:transform .22s,box-shadow .22s}
+.premium-kids .premium-button:hover{transform:translateY(-3px);box-shadow:0 12px 36px #ffc85677}
+.premium-kids .premium-crew{position:relative;margin-top:24px;max-width:1060px;gap:clamp(10px,3vw,45px);padding:16px 0}
+.premium-crew-glow{position:absolute;inset:15% 7%;pointer-events:none;border-radius:50%;background:radial-gradient(ellipse at center,#427adc36,transparent 72%);filter:blur(18px)}
+.premium-kids .premium-mascot{position:relative;z-index:1;transition:transform .25s}
+.premium-kids .premium-mascot:hover{transform:translateY(-6px)}
+.premium-kids .premium-mascot .premium-character-image{width:clamp(140px,17vw,218px);height:clamp(180px,22vw,270px);filter:drop-shadow(0 14px 10px #030a32a8) drop-shadow(0 0 18px #6ba5ed63)}
+.premium-kids .premium-mascot strong,.premium-pixel-label{letter-spacing:.18em;font-size:12px;color:#fff;background:linear-gradient(120deg,#2f72cbb8,#5c4cc5bb);border:1px solid #bad7ff80;border-radius:99px;padding:6px 16px;box-shadow:0 0 20px #439bf94d}
+.premium-kids .premium-speech{background:linear-gradient(135deg,#172c58df,#26376bdf);border:1px solid #8bb9f6c4;border-radius:23px;box-shadow:0 18px 44px #040c2e8c,0 0 38px #6590dc2c;padding:21px 24px}
+.premium-kids .premium-speech b{font-size:17px;color:#ffdf8f}
+.premium-kids .premium-speech p{font-size:15px;line-height:1.75;color:#ebf3ff}
+.premium-kids .premium-crew-pixel{position:relative;display:flex;align-items:center;flex-direction:column;gap:4px}
+.premium-kids .premium-crew-pixel img{width:clamp(88px,10vw,125px);filter:drop-shadow(0 0 19px #83c9ff77)}
+.premium-kids .premium-universe{position:relative}
+.premium-kids .premium-sky{width:min(96vw,980px);max-width:980px;aspect-ratio:1.72;margin:10px auto 5px;border-radius:50%;background:radial-gradient(ellipse at center,#213e82a1 0%,#0b1a45cf 60%,#0a1438e6 100%);box-shadow:inset 0 0 110px #5286da54,0 0 65px #6d8dca35;border-color:#7bb6ff5c}
+.premium-kids .premium-sky::after{background:radial-gradient(ellipse at 35% 47%,#a66ce92a,transparent 45%),radial-gradient(ellipse at 73% 53%,#4bd1ff1b,transparent 42%);mix-blend-mode:screen}
+.premium-kids .premium-orbit-svg{filter:drop-shadow(0 0 10px #5d8eff44)}
+.premium-kids .premium-motion-note{font-size:12px;color:#becfeb;margin-top:20px}
+.premium-kids .premium-pluto{margin-top:18px}
+.premium-kids .premium-section{position:relative}
+.premium-kids .premium-section-title h2{font-size:clamp(34px,4vw,52px);letter-spacing:-.035em;text-shadow:0 5px 25px #0108207a}
+.premium-kids .premium-section-title>span{letter-spacing:.2em}
+.premium-kids .premium-three article,.premium-kids .premium-journey-grid article{position:relative;overflow:hidden;transition:transform .22s,border-color .22s}
+.premium-kids .premium-three article::before,.premium-kids .premium-journey-grid article::before{content:"";position:absolute;inset:-45% -30% auto;height:80%;pointer-events:none;background:radial-gradient(ellipse at center,#7094fd30,transparent 65%)}
+.premium-kids .premium-three article:hover,.premium-kids .premium-journey-grid article:hover{transform:translateY(-6px);border-color:#b2d5ffb2}
+.premium-kids .premium-three article>div,.premium-kids .premium-journey-grid article>span{filter:drop-shadow(0 0 14px #819cff70)}
+.premium-kids .premium-three h3,.premium-kids .premium-journey-grid h3{color:#fff}
+.premium-kids .premium-school{box-shadow:inset 0 0 80px #5b80ce44}
+.premium-kids .premium-contact form{box-shadow:0 20px 60px #020a2f6e}
+.premium-kids .premium-footer{background:#070f28d9;border-top:1px solid #7994cc55}
+@media(max-width:800px){.premium-kids .premium-hero{padding-top:32px}.premium-kids .premium-crew{gap:12px}.premium-kids .premium-crew-pixel img{width:72px}.premium-kids .premium-sky{width:min(98vw,700px)}}
+@media(max-width:620px){.premium-kids .premium-hero{padding:25px 13px 75px}.premium-kids .premium-copy h1{font-size:clamp(39px,10vw,56px)}.premium-kids .premium-crew{gap:5px}.premium-kids .premium-mascot .premium-character-image{width:76px;height:115px}.premium-kids .premium-mascot strong,.premium-pixel-label{font-size:9px;letter-spacing:0;padding:4px 8px}.premium-kids .premium-speech{padding:10px 9px}.premium-kids .premium-speech b{font-size:12px}.premium-kids .premium-speech p{font-size:11px;line-height:1.45}.premium-kids .premium-crew-pixel img{width:45px}.premium-kids .premium-sky{width:100%;aspect-ratio:1.4}.premium-kids .premium-section-title h2{font-size:34px}}
+@media(prefers-reduced-motion:reduce){.premium-kids .premium-three article,.premium-kids .premium-journey-grid article,.premium-kids .premium-button{transition:none!important}}
