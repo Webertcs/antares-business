@@ -36,13 +36,28 @@ export default function PremiumVitrine(){
  const [reduce,setReduce]=useState(false);
  const orbitSvg=useRef<SVGSVGElement|null>(null);
  useEffect(()=>{setReduce(window.matchMedia('(prefers-reduced-motion: reduce)').matches);setVoiceAvailable('speechSynthesis'in window);return()=>{window.speechSynthesis?.cancel();};},[]);
- function speakFact(fact:string){if(mute||!voiceAvailable)return;window.speechSynthesis.cancel();const utter=new SpeechSynthesisUtterance(fact);utter.lang='pt-BR';utter.rate=.93;utter.pitch=1.08;window.speechSynthesis.speak(utter);}
+ function speakFact(fact:string,speaker:'Astro'|'Lunna'|'PIXEL'){
+  if(mute||!voiceAvailable)return;
+  const synth=window.speechSynthesis;
+  synth.cancel();
+  const utter=new SpeechSynthesisUtterance('Olá! Eu sou '+speaker+'. '+fact);
+  utter.lang='pt-BR';
+  utter.rate=speaker==='PIXEL'?1.06:.93;
+  utter.pitch=speaker==='Lunna'?1.4:speaker==='PIXEL'?1.65:.88;
+  const voices=synth.getVoices().filter(v=>/^pt(-|_)/i.test(v.lang));
+  const preferred=speaker==='Lunna'
+   ?voices.find(v=>/female|femin|maria|luciana|francisca|helena/i.test(v.name))
+   :speaker==='Astro'?voices.find(v=>/male|mascul|daniel|antonio|ricardo/i.test(v.name)):undefined;
+  utter.voice=preferred||voices.find(v=>/pt-BR/i.test(v.lang))||voices[0]||null;
+  synth.speak(utter);
+ }
  function selectWorld(w:World){
   setWorld(w);setShowSpeech(true);
   const presenters:('Astro'|'Lunna'|'PIXEL')[]=['Astro','Lunna','PIXEL'];
-  setMascot(presenters[presenterTurn.current%presenters.length]);
+  const next=presenters[presenterTurn.current%presenters.length];
+  setMascot(next);
   presenterTurn.current+=1;
-  speakFact(w.fact);
+  speakFact(w.fact,next);
  }
  function toggleSound(){
   if(!mute)window.speechSynthesis?.cancel();
@@ -87,9 +102,9 @@ export default function PremiumVitrine(){
       </g>;})}
     </svg><div className="premium-universe-controls"><button onClick={()=>setPaused(v=>!v)} aria-label={paused?'Retomar órbitas':'Pausar órbitas'}>{paused?<Play size={16}/>:<Pause size={16}/>} {paused?'Continuar':'Pausar'}</button><button onClick={toggleSound} aria-label={mute?'Ativar narração':'Silenciar narração'} disabled={!voiceAvailable}>{mute?<VolumeX size={16}/>:<Volume2 size={16}/>} {mute?'Ouvir':'Silenciar'}</button></div></div>
     <div className="premium-crew"><div className="premium-crew-glow" aria-hidden="true"/>
-      <div className={"premium-crew-member"+(showSpeech&&mascot==="Astro"?" is-presenting":"")}><button className={'premium-mascot'+(mascot==='Astro'&&showSpeech?' speaking':'')} onClick={()=>{setMascot('Astro');setShowSpeech(true);speakFact(world.fact);}} aria-label="Ouvir Astro apresentar o planeta"><Image src="/mascotes/astro.png" alt="" width={115} height={150} className="premium-character-image"/><strong>ASTRO</strong></button>{showSpeech&&mascot==='Astro'&&<div className="premium-character-bubble" role="status"><button aria-label="Fechar curiosidade" className="premium-bubble-close" onClick={()=>setShowSpeech(false)}>×</button><b>ASTRO · {world.name}</b><p>{world.fact}</p></div>}</div>
-      <div className={"premium-crew-member"+(showSpeech&&mascot==="Lunna"?" is-presenting":"")}><button className={'premium-mascot'+(mascot==='Lunna'&&showSpeech?' speaking':'')} onClick={()=>{setMascot('Lunna');setShowSpeech(true);speakFact(world.fact);}} type="button" aria-label="Lunna apresenta o planeta selecionado"><Image src="/mascotes/lunna.png" alt="" width={115} height={150} className="premium-character-image"/><strong>LUNNA</strong></button>{showSpeech&&mascot==='Lunna'&&<div className="premium-character-bubble" role="status"><button aria-label="Fechar curiosidade" className="premium-bubble-close" onClick={()=>setShowSpeech(false)}>×</button><b>LUNNA · {world.name}</b><p>{world.fact}</p></div>}</div>
-      <div className={"premium-crew-pixel premium-crew-member"+(showSpeech&&mascot==="PIXEL"?" is-presenting":"")}><button type="button" className="premium-pixel-button" aria-label="PIXEL apresenta uma curiosidade" onClick={()=>{setMascot("PIXEL");setShowSpeech(true);speakFact(world.fact);}}><Image src="/mascotes/pixel.png" width={105} height={115} alt="PIXEL, robô companheiro"/><span className="premium-pixel-label">PIXEL</span></button>{showSpeech&&mascot==="PIXEL"&&<div className="premium-character-bubble premium-pixel-bubble" role="status"><button aria-label="Fechar curiosidade" className="premium-bubble-close" onClick={()=>setShowSpeech(false)}>×</button><b>🤖 PIXEL explica {world.name}</b><p>{world.fact}</p></div>}</div>
+      <div className={"premium-crew-member"+(showSpeech&&mascot==="Astro"?" is-presenting":"")}><button className={'premium-mascot'+(mascot==='Astro'&&showSpeech?' speaking':'')} onClick={()=>{setMascot('Astro');setShowSpeech(true);speakFact(world.fact,'Astro');}} aria-label="Ouvir Astro apresentar o planeta"><Image src="/mascotes/astro.png" alt="" width={115} height={150} className="premium-character-image"/><strong>ASTRO</strong></button>{showSpeech&&mascot==='Astro'&&<div className="premium-character-bubble" role="status"><button aria-label="Fechar curiosidade" className="premium-bubble-close" onClick={()=>setShowSpeech(false)}>×</button><b>Olá! Eu sou o ASTRO 🚀</b><p>Vou te contar sobre {world.name}!</p><p>{world.fact}</p></div>}</div>
+      <div className={"premium-crew-member"+(showSpeech&&mascot==="Lunna"?" is-presenting":"")}><button className={'premium-mascot'+(mascot==='Lunna'&&showSpeech?' speaking':'')} onClick={()=>{setMascot('Lunna');setShowSpeech(true);speakFact(world.fact,'Lunna');}} type="button" aria-label="Lunna apresenta o planeta selecionado"><Image src="/mascotes/lunna.png" alt="" width={115} height={150} className="premium-character-image"/><strong>LUNNA</strong></button>{showSpeech&&mascot==='Lunna'&&<div className="premium-character-bubble" role="status"><button aria-label="Fechar curiosidade" className="premium-bubble-close" onClick={()=>setShowSpeech(false)}>×</button><b>Olá! Eu sou a LUNNA 🌟</b><p>Conheça {world.name} comigo!</p><p>{world.fact}</p></div>}</div>
+      <div className={"premium-crew-pixel premium-crew-member"+(showSpeech&&mascot==="PIXEL"?" is-presenting":"")}><button type="button" className="premium-pixel-button" aria-label="PIXEL apresenta uma curiosidade" onClick={()=>{setMascot("PIXEL");setShowSpeech(true);speakFact(world.fact,'PIXEL');}}><Image src="/mascotes/pixel.png" width={105} height={115} alt="PIXEL, robô companheiro"/><span className="premium-pixel-label">PIXEL</span></button>{showSpeech&&mascot==="PIXEL"&&<div className="premium-character-bubble premium-pixel-bubble" role="status"><button aria-label="Fechar curiosidade" className="premium-bubble-close" onClick={()=>setShowSpeech(false)}>×</button><b>Olá! Eu sou o PIXEL 🤖</b><p>Curiosidade sobre {world.name}:</p><p>{world.fact}</p></div>}</div>
     </div>
     <div className="premium-planet-picker" aria-label="Escolha um astro para explorar"><span>EXPLORAR O SISTEMA SOLAR</span><div className="premium-planet-options">{worlds.map(w=><button key={w.id} type="button" aria-pressed={world.id===w.id} onClick={()=>selectWorld(w)}>{w.name}</button>)}</div></div>
     <p className="premium-motion-note">Oito planetas oficiais · Órbitas ilustrativas, sem escala real · Toque para descobrir curiosidades.</p>
