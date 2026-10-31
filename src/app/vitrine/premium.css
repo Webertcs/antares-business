@@ -67,3 +67,41 @@
 .pk-planet-hit circle:first-of-type{filter:drop-shadow(0 3px 5px #050b2c9c)}
 @keyframes pk-twinkle{from{opacity:.34}to{opacity:.86}}
 @media(prefers-reduced-motion:reduce){.premium-sky::before{animation:none!important}}
+
+/* ANTARES Vitrine Premium — espaço contínuo, profundidade e cometas ocasionais */
+.premium-kids{--pk-bg:#111b39;--pk-ink:#f6f8ff;--pk-muted:#ccdafa;--pk-card:#1b2b50;--pk-line:#536b9a;position:relative;isolation:isolate;background:#090f29;color:#f6f8ff}
+.premium-kids.premium-night{--pk-bg:#111b39;--pk-ink:#f6f8ff;--pk-muted:#ccdafa;--pk-card:#1b2b50;--pk-line:#536b9a;background:#080d22}
+.premium-kids>.premium-galaxy-backdrop{position:absolute;inset:0;z-index:-1;pointer-events:none;overflow:hidden;background:radial-gradient(ellipse at 75% 8%,#26336e 0%,transparent 32%),radial-gradient(ellipse at 15% 36%,#34307166 0%,transparent 27%),radial-gradient(ellipse at 80% 69%,#0d52734d 0%,transparent 29%),linear-gradient(155deg,#090f28,#101a3f 46%,#080f27)}
+.premium-galaxy-nebula{position:absolute;inset:0;background:radial-gradient(ellipse at 24% 18%,#a363cd2e,transparent 31%),radial-gradient(ellipse at 80% 40%,#3b8ee32e,transparent 27%),radial-gradient(ellipse at 30% 83%,#b16fa91c,transparent 28%);filter:blur(30px)}
+.premium-stars-layer{position:absolute;inset:0;background-repeat:repeat;opacity:.74}
+.premium-stars-layer.far{background-image:radial-gradient(1px 1px at 14px 34px,#fff 96%,transparent),radial-gradient(1px 1px at 64px 109px,#d8d9ff 96%,transparent),radial-gradient(1.5px 1.5px at 192px 65px,#fff 96%,transparent),radial-gradient(1px 1px at 136px 157px,#b7dcff 96%,transparent);background-size:243px 201px}
+.premium-stars-layer.near{background-image:radial-gradient(2px 2px at 68px 51px,#fff 96%,transparent),radial-gradient(2px 2px at 228px 167px,#f8d5ff 96%,transparent),radial-gradient(1.6px 1.6px at 322px 111px,#b8eaff 96%,transparent),radial-gradient(2.2px 2.2px at 155px 248px,#fff 96%,transparent);background-size:397px 321px;animation:pk-sky-breathe 11s ease-in-out infinite alternate}
+.premium-comet{position:absolute;width:170px;height:2px;left:-240px;top:12%;border-radius:999px;background:linear-gradient(90deg,transparent,#77caff77,#fff);filter:drop-shadow(0 0 7px #79cafa);transform:rotate(-18deg);opacity:0;animation:pk-comet 22s linear infinite;will-change:transform,opacity}
+.premium-comet::after{content:"";position:absolute;right:0;top:-2px;width:6px;height:6px;border-radius:50%;background:#fff;box-shadow:0 0 14px #b0f3ff}
+.premium-comet.comet-b{top:43%;animation-delay:-8s;animation-duration:30s;width:135px;filter:drop-shadow(0 0 6px #d6b8ff)}
+.premium-comet.comet-c{top:76%;animation-delay:-17s;animation-duration:37s;width:200px}
+@keyframes pk-comet{0%,8%{opacity:0;transform:translate3d(-8vw,0,0) rotate(-18deg)}10%{opacity:.85}18%{opacity:.65}24%,100%{opacity:0;transform:translate3d(125vw,-29vh,0) rotate(-18deg)}}
+@keyframes pk-sky-breathe{from{opacity:.38}to{opacity:.86}}
+.premium-kids .premium-header,.premium-kids main,.premium-kids .premium-footer{position:relative;z-index:1}
+.premium-kids .premium-header{background:#0b173677;backdrop-filter:blur(10px);border-bottom:1px solid #9fbdf72a;max-width:none;padding-inline:max(20px,calc((100vw - 1230px)/2))}
+.premium-kids .premium-header nav a{color:#f4f8ff}
+.premium-kids .premium-eyebrow,.premium-kids .premium-section-title>span,.premium-kids .premium-contact>div>span{color:#ffdb91}
+.premium-kids .premium-copy h1 em{background:linear-gradient(100deg,#74d6ff,#ce9eff,#fbd184);background-clip:text;-webkit-text-fill-color:transparent}
+.premium-kids .premium-trust{color:#b8d5ff}
+.premium-kids .premium-ghost{background:#17274caa;color:#fff;border-color:#93b3f58c}
+.premium-kids .premium-three article,.premium-kids .premium-journey-grid article,.premium-kids .premium-contact form,.premium-kids .premium-faq details{background:#182548d9;backdrop-filter:blur(12px);border-color:#668acc71;box-shadow:0 10px 40px #03092048;color:#f6f8ff}
+.premium-kids .premium-journeys{background:#13204a6b;border:1px solid #6d87c436}
+.premium-kids .premium-school{background:linear-gradient(110deg,#24459cc9,#583a9fbc);backdrop-filter:blur(8px);border-block:1px solid #779ae856}
+.premium-kids .premium-age-tabs button{background:#253662;border-color:#7898d288;color:#fff}
+.premium-kids .premium-age-tabs button[aria-selected=true]{background:#326dec}
+.premium-kids .premium-speech{background:#172954ea;color:#fff;border-color:#6d93d0}
+.premium-kids .premium-speech small{color:#b0d9ff}
+.premium-kids .premium-contact input:not([type=checkbox]),.premium-kids .premium-contact select,.premium-kids .premium-contact textarea{background:#111e3c;color:#fff;border-color:#6487bb}
+.premium-kids .premium-form-status{color:#98f0d2}
+.premium-kids .premium-floating{box-shadow:0 8px 30px #050a2f}
+.premium-kids .premium-sky{background:radial-gradient(ellipse at 45% 50%,#233e83 0%,#14255bc9 55%,#081636aa 95%);border:1px solid #7eabf344;box-shadow:inset 0 0 95px #365fa969,0 0 70px #456bc322}
+.premium-kids .premium-crew-pixel{z-index:2}
+.premium-pluto{max-width:480px;margin:15px auto 0;text-align:center;color:#dbeaff;background:#172a52b8;border:1px solid #6e92cc70;border-radius:16px;padding:8px 18px;font-size:13px}
+.premium-pluto summary{cursor:pointer;font-weight:800}
+.premium-pluto p{line-height:1.6;margin-top:9px}
+@media(prefers-reduced-motion:reduce){.premium-stars-layer.near,.premium-comet{animation:none!important}.premium-comet{display:none}}
