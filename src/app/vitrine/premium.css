@@ -252,3 +252,10 @@
 .premium-kids .premium-character-bubble,.premium-kids .premium-pixel-bubble{top:auto;bottom:calc(100% + 12px);left:50%;right:auto;transform:translateX(-50%);width:min(255px,76vw);max-width:255px}
 .premium-kids .premium-character-bubble::after,.premium-kids .premium-pixel-bubble::after{top:auto;bottom:-9px;left:calc(50% - 8px);right:auto;transform:rotate(45deg)}
 @media(max-width:620px){.premium-kids .premium-character-bubble,.premium-kids .premium-pixel-bubble{bottom:calc(100% + 8px);width:min(220px,80vw)}}
+
+/* Correção de sobreposição: o apresentador ativo sempre tem prioridade visual. */
+.premium-kids .premium-crew{isolation:isolate;overflow:visible}
+.premium-kids .premium-crew-member{z-index:2}
+.premium-kids .premium-crew-member.is-presenting{z-index:40}
+.premium-kids .premium-crew-member.is-presenting .premium-character-bubble{z-index:50;opacity:1;visibility:visible;pointer-events:auto}
+.premium-kids .premium-crew-member.is-presenting .premium-mascot,.premium-kids .premium-crew-member.is-presenting .premium-pixel-button{position:relative;z-index:1}
