@@ -2,7 +2,7 @@
 import {useCallback,useEffect,useMemo,useState} from 'react';
 import Link from 'next/link';
 type Lead={id:string;responsible_name:string;institution:string;city:string;phone:string;
- audience:string;attendees:number|null;desired_date:string|null;notes:string;status:string;created_at:string};
+ audience:string;attendees:number|null;desired_date:string|null;notes:string;status:string;created_at:string;converted_client_id:string|null;converted_proposal_id:string|null};
 const label:Record<string,string>={pending:'Pendente',reviewing:'Em análise',converted:'Convertido',archived:'Arquivado'};
 const date=(value:string|null)=>value?new Date(value.slice(0,10)+'T12:00:00').toLocaleDateString('pt-BR'):'A combinar';
 export default function Inbox({conversionEnabled}:{conversionEnabled:boolean}){
@@ -27,7 +27,7 @@ export default function Inbox({conversionEnabled}:{conversionEnabled:boolean}){
   setBusy(id);setNotice('');
   try{const r=await fetch('/api/vitrine/convert',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({id,existingClientId})});
    const data=await r.json();if(!r.ok)throw Error(data.error||'Falha ao converter');
-   setNotice('Cliente e proposta em rascunho criados. Confira os preços antes de enviar.');await load();
+   setNotice('Conversão concluída. Abra a proposta para conferir os dados antes de definir valores.');await load();
   }catch(e){setNotice(e instanceof Error?e.message:'Falha ao converter');}
   finally{setBusy('');}
  }
@@ -71,6 +71,7 @@ export default function Inbox({conversionEnabled}:{conversionEnabled:boolean}){
        style={{padding:10,border:'1px solid #64748b',borderRadius:8}}>{s==='reviewing'?'Iniciar análise':s==='pending'?'Reabrir':'Arquivar'}</button>)}
      {conversionEnabled&&lead.status!=='converted'&&lead.status!=='archived'&&<label style={{display:'flex',flexDirection:'column',gap:4}}>Destino da conversão<select aria-label={'Cliente para '+lead.institution} value={chosen[lead.id]||''} onChange={e=>setChosen(old=>({...old,[lead.id]:e.target.value}))} style={{padding:10,border:'1px solid #64748b',borderRadius:8}}><option value="">Criar novo cliente</option>{clients.filter(c=>c.kind===kindOf(lead.audience)).map(c=><option key={c.id} value={c.id}>Vincular: {c.name}</option>)}</select></label>}
      {conversionEnabled&&lead.status!=='converted'&&lead.status!=='archived'&&<button disabled={busy===lead.id} onClick={()=>void convert(lead.id)} style={{padding:10,borderRadius:8,background:'#1d4ed8',color:'#fff'}}>Converter em cliente + proposta rascunho</button>}
+     {lead.status==='converted'&&lead.converted_proposal_id&&<Link href={'/vitrine/proposta/'+lead.converted_proposal_id} style={{padding:10,borderRadius:8,background:'#1d4ed8',color:'white'}}>Abrir proposta em rascunho</Link>}
      <Link href="/clientes" style={{padding:10,border:'1px solid #64748b',borderRadius:8}}>Abrir cadastro de clientes</Link>
     </div>
    </article>)}
