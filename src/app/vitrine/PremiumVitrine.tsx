@@ -42,13 +42,12 @@ export default function PremiumVitrine(){
   synth.cancel();
   const utter=new SpeechSynthesisUtterance('Olá! Eu sou '+speaker+'. '+fact);
   utter.lang='pt-BR';
-  utter.rate=speaker==='PIXEL'?1.06:.93;
-  utter.pitch=speaker==='Lunna'?1.4:speaker==='PIXEL'?1.65:.88;
-  const voices=synth.getVoices().filter(v=>/^pt(-|_)/i.test(v.lang));
-  const preferred=speaker==='Lunna'
-   ?voices.find(v=>/female|femin|maria|luciana|francisca|helena/i.test(v.name))
-   :speaker==='Astro'?voices.find(v=>/male|mascul|daniel|antonio|ricardo/i.test(v.name)):undefined;
-  utter.voice=preferred||voices.find(v=>/pt-BR/i.test(v.lang))||voices[0]||null;
+  utter.rate=.93;
+  // O mesmo mecanismo e a mesma voz de base para os três mascotes.
+  // O motor do navegador pode não disponibilizar vozes distintas.
+  utter.pitch=speaker==='Lunna'?1.12:speaker==='PIXEL'?1.18:1;
+  const voices=synth.getVoices();
+  utter.voice=voices.find(v=>v.lang.toLowerCase()==='pt-br')||voices.find(v=>v.lang.toLowerCase().startsWith('pt'))||null;
   synth.speak(utter);
  }
  function selectWorld(w:World){
