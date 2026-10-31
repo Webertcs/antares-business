@@ -37,6 +37,19 @@ export async function POST(request:NextRequest){
  const abuseKey=createHmac('sha256',secret).update(ip).digest('hex');
  try {
   const db=neon(dbUrl);
+  // Fail-closed: credencial exclusiva, sem leitura/gravação direta em dados pessoais.
+  const audit=await db`SELECT current_user AS db_user,
+    r.rolcanlogin AND NOT r.rolsuper AND NOT r.rolbypassrls AS safe_role,
+    NOT has_table_privilege(current_user,'public.vitrine_leads','SELECT')
+    AND NOT has_table_privilege(current_user,'public.vitrine_leads','INSERT')
+    AND NOT has_table_privilege(current_user,'public.vitrine_leads','UPDATE')
+    AND NOT has_table_privilege(current_user,'public.vitrine_leads','DELETE') AS safe_table,
+    has_function_privilege(current_user,
+      'public.vitrine_receive_lead(uuid,text,text,text,text,text,integer,date,text,text)','EXECUTE') AS safe_function
+    FROM pg_roles r WHERE r.rolname=current_user`;
+  if(audit[0]?.db_user==='neondb_owner'||audit[0]?.db_user==='antares_team_runtime'||
+    !audit[0]?.safe_role||!audit[0]?.safe_table||!audit[0]?.safe_function)
+    return fail('Credencial pública sem isolamento aprovado.',503);
   const rows=await db`SELECT public.vitrine_receive_lead(${org}::uuid,${name},${institution},
    ${city},${phone},${audience},${attendees},${date||null}::date,${notes},${abuseKey}) AS id`;
   return NextResponse.json({ok:true,id:rows[0]?.id,message:'Solicitação recebida para análise.'},{status:201,headers:{'Cache-Control':'no-store'}});
