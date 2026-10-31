@@ -28,7 +28,7 @@ export default function PremiumVitrine(){
  const [mute,setMute]=useState(true);
  const [age,setAge]=useState<Age>('6–7 anos');
  const [voiceAvailable,setVoiceAvailable]=useState(false);
- const [mascot,setMascot]=useState<'Astro'|'Lunna'>('Astro');
+ const [mascot,setMascot]=useState<'Astro'|'Lunna'|'PIXEL'>('Astro');
  const [showSpeech,setShowSpeech]=useState(false);
  const [formStatus,setFormStatus]=useState('');
  const [dark,setDark]=useState(false);
@@ -37,7 +37,7 @@ export default function PremiumVitrine(){
  const [hoverPause,setHoverPause]=useState(false);
  useEffect(()=>{setReduce(window.matchMedia('(prefers-reduced-motion: reduce)').matches);setVoiceAvailable('speechSynthesis'in window);return()=>{window.speechSynthesis?.cancel();};},[]);
  function selectWorld(w:World){
-  setWorld(w);setShowSpeech(true);setMascot(m=>m==='Astro'?'Lunna':'Astro');
+  setWorld(w);setShowSpeech(true);setMascot(m=>m==='Astro'?'Lunna':m==='Lunna'?'PIXEL':'Astro');
   if(!mute&&voiceAvailable){
    window.speechSynthesis.cancel();
    const utter=new SpeechSynthesisUtterance(w.fact);
@@ -90,7 +90,7 @@ export default function PremiumVitrine(){
     <div className="premium-crew"><div className="premium-crew-glow" aria-hidden="true"/>
       <div className="premium-crew-member"><button className={'premium-mascot'+(mascot==='Astro'&&showSpeech?' speaking':'')} onClick={()=>{setMascot('Astro');setShowSpeech(true);}} aria-label="Ouvir Astro apresentar o planeta"><Image src="/mascotes/astro.png" alt="" width={115} height={150} className="premium-character-image"/><strong>ASTRO</strong></button>{showSpeech&&mascot==='Astro'&&<div className="premium-character-bubble" role="status"><button aria-label="Fechar curiosidade" className="premium-bubble-close" onClick={()=>setShowSpeech(false)}>×</button><b>{world.name}</b><p>{world.fact}</p></div>}</div>
       <div className="premium-crew-member"><button className={'premium-mascot'+(mascot==='Lunna'&&showSpeech?' speaking':'')} onClick={()=>{setMascot('Lunna');setShowSpeech(true);}} aria-label="Ouvir Lunna apresentar o planeta"><Image src="/mascotes/lunna.png" alt="" width={115} height={150} className="premium-character-image"/><strong>LUNNA</strong></button>{showSpeech&&mascot==='Lunna'&&<div className="premium-character-bubble" role="status"><button aria-label="Fechar curiosidade" className="premium-bubble-close" onClick={()=>setShowSpeech(false)}>×</button><b>{world.name}</b><p>{world.fact}</p></div>}</div>
-      <div className="premium-crew-pixel"><Image src="/mascotes/pixel.png" width={105} height={115} alt="PIXEL, robô companheiro"/><span className="premium-pixel-label">PIXEL</span></div>
+      <div className="premium-crew-pixel premium-crew-member"><button type="button" className="premium-pixel-button" aria-label="PIXEL apresenta uma curiosidade" onClick={()=>{setMascot("PIXEL");setShowSpeech(true);}}><Image src="/mascotes/pixel.png" width={105} height={115} alt="PIXEL, robô companheiro"/><span className="premium-pixel-label">PIXEL</span></button>{showSpeech&&mascot==="PIXEL"&&<div className="premium-character-bubble premium-pixel-bubble" role="status"><button aria-label="Fechar curiosidade" className="premium-bubble-close" onClick={()=>setShowSpeech(false)}>×</button><b>🤖 PIXEL explica {world.name}</b><p>{world.fact}</p></div>}</div>
     </div>
     <p className="premium-motion-note">Oito planetas oficiais · Órbitas ilustrativas, sem escala real · Toque para descobrir curiosidades.</p>
     <details className="premium-pluto"><summary>✨ E Plutão, onde está?</summary><p>Plutão é um planeta anão desde a classificação adotada pela União Astronômica Internacional em 2006. Ele continua sendo um mundo fascinante!</p></details>
