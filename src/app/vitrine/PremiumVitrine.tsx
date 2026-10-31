@@ -95,8 +95,8 @@ export default function PremiumVitrine(){
    return;
   }
   const href='https://wa.me/'+number+'?text='+encodeURIComponent(text);
-  const opened=window.open(href,'_blank','noopener,noreferrer');
-  setFormStatus(opened?'WhatsApp aberto com a mensagem preenchida. Confirme o envio na conversa; nada foi registrado no CRM.':'A abertura automática pode ter sido bloqueada. Copie a mensagem ou abra o WhatsApp pelo link abaixo.');
+  window.open(href,'_blank','noopener,noreferrer');
+  setFormStatus('Solicitamos a abertura do WhatsApp. Confirme o envio na conversa; se não abriu, copie a mensagem abaixo. Nada foi registrado no CRM.');
  }
  async function copyQuote(){
   try{await navigator.clipboard.writeText(quoteDraft);setFormStatus('Mensagem copiada. Você pode enviá-la ao atendimento do planetário.');}
