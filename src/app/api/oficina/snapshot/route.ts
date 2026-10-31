@@ -13,12 +13,14 @@ export async function GET(){
    db`SELECT id,client_id,full_name,position,phone,email,whatsapp,is_primary FROM public.crm_contacts WHERE organization_id=${owner.organizationId} ORDER BY created_at DESC LIMIT 500`,
    db`SELECT id,client_id,title,event_kind,event_date,expected_attendees,pricing_model,price_per_person,fixed_amount,status,venue,notes FROM public.crm_events WHERE organization_id=${owner.organizationId} ORDER BY event_date DESC NULLS LAST LIMIT 500`
   ]);
+  const [inboxState]=await db`SELECT to_regclass('public.vitrine_leads') IS NOT NULL AS ready`;
+  const leads=inboxState?.ready?await db`SELECT id,responsible_name,institution,city,phone,audience,attendees,desired_date,notes,status,created_at FROM public.vitrine_leads WHERE organization_id=${owner.organizationId} ORDER BY created_at DESC LIMIT 300`:[];
   const [state]=await db`SELECT count(*)::integer AS count FROM pg_class WHERE oid IN
   (to_regclass('public.business_proposals'),to_regclass('public.business_contracts'),
   to_regclass('public.business_domes'),to_regclass('public.business_bookings'),
   to_regclass('public.business_ledger'),to_regclass('public.business_audit'))`;
   if(Number(state?.count)!==6){
-   return NextResponse.json({clients,contacts,events,proposals:[],contracts:[],domes:[],bookings:[],ledger:[],
+   return NextResponse.json({clients,contacts,events,leads,proposals:[],contracts:[],domes:[],bookings:[],ledger:[],
     commercialReady:false,notice:'CRM 03 disponível. A estrutura comercial 04 ainda não está totalmente instalada.'},{headers});
   }
   const [proposals,contracts,domes,bookings,ledger]=await Promise.all([
@@ -28,7 +30,7 @@ export async function GET(){
    db`SELECT id,event_id,dome_id,starts_at,ends_at,status FROM public.business_bookings WHERE organization_id=${owner.organizationId} ORDER BY starts_at DESC LIMIT 500`,
    db`SELECT id,proposal_id,category,status,description,amount,occurred_on FROM public.business_ledger WHERE organization_id=${owner.organizationId} ORDER BY occurred_on DESC LIMIT 1000`
   ]);
-  return NextResponse.json({clients,contacts,events,proposals,contracts,domes,bookings,ledger,
+  return NextResponse.json({clients,contacts,events,leads,proposals,contracts,domes,bookings,ledger,
    commercialReady:true},{headers});
  }catch{
   return NextResponse.json({error:'Consulta ao CRM indisponível. Confira a implantação 03 e a conexão autorizada.'},{status:503,headers});
