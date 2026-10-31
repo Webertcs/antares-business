@@ -215,3 +215,11 @@
 @keyframes pk-bubble-in{from{opacity:0;transform:translate(-50%,8px)}to{opacity:1;transform:translate(-50%,0)}}
 @media(max-width:620px){.premium-kids .premium-crew{gap:clamp(16px,5vw,45px);min-height:125px}.premium-character-bubble{bottom:calc(100% - 5px);width:min(245px,85vw);padding:10px 25px 10px 12px}.premium-character-bubble p{font-size:11px}}
 @media(prefers-reduced-motion:reduce){.premium-character-bubble{animation:none!important}}
+
+/* PIXEL também participa das curiosidades da tripulação. */
+.premium-pixel-button{border:0;background:transparent;display:flex;flex-direction:column;align-items:center;gap:5px;color:#fff;padding:0;cursor:pointer}
+.premium-pixel-button:hover img,.premium-pixel-button:focus-visible img{transform:translateY(-6px) scale(1.05)}
+.premium-pixel-button img{transition:transform .22s}
+.premium-pixel-bubble{left:50%;bottom:calc(100% + 10px)}
+@media(max-width:620px){.premium-pixel-bubble{left:auto;right:-10px;transform:none}.premium-pixel-bubble::after{left:auto;right:28px}}
+@media(prefers-reduced-motion:reduce){.premium-pixel-button img{transition:none!important}}
