@@ -63,7 +63,7 @@ export default function PremiumVitrine(){
   if(!voiceAvailable)return;
   if(!mute){window.speechSynthesis.cancel();setMute(true);return;}
   setMute(false);
-  const utter=new SpeechSynthesisUtterance('Olá! Eu sou '+mascot+'. '+world.fact);
+  const utter=new SpeechSynthesisUtterance(speechMode==='intro'?(mascot==='Lunna'?'Oi! Eu sou a Lunna!':mascot==='PIXEL'?'Olá! Eu sou o Pixel!':'Olá! Eu sou o Astro!'):world.fact);
   utter.lang='pt-BR';utter.rate=.94;
   utter.pitch=mascot==='Lunna'?1.4:mascot==='PIXEL'?1.65:.88;
   const voices=window.speechSynthesis.getVoices().filter(v=>/^pt(-|_)/i.test(v.lang));
