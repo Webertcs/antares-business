@@ -7,6 +7,9 @@ const label:Record<string,string>={pending:'Pendente',reviewing:'Em análise',co
 const date=(value:string|null)=>value?new Date(value.slice(0,10)+'T12:00:00').toLocaleDateString('pt-BR'):'A combinar';
 export default function Inbox({conversionEnabled}:{conversionEnabled:boolean}){
  const [leads,setLeads]=useState<Lead[]>([]);
+ const [clients,setClients]=useState<{id:string;name:string;kind:string}[]>([]);
+ const [chosen,setChosen]=useState<Record<string,string>>({});
+ const kindOf=(audience:string)=>({Escola:'school',Empresa:'company',Associação:'association','Evento particular':'private'} as Record<string,string>)[audience]||'private';
  const [error,setError]=useState('');const [busy,setBusy]=useState('');const [filter,setFilter]=useState('all');
  const [loading,setLoading]=useState(true);const [notice,setNotice]=useState('');
  const load=useCallback(async()=>{setLoading(true);
@@ -16,12 +19,13 @@ export default function Inbox({conversionEnabled}:{conversionEnabled:boolean}){
   }catch(e){setError(e instanceof Error?e.message:'Erro ao consultar');}
   finally{setLoading(false);}
  },[]);
- useEffect(()=>{void load();},[load]);
+ useEffect(()=>{void load();if(conversionEnabled){fetch('/api/crm/clientes',{cache:'no-store'}).then(r=>r.json()).then(d=>setClients(d.clients||[])).catch(()=>setNotice('Lista de clientes indisponível.'));}},[load,conversionEnabled]);
  const shown=useMemo(()=>leads.filter(x=>filter==='all'||x.status===filter),[leads,filter]);
  async function convert(id:string){
-  if(!window.confirm('Converter esta solicitação em novo cliente e proposta RASCUNHO sem preço? Nenhum contrato será criado.'))return;
+  const existingClientId=chosen[id]||null;
+  if(!window.confirm(existingClientId?'Vincular ao cliente selecionado e criar proposta RASCUNHO sem valor?':'Criar NOVO cliente e proposta RASCUNHO sem valor? Nenhum contrato ou cobrança será criado.'))return;
   setBusy(id);setNotice('');
-  try{const r=await fetch('/api/vitrine/convert',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({id})});
+  try{const r=await fetch('/api/vitrine/convert',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({id,existingClientId})});
    const data=await r.json();if(!r.ok)throw Error(data.error||'Falha ao converter');
    setNotice('Cliente e proposta em rascunho criados. Confira os preços antes de enviar.');await load();
   }catch(e){setNotice(e instanceof Error?e.message:'Falha ao converter');}
@@ -65,11 +69,12 @@ export default function Inbox({conversionEnabled}:{conversionEnabled:boolean}){
      {lead.status!=='converted'&&(['pending','reviewing','archived'] as const).filter(s=>s!==lead.status).map(s=>
       <button key={s} disabled={busy===lead.id} onClick={()=>void review(lead.id,s)}
        style={{padding:10,border:'1px solid #64748b',borderRadius:8}}>{s==='reviewing'?'Iniciar análise':s==='pending'?'Reabrir':'Arquivar'}</button>)}
+     {conversionEnabled&&lead.status!=='converted'&&lead.status!=='archived'&&<label style={{display:'flex',flexDirection:'column',gap:4}}>Destino da conversão<select aria-label={'Cliente para '+lead.institution} value={chosen[lead.id]||''} onChange={e=>setChosen(old=>({...old,[lead.id]:e.target.value}))} style={{padding:10,border:'1px solid #64748b',borderRadius:8}}><option value="">Criar novo cliente</option>{clients.filter(c=>c.kind===kindOf(lead.audience)).map(c=><option key={c.id} value={c.id}>Vincular: {c.name}</option>)}</select></label>}
      {conversionEnabled&&lead.status!=='converted'&&lead.status!=='archived'&&<button disabled={busy===lead.id} onClick={()=>void convert(lead.id)} style={{padding:10,borderRadius:8,background:'#1d4ed8',color:'#fff'}}>Converter em cliente + proposta rascunho</button>}
      <Link href="/clientes" style={{padding:10,border:'1px solid #64748b',borderRadius:8}}>Abrir cadastro de clientes</Link>
     </div>
    </article>)}
   </div>
-  <p style={{marginTop:24,opacity:.8}}>A conversão vinculada em cliente/proposta será liberada somente após validação da migração, permissões e auditoria. Esta tela não envia mensagens automaticamente.</p>
+  <p style={{marginTop:24,opacity:.8}}>A conversão requer aprovação do proprietário e utiliza a migração 05F. Conferir o cliente escolhido antes de confirmar. Esta tela não envia mensagens automaticamente.</p>
  </main>;
 }
