@@ -5,7 +5,7 @@ type Lead={id:string;responsible_name:string;institution:string;city:string;phon
  audience:string;attendees:number|null;desired_date:string|null;notes:string;status:string;created_at:string};
 const label:Record<string,string>={pending:'Pendente',reviewing:'Em análise',converted:'Convertido',archived:'Arquivado'};
 const date=(value:string|null)=>value?new Date(value.slice(0,10)+'T12:00:00').toLocaleDateString('pt-BR'):'A combinar';
-export default function Inbox(){
+export default function Inbox({conversionEnabled}:{conversionEnabled:boolean}){
  const [leads,setLeads]=useState<Lead[]>([]);
  const [error,setError]=useState('');const [busy,setBusy]=useState('');const [filter,setFilter]=useState('all');
  const [loading,setLoading]=useState(true);const [notice,setNotice]=useState('');
@@ -18,6 +18,15 @@ export default function Inbox(){
  },[]);
  useEffect(()=>{void load();},[load]);
  const shown=useMemo(()=>leads.filter(x=>filter==='all'||x.status===filter),[leads,filter]);
+ async function convert(id:string){
+  if(!window.confirm('Converter esta solicitação em novo cliente e proposta RASCUNHO sem preço? Nenhum contrato será criado.'))return;
+  setBusy(id);setNotice('');
+  try{const r=await fetch('/api/vitrine/convert',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({id})});
+   const data=await r.json();if(!r.ok)throw Error(data.error||'Falha ao converter');
+   setNotice('Cliente e proposta em rascunho criados. Confira os preços antes de enviar.');await load();
+  }catch(e){setNotice(e instanceof Error?e.message:'Falha ao converter');}
+  finally{setBusy('');}
+ }
  async function review(id:string,status:string){
   setBusy(id);setNotice('');
   try{const r=await fetch('/api/vitrine/inbox',{method:'POST',headers:{'Content-Type':'application/json'},
@@ -56,6 +65,7 @@ export default function Inbox(){
      {lead.status!=='converted'&&(['pending','reviewing','archived'] as const).filter(s=>s!==lead.status).map(s=>
       <button key={s} disabled={busy===lead.id} onClick={()=>void review(lead.id,s)}
        style={{padding:10,border:'1px solid #64748b',borderRadius:8}}>{s==='reviewing'?'Iniciar análise':s==='pending'?'Reabrir':'Arquivar'}</button>)}
+     {conversionEnabled&&lead.status!=='converted'&&lead.status!=='archived'&&<button disabled={busy===lead.id} onClick={()=>void convert(lead.id)} style={{padding:10,borderRadius:8,background:'#1d4ed8',color:'#fff'}}>Converter em cliente + proposta rascunho</button>}
      <Link href="/clientes" style={{padding:10,border:'1px solid #64748b',borderRadius:8}}>Abrir cadastro de clientes</Link>
     </div>
    </article>)}
