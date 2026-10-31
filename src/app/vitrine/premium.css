@@ -32,3 +32,8 @@
  .premium-speech p{font-size:12px}
  .premium-sky{width:min(96vw,480px);margin:-2px auto 0}
 }
+
+.premium-crew-nexo{flex:none;align-self:center;animation:pk-float 3.5s ease-in-out infinite}
+.premium-crew-nexo img{display:block;width:clamp(70px,10vw,115px);height:auto}
+@media(max-width:620px){.premium-crew-nexo img{width:56px}}
+@media(prefers-reduced-motion:reduce){.premium-crew-nexo{animation:none!important}}
