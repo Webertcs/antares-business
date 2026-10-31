@@ -33,7 +33,18 @@
  .premium-sky{width:min(96vw,480px);margin:-2px auto 0}
 }
 
-.premium-crew-nexo{flex:none;align-self:center;animation:pk-float 3.5s ease-in-out infinite}
-.premium-crew-nexo img{display:block;width:clamp(70px,10vw,115px);height:auto}
-@media(max-width:620px){.premium-crew-nexo img{width:56px}}
-@media(prefers-reduced-motion:reduce){.premium-crew-nexo{animation:none!important}}
+.premium-crew-pixel{flex:none;align-self:center;animation:pk-float 3.5s ease-in-out infinite}
+.premium-crew-pixel img{display:block;width:clamp(70px,10vw,115px);height:auto}
+@media(max-width:620px){.premium-crew-pixel img{width:56px}}
+@media(prefers-reduced-motion:reduce){.premium-crew-pixel{animation:none!important}}
+
+/* Refinamento orbital: elipses em perspectiva, superfície compacta e fundo espacial delicado. */
+.premium-sky{aspect-ratio:1.65;max-width:850px;width:min(94vw,850px);background:radial-gradient(ellipse at 50% 50%,#fae1a6b3 0 7%,#c7e4ffb8 23%,#93baf233 56%,transparent 74%),radial-gradient(ellipse at 55% 50%,#365aa7 0%,#122855 70%,#0c1841 100%);border-radius:48%;margin:4px auto 0;box-shadow:inset 0 0 75px #a0c9ff25,0 15px 70px #3354a81c}
+.premium-orbit{border-color:#d4e7ff99;box-shadow:0 0 10px #89bafd1c}
+.premium-sun{box-shadow:0 0 0 10px #ffc94844,0 0 45px #fbc549}
+.premium-world{filter:drop-shadow(0 3px 4px #182c5380)}
+.premium-crew{margin-bottom:0}
+.premium-universe{margin-top:0}
+.premium-orbits:focus-within .premium-orbit{animation-play-state:paused!important}
+.premium-orbits.is-paused .premium-orbit,.premium-orbits.is-paused .premium-world{animation-play-state:paused!important}
+@media(max-width:620px){.premium-sky{width:min(98vw,540px);aspect-ratio:1.35;margin:10px auto 0}.premium-universe-controls{right:2%;bottom:-26px}.premium-motion-note{margin-top:36px}}
