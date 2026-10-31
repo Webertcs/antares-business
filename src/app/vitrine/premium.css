@@ -277,3 +277,9 @@
 .premium-kids .premium-crew .premium-crew-member .premium-character-bubble{top:auto;bottom:calc(100% + 12px);left:50%;right:auto;transform:translateX(-50%);max-width:255px;width:min(255px,76vw)}
 .premium-kids .premium-crew .premium-crew-member .premium-character-bubble::after{top:auto;bottom:-9px;left:calc(50% - 8px);right:auto;transform:rotate(45deg)}
 @media(max-width:620px){.premium-kids .premium-crew .premium-crew-member .premium-character-bubble{bottom:calc(100% + 8px);width:min(220px,80vw)}}
+
+/* Solicitação comercial explícita: usuário controla envio e pode copiar o texto. */
+.premium-quote-preview{display:grid;gap:10px;padding:14px;border:1px solid #8daff288;background:#0c1b3c9c;border-radius:15px}
+.premium-quote-preview textarea{font-size:13px!important;line-height:1.6;resize:vertical}
+.premium-copy-quote{justify-self:start;border:1px solid #f7cf7f;background:#ffe0a2;color:#172448;font-weight:850;border-radius:999px;padding:10px 17px;min-height:44px}
+.premium-copy-quote:hover{background:#fff0c7}
