@@ -223,3 +223,19 @@
 .premium-pixel-bubble{left:50%;bottom:calc(100% + 10px)}
 @media(max-width:620px){.premium-pixel-bubble{left:auto;right:-10px;transform:none}.premium-pixel-bubble::after{left:auto;right:28px}}
 @media(prefers-reduced-motion:reduce){.premium-pixel-button img{transition:none!important}}
+
+/* Aperfeiçoamento de uso: balões abaixo dos mascotes, sem cobrir o título. */
+.premium-kids .premium-crew{margin-bottom:22px}
+.premium-kids .premium-crew-member{position:relative}
+.premium-kids .premium-character-bubble{top:calc(100% + 10px);bottom:auto;z-index:20;width:min(260px,76vw);max-width:260px}
+.premium-kids .premium-character-bubble::after{bottom:auto;top:-9px;transform:rotate(225deg)}
+.premium-kids .premium-pixel-bubble{top:calc(100% + 10px);bottom:auto}
+.premium-planet-picker{position:relative;z-index:3;order:2;max-width:900px;width:100%;margin:12px auto 0;display:flex;flex-direction:column;align-items:center;gap:10px}
+.premium-planet-picker>span{font-size:11px;font-weight:900;letter-spacing:.18em;color:#ffe3a1}
+.premium-planet-options{display:flex;flex-wrap:wrap;justify-content:center;gap:7px;padding:0 12px}
+.premium-planet-options button{background:#1e3768d9;color:#e9f3ff;border:1px solid #8caee469;border-radius:999px;padding:8px 12px;font-size:12px;font-weight:750;min-height:37px;transition:background .2s}
+.premium-planet-options button[aria-pressed=true]{background:#ffce62;color:#192a57;border-color:#ffe9a5;box-shadow:0 0 19px #ffcb6680}
+.premium-planet-options button:hover{background:#4465a1;color:#fff}
+.premium-kids .premium-motion-note{order:4}
+.premium-kids .premium-pluto{order:5}
+@media(max-width:620px){.premium-kids .premium-character-bubble{top:calc(100% + 3px);width:min(210px,72vw)}.premium-kids .premium-character-bubble::after{top:-9px}.premium-kids .premium-crew{margin-bottom:17px}.premium-planet-options{gap:6px}.premium-planet-options button{font-size:11px;padding:7px 10px;min-height:35px}.premium-planet-picker{margin-top:14px}}
