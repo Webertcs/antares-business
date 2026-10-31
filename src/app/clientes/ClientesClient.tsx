@@ -71,6 +71,7 @@ export default function ClientsPage({ writesEnabled }: { writesEnabled: boolean 
     <p>Escolas, empresas, associações e apresentações em um só lugar.</p></div>
    <div style={{display:'flex',gap:8,alignItems:'center',flexWrap:'wrap'}}>
    <span style={{border:'1px solid #eab308',padding:'8px 12px',borderRadius:10}}>{writesEnabled?"Cadastros liberados":"Cadastros em homologação"}</span>
+   <Link href="/vitrine/inbox" style={{padding:12,borderRadius:9,border:'1px solid #2563eb',textDecoration:'none'}}>📨 Solicitações da vitrine</Link>
    <button type="button" disabled={!writesEnabled} onClick={()=>openForm('client')} style={{padding:12,borderRadius:9,background:'#2563eb',color:'#fff',opacity:writesEnabled?1:.5}}>+ Novo cliente</button></div>
   </div>
   <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(160px,1fr))',gap:12,marginBottom:20}}>
