@@ -239,3 +239,11 @@
 .premium-kids .premium-motion-note{order:4}
 .premium-kids .premium-pluto{order:5}
 @media(max-width:620px){.premium-kids .premium-character-bubble{top:calc(100% + 3px);width:min(210px,72vw)}.premium-kids .premium-character-bubble::after{top:-9px}.premium-kids .premium-crew{margin-bottom:17px}.premium-planet-options{gap:6px}.premium-planet-options button{font-size:11px;padding:7px 10px;min-height:35px}.premium-planet-picker{margin-top:14px}}
+
+/* Balões laterais: não cobrem o título nem o sistema solar. */
+.premium-kids .premium-character-bubble,.premium-kids .premium-pixel-bubble{top:50%;bottom:auto;left:calc(100% + 14px);right:auto;transform:translateY(-50%);width:245px;max-width:245px;animation:none}
+.premium-kids .premium-character-bubble::after{top:calc(50% - 8px);bottom:auto;left:-9px;right:auto;transform:rotate(135deg)}
+.premium-kids .premium-crew-member:nth-of-type(3) .premium-character-bubble,.premium-kids .premium-pixel-bubble{left:auto;right:calc(100% + 14px)}
+.premium-kids .premium-crew-member:nth-of-type(3) .premium-character-bubble::after,.premium-kids .premium-pixel-bubble::after{left:auto;right:-9px;transform:rotate(-45deg)}
+@media(max-width:950px){.premium-kids .premium-character-bubble,.premium-kids .premium-pixel-bubble{width:185px;max-width:185px;padding:10px 26px 10px 12px}}
+@media(max-width:620px){.premium-kids .premium-character-bubble,.premium-kids .premium-pixel-bubble{position:absolute;top:auto;bottom:calc(100% + 12px);left:50%;right:auto;transform:translateX(-50%);width:min(230px,80vw);max-width:230px}.premium-kids .premium-character-bubble::after,.premium-kids .premium-pixel-bubble::after{top:auto;bottom:-9px;left:calc(50% - 8px);right:auto;transform:rotate(45deg)}}
