@@ -10,3 +10,25 @@
 .premium-robot img{width:106px;height:112px;object-fit:contain;flex-shrink:0}
 @media(max-width:620px){.premium-mascot .premium-character-image{width:66px;height:95px}}
 @media(prefers-reduced-motion:reduce){.premium-mascot .premium-character-image{animation:none!important}}
+
+/* Composição premium aprovada: chamada, mascotes em destaque e sistema solar abaixo. */
+.premium-hero{display:flex;flex-direction:column;align-items:center;gap:12px;max-width:1240px;padding-top:34px}
+.premium-copy{text-align:center;max-width:920px}
+.premium-copy h1{font-size:clamp(45px,6vw,76px);max-width:900px}
+.premium-copy>p{max-width:720px;margin-inline:auto}
+.premium-actions,.premium-trust{justify-content:center}
+.premium-universe{display:flex;flex-direction:column;align-items:center;width:100%;min-width:0;margin-top:18px}
+.premium-crew{order:0;display:flex;justify-content:center;align-items:center;gap:clamp(12px,3vw,38px);width:100%;max-width:900px;z-index:2;margin:0}
+.premium-mascot .premium-character-image{width:clamp(120px,15vw,190px);height:clamp(155px,18vw,235px)}
+.premium-speech{max-width:430px;text-align:center}
+.premium-sky{order:1;width:min(94vw,720px);max-width:720px;margin:-12px auto 0;flex:none}
+.premium-motion-note{order:2}
+@media(max-width:620px){
+ .premium-hero{padding-top:24px;gap:6px}
+ .premium-copy h1{font-size:clamp(37px,10vw,52px)}
+ .premium-crew{gap:7px}
+ .premium-mascot .premium-character-image{width:clamp(74px,22vw,115px);height:clamp(98px,29vw,145px)}
+ .premium-speech{padding:10px;min-width:0}
+ .premium-speech p{font-size:12px}
+ .premium-sky{width:min(96vw,480px);margin:-2px auto 0}
+}
