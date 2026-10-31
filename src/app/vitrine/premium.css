@@ -259,3 +259,16 @@
 .premium-kids .premium-crew-member.is-presenting{z-index:40}
 .premium-kids .premium-crew-member.is-presenting .premium-character-bubble{z-index:50;opacity:1;visibility:visible;pointer-events:auto}
 .premium-kids .premium-crew-member.is-presenting .premium-mascot,.premium-kids .premium-crew-member.is-presenting .premium-pixel-button{position:relative;z-index:1}
+
+/* Identidade tipográfica uniforme dos três apresentadores. */
+.premium-kids .premium-mascot strong,.premium-kids .premium-pixel-label{
+ display:inline-flex;align-items:center;justify-content:center;
+ font-family:system-ui,-apple-system,"Segoe UI",sans-serif;
+ font-size:12px;font-weight:800;line-height:1.2;letter-spacing:.09em;
+ text-transform:uppercase;color:#fff;
+ background:linear-gradient(120deg,#2f72cbb8,#5c4cc5bb);
+ border:1px solid #bad7ff80;border-radius:999px;
+ padding:6px 16px;box-shadow:0 0 20px #439bf94d;
+}
+.premium-character-bubble p+p{margin-top:6px}
+@media(max-width:620px){.premium-kids .premium-mascot strong,.premium-kids .premium-pixel-label{font-size:10px;letter-spacing:.04em;padding:5px 10px}}
