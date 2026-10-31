@@ -9,7 +9,7 @@ export async function GET(){
   if(!owner)return respond({error:'Somente o proprietário pode acessar solicitações.'},403);
   const db=getDb();
   const rows=await db`SELECT id,responsible_name,institution,city,phone,audience,attendees,
-    desired_date,notes,status,created_at FROM public.vitrine_leads
+    desired_date,notes,status,created_at,converted_client_id,converted_proposal_id FROM public.vitrine_leads
     WHERE organization_id=${owner.organizationId}
     ORDER BY created_at DESC LIMIT 300`;
   return respond({leads:rows});
