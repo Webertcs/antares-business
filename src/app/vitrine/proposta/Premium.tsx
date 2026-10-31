@@ -17,8 +17,8 @@ export default function Premium({proposal:p,history}:{proposal:Item;history:Chan
   }catch(e){setNotice(e instanceof Error?e.message:'Erro ao salvar')}
   finally{setBusy(false)}
  }
- return <div style={{marginTop:20}}>
- <section style={{background:'#12305d',color:'white',padding:22,borderRadius:14}}>
+ return <div className="premium-root" style={{marginTop:20}}>
+ <section className="print-document" style={{background:'#12305d',color:'white',padding:22,borderRadius:14}}>
  <div style={{fontWeight:800,fontSize:23}}>✦ ANTARES — PLANETÁRIO KIDS</div>
  <p>Proposta comercial · {p.status==='draft'?'RASCUNHO NÃO APROVADO':'APROVADA INTERNAMENTE'}</p>
  <h2 style={{fontSize:21}}>{p.title}</h2>
@@ -55,6 +55,6 @@ export default function Premium({proposal:p,history}:{proposal:Item;history:Chan
  <div>Desconto: {String(h.before_values.discount??'—')} → {String(h.after_values.discount??'—')} · Sinal: {String(h.before_values.deposit??'—')} → {String(h.after_values.deposit??'—')}</div>
  </li>)}</ul>}
  </section>
- <style>{`@media print{body{background:#fff!important;color:#111!important}.no-print{display:none!important}nav,header{display:none!important}main{max-width:100%!important;padding:0!important}section{break-inside:avoid}}`}</style>
+ <style>{`@media print{@page{size:A4 portrait;margin:0}html,body{margin:0!important;padding:0!important;background:white!important;-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}main{max-width:none!important;margin:0!important;padding:0!important}main>:not(.premium-root),.premium-root>:not(.print-document){display:none!important}.premium-root{margin:0!important}.print-document{width:210mm!important;height:297mm!important;border-radius:0!important;padding:25mm!important;background:#12305d!important;color:white!important;break-inside:avoid;page-break-after:avoid}.print-document h2{font-size:26pt!important}.print-document p{font-size:12pt!important;margin-top:10mm!important}.print-document p:last-child{display:none!important}}`}</style>
  </div>;
 }
