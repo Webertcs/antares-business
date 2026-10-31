@@ -2,3 +2,11 @@
 /* Pausa acessível ao explorar por ponteiro ou teclado. */
 .premium-orbits:hover .premium-orbit,.premium-orbits:hover .premium-world,.premium-orbits:focus-within .premium-orbit,.premium-orbits:focus-within .premium-world{animation-play-state:paused!important}
 .premium-orbit:has(.premium-world:hover) .premium-world{animation-play-state:paused!important}
+
+/* Mascotes ANTARES são imagens independentes, não recortes de um banner. */
+.premium-mascot .premium-character-image{width:clamp(80px,10vw,130px);height:clamp(110px,13vw,165px);object-fit:contain;filter:drop-shadow(0 8px 10px #273b7a30);animation:pk-float 3.2s ease-in-out infinite;transition:transform .25s ease}
+.premium-mascot:last-child .premium-character-image{animation-delay:-1.5s}
+.premium-mascot.speaking .premium-character-image{transform:scale(1.08)}
+.premium-robot img{width:106px;height:112px;object-fit:contain;flex-shrink:0}
+@media(max-width:620px){.premium-mascot .premium-character-image{width:66px;height:95px}}
+@media(prefers-reduced-motion:reduce){.premium-mascot .premium-character-image{animation:none!important}}
