@@ -146,3 +146,21 @@
 @media(max-width:800px){.premium-kids .premium-hero{padding-top:32px}.premium-kids .premium-crew{gap:12px}.premium-kids .premium-crew-pixel img{width:72px}.premium-kids .premium-sky{width:min(98vw,700px)}}
 @media(max-width:620px){.premium-kids .premium-hero{padding:25px 13px 75px}.premium-kids .premium-copy h1{font-size:clamp(39px,10vw,56px)}.premium-kids .premium-crew{gap:5px}.premium-kids .premium-mascot .premium-character-image{width:76px;height:115px}.premium-kids .premium-mascot strong,.premium-pixel-label{font-size:9px;letter-spacing:0;padding:4px 8px}.premium-kids .premium-speech{padding:10px 9px}.premium-kids .premium-speech b{font-size:12px}.premium-kids .premium-speech p{font-size:11px;line-height:1.45}.premium-kids .premium-crew-pixel img{width:45px}.premium-kids .premium-sky{width:100%;aspect-ratio:1.4}.premium-kids .premium-section-title h2{font-size:34px}}
 @media(prefers-reduced-motion:reduce){.premium-kids .premium-three article,.premium-kids .premium-journey-grid article,.premium-kids .premium-button{transition:none!important}}
+
+/* Galeria editorial ilustrada, com estética premium e transparência sobre as imagens conceituais. */
+.premium-showcase{position:relative;max-width:1260px;margin:auto;padding:76px 24px 96px}
+.premium-showcase-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:18px}
+.premium-showcase-grid article{position:relative;overflow:hidden;border:1px solid #95bdf17d;background:linear-gradient(155deg,#1d3566ed,#142144f0);border-radius:24px;box-shadow:0 14px 42px #040b2c88;transition:transform .25s,border-color .25s}
+.premium-showcase-grid article:hover{transform:translateY(-6px);border-color:#b9dfff}
+.premium-showcase-grid article img{display:block;width:100%;height:auto;aspect-ratio:7/5;object-fit:cover}
+.premium-showcase-grid article>div{padding:17px 18px 23px}
+.premium-showcase-grid h3{color:#fefcff;font-size:19px;font-weight:850;margin:0 0 7px}
+.premium-showcase-grid p{color:#c6d9f3;font-size:13px;line-height:1.65}
+.premium-showcase-disclaimer{text-align:center;font-size:12px;color:#b7cbe7;margin:20px 0 0}
+.premium-kids .premium-school-art.premium-school-picture{display:block;width:min(37vw,420px);flex:none;font-size:initial;white-space:normal;filter:drop-shadow(0 14px 30px #050f5080)}
+.premium-school-picture img{display:block;width:100%;height:auto;border:2px solid #a0d8ff9f;border-radius:22px;object-fit:cover}
+.premium-kids .premium-crew .premium-character-image{filter:drop-shadow(0 14px 12px #030729ba) drop-shadow(0 0 20px #69b1ff77)}
+.premium-kids .premium-orbit-svg .pk-planet-hit{filter:drop-shadow(0 4px 5px #050d2eae)}
+@media(max-width:960px){.premium-showcase-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.premium-kids .premium-school-art.premium-school-picture{width:min(38vw,300px)}}
+@media(max-width:620px){.premium-showcase{padding:50px 16px 70px}.premium-showcase-grid{grid-template-columns:1fr 1fr;gap:10px}.premium-showcase-grid article{border-radius:15px}.premium-showcase-grid article>div{padding:12px}.premium-showcase-grid h3{font-size:15px}.premium-showcase-grid p{font-size:12px}.premium-kids .premium-school-art.premium-school-picture{display:none}}
+@media(prefers-reduced-motion:reduce){.premium-showcase-grid article{transition:none!important}}
