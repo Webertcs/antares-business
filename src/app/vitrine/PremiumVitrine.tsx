@@ -33,10 +33,12 @@ export default function PremiumVitrine(){
  const [speechMode,setSpeechMode]=useState<'intro'|'planet'>('intro');
  const presenterTurn=useRef(0);
  const [formStatus,setFormStatus]=useState('');
+ const [quoteDraft,setQuoteDraft]=useState('');
+ const [today,setToday]=useState('');
  const [dark,setDark]=useState(false);
  const [reduce,setReduce]=useState(false);
  const orbitSvg=useRef<SVGSVGElement|null>(null);
- useEffect(()=>{setReduce(window.matchMedia('(prefers-reduced-motion: reduce)').matches);setVoiceAvailable('speechSynthesis'in window);return()=>{window.speechSynthesis?.cancel();};},[]);
+ useEffect(()=>{setReduce(window.matchMedia('(prefers-reduced-motion: reduce)').matches);setVoiceAvailable('speechSynthesis'in window);const d=new Date();setToday([d.getFullYear(),String(d.getMonth()+1).padStart(2,'0'),String(d.getDate()).padStart(2,'0')].join('-'));return()=>{window.speechSynthesis?.cancel();};},[]);
  function speakFact(fact:string,speaker:'Astro'|'Lunna'|'PIXEL',mode:'intro'|'planet'='planet'){
   if(mute||!voiceAvailable)return;
   const synth=window.speechSynthesis;
@@ -74,16 +76,31 @@ export default function PremiumVitrine(){
  function submit(e:React.FormEvent<HTMLFormElement>){
   e.preventDefault();
   const form=new FormData(e.currentTarget);
+  const get=(name:string)=>String(form.get(name)||'').trim();
+  const phone=get('telefone').replace(/\D/g,'');
+  if(phone.length<10||phone.length>13){setFormStatus('Confira o WhatsApp: informe DDD e número válido.');return;}
+  const people=Number(get('alunos'));
+  if(get('alunos')&&(!Number.isInteger(people)||people<1||people>100000)){setFormStatus('Informe uma quantidade de participantes válida.');return;}
+  if(today&&get('data')&&get('data')<today){setFormStatus('A data desejada precisa ser hoje ou uma data futura.');return;}
   const text=['Olá! Quero solicitar uma apresentação do planetário.',
-   'Responsável: '+form.get('nome'),'Instituição: '+form.get('instituicao'),
-   'Cidade: '+form.get('cidade'),'WhatsApp: '+form.get('telefone'),
-   'Público: '+form.get('publico'),'Participantes: '+(form.get('alunos')||'a combinar'),
-   'Data desejada: '+(form.get('data')||'a combinar'),
-   'Mensagem: '+(form.get('mensagem')||'')].join('\n');
+   'Responsável: '+get('nome'),'Instituição: '+get('instituicao'),
+   'Cidade: '+get('cidade'),'WhatsApp: '+get('telefone'),
+   'Público: '+get('publico'),'Participantes: '+(get('alunos')||'a combinar'),
+   'Data desejada: '+(get('data')||'a combinar'),
+   'Mensagem: '+(get('mensagem')||'sem observações')].join('\n');
+  setQuoteDraft(text);
   const number=process.env.NEXT_PUBLIC_ANTARES_WHATSAPP?.replace(/\D/g,'');
-  if(!number){setFormStatus('Prévia: formulário validado. Envio disponível após configuração do WhatsApp oficial. Nenhum dado foi transmitido.');return;}
-  window.open('https://wa.me/'+number+'?text='+encodeURIComponent(text),'_blank','noopener,noreferrer');
-  setFormStatus('Mensagem preparada no WhatsApp. Confirme o envio por lá. Nenhum registro foi salvo no CRM nesta prévia.');
+  if(!number||number.length<11||number.length>13){
+   setFormStatus('Pedido preparado, mas o WhatsApp oficial ainda não está configurado. Você pode copiar a mensagem abaixo. Nenhum dado foi enviado ou salvo.');
+   return;
+  }
+  const href='https://wa.me/'+number+'?text='+encodeURIComponent(text);
+  const opened=window.open(href,'_blank','noopener,noreferrer');
+  setFormStatus(opened?'WhatsApp aberto com a mensagem preenchida. Confirme o envio na conversa; nada foi registrado no CRM.':'A abertura automática pode ter sido bloqueada. Copie a mensagem ou abra o WhatsApp pelo link abaixo.');
+ }
+ async function copyQuote(){
+  try{await navigator.clipboard.writeText(quoteDraft);setFormStatus('Mensagem copiada. Você pode enviá-la ao atendimento do planetário.');}
+  catch{setFormStatus('Selecione e copie a mensagem no campo abaixo.');}
  }
  const stopped=paused||reduce;
  useEffect(()=>{const svg=orbitSvg.current;if(!svg)return;if(stopped)svg.pauseAnimations();else svg.unpauseAnimations();},[stopped]);
@@ -122,7 +139,7 @@ export default function PremiumVitrine(){
    <section className="premium-showcase" aria-label="Experiências ilustradas do planetário"><div className="premium-section-title"><span>✦ CONHEÇA NOSSO UNIVERSO</span><h2>Uma experiência para lembrar</h2><p>Da cúpula às estrelas: conheça possibilidades de visitas, jornadas e eventos.</p></div><div className="premium-showcase-grid">{[{src:'/vitrine/cupula.svg',title:'Sessões imersivas',desc:'O céu estrelado ganha vida dentro da cúpula.'},{src:'/vitrine/espaco.svg',title:'Viagens espaciais',desc:'Exploração e descoberta para cada idade.'},{src:'/vitrine/escolas.svg',title:'Sua escola no universo',desc:'Ciência e curiosidade sem sair da escola.'},{src:'/vitrine/eventos.svg',title:'Eventos especiais',desc:'Uma atração educativa para diferentes públicos.'}].map(card=><article key={card.src}><Image src={card.src} alt={'Ilustração conceitual: '+card.title} width={700} height={450}/><div><h3>{card.title}</h3><p>{card.desc}</p></div></article>)}</div><p className="premium-showcase-disclaimer">Imagens conceituais ilustrativas. Estrutura e programação reais dependem da proposta contratada.</p></section>
    <section id="viagens" className="premium-section premium-journeys"><div className="premium-section-title"><span>PARA CADA TURMA</span><h2>Uma aventura para cada idade</h2><p>Escolha uma faixa etária para conhecer algumas possibilidades de conteúdo.</p></div><div className="premium-age-tabs" role="tablist" aria-label="Faixas etárias">{(Object.keys(journeys) as Age[]).map(a=><button role="tab" aria-selected={age===a} key={a} onClick={()=>setAge(a)}>{a}</button>)}</div><div className="premium-journey-grid">{journeys[age].map(([emoji,title,description])=><article key={title}><span>{emoji}</span><h3>{title}</h3><p>{description}</p></article>)}</div></section>
    <section id="escolas" className="premium-school"><div><span>ESCOLAS E INSTITUIÇÕES</span><h2>O universo pode voltar todos os anos.</h2><p>Planeje visitas recorrentes com turmas diferentes. Pacotes e condições especiais são definidos em proposta personalizada.</p><a className="premium-button" href="#orcamento">Conhecer as possibilidades <ArrowRight size={17}/></a></div><div className="premium-school-art premium-school-picture"><Image src="/vitrine/escolas.svg" alt="Ilustração de uma escola com cúpula planetária móvel" width={700} height={450}/></div></section>
-   <section id="orcamento" className="premium-section premium-contact"><div><span>PRONTOS PARA DECOLAR?</span><h2>Leve essa experiência para sua escola!</h2><p>Conte sobre sua instituição. A equipe poderá preparar uma proposta conforme o número de participantes e o formato da visita.</p><div className="premium-robot"><Image src="/mascotes/pixel.png" width={105} height={110} alt="PIXEL, o robô companheiro do ANTARES"/><small>BIP! BIP! SUA AVENTURA COMEÇA AQUI!</small></div><p className="premium-privacy"><ShieldCheck size={17}/> Formulário destinado a adultos responsáveis. Não solicitamos dados pessoais de crianças.</p></div><form onSubmit={submit}><div className="premium-form-grid"><label>Seu nome<input required name="nome" maxLength={120} autoComplete="name"/></label><label>Escola ou instituição<input required name="instituicao" maxLength={150}/></label><label>Cidade<input required name="cidade" maxLength={100}/></label><label>WhatsApp<input required name="telefone" type="tel" maxLength={22} autoComplete="tel"/></label><label>Público<select name="publico" defaultValue="Escola"><option>Escola</option><option>Associação</option><option>Empresa</option><option>Evento particular</option></select></label><label>Participantes estimados<input name="alunos" type="number" min="1" max="100000"/></label><label>Data desejada<input name="data" type="date"/></label></div><label>Observações<textarea name="mensagem" rows={3} maxLength={800}/></label><label className="premium-consent"><input required type="checkbox"/> Autorizo o contato em resposta a este pedido de orçamento. Entendo que os dados serão usados para esse atendimento.</label><button className="premium-button" type="submit">Preparar pedido <Send size={17}/></button>{formStatus&&<p role="status" className="premium-form-status">{formStatus}</p>}<small>Prévia comercial: sem gravação no CRM até concluir a integração autorizada.</small></form></section>
+   <section id="orcamento" className="premium-section premium-contact"><div><span>PRONTOS PARA DECOLAR?</span><h2>Leve essa experiência para sua escola!</h2><p>Conte sobre sua instituição. A equipe poderá preparar uma proposta conforme o número de participantes e o formato da visita.</p><div className="premium-robot"><Image src="/mascotes/pixel.png" width={105} height={110} alt="PIXEL, o robô companheiro do ANTARES"/><small>BIP! BIP! SUA AVENTURA COMEÇA AQUI!</small></div><p className="premium-privacy"><ShieldCheck size={17}/> Formulário destinado a adultos responsáveis. Não solicitamos dados pessoais de crianças.</p></div><form onSubmit={submit}><div className="premium-form-grid"><label>Seu nome<input required name="nome" maxLength={120} autoComplete="name"/></label><label>Escola ou instituição<input required name="instituicao" maxLength={150}/></label><label>Cidade<input required name="cidade" maxLength={100}/></label><label>WhatsApp<input required name="telefone" type="tel" maxLength={22} autoComplete="tel"/></label><label>Público<select name="publico" defaultValue="Escola"><option>Escola</option><option>Associação</option><option>Empresa</option><option>Evento particular</option></select></label><label>Participantes estimados<input name="alunos" type="number" min="1" max="100000"/></label><label>Data desejada<input name="data" type="date" min={today||undefined}/></label></div><label>Observações<textarea name="mensagem" rows={3} maxLength={800}/></label><label className="premium-consent"><input required type="checkbox"/> Autorizo o contato em resposta a este pedido de orçamento. Entendo que os dados serão usados para esse atendimento.</label><button className="premium-button" type="submit">Preparar pedido <Send size={17}/></button>{formStatus&&<p role="status" className="premium-form-status">{formStatus}</p>}{quoteDraft&&<div className="premium-quote-preview"><label>Mensagem preparada<textarea readOnly rows={7} value={quoteDraft} aria-label="Mensagem de orçamento pronta para copiar"/></label><button type="button" onClick={copyQuote} className="premium-copy-quote">Copiar mensagem</button></div>}<small>O pedido só será enviado quando você confirmar a mensagem no WhatsApp. Integração com o CRM ainda não ativada.</small></form></section>
    <section className="premium-section premium-faq"><div className="premium-section-title"><span>DÚVIDAS FREQUENTES</span><h2>Perguntas de quem vai viajar</h2></div><details><summary>O planetário vai até a escola?</summary><p>Sim. A equipe leva a estrutura móvel e combina previamente o espaço necessário.</p></details><details><summary>Quantas crianças participam?</summary><p>A capacidade depende da cúpula utilizada. As turmas são organizadas em sessões.</p></details><details><summary>Também atende eventos e associações?</summary><p>Sim. Basta informar o formato do evento no pedido de orçamento.</p></details></section>
   </main><footer className="premium-footer"><div><strong>✦ ANTARES · PLANETÁRIO KIDS</strong><p>Descobrindo o universo, uma escola de cada vez.</p></div><a href="#inicio">Voltar ao início ↑</a></footer>
   <a href="#orcamento" className="premium-floating" aria-label="Solicitar orçamento"><MessageCircle size={20}/> Orçamento</a>
