@@ -194,3 +194,12 @@
 @media(max-width:800px){.premium-kids .premium-hero{padding-top:30px}.premium-kids .premium-sky{width:min(96vw,700px)}}
 @media(max-width:620px){.premium-kids .premium-hero{padding:22px 14px 56px}.premium-kids .premium-copy h1{font-size:clamp(37px,9.2vw,52px)}.premium-kids .premium-mascot .premium-character-image{width:72px;height:104px}.premium-kids .premium-crew{gap:5px}.premium-kids .premium-speech{max-width:200px}.premium-kids .premium-sky{width:100%;aspect-ratio:1.55}.premium-kids .premium-universe-controls{bottom:-34px}.premium-kids .premium-motion-note{margin-top:44px;padding-inline:8px}.premium-kids .premium-showcase-grid{gap:12px}.premium-kids .premium-showcase-grid article>div{min-height:116px}.premium-kids .premium-section{padding-block:51px}.premium-kids .premium-school{padding-block:44px}.premium-kids .premium-contact form{padding:18px}.premium-kids .premium-floating{right:12px;bottom:12px}}
 @media(prefers-reduced-motion:reduce){.premium-kids .premium-showcase-grid img{transition:none!important}}
+
+/* Refinamento aprovado: mascotes protagonistas, sem CTAs duplicados. */
+.premium-kids .premium-copy{padding-bottom:0}
+.premium-kids .premium-trust{margin-top:19px}
+.premium-kids .premium-crew{gap:clamp(13px,3vw,44px)}
+.premium-kids .premium-speech-compact{flex:0 1 250px;max-width:250px;min-width:140px;padding:12px 15px;border-radius:16px;background:#132347bd;border-color:#91aef55c;box-shadow:0 6px 20px #040d2b56;text-align:center}
+.premium-kids .premium-speech-compact b{font-size:13px;color:#ffe3a0}
+.premium-kids .premium-speech-compact p{font-size:12px;line-height:1.55;margin:4px 0 0;color:#dceaff}
+@media(max-width:620px){.premium-kids .premium-speech-compact{flex:1 1 100px;min-width:92px;padding:8px}.premium-kids .premium-speech-compact b{font-size:11px}.premium-kids .premium-speech-compact p{font-size:10px;line-height:1.35}}
