@@ -1,6 +1,6 @@
 'use client';
 import Image from 'next/image';
-import {useEffect,useState} from 'react';
+import {useEffect,useRef,useState} from 'react';
 import {ArrowRight,Volume2,VolumeX,Pause,Play,Send,ShieldCheck,MessageCircle} from 'lucide-react';
 import './premium.css';
 const worlds=[
@@ -29,6 +29,8 @@ export default function PremiumVitrine(){
  const [formStatus,setFormStatus]=useState('');
  const [dark,setDark]=useState(false);
  const [reduce,setReduce]=useState(false);
+ const orbitSvg=useRef<SVGSVGElement|null>(null);
+ const [hoverPause,setHoverPause]=useState(false);
  useEffect(()=>{setReduce(window.matchMedia('(prefers-reduced-motion: reduce)').matches);setVoiceAvailable('speechSynthesis'in window);return()=>{window.speechSynthesis?.cancel();};},[]);
  function selectWorld(w:World){
   setWorld(w);setMascot(m=>m==='Astro'?'Lunna':'Astro');
@@ -57,14 +59,25 @@ export default function PremiumVitrine(){
   window.open('https://wa.me/'+number+'?text='+encodeURIComponent(text),'_blank','noopener,noreferrer');
   setFormStatus('Mensagem preparada no WhatsApp. Confirme o envio por lá. Nenhum registro foi salvo no CRM nesta prévia.');
  }
- const stopped=paused||reduce;
+ const stopped=paused||reduce||hoverPause;
+ useEffect(()=>{const svg=orbitSvg.current;if(!svg)return;if(stopped)svg.pauseAnimations();else svg.unpauseAnimations();},[stopped]);
  return <div className={'premium-kids'+(dark?' premium-night':'')}>
   <header className="premium-header"><a href="#inicio" className="premium-logo"><span>✦</span> ANTARES <small>PLANETÁRIO KIDS</small></a><nav aria-label="Navegação da vitrine"><a href="#experiencia">Experiência</a><a href="#viagens">Viagens</a><a href="#escolas">Escolas</a><a className="premium-nav-cta" href="#orcamento">Pedir orçamento <ArrowRight size={16}/></a></nav><button className="premium-theme" onClick={()=>setDark(v=>!v)} aria-label={dark?'Ativar tema claro':'Ativar tema escuro'}>{dark?'☀️':'🌙'}</button></header>
   <main><section className="premium-hero" id="inicio"><div className="premium-copy"><span className="premium-eyebrow">✦ O UNIVERSO VAI ATÉ SUA ESCOLA</span><h1>Uma viagem espacial <em>inesquecível!</em></h1><p>Uma cúpula de descobertas, planetas e histórias. A ciência ganha vida em uma experiência que encanta pequenos exploradores.</p><div className="premium-actions"><a className="premium-button" href="#orcamento">Levar o planetário à escola <ArrowRight size={18}/></a><a className="premium-ghost" href="#experiencia">Descobrir a experiência</a></div><div className="premium-trust"><span>✦ Educativo</span><span>✦ Para crianças</span><span>✦ Na sua escola</span></div></div>
-   <div className="premium-universe"><div className="premium-sky"><div className={'premium-orbits'+(stopped?' is-paused':'')}>
-     {worlds.slice(1).map((w,i)=><div className="premium-orbit" key={w.id} style={{width:(27+i*11.7)+'%',height:(27+i*11.7)+'%',animationDuration:w.duration+'s',animationPlayState:stopped?'paused':undefined}}><button type="button" className={'premium-world premium-world-'+w.id+(world.id===w.id?' chosen':'')} style={{animationDuration:w.duration+'s',animationPlayState:stopped?'paused':undefined}} aria-label={'Descobrir '+w.name} onClick={()=>selectWorld(w)}>{w.icon}</button></div>)}
-     <button type="button" className={'premium-sun'+(world.id==='sol'?' chosen':'')} onClick={()=>selectWorld(worlds[0])} aria-label="Descobrir o Sol">☀️</button>
-    </div><div className="premium-universe-controls"><button onClick={()=>setPaused(v=>!v)} aria-label={paused?'Retomar órbitas':'Pausar órbitas'}>{paused?<Play size={16}/>:<Pause size={16}/>} {paused?'Continuar':'Pausar'}</button><button onClick={toggleSound} aria-label={mute?'Ativar narração':'Silenciar narração'} disabled={!voiceAvailable}>{mute?<VolumeX size={16}/>:<Volume2 size={16}/>} {mute?'Ouvir':'Silenciar'}</button></div></div>
+   <div className="premium-universe"><div className="premium-sky"><svg ref={orbitSvg} className="premium-orbit-svg" viewBox="0 0 900 510" aria-label="Sistema solar com órbitas fixas e planetas em movimento" onPointerEnter={()=>setHoverPause(true)} onPointerLeave={()=>setHoverPause(false)} onFocusCapture={()=>setHoverPause(true)} onBlurCapture={(e)=>{if(!e.currentTarget.contains(e.relatedTarget as Node))setHoverPause(false);}}>
+     <defs><radialGradient id="pk-sun-glow"><stop offset="0" stopColor="#ffec94"/><stop offset=".55" stopColor="#ffd45a"/><stop offset="1" stopColor="#e99520"/></radialGradient><filter id="pk-sun-halo"><feGaussianBlur stdDeviation="15"/></filter></defs>
+     {worlds.slice(1).map((w,i)=>{const rx=85+i*51;const ry=32+i*29;return <ellipse key={'track-'+w.id} cx="450" cy="255" rx={rx} ry={ry} fill="none" stroke="#cce5ff" strokeWidth="1.6" strokeDasharray="5 7" opacity=".56"/>;})}
+     <circle cx="450" cy="255" r="58" fill="#ffc943" opacity=".38" filter="url(#pk-sun-halo)"/>
+     <g role="button" tabIndex={0} aria-label="Descobrir o Sol" className="pk-sun-hit" onClick={()=>selectWorld(worlds[0])} onKeyDown={e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();selectWorld(worlds[0]);}}}>
+      <circle cx="450" cy="255" r="37" fill="url(#pk-sun-glow)" stroke={world.id==='sol'?'#fff5ca':'#ffc23b'} strokeWidth={world.id==='sol'?5:2}/>
+      <text x="450" y="267" fontSize="39" textAnchor="middle">☀️</text>
+     </g>
+     {worlds.slice(1).map((w,i)=>{const rx=85+i*51,ry=32+i*29;const startX=450+rx;const path=`M ${startX} 255 A ${rx} ${ry} 0 1 1 ${450-rx} 255 A ${rx} ${ry} 0 1 1 ${startX} 255`;return <g key={w.id} className={'pk-planet-hit'+(world.id===w.id?' chosen':'')} role="button" tabIndex={0} aria-label={'Descobrir '+w.name} onClick={()=>selectWorld(w)} onKeyDown={e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();selectWorld(w);}}}>
+       <animateMotion dur={w.duration+'s'} begin={'-'+(i*3.8)+'s'} repeatCount="indefinite" rotate="0" path={path}/>
+       <circle r={world.id===w.id?25:21} fill="#f8fbff" stroke={world.id===w.id?'#ffc946':'#b4d7ff'} strokeWidth={world.id===w.id?5:2} opacity=".96"/>
+       <text x="0" y="9" fontSize="29" textAnchor="middle">{w.icon}</text>
+      </g>;})}
+    </svg><div className="premium-universe-controls"><button onClick={()=>setPaused(v=>!v)} aria-label={paused?'Retomar órbitas':'Pausar órbitas'}>{paused?<Play size={16}/>:<Pause size={16}/>} {paused?'Continuar':'Pausar'}</button><button onClick={toggleSound} aria-label={mute?'Ativar narração':'Silenciar narração'} disabled={!voiceAvailable}>{mute?<VolumeX size={16}/>:<Volume2 size={16}/>} {mute?'Ouvir':'Silenciar'}</button></div></div>
     <div className="premium-crew"><button className={'premium-mascot'+(mascot==='Astro'?' speaking':'')} onClick={()=>setMascot('Astro')} aria-label="Selecionar Astro"><Image src="/mascotes/astro.svg" alt="" width={115} height={150} className="premium-character-image"/><strong>ASTRO</strong></button><div className="premium-speech" aria-live="polite"><b>{mascot} apresenta {world.name}!</b><p>{world.fact}</p><small>Toque nos planetas e descubra o universo.</small></div><button className={'premium-mascot'+(mascot==='Lunna'?' speaking':'')} onClick={()=>setMascot('Lunna')} aria-label="Selecionar Lunna"><Image src="/mascotes/lunna.svg" alt="" width={115} height={150} className="premium-character-image"/><strong>LUNNA</strong></button><div className="premium-crew-pixel"><Image src="/mascotes/pixel.svg" width={105} height={115} alt="PIXEL, robô companheiro"/></div></div>
     <p className="premium-motion-note">As órbitas são ilustrativas, não representam distâncias reais. Use Pausar para explorar com calma.</p>
    </div></section>
