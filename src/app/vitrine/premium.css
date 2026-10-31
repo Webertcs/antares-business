@@ -247,3 +247,8 @@
 .premium-kids .premium-crew-member:nth-of-type(3) .premium-character-bubble::after,.premium-kids .premium-pixel-bubble::after{left:auto;right:-9px;transform:rotate(-45deg)}
 @media(max-width:950px){.premium-kids .premium-character-bubble,.premium-kids .premium-pixel-bubble{width:185px;max-width:185px;padding:10px 26px 10px 12px}}
 @media(max-width:620px){.premium-kids .premium-character-bubble,.premium-kids .premium-pixel-bubble{position:absolute;top:auto;bottom:calc(100% + 12px);left:50%;right:auto;transform:translateX(-50%);width:min(230px,80vw);max-width:230px}.premium-kids .premium-character-bubble::after,.premium-kids .premium-pixel-bubble::after{top:auto;bottom:-9px;left:calc(50% - 8px);right:auto;transform:rotate(45deg)}}
+
+/* Decisão visual final: balões acima de quem fala, com botão de fechar. */
+.premium-kids .premium-character-bubble,.premium-kids .premium-pixel-bubble{top:auto;bottom:calc(100% + 12px);left:50%;right:auto;transform:translateX(-50%);width:min(255px,76vw);max-width:255px}
+.premium-kids .premium-character-bubble::after,.premium-kids .premium-pixel-bubble::after{top:auto;bottom:-9px;left:calc(50% - 8px);right:auto;transform:rotate(45deg)}
+@media(max-width:620px){.premium-kids .premium-character-bubble,.premium-kids .premium-pixel-bubble{bottom:calc(100% + 8px);width:min(220px,80vw)}}
