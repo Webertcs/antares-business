@@ -30,6 +30,7 @@ export default function PremiumVitrine(){
  const [voiceAvailable,setVoiceAvailable]=useState(false);
  const [mascot,setMascot]=useState<'Astro'|'Lunna'|'PIXEL'>('Astro');
  const [showSpeech,setShowSpeech]=useState(false);
+ const presenterTurn=useRef(0);
  const [formStatus,setFormStatus]=useState('');
  const [dark,setDark]=useState(false);
  const [reduce,setReduce]=useState(false);
@@ -38,7 +39,10 @@ export default function PremiumVitrine(){
  useEffect(()=>{setReduce(window.matchMedia('(prefers-reduced-motion: reduce)').matches);setVoiceAvailable('speechSynthesis'in window);return()=>{window.speechSynthesis?.cancel();};},[]);
  function speakFact(fact:string){if(mute||!voiceAvailable)return;window.speechSynthesis.cancel();const utter=new SpeechSynthesisUtterance(fact);utter.lang='pt-BR';utter.rate=.93;utter.pitch=1.08;window.speechSynthesis.speak(utter);}
  function selectWorld(w:World){
-  setWorld(w);setShowSpeech(true);setMascot(m=>m==='Astro'?'Lunna':m==='Lunna'?'PIXEL':'Astro');
+  setWorld(w);setShowSpeech(true);
+  const presenters:('Astro'|'Lunna'|'PIXEL')[]=['Astro','Lunna','PIXEL'];
+  setMascot(presenters[presenterTurn.current%presenters.length]);
+  presenterTurn.current+=1;
   speakFact(w.fact);
  }
  function toggleSound(){
