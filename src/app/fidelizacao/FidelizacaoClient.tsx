@@ -4,6 +4,7 @@ import Link from 'next/link';
 
 type Client={id:string;name:string;kind:string;status:string;city:string|null};
 type Event={id:string;client_id:string;status:string;event_date:string|null;title:string};
+type Action={id:string;client_id:string;client_name:string;action_kind:string;due_date:string|null;priority:string;status:string;note:string};
 type Item={client:Client;completed:number;last:Date|null;days:number|null;tier:string;alert:string;priority:number};
 const DAY=86400000;
 function parseDate(value:string|null):Date|null{
@@ -18,6 +19,28 @@ export default function FidelizacaoClient(){
  const [error,setError]=useState('');
  const [filter,setFilter]=useState('all');
  const [threshold,setThreshold]=useState(90);
+ const [actions,setActions]=useState<Action[]>([]);
+ const [selected,setSelected]=useState('');
+ const [due,setDue]=useState('');
+ const [kind,setKind]=useState('follow_up');
+ const [priority,setPriority]=useState('normal');
+ const [note,setNote]=useState('');
+ const [saving,setSaving]=useState(false);
+ const [feedback,setFeedback]=useState('');
+ async function refreshActions(){
+  const r=await fetch('/api/fidelizacao/acoes',{cache:'no-store'});const d=await r.json();
+  if(!r.ok)throw Error(d.error||'Falha ao carregar lembretes');setActions(d.actions||[]);
+ }
+ useEffect(()=>{refreshActions().catch(e=>setFeedback(e.message));},[]);
+ async function saveAction(command:'create'|'complete'|'dismiss',id?:string){
+  setSaving(true);setFeedback('');
+  try{
+   const r=await fetch('/api/fidelizacao/acoes',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({command,id,clientId:selected,date:due||null,kind,priority,note})});
+   const d=await r.json();if(!r.ok)throw Error(d.error||'Não foi possível salvar');
+   await refreshActions();setNote('');setDue('');setFeedback('Lembrete atualizado com sucesso.');
+  }catch(e){setFeedback(e instanceof Error?e.message:'Erro inesperado');}
+  finally{setSaving(false);}
+ }
  useEffect(()=>{
   const ctrl=new AbortController();
   fetch('/api/crm/clientes',{cache:'no-store',signal:ctrl.signal}).then(async r=>{
@@ -35,8 +58,8 @@ export default function FidelizacaoClient(){
    const days=last?Math.max(0,Math.floor((now.getTime()-last.getTime())/DAY)):null;
    const yearly=dated.filter(d=>d.getUTCFullYear()===year).length;
    const tier=yearly>=4?'Ouro':yearly>=2?'Prata':yearly===1?'Bronze':'Sem categoria';
-   const alert=days!==null&&days>=threshold?'Retomar contato':completed.length===0?'Sem visita registrada':days!==null&&days>=60?'Acompanhar':'Relacionamento recente';
-   return {client,completed:yearly,last,days,tier,alert,priority:days!==null&&days>=threshold?0:completed.length===0?1:days!==null&&days>=60?2:3};
+   const alert=days!==null&&days>=threshold?'Retomar contato':completed.length===0?'Novo / sem visita realizada':days!==null&&days>=60?'Acompanhar':'Relacionamento recente';
+   return {client,completed:yearly,last,days,tier,alert,priority:days!==null&&days>=threshold?0:days!==null&&days>=60?2:3};
   }).sort((a,b)=>a.priority-b.priority||((b.days||0)-(a.days||0)));
  },[clients,events,threshold]);
  const displayed=items.filter(i=>filter==='all'||(filter==='attention'?i.priority<=2:i.tier===filter));
@@ -65,6 +88,25 @@ export default function FidelizacaoClient(){
  <tbody>{displayed.map(i=><tr key={i.client.id}><td style={{padding:12,borderBottom:'1px solid #e1e8f1'}}><strong>{i.client.name}</strong><div style={{fontSize:12}}>{i.client.city||'Cidade não informada'}</div></td>
  <td>{i.tier}</td><td>{i.completed}</td><td>{dateLabel(i.last)}</td><td>{i.alert}{i.days!==null?' ('+i.days+' dias)':''}</td></tr>)}</tbody>
  </table></div>}
+ </section>
+ <section style={{border:'1px solid #b6c7de',borderRadius:14,padding:19,marginTop:20}}>
+ <h2 style={{fontSize:21,fontWeight:750}}>Agenda interna de relacionamento</h2>
+ <p style={{fontSize:13}}>Registre contatos e programe retornos. O ANTARES não envia mensagens automaticamente.</p>
+ <div style={{display:'flex',gap:10,flexWrap:'wrap',alignItems:'end',margin:'16px 0'}}>
+ <label>Instituição<select value={selected} onChange={e=>setSelected(e.target.value)} style={{display:'block',padding:9,maxWidth:230}}><option value="">Selecione</option>{items.map(i=><option key={i.client.id} value={i.client.id}>{i.client.name}</option>)}</select></label>
+ <label>Ação<select value={kind} onChange={e=>setKind(e.target.value)} style={{display:'block',padding:9}}><option value="follow_up">Retomar contato</option><option value="renewal">Renovação</option><option value="feedback">Pedir avaliação</option><option value="offer">Nova experiência</option><option value="other">Outra</option></select></label>
+ <label>Data prevista<input type="date" value={due} onChange={e=>setDue(e.target.value)} style={{display:'block',padding:8}}/></label>
+ <label>Prioridade<select value={priority} onChange={e=>setPriority(e.target.value)} style={{display:'block',padding:9}}><option value="normal">Normal</option><option value="high">Alta</option><option value="low">Baixa</option></select></label>
+ </div>
+ <label>Observação<input value={note} onChange={e=>setNote(e.target.value)} maxLength={2000} placeholder="Ex.: oferecer sessão de galáxias no próximo bimestre" style={{display:'block',padding:10,width:'100%',margin:'6px 0 12px'}}/></label>
+ <button disabled={saving||!selected} onClick={()=>saveAction('create')} style={{padding:'10px 18px',background:'#2058d4',color:'white',borderRadius:8}}>{saving?'Salvando...':'Criar lembrete interno'}</button>
+ {feedback&&<p role="status" style={{marginTop:10}}>{feedback}</p>}
+ <h3 style={{marginTop:22,fontWeight:700}}>Lembretes registrados ({actions.filter(a=>a.status==='open').length} em aberto)</h3>
+ <div style={{display:'grid',gap:10,marginTop:10}}>
+ {actions.length===0?<p>Nenhum lembrete cadastrado.</p>:actions.map(a=><div key={a.id} style={{border:'1px solid #d0dcf0',padding:13,borderRadius:10,display:'flex',gap:12,justifyContent:'space-between',flexWrap:'wrap'}}>
+ <div><strong>{a.client_name}</strong><div style={{fontSize:13}}>Tipo: {a.action_kind} · Prioridade: {a.priority} · {a.status==='open'?'Em aberto':a.status==='done'?'Concluído':'Dispensado'}</div><div style={{fontSize:13}}>Prazo: {a.due_date?String(a.due_date).slice(0,10).split('-').reverse().join('/'):'Sem data'}</div><div>{a.note}</div></div>
+ {a.status==='open'&&<div style={{display:'flex',alignItems:'center',gap:8}}><button disabled={saving} onClick={()=>saveAction('complete',a.id)}>Concluir</button><button disabled={saving} onClick={()=>saveAction('dismiss',a.id)}>Dispensar</button></div>}</div>)}
+ </div>
  </section>
  <p style={{fontSize:12,opacity:.8,marginTop:16}}>Painel somente leitura. Alertas sugeridos, não confirmações de abandono ou interesse comercial. Para ações manuais e histórico completo, utilize Clientes e Eventos. A agenda de tarefas editáveis e o controle de cúpulas serão integrados em etapa posterior.</p>
  </main>;
