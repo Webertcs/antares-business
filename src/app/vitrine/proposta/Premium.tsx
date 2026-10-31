@@ -18,15 +18,25 @@ export default function Premium({proposal:p,history}:{proposal:Item;history:Chan
   finally{setBusy(false)}
  }
  return <div className="premium-root" style={{marginTop:20}}>
- <section className="print-document" style={{background:'#12305d',color:'white',padding:22,borderRadius:14}}>
- <div style={{fontWeight:800,fontSize:23}}>✦ ANTARES — PLANETÁRIO KIDS</div>
- <p>Proposta comercial · {p.status==='draft'?'RASCUNHO NÃO APROVADO':'APROVADA INTERNAMENTE'}</p>
- <h2 style={{fontSize:21}}>{p.title}</h2>
- <p>Instituição: {p.client_name} · Participantes: {p.expected_attendees}</p>
- <p>Total: {Number(p.total).toLocaleString('pt-BR',{style:'currency',currency:'BRL'})} · Sinal previsto: {Number(p.deposit).toLocaleString('pt-BR',{style:'currency',currency:'BRL'})}</p>
- <p>Validade: {valid||'Não definida'}</p>
- <p style={{whiteSpace:'pre-wrap'}}>Condições: {terms||'Não definidas'}</p>
- <p style={{fontSize:12}}>Pré-visualização interna. O PDF é gerado pelo recurso Imprimir do navegador.</p>
+ <section className="print-document" aria-label="Proposta comercial">
+ <div className="proposal-letterhead">
+  <div><div className="proposal-brand">✦ ANTARES</div><div className="proposal-subbrand">PLANETÁRIO KIDS</div></div>
+  <div className="proposal-kicker">PROPOSTA COMERCIAL</div>
+ </div>
+ <div className="proposal-body">
+  <div className="proposal-eyebrow">EDUCAÇÃO • CIÊNCIA • EXPERIÊNCIA</div>
+  <h2>{p.title}</h2>
+  <p className="proposal-description">Uma experiência educativa pelo universo, preparada para sua instituição.</p>
+  <div className="proposal-client"><div className="proposal-label">INSTITUIÇÃO</div><strong>{p.client_name}</strong><p>Participantes previstos: {p.expected_attendees}</p></div>
+  <div className="proposal-finance">
+   <div className="proposal-highlight"><div className="proposal-label">INVESTIMENTO TOTAL</div><strong>{Number(p.total).toLocaleString('pt-BR',{style:'currency',currency:'BRL'})}</strong></div>
+   <div><div className="proposal-label">SINAL PREVISTO</div><strong>{Number(p.deposit).toLocaleString('pt-BR',{style:'currency',currency:'BRL'})}</strong></div>
+   <div><div className="proposal-label">SALDO PREVISTO</div><strong>{Math.max(0,Number(p.total)-Number(p.deposit)).toLocaleString('pt-BR',{style:'currency',currency:'BRL'})}</strong></div>
+  </div>
+  <div className="proposal-terms"><h3>Condições comerciais</h3><p>{terms||'A definir com a instituição.'}</p></div>
+  <div className="proposal-valid"><strong>Validade da proposta</strong><span>{valid?valid.split('-').reverse().join('/'):'A definir'}</span></div>
+ </div>
+ <div className="proposal-footer"><strong>ANTARES · PLANETÁRIO KIDS</strong><span>Documento informativo. A aprovação interna não constitui aceite da instituição ou confirmação de reserva.</span></div>
  </section>
  <div className="no-print" style={{marginTop:12}}>
  <button type="button" onClick={()=>window.print()} style={{padding:11,borderRadius:8,background:'#1d4ed8',color:'white'}}>Imprimir / Salvar PDF</button>
@@ -55,6 +65,48 @@ export default function Premium({proposal:p,history}:{proposal:Item;history:Chan
  <div>Desconto: {String(h.before_values.discount??'—')} → {String(h.after_values.discount??'—')} · Sinal: {String(h.before_values.deposit??'—')} → {String(h.after_values.deposit??'—')}</div>
  </li>)}</ul>}
  </section>
- <style>{`@media print{@page{size:A4 portrait;margin:0}html,body{margin:0!important;padding:0!important;background:white!important;-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}main{max-width:none!important;margin:0!important;padding:0!important}main>:not(.premium-root),.premium-root>:not(.print-document){display:none!important}.premium-root{margin:0!important}.print-document{width:210mm!important;height:297mm!important;border-radius:0!important;padding:25mm!important;background:#12305d!important;color:white!important;break-inside:avoid;page-break-after:avoid}.print-document h2{font-size:26pt!important}.print-document p{font-size:12pt!important;margin-top:10mm!important}.print-document p:last-child{display:none!important}}`}</style>
+ <style>{`
+.print-document{background:white;color:#142e55;border:1px solid #cddbf0;border-radius:12px;overflow:hidden;font-family:Arial,sans-serif}
+.proposal-letterhead{background:#12305d;color:white;display:flex;justify-content:space-between;align-items:center;padding:26px 30px;gap:15px}
+.proposal-brand{font-size:27px;font-weight:800;letter-spacing:1px}
+.proposal-subbrand{font-size:11px;letter-spacing:2px}
+.proposal-kicker{font-size:11px;letter-spacing:1px;font-weight:bold}
+.proposal-body{padding:30px}
+.proposal-eyebrow{color:#245ac0;font-weight:700;letter-spacing:1.2px;font-size:10px}
+.proposal-body h2{font-size:24px;line-height:1.25;margin:12px 0}
+.proposal-description{color:#4d6686;margin-bottom:25px}
+.proposal-client{background:#eff5fd;border:1px solid #d7e3f4;padding:20px;border-radius:9px}
+.proposal-client strong{font-size:20px;display:block;margin-top:7px}
+.proposal-client p{margin:9px 0 0}
+.proposal-label{font-size:10px;font-weight:700;color:#49658b;letter-spacing:0.7px}
+.proposal-finance{display:grid;grid-template-columns:1.3fr 1fr 1fr;gap:10px;margin:22px 0}
+.proposal-finance>div{border:1px solid #d3def0;padding:14px 12px;border-radius:8px;min-width:0}
+.proposal-finance strong{font-size:17px;display:block;margin-top:8px;white-space:nowrap}
+.proposal-finance .proposal-highlight{background:#12305d;color:white}
+.proposal-highlight .proposal-label{color:#d8e7fc}
+.proposal-terms h3{font-size:16px;margin:20px 0 8px}
+.proposal-terms p{white-space:pre-wrap;overflow-wrap:anywhere;line-height:1.5}
+.proposal-valid{display:flex;justify-content:space-between;gap:15px;border-top:1px solid #d3def0;margin-top:22px;padding-top:16px}
+.proposal-footer{border-top:3px solid #c9a45b;margin:20px 30px 0;padding:13px 0 22px;display:flex;flex-direction:column;gap:6px;color:#536a87;font-size:11px}
+.proposal-footer strong{color:#12305d;letter-spacing:.8px}
+@media print{
+ @page{size:A4 portrait;margin:0}
+ html,body{margin:0!important;padding:0!important;background:white!important;-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}
+ header,nav,aside{display:none!important}
+ main{max-width:none!important;margin:0!important;padding:0!important}
+ main>:not(.premium-root),.premium-root>:not(.print-document){display:none!important}
+ .premium-root{margin:0!important}
+ .print-document{display:block!important;width:210mm!important;height:297mm!important;box-sizing:border-box!important;border:0!important;border-radius:0!important;break-inside:avoid!important;page-break-after:avoid!important;background:white!important}
+ .proposal-letterhead{padding:15mm 17mm!important;background:#12305d!important;color:white!important}
+ .proposal-body{padding:13mm 17mm 0!important}
+ .proposal-body h2{font-size:20pt!important}
+ .proposal-client{margin-top:7mm}
+ .proposal-finance{margin:9mm 0!important}
+ .proposal-finance strong{font-size:13pt!important}
+ .proposal-terms p{max-height:72mm;overflow:hidden}
+ .proposal-footer{margin:0!important;padding:5mm 17mm 9mm!important;position:absolute;bottom:0;left:0;right:0;background:white!important}
+ .print-document{position:relative}
+}
+`}</style>
  </div>;
 }
