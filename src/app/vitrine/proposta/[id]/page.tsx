@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import Editor from '../Editor';
+import Premium from '../Premium';
 import {redirect} from 'next/navigation';
 import {requireOwner,getDb} from '@/lib/equipe/auth';
 export const dynamic='force-dynamic';
@@ -8,10 +9,11 @@ export default async function Proposta({params}:{params:Promise<{id:string}>}){
  const {id}=await params;
  if(!/^[a-f0-9]{8}(-[a-f0-9]{4}){3}-[a-f0-9]{12}$/i.test(id))return <main style={{padding:32}}>Proposta inválida. <Link href="/vitrine/inbox">Voltar</Link></main>;
  let proposal:null|Record<string,unknown>=null;
+ let history:Array<{id:string;changed_at:string;before_values:Record<string,unknown>;after_values:Record<string,unknown>}> = [];
  try {
   const db=getDb();
   const rows=await db`SELECT p.id,p.title,p.status,p.pricing_model,p.expected_attendees,
-  p.unit_price,p.fixed_price,p.discount,p.deposit,p.total,p.notes,p.created_at,
+  p.unit_price,p.fixed_price,p.discount,p.deposit,p.total,p.notes,p.created_at,p.valid_until,p.payment_terms,
   c.name AS client_name,c.kind AS client_kind,
   l.institution AS origin_institution,l.id AS lead_id
   FROM public.business_proposals p
@@ -19,6 +21,7 @@ export default async function Proposta({params}:{params:Promise<{id:string}>}){
   LEFT JOIN public.vitrine_leads l ON l.converted_proposal_id=p.id AND l.organization_id=p.organization_id
   WHERE p.id=${id}::uuid AND p.organization_id=${owner.organizationId} LIMIT 1`;
   proposal=(rows[0] as Record<string,unknown>)||null;
+  try {const changes=await db`SELECT id,changed_at,before_values,after_values FROM public.business_proposal_changes WHERE proposal_id=${id}::uuid AND organization_id=${owner.organizationId} ORDER BY changed_at DESC LIMIT 30`;history=changes as typeof history;} catch {history=[];}
  } catch {return <main style={{padding:32}}><Link href="/vitrine/inbox">← Solicitações</Link><p>Não foi possível consultar a proposta.</p></main>;}
  if(!proposal)return <main style={{padding:32}}><Link href="/vitrine/inbox">← Solicitações</Link><p>Proposta não encontrada.</p></main>;
  const t=(v:unknown)=>v==null?'—':String(v);
@@ -46,6 +49,7 @@ export default async function Proposta({params}:{params:Promise<{id:string}>}){
    <p style={{fontWeight:650}}>Valores iniciais em zero: revisar antes de qualquer envio ao cliente.</p>
   </section>
   <Editor proposal={{id:String(proposal.id),status:String(proposal.status),pricing_model:String(proposal.pricing_model),expected_attendees:Number(proposal.expected_attendees??0),unit_price:Number(proposal.unit_price),fixed_price:Number(proposal.fixed_price),discount:Number(proposal.discount),deposit:Number(proposal.deposit)}} />
+  <Premium proposal={{id:String(proposal.id),status:String(proposal.status),valid_until:proposal.valid_until?String(proposal.valid_until):null,payment_terms:proposal.payment_terms?String(proposal.payment_terms):null,title:String(proposal.title),client_name:String(proposal.client_name),expected_attendees:Number(proposal.expected_attendees??0),total:Number(proposal.total),deposit:Number(proposal.deposit)}} history={history}/>
   <section style={{border:'1px solid #64748b',borderRadius:14,padding:20,marginTop:16}}>
    <h2 style={{fontSize:21,fontWeight:700}}>Observações</h2>
    <p style={{whiteSpace:'pre-wrap',overflowWrap:'anywhere'}}>{t(proposal.notes)}</p>
