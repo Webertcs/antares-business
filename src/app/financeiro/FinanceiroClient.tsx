@@ -19,6 +19,7 @@ export default function FinanceiroClient(){
  const [pendingId,setPendingId]=useState<string|null>(null);
  const [saving,setSaving]=useState(false);
  const [notice,setNotice]=useState('');
+ const [reversing,setReversing]=useState<string|null>(null);
  const [dome,setDome]=useState('all');
  async function refreshFinance(){
   const [ledger,reportResponse]=await Promise.all([
@@ -46,6 +47,19 @@ export default function FinanceiroClient(){
  setNotice(result.alreadyExists?'Lançamento já registrado anteriormente; não foi duplicado.':'Lançamento registrado.');setAmount('');setDescription('');setPresentation('');setPendingId(null);
  }catch(e){setNotice(e instanceof Error?e.message:'Falha desconhecida. Confira o extrato antes de reenviar.');}finally{setSaving(false);}
  }
+ async function reverseEntry(id:string){
+  if(!data?.writesEnabled||reversing)return;
+  const reason=window.prompt('Justificativa obrigatória do estorno (mínimo 8 caracteres):');
+  if(!reason||reason.trim().length<8)return;
+  if(!window.confirm('Confirma o estorno? Será criado um lançamento inverso auditável.'))return;
+  setReversing(id);
+  try{
+   const res=await fetch('/api/financeiro/estornar',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({original_id:id,reason:reason.trim()})});
+   const json=await res.json();if(!res.ok)throw Error(json.error||'Estorno não realizado');
+   await refreshFinance();setNotice('Estorno registrado com histórico preservado.');
+  }catch(e){setNotice(e instanceof Error?e.message:'Erro ao estornar');}finally{setReversing(null);}
+ }
+ const reversed=new Set((data?.entries||[]).map(x=>x.reversal_of).filter(Boolean));
  const entries=(data?.entries||[]).filter(e=>(type==='all'||e.entry_type===type)&&(dome==='all'||e.dome_name===dome));
  const card={border:'1px solid #bed0e8',borderRadius:14,padding:20,background:'#fff'};
  return <><style>{`@media print {
@@ -81,7 +95,7 @@ export default function FinanceiroClient(){
  <td style={{padding:12,borderBottom:'1px solid #e3eaf3'}}>{e.description}{e.reversal_of&&' (estorno)'}</td>
  <td style={{padding:12,borderBottom:'1px solid #e3eaf3'}}>{e.entry_type==='income'?'Receita':'Despesa'}</td>
  <td style={{padding:12,borderBottom:'1px solid #e3eaf3'}}>{e.presentation_title||'Não vinculada'}{e.dome_name&&' · '+e.dome_name}</td>
- <td style={{padding:12,borderBottom:'1px solid #e3eaf3',fontWeight:700}}>{e.entry_type==='income'?'+':'−'} {brl(Number(e.amount))}</td>
+ <td style={{padding:12,borderBottom:'1px solid #e3eaf3',fontWeight:700}}>{e.entry_type==='income'?'+':'−'} {brl(Number(e.amount))} {data.writesEnabled&&!e.reversal_of&&!reversed.has(e.id)&&<button type="button" disabled={!!reversing} onClick={()=>reverseEntry(e.id)} style={{marginLeft:8,padding:5,border:'1px solid #bdcbe0',borderRadius:6}}>Estornar</button>}</td>
  </tr>)}</tbody></table>{entries.length===0&&<p>Nenhuma movimentação encontrada para os filtros selecionados.</p>}</div>
  {data.limited&&<p style={{color:'#92400e'}}>Exibindo somente os mil lançamentos mais recentes. Totais não são definitivos.</p>}
  </section>
@@ -91,7 +105,7 @@ export default function FinanceiroClient(){
  <div style={{overflowX:'auto'}}><h3>Resumo mensal</h3><table style={{width:'100%',textAlign:'left'}}><thead><tr><th>Período</th><th>Receitas</th><th>Despesas</th><th>Saldo</th></tr></thead><tbody>{report.months.map(m=><tr key={m.periodo}><td>{m.periodo}</td><td>{brl(Number(m.receitas))}</td><td>{brl(Number(m.despesas))}</td><td>{brl(Number(m.receitas)-Number(m.despesas))}</td></tr>)}</tbody></table>{!report.months.length&&<p>Sem movimentações realizadas.</p>}</div>
  <h3>Resumo anual</h3><div style={{overflowX:'auto'}}><table style={{width:'100%',textAlign:'left'}}><thead><tr><th>Ano</th><th>Receitas</th><th>Despesas</th><th>Resultado de caixa</th></tr></thead><tbody>{report.years.map(y=><tr key={y.ano}><td>{y.ano}</td><td>{brl(Number(y.receitas))}</td><td>{brl(Number(y.despesas))}</td><td>{brl(Number(y.receitas)-Number(y.despesas))}</td></tr>)}</tbody></table></div>
  <h3>Por cúpula</h3><div style={{overflowX:'auto'}}><table style={{width:'100%',textAlign:'left'}}><thead><tr><th>Cúpula</th><th>Receitas</th><th>Despesas</th><th>Saldo</th></tr></thead><tbody>{report.domes.map(d=><tr key={d.cupula}><td>{d.cupula}</td><td>{brl(Number(d.receitas))}</td><td>{brl(Number(d.despesas))}</td><td>{brl(Number(d.receitas)-Number(d.despesas))}</td></tr>)}</tbody></table></div>
- <h3>Propostas em negociação ou aceitas</h3><p style={{fontSize:13}}>Oportunidades comerciais, ainda não classificadas como contas a receber confirmadas.</p>
+ <h3>Carteira comercial — valores previstos</h3><p style={{fontSize:13}}>Propostas em andamento ou aceitas. Não constituem, por si só, títulos a receber e não entram no saldo bancário.</p>
  {report.proposals.map(p=><p key={p.id} style={{fontSize:14}}>{p.title} — {brl(Number(p.total||0))} ({p.status})</p>)}
  {!report.proposals.length&&<p>Sem propostas comerciais abertas.</p>}
  <button type="button" className="finance-print-hide" onClick={()=>window.print()} style={{padding:'10px 14px',borderRadius:8,background:'#2454d3',color:'white'}}>Imprimir relatório / salvar PDF</button>
@@ -108,7 +122,7 @@ export default function FinanceiroClient(){
  {data.writesEnabled===false&&<p role="status" style={{background:'#fff7ed',padding:12,borderRadius:9,color:'#8a4618'}}>Lançamentos temporariamente bloqueados enquanto a integração é homologada. O extrato e os relatórios continuam disponíveis.</p>}
  <button type="button" disabled={saving||!data.writesEnabled} onClick={saveEntry} style={{background:'#2454d3',color:'white',padding:'12px 18px',borderRadius:9,marginTop:14}}>{saving?'Registrando...':'Confirmar lançamento'}</button>
  {notice&&<p role="status">{notice}</p>}
- <p style={{fontSize:12,opacity:.7}}>Em caso de erro, confira o extrato antes de tentar novamente. Estornos exigem autorização e serão liberados somente após implementação auditável.</p>
+ <p style={{fontSize:12,opacity:.7}}>Em caso de erro, confira o extrato antes de tentar novamente. Estornos criam um lançamento inverso, preservando o original. A função fica disponível somente após migração e homologação.</p>
  </section>
  </>}
  </div></main></>;
