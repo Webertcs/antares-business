@@ -48,6 +48,7 @@ export async function POST(request:Request){
     ||new Date(occurredOn+'T12:00:00Z').toISOString().slice(0,10)!==occurredOn
     ||(presentationId!==null&&!/^[0-9a-f]{8}-[0-9a-f-]{27}$/i.test(presentationId)))
     return NextResponse.json({error:'Revise os dados do lançamento.'},{status:400});
+  if(process.env.ANTARES_FINANCE_WRITES_ENABLED!=='true')return NextResponse.json({error:'Gravação financeira bloqueada até validação das permissões.'},{status:503});
   const db=getDb();
   if(presentationId){
    const matched=await db`SELECT id FROM public.presentations WHERE organization_id=${ctx.organizationId} AND id=${presentationId} LIMIT 1`;
