@@ -62,18 +62,43 @@ export default function FidelizacaoClient(){
    return {client,completed:yearly,last,days,tier,alert,priority:days!==null&&days>=threshold?0:days!==null&&days>=60?2:3};
   }).sort((a,b)=>a.priority-b.priority||((b.days||0)-(a.days||0)));
  },[clients,events,threshold]);
+ const radar=useMemo(()=>{
+  const withoutVisit=items.filter(i=>i.last===null);
+  const inactive=items.filter(i=>i.days!==null&&i.days>=threshold);
+  const attention=items.filter(i=>i.days!==null&&i.days>=60&&i.days<threshold);
+  const recurring=items.filter(i=>i.completed>=2);
+  const today=new Date().toLocaleDateString('en-CA',{timeZone:'America/Sao_Paulo'});
+  const overdue=actions.filter(a=>a.status==='open'&&a.due_date&&String(a.due_date).slice(0,10)<today);
+  const suggestions=[
+   ...inactive.map(i=>({id:i.client.id,name:i.client.name,reason:'Sem visita concluída há '+i.days+' dias',tip:'Avaliar oferta de nova apresentação',rank:0})),
+   ...attention.map(i=>({id:i.client.id,name:i.client.name,reason:'Última visita há '+i.days+' dias',tip:'Programar acompanhamento',rank:1})),
+   ...recurring.filter(i=>i.priority!==0).map(i=>({id:i.client.id,name:i.client.name,reason:i.completed+' apresentações neste ano',tip:'Avaliar pacote de renovação',rank:2})),
+   ...withoutVisit.map(i=>({id:i.client.id,name:i.client.name,reason:'Nenhuma visita concluída',tip:'Verificar negociação da primeira visita',rank:3}))
+  ].sort((a,b)=>a.rank-b.rank);
+  return {withoutVisit:withoutVisit.length,inactive:inactive.length,attention:attention.length,recurring:recurring.length,overdue:overdue.length,suggestions};
+ },[items,actions,threshold]);
  const displayed=items.filter(i=>filter==='all'||(filter==='attention'?i.priority<=2:i.tier===filter));
  const count=(tier:string)=>items.filter(i=>i.tier===tier).length;
  const dateLabel=(d:Date|null)=>d?d.toLocaleDateString('pt-BR',{timeZone:'UTC'}):'Nenhuma visita concluída';
  return <main style={{maxWidth:1180,margin:'0 auto',padding:'28px 18px',fontFamily:'system-ui'}}>
  <Link href="/">← Voltar ao painel</Link>
- <div style={{margin:'22px 0'}}><div style={{fontSize:12,letterSpacing:2,color:'#315a96'}}>ANTARES BUSINESS · BLOCO 06B</div>
+ <div style={{margin:'22px 0'}}><div style={{fontSize:12,letterSpacing:2,color:'#315a96'}}>ANTARES BUSINESS · BLOCO 06E</div>
  <h1 style={{fontSize:30,fontWeight:800}}>Fidelização e Relacionamento</h1>
  <p>Alertas internos para ajudar o proprietário a decidir quem merece atenção. Nenhuma mensagem é enviada automaticamente.</p></div>
  <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(170px,1fr))',gap:12}}>
  {([['Instituições',items.length],['Ouro',count('Ouro')],['Prata',count('Prata')],['Bronze',count('Bronze')],['Precisam de atenção',items.filter(i=>i.priority<=2).length]] as [string,number][]).map(([k,v])=>
  <div key={k} style={{border:'1px solid #a9bdd8',borderRadius:12,padding:17}}><small>{k}</small><div style={{fontSize:27,fontWeight:800}}>{v}</div></div>)}
  </div>
+ <section style={{border:'1px solid #b6c7de',borderRadius:14,padding:19,marginTop:20}}>
+ <h2 style={{fontSize:21,fontWeight:750}}>ANTARES Intelligence · Radar comercial</h2>
+ <p>Oportunidades calculadas a partir de apresentações concluídas, sem enviar mensagens nem conceder descontos.</p>
+ <div style={{display:'flex',gap:10,flexWrap:'wrap',marginBottom:18}}>
+ {([['Primeira visita pendente',radar.withoutVisit],['Retorno em atenção',radar.inactive],['Acompanhar',radar.attention],['Recorrentes no ano',radar.recurring],['Lembretes vencidos',radar.overdue]] as [string,number][]).map(([label,total])=><div key={label} style={{flex:'1 1 140px',background:'#e9f0fa',padding:14,borderRadius:10}}><small>{label}</small><div style={{fontSize:25,fontWeight:800}}>{total}</div></div>)}
+ </div>
+ <h3 style={{fontWeight:700,marginBottom:10}}>Oportunidades sugeridas</h3>
+ {loading?<p>Carregando...</p>:error?<p role="alert">{error}</p>:radar.suggestions.length===0?<p>Sem oportunidades identificadas.</p>:<div style={{display:'grid',gap:9}}>{radar.suggestions.slice(0,12).map(o=><div key={o.id+o.rank} style={{padding:12,border:'1px solid #cad8e9',borderRadius:10,display:'flex',justifyContent:'space-between',gap:12,flexWrap:'wrap'}}><div><strong>{o.name}</strong><div style={{fontSize:13}}>{o.reason}</div><div style={{fontSize:13,color:'#315a96'}}>{o.tip}</div></div><button type="button" onClick={()=>{setSelected(o.id);document.getElementById('agenda-relacionamento')?.scrollIntoView({behavior:'smooth'});}}>Programar contato</button></div>)}</div>}
+ <p style={{fontSize:12,opacity:.75,marginTop:12}}>Sugestões gerenciais, não constatações de abandono. A consulta atual considera até 500 eventos cadastrados na API; revisar este limite antes de uso em escala.</p>
+ </section>
  <section style={{border:'1px solid #b6c7de',borderRadius:14,padding:19,marginTop:20}}>
  <h2 style={{fontWeight:750,fontSize:21}}>Central de atenção aos clientes</h2>
  <p style={{fontSize:13}}>Classificação por apresentações concluídas no ano atual: Bronze (1), Prata (2–3), Ouro (4+). Eventos cancelados, reservados ou apenas orçados não contam.</p>
@@ -90,7 +115,7 @@ export default function FidelizacaoClient(){
  </table></div>}
  </section>
  <section style={{border:'1px solid #b6c7de',borderRadius:14,padding:19,marginTop:20}}>
- <h2 style={{fontSize:21,fontWeight:750}}>Agenda interna de relacionamento</h2>
+ <h2 id="agenda-relacionamento" style={{fontSize:21,fontWeight:750}}>Agenda interna de relacionamento</h2>
  <p style={{fontSize:13}}>Registre contatos e programe retornos. O ANTARES não envia mensagens automaticamente.</p>
  <div style={{display:'flex',gap:10,flexWrap:'wrap',alignItems:'end',margin:'16px 0'}}>
  <label>Instituição<select value={selected} onChange={e=>setSelected(e.target.value)} style={{display:'block',padding:9,maxWidth:230}}><option value="">Selecione</option>{items.map(i=><option key={i.client.id} value={i.client.id}>{i.client.name}</option>)}</select></label>
@@ -108,6 +133,6 @@ export default function FidelizacaoClient(){
  {a.status==='open'&&<div style={{display:'flex',alignItems:'center',gap:8}}><button disabled={saving} onClick={()=>saveAction('complete',a.id)}>Concluir</button><button disabled={saving} onClick={()=>saveAction('dismiss',a.id)}>Dispensar</button></div>}</div>)}
  </div>
  </section>
- <p style={{fontSize:12,opacity:.8,marginTop:16}}>Painel somente leitura. Alertas sugeridos, não confirmações de abandono ou interesse comercial. Para ações manuais e histórico completo, utilize Clientes e Eventos. A agenda de tarefas editáveis e o controle de cúpulas serão integrados em etapa posterior.</p>
+ <p style={{fontSize:12,opacity:.8,marginTop:16}}>As recomendações são somente orientativas. A agenda permite cadastrar e concluir lembretes internos; não envia mensagens. A gestão das cúpulas virá em etapa posterior.</p>
  </main>;
 }
