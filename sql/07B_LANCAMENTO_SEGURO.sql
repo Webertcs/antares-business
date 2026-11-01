@@ -1,13 +1,28 @@
 -- ANTARES 07B: livro-caixa, escrita controlada e idempotente.
--- Execute somente após revisão e backup. Não ativa o feature flag.
+-- Necessita segredo de capacidade no servidor. Ainda não executar até validar a configuração.
 BEGIN;
+-- A capacidade de escrita é gerada no banco, nunca enviada ao navegador.
+CREATE TABLE IF NOT EXISTS public.antares_finance_capability(
+ singleton boolean PRIMARY KEY DEFAULT true CHECK(singleton),
+ secret text NOT NULL CHECK(length(secret)=64)
+);
+REVOKE ALL ON public.antares_finance_capability FROM PUBLIC;
+REVOKE ALL ON public.antares_finance_capability FROM antares_team_runtime;
+INSERT INTO public.antares_finance_capability(singleton,secret)
+VALUES(true,encode(gen_random_bytes(32),'hex'))
+ON CONFLICT(singleton) DO NOTHING;
 CREATE OR REPLACE FUNCTION public.antares_post_ledger_entry(
- p_subject text,p_org uuid,p_id uuid,p_type text,p_amount numeric,
+ p_capability text,p_subject text,p_org uuid,p_id uuid,p_type text,p_amount numeric,
  p_description text,p_day date,p_presentation uuid DEFAULT NULL
 ) RETURNS TABLE(entry_id uuid,already_exists boolean)
 LANGUAGE plpgsql SECURITY DEFINER SET search_path=pg_catalog,public,pg_temp AS $$
-DECLARE v_member uuid; v_old public.ledger_entries%ROWTYPE;
+DECLARE v_member uuid; v_old public.ledger_entries%ROWTYPE; v_token text;
 BEGIN
+ SELECT secret INTO v_token FROM public.antares_finance_capability WHERE singleton=true;
+ IF v_token IS NULL OR p_capability IS NULL OR length(p_capability)<>64 OR
+    md5(p_capability)<>md5(v_token) THEN
+   RAISE EXCEPTION 'Capacidade financeira inválida';
+ END IF;
  IF p_subject IS NULL OR length(trim(p_subject))=0 OR
     p_id IS NULL OR p_org IS NULL OR
     p_type NOT IN ('income','expense') OR p_type IS NULL OR
@@ -37,10 +52,15 @@ BEGIN
  ) VALUES(p_id,p_org,v_member,p_type,p_amount,trim(p_description),p_day,p_presentation);
  RETURN QUERY SELECT p_id,false;
 END $$;
-REVOKE ALL ON FUNCTION public.antares_post_ledger_entry(text,uuid,uuid,text,numeric,text,date,uuid) FROM PUBLIC;
-REVOKE ALL ON FUNCTION public.antares_post_ledger_entry(text,uuid,uuid,text,numeric,text,date,uuid) FROM antares_team_runtime;
-GRANT EXECUTE ON FUNCTION public.antares_post_ledger_entry(text,uuid,uuid,text,numeric,text,date,uuid) TO antares_team_runtime;
+REVOKE ALL ON FUNCTION public.antares_post_ledger_entry(text,text,uuid,uuid,text,numeric,text,date,uuid) FROM PUBLIC;
+REVOKE ALL ON FUNCTION public.antares_post_ledger_entry(text,text,uuid,uuid,text,numeric,text,date,uuid) FROM antares_team_runtime;
+GRANT EXECUTE ON FUNCTION public.antares_post_ledger_entry(text,text,uuid,uuid,text,numeric,text,date,uuid) TO antares_team_runtime;
 COMMIT;
 -- Exige revisão adicional: função SECURITY DEFINER depende da integridade
 -- do sujeito autenticado enviado pelo servidor. Nunca chamar pelo cliente.
 -- A função não concede SELECT/INSERT/UPDATE/DELETE diretamente ao runtime.
+
+-- Após execução, proprietário deve obter o secret somente em canal local seguro:
+-- SELECT secret FROM public.antares_finance_capability WHERE singleton=true;
+-- Guardar em ANTARES_FINANCE_CAPABILITY no servidor, NUNCA no GitHub ou chat.
+-- Ativar feature flag SOMENTE após testes negativos de autorização e duplicidade.
