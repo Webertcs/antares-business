@@ -1,5 +1,5 @@
 import {NextResponse} from 'next/server';
-import {requireOwner,getDb} from '@/lib/equipe/auth';
+import {requireOwner,getDb,getTeamWriteDb} from '@/lib/equipe/auth';
 export const runtime='nodejs';
 export const dynamic='force-dynamic';
 export async function GET(){
@@ -49,19 +49,11 @@ export async function POST(request:Request){
     ||(presentationId!==null&&!/^[0-9a-f]{8}-[0-9a-f-]{27}$/i.test(presentationId)))
     return NextResponse.json({error:'Revise os dados do lançamento.'},{status:400});
   if(process.env.ANTARES_FINANCE_WRITES_ENABLED!=='true')return NextResponse.json({error:'Gravação financeira bloqueada até validação das permissões.'},{status:503});
-  const db=getDb();
-  if(presentationId){
-   const matched=await db`SELECT id FROM public.presentations WHERE organization_id=${ctx.organizationId} AND id=${presentationId} LIMIT 1`;
-   if(matched.length!==1)return NextResponse.json({error:'Apresentação não pertence à organização.'},{status:400});
-  }
-  const rows=await db`INSERT INTO public.ledger_entries (id,organization_id,entered_by,entry_type,amount,description,occurred_on,presentation_id)
-   VALUES (${id},${ctx.organizationId},${ctx.memberId},${entryType},${amount},${description},${occurredOn},${presentationId})
-   ON CONFLICT (id) DO NOTHING RETURNING id`;
-  if(rows.length===0){
-   const existing=await db`SELECT id,entry_type,amount,description,occurred_on,presentation_id FROM public.ledger_entries WHERE id=${id} AND organization_id=${ctx.organizationId}`;
-   if(existing.length!==1||existing[0].entry_type!==entryType||Number(existing[0].amount)!==amount||existing[0].description!==description||String(existing[0].occurred_on).slice(0,10)!==occurredOn||(existing[0].presentation_id||null)!==presentationId)
-    return NextResponse.json({error:'Identificador já utilizado. Recarregue o formulário.'},{status:409});
-  }
-  return NextResponse.json({ok:true,id,alreadyExists:rows.length===0});
+  const db=getTeamWriteDb();
+  const rows=await db`SELECT entry_id,already_exists FROM public.antares_post_ledger_entry(
+   ${String(ctx.user.id)},${ctx.organizationId},${id},${entryType},${amount},
+   ${description},${occurredOn},${presentationId}
+  )`;
+  return NextResponse.json({ok:true,id,alreadyExists:Boolean(rows[0]?.already_exists)});
  }catch{return NextResponse.json({error:'Não foi possível registrar o lançamento. Confira o extrato antes de tentar novamente.'},{status:503});}
 }
