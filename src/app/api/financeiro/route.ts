@@ -22,7 +22,7 @@ export async function GET(){
   ]);
   const income=Number(totals[0]?.income||0);
   const expenses=Number(totals[0]?.expenses||0);
-  return NextResponse.json({entries,presentations,domes,income,expenses,balance:income-expenses,limited:entries.length===1000},{headers:{'Cache-Control':'private, no-store'}});
+  return NextResponse.json({entries,presentations,domes,income,expenses,balance:income-expenses,writesEnabled:process.env.ANTARES_FINANCE_WRITES_ENABLED==='true'&&/^[0-9a-f]{64}$/i.test(process.env.ANTARES_FINANCE_CAPABILITY||''),limited:entries.length===1000},{headers:{'Cache-Control':'private, no-store'}});
  }catch{return NextResponse.json({error:'Não foi possível consultar o extrato financeiro.'},{status:503});}
 }
 export async function POST(request:Request){
@@ -31,7 +31,9 @@ export async function POST(request:Request){
   if(!ctx)return NextResponse.json({error:'Acesso restrito ao proprietário.'},{status:403});
   const origin=request.headers.get('origin');
   const host=request.headers.get('host');
-  if(!origin||!host||new URL(origin).host!==host)return NextResponse.json({error:'Origem não autorizada.'},{status:403});
+  const normalizedOrigin=origin?new URL(origin):null;
+  if(!normalizedOrigin||!host||normalizedOrigin.host!==host||!['http:','https:'].includes(normalizedOrigin.protocol))
+    return NextResponse.json({error:'Origem não autorizada.'},{status:403});
   const body=await request.json();
   const id=typeof body.id==='string'?body.id:'';
   const entryType=body.entry_type;
