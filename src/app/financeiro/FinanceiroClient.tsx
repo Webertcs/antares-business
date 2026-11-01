@@ -39,17 +39,27 @@ export default function FinanceiroClient(){
  }
  const entries=(data?.entries||[]).filter(e=>(type==='all'||e.entry_type===type)&&(dome==='all'||e.dome_name===dome));
  const card={border:'1px solid #bed0e8',borderRadius:14,padding:20,background:'#fff'};
- return <main style={{background:'#f3f6fc',color:'#11264d',minHeight:'100vh',padding:'clamp(20px,5vw,52px)',fontFamily:'Arial,sans-serif'}}>
+ return <><style>{`@media print {
+ @page { size: A4 portrait; margin: 14mm; }
+ body { background: #fff !important; }
+ .finance-print-hide { display: none !important; }
+ .finance-report-print { border: 0 !important; box-shadow: none !important; padding: 0 !important; margin: 0 !important; }
+ .finance-report-print h2 { color:#163763 !important; font-size:20pt !important; margin-bottom:12px !important; }
+ .finance-report-print h3 { color:#163763 !important; margin-top:17px !important; }
+ .finance-report-print table { border-collapse:collapse !important; width:100% !important; font-size:10pt !important; }
+ .finance-report-print th,.finance-report-print td { border-bottom:1px solid #ddd !important; padding:6px !important; }
+ .finance-report-print tr { break-inside:avoid !important; }
+ }`}</style><main style={{background:'#f3f6fc',color:'#11264d',minHeight:'100vh',padding:'clamp(20px,5vw,52px)',fontFamily:'Arial,sans-serif'}}>
  <div style={{maxWidth:1120,margin:'0 auto'}}>
- <Link href="/" style={{color:'#2854a3'}}>← Voltar ao painel</Link>
- <p style={{letterSpacing:2,fontSize:12,marginTop:25}}>ANTARES BUSINESS · BLOCO 07B</p>
- <h1 style={{fontSize:32,margin:'8px 0'}}>Gestão financeira</h1>
- <p>Livro-caixa real, sem incluir propostas ou sinais apenas previstos. Acesso exclusivo do proprietário.</p>
- {loading&&<p>Carregando movimentações...</p>}
- {error&&<p role="alert" style={{color:'#a32727'}}>{error}</p>}
- {data&&<><div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(190px,1fr))',gap:14,margin:'26px 0'}}>
+ <div className="finance-print-hide"><Link href="/" style={{color:'#2854a3'}}>← Voltar ao painel</Link></div>
+ <p className="finance-print-hide" style={{letterSpacing:2,fontSize:12,marginTop:25}}>ANTARES BUSINESS · BLOCO 07C</p>
+ <h1 className="finance-print-hide" style={{fontSize:32,margin:'8px 0'}}>Gestão financeira</h1>
+ <p className="finance-print-hide">Livro-caixa real, sem incluir propostas ou sinais apenas previstos. Acesso exclusivo do proprietário.</p>
+ {loading&&<p className="finance-print-hide">Carregando movimentações...</p>}
+ {error&&<p className="finance-print-hide" role="alert" style={{color:'#a32727'}}>{error}</p>}
+ {data&&<><div className="finance-print-hide" style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(190px,1fr))',gap:14,margin:'26px 0'}}>
  {([['Entradas realizadas',data.income],['Saídas realizadas',data.expenses],['Saldo acumulado',data.balance]] as [string,number][]).map(([label,value])=><div style={card} key={label}><small>{label}</small><h2 style={{fontSize:25}}>{brl(value)}</h2></div>)}</div>
- <section style={card}><h2>Extrato auditável</h2>
+ <section className="finance-print-hide" style={card}><h2>Extrato auditável</h2>
  <p style={{fontSize:13}}>Lançamentos confirmados no livro-caixa. Estornos permanecem no histórico.</p>
  <div style={{display:'flex',gap:12,flexWrap:'wrap',margin:'15px 0'}}>
  <label>Tipo <select value={type} onChange={e=>setType(e.target.value)} style={{padding:8,marginLeft:6}}><option value="all">Todos</option><option value="income">Receitas</option><option value="expense">Despesas</option></select></label>
@@ -66,7 +76,7 @@ export default function FinanceiroClient(){
  </tr>)}</tbody></table>{entries.length===0&&<p>Nenhuma movimentação encontrada para os filtros selecionados.</p>}</div>
  {data.limited&&<p style={{color:'#92400e'}}>Exibindo somente os mil lançamentos mais recentes. Totais não são definitivos.</p>}
  </section>
- {report&&<section style={{...card,marginTop:20}}>
+ {report&&<section className="finance-report-print" style={{...card,marginTop:20}}>
  <h2>Fluxo de caixa e relatórios gerenciais</h2>
  <p style={{fontSize:13}}>Valores efetivamente realizados. Propostas comerciais não entram no saldo do caixa.</p>
  <div style={{overflowX:'auto'}}><h3>Resumo mensal</h3><table style={{width:'100%',textAlign:'left'}}><thead><tr><th>Período</th><th>Receitas</th><th>Despesas</th><th>Saldo</th></tr></thead><tbody>{report.months.map(m=><tr key={m.periodo}><td>{m.periodo}</td><td>{brl(Number(m.receitas))}</td><td>{brl(Number(m.despesas))}</td><td>{brl(Number(m.receitas)-Number(m.despesas))}</td></tr>)}</tbody></table>{!report.months.length&&<p>Sem movimentações realizadas.</p>}</div>
@@ -75,10 +85,10 @@ export default function FinanceiroClient(){
  <h3>Propostas em negociação ou aceitas</h3><p style={{fontSize:13}}>Oportunidades comerciais, ainda não classificadas como contas a receber confirmadas.</p>
  {report.proposals.map(p=><p key={p.id} style={{fontSize:14}}>{p.title} — {brl(Number(p.total||0))} ({p.status})</p>)}
  {!report.proposals.length&&<p>Sem propostas comerciais abertas.</p>}
- <button type="button" onClick={()=>window.print()} style={{padding:'10px 14px',borderRadius:8,background:'#2454d3',color:'white'}}>Imprimir relatório / salvar PDF</button>
+ <button type="button" className="finance-print-hide" onClick={()=>window.print()} style={{padding:'10px 14px',borderRadius:8,background:'#2454d3',color:'white'}}>Imprimir relatório / salvar PDF</button>
  <p style={{fontSize:12,opacity:.7}}>Relatório gerencial de caixa. Não substitui balanço patrimonial, DRE ou balancete contábil.</p>
  </section>}
-  <section style={{...card,marginTop:20}}><h2>Novo lançamento</h2><p>Somente valores efetivamente recebidos ou pagos. Propostas e sinais previstos não devem ser lançados como recebidos.</p>
+  <section className="finance-print-hide" style={{...card,marginTop:20}}><h2>Novo lançamento</h2><p>Somente valores efetivamente recebidos ou pagos. Propostas e sinais previstos não devem ser lançados como recebidos.</p>
  <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(210px,1fr))',gap:12}}>
  <label>Tipo<select value={entryType} onChange={e=>{setEntryType(e.target.value);setPendingId(null);}} style={{display:'block',width:'100%',padding:10}}><option value="income">Receita recebida</option><option value="expense">Despesa paga</option></select></label>
  <label>Valor (R$)<input value={amount} onChange={e=>{setAmount(e.target.value);setPendingId(null);}} inputMode="decimal" placeholder="0,00" style={{display:'block',width:'100%',padding:10}}/></label>
@@ -91,5 +101,5 @@ export default function FinanceiroClient(){
  <p style={{fontSize:12,opacity:.7}}>Para evitar duplicidade, em caso de erro confira o extrato antes de tentar novamente. Estornos e categorias detalhadas serão integrados em bloco separado.</p>
  </section>
  </>}
- </div></main>;
+ </div></main></>;
 }
