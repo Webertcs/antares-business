@@ -2,7 +2,7 @@
 import {useEffect,useState} from 'react';
 import Link from 'next/link';
 type Entry={id:string;entry_type:'income'|'expense';amount:number;description:string;occurred_on:string;reversal_of:string|null;presentation_title:string|null;dome_name:string|null};
-type Data={entries:Entry[];income:number;expenses:number;balance:number;limited:boolean;domes:{id:string;name:string;active:boolean}[];presentations:{id:string;title:string;starts_at:string}[]};
+type Data={entries:Entry[];income:number;expenses:number;balance:number;writesEnabled:boolean;limited:boolean;domes:{id:string;name:string;active:boolean}[];presentations:{id:string;title:string;starts_at:string}[]};
 type Report={months:{periodo:string;receitas:number;despesas:number}[];years:{ano:number;receitas:number;despesas:number}[];domes:{cupula:string;receitas:number;despesas:number}[];proposals:{id:string;title:string;total:number;status:string}[];notes:string[]};
 const brl=(n:number)=>new Intl.NumberFormat('pt-BR',{style:'currency',currency:'BRL'}).format(n);
 export default function FinanceiroClient(){
@@ -20,6 +20,15 @@ export default function FinanceiroClient(){
  const [saving,setSaving]=useState(false);
  const [notice,setNotice]=useState('');
  const [dome,setDome]=useState('all');
+ async function refreshFinance(){
+  const [ledger,reportResponse]=await Promise.all([
+   fetch('/api/financeiro',{cache:'no-store'}),
+   fetch('/api/financeiro/relatorios',{cache:'no-store'})
+  ]);
+  if(!ledger.ok)throw new Error('Não foi possível atualizar o extrato.');
+  setData(await ledger.json());
+  if(reportResponse.ok)setReport(await reportResponse.json());
+ }
  useEffect(()=>{const c=new AbortController();fetch('/api/financeiro/relatorios',{cache:'no-store',signal:c.signal}).then(r=>r.ok?r.json():null).then(j=>{if(j)setReport(j)}).catch(()=>{});return()=>c.abort()},[]);
  useEffect(()=>{const c=new AbortController();fetch('/api/financeiro',{cache:'no-store',signal:c.signal})
  .then(async r=>{const j=await r.json();if(!r.ok)throw Error(j.error||'Não foi possível carregar');return j;})
@@ -33,8 +42,8 @@ export default function FinanceiroClient(){
  const id=pendingId||crypto.randomUUID();setPendingId(id);setSaving(true);setNotice('');
  try{const response=await fetch('/api/financeiro',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({id,entry_type:entryType,amount:parsed,description,occurred_on:date,presentation_id:presentation||null})});
  const result=await response.json();if(!response.ok)throw new Error(result.error||'Falha no lançamento');
- const refresh=await fetch('/api/financeiro',{cache:'no-store'});if(refresh.ok)setData(await refresh.json());
- setNotice('Lançamento registrado.');setAmount('');setDescription('');setPresentation('');setPendingId(null);
+ await refreshFinance();
+ setNotice(result.alreadyExists?'Lançamento já registrado anteriormente; não foi duplicado.':'Lançamento registrado.');setAmount('');setDescription('');setPresentation('');setPendingId(null);
  }catch(e){setNotice(e instanceof Error?e.message:'Falha desconhecida. Confira o extrato antes de reenviar.');}finally{setSaving(false);}
  }
  const entries=(data?.entries||[]).filter(e=>(type==='all'||e.entry_type===type)&&(dome==='all'||e.dome_name===dome));
@@ -96,9 +105,10 @@ export default function FinanceiroClient(){
  <label>Apresentação (opcional)<select value={presentation} onChange={e=>{setPresentation(e.target.value);setPendingId(null);}} style={{display:'block',width:'100%',padding:10}}><option value="">Sem vínculo</option>{data.presentations.map(p=><option value={p.id} key={p.id}>{p.title}</option>)}</select></label>
  </div>
  <label style={{display:'block',marginTop:14}}>Descrição<input value={description} maxLength={500} onChange={e=>{setDescription(e.target.value);setPendingId(null);}} placeholder="Ex.: recebimento da apresentação / combustível" style={{display:'block',width:'100%',padding:10}}/></label>
- <button type="button" disabled={saving} onClick={saveEntry} style={{background:'#2454d3',color:'white',padding:'12px 18px',borderRadius:9,marginTop:14}}>{saving?'Registrando...':'Confirmar lançamento'}</button>
+ {data.writesEnabled===false&&<p role="status" style={{background:'#fff7ed',padding:12,borderRadius:9,color:'#8a4618'}}>Lançamentos temporariamente bloqueados enquanto a integração é homologada. O extrato e os relatórios continuam disponíveis.</p>}
+ <button type="button" disabled={saving||!data.writesEnabled} onClick={saveEntry} style={{background:'#2454d3',color:'white',padding:'12px 18px',borderRadius:9,marginTop:14}}>{saving?'Registrando...':'Confirmar lançamento'}</button>
  {notice&&<p role="status">{notice}</p>}
- <p style={{fontSize:12,opacity:.7}}>Para evitar duplicidade, em caso de erro confira o extrato antes de tentar novamente. Estornos e categorias detalhadas serão integrados em bloco separado.</p>
+ <p style={{fontSize:12,opacity:.7}}>Em caso de erro, confira o extrato antes de tentar novamente. Estornos exigem autorização e serão liberados somente após implementação auditável.</p>
  </section>
  </>}
  </div></main></>;
