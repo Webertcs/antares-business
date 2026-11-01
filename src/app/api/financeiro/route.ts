@@ -49,9 +49,11 @@ export async function POST(request:Request){
     ||(presentationId!==null&&!/^[0-9a-f]{8}-[0-9a-f-]{27}$/i.test(presentationId)))
     return NextResponse.json({error:'Revise os dados do lançamento.'},{status:400});
   if(process.env.ANTARES_FINANCE_WRITES_ENABLED!=='true')return NextResponse.json({error:'Gravação financeira bloqueada até validação das permissões.'},{status:503});
+  const capability=process.env.ANTARES_FINANCE_CAPABILITY;
+  if(!capability||!/^[0-9a-f]{64}$/i.test(capability))return NextResponse.json({error:'Capacidade financeira ainda não configurada.'},{status:503});
   const db=getTeamWriteDb();
   const rows=await db`SELECT entry_id,already_exists FROM public.antares_post_ledger_entry(
-   ${String(ctx.user.id)},${ctx.organizationId},${id},${entryType},${amount},
+   ${capability},${String(ctx.user.id)},${ctx.organizationId},${id},${entryType},${amount},
    ${description},${occurredOn},${presentationId}
   )`;
   return NextResponse.json({ok:true,id,alreadyExists:Boolean(rows[0]?.already_exists)});
