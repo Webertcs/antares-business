@@ -24,7 +24,8 @@ export async function GET(){
       coalesce(sum(l.amount) FILTER(WHERE l.entry_type='expense'),0) AS despesas
     FROM public.ledger_entries l
     LEFT JOIN public.presentations p ON p.id=l.presentation_id AND p.organization_id=l.organization_id
-    LEFT JOIN public.antares_domes d ON d.id=p.dome_id AND d.organization_id=l.organization_id
+    LEFT JOIN public.antares_dome_links dl ON dl.equipment_id=p.dome_id AND dl.organization_id=l.organization_id
+    LEFT JOIN public.antares_domes d ON d.id=dl.antares_dome_id AND d.organization_id=l.organization_id
     WHERE l.organization_id=${owner.organizationId}
     GROUP BY 1 ORDER BY 1`,
    sql`SELECT id,title,total,status,valid_until,client_id
