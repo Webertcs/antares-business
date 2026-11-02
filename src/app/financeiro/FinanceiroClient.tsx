@@ -77,6 +77,7 @@ export default function FinanceiroClient(){
  <div className="finance-print-hide"><Link href="/" style={{color:'#2854a3'}}>← Voltar ao painel</Link></div>
  <p className="finance-print-hide" style={{letterSpacing:2,fontSize:12,marginTop:25}}>ANTARES BUSINESS · BLOCO 07C</p>
  <h1 className="finance-print-hide" style={{fontSize:32,margin:'8px 0'}}>Gestão financeira</h1>
+ <div className="finance-print-hide" style={{marginBottom:15}}><Link href="/financeiro/receber" style={{display:'inline-block',padding:'10px 16px',background:'#2454d3',color:'white',borderRadius:8}}>Contas a receber</Link></div>
  <p className="finance-print-hide">Livro-caixa real, sem incluir propostas ou sinais apenas previstos. Acesso exclusivo do proprietário.</p>
  {loading&&<p className="finance-print-hide">Carregando movimentações...</p>}
  {error&&<p className="finance-print-hide" role="alert" style={{color:'#a32727'}}>{error}</p>}
