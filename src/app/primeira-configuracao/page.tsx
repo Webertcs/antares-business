@@ -1,5 +1,6 @@
 import {redirect} from 'next/navigation';
 import Link from 'next/link';
+import SetupReadiness from './SetupReadiness';
 import {requireOwner} from '@/lib/equipe/auth';
 export const dynamic='force-dynamic';
 export default async function Page(){
@@ -12,7 +13,7 @@ export default async function Page(){
  return <main style={{maxWidth:920,margin:'20px auto',padding:24,fontFamily:'system-ui',color:'#16345b'}}>
  <Link href="/">← Painel</Link><h1>Primeira configuração do planetário</h1>
  <p>Complete os três cadastros com dados reais confirmados pelo responsável. As gravações só ficam disponíveis após homologação e liberação individual.</p>
- <div style={{display:'grid',gap:18}}>{blocks.map(item=><section key={item.title} style={{border:'1px solid #bfd0e7',borderRadius:12,padding:20}}>
+ <SetupReadiness/><div style={{display:'grid',gap:18}}>{blocks.map(item=><section key={item.title} style={{border:'1px solid #bfd0e7',borderRadius:12,padding:20}}>
  <h2>{item.title}</h2><p>{item.detail}</p>
  <p style={{fontWeight:650,color:item.enabled?'#17633c':'#a06210'}}>{item.enabled?'Gravação habilitada para esta área':'Gravação bloqueada até a homologação'}</p>
  <Link href={item.href} style={{display:'inline-block',background:'#1d4ed8',color:'#fff',padding:'10px 14px',borderRadius:8,textDecoration:'none'}}>Abrir cadastro</Link>
