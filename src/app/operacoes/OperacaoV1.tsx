@@ -11,6 +11,7 @@ const dateTime=(value:unknown)=>{if(!value)return '—';const d=new Date(String(
 const localDay=()=>new Intl.DateTimeFormat('en-CA',{timeZone:'America/Sao_Paulo',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date());
 export default function OperacaoV1({writesEnabled}:{writesEnabled:boolean}){
  const [data,setData]=useState<State>(empty),[error,setError]=useState(''),[loading,setLoading]=useState(true);
+ const [unavailable,setUnavailable]=useState<string[]>([]);
  const [tab,setTab]=useState<'comercial'|'contratos'|'agenda'|'financeiro'|'balanco'|'auditoria'>('comercial');
  const [term,setTerm]=useState('');
  const [balance,setBalance]=useState<Balance|null>(null);
@@ -52,7 +53,7 @@ export default function OperacaoV1({writesEnabled}:{writesEnabled:boolean}){
   finally{setBusy(false);}
  }
  useEffect(()=>{const ctrl=new AbortController();
-  fetch('/api/business',{cache:'no-store',signal:ctrl.signal}).then(async r=>{const b=await r.json();if(!r.ok)throw Error(b.error||'Falha na consulta');setData(b);setError('');})
+  fetch('/api/business',{cache:'no-store',signal:ctrl.signal}).then(async r=>{const b=await r.json();if(!r.ok)throw Error(b.error||'Falha na consulta');setData(b);setUnavailable(Array.isArray(b.unavailable)?b.unavailable:[]);setError('');})
   .catch(e=>{if(e.name!=='AbortError')setError(e instanceof Error?e.message:'Consulta indisponível');})
   .finally(()=>setLoading(false));return()=>ctrl.abort();
  },[revision]);
@@ -96,6 +97,7 @@ export default function OperacaoV1({writesEnabled}:{writesEnabled:boolean}){
  <Link href="/clientes" style={{background:'#2563eb',color:'white',padding:12,borderRadius:9,textDecoration:'none'}}>Abrir cadastro de clientes</Link></div>
  {loading&&<p role="status">Carregando informações do planetário...</p>}
  {error&&<div role="alert" style={{...base,borderColor:'#b45309',marginTop:20}}>O núcleo da V1 ainda não foi implantado no Neon. {error} As gravações deste módulo permanecem bloqueadas.</div>}
+ {!loading&&!error&&unavailable.length>0&&<div role="status" style={{...base,borderColor:'#f59e0b',marginTop:16}}>Algumas áreas estão em implantação: {unavailable.join(', ')}. Os demais dados estão disponíveis para consulta. Gravações permanecem bloqueadas.</div>}
  {!loading&&!error&&<>
  <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(175px,1fr))',gap:12,margin:'20px 0'}}>
   {([['Clientes',data.clients.length],['Propostas',data.proposals.length],['Valor proposto',money(forecast)],['Saldo realizado',money(cash)],['Fluxo previsto',money(pending)],['Reservas',data.bookings.length]] as [string,string|number][]).map(([t,v])=><div key={t} style={base}><small>{t}</small><div style={{fontSize:25,fontWeight:750}}>{v}</div></div>)}
