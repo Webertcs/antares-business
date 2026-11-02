@@ -9,7 +9,7 @@ const money=(value:unknown)=>new Intl.NumberFormat('pt-BR',{style:'currency',cur
 const date=(value:unknown)=>{if(!value)return '—';const raw=String(value);const day=/^\d{4}-\d{2}-\d{2}$/.test(raw)?new Date(raw+'T12:00:00Z'):new Date(raw);return Number.isNaN(day.getTime())?'—':new Intl.DateTimeFormat('pt-BR',{dateStyle:'short',timeZone:'America/Sao_Paulo'}).format(day);};
 const dateTime=(value:unknown)=>{if(!value)return '—';const d=new Date(String(value));return Number.isNaN(d.getTime())?'—':new Intl.DateTimeFormat('pt-BR',{dateStyle:'short',timeStyle:'short',timeZone:'America/Sao_Paulo'}).format(d);};
 const localDay=()=>new Intl.DateTimeFormat('en-CA',{timeZone:'America/Sao_Paulo',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date());
-export default function OperacaoV1({writesEnabled}:{writesEnabled:boolean}){
+export default function OperacaoV1({writesEnabled,contractWritesEnabled}:{writesEnabled:boolean;contractWritesEnabled:boolean}){
  const [data,setData]=useState<State>(empty),[error,setError]=useState(''),[loading,setLoading]=useState(true);
  const [unavailable,setUnavailable]=useState<string[]>([]);
  const [tab,setTab]=useState<'comercial'|'contratos'|'agenda'|'financeiro'|'balanco'|'auditoria'>('comercial');
@@ -23,6 +23,21 @@ export default function OperacaoV1({writesEnabled}:{writesEnabled:boolean}){
  const [fields,setFields]=useState<Record<string,string>>({});
  const [busy,setBusy]=useState(false);
  const [feedback,setFeedback]=useState('');
+ const [contractDraft,setContractDraft]=useState({proposalId:'',mode:'written',terms:'',confirm:false});
+ async function saveContract(e:React.FormEvent<HTMLFormElement>){
+ e.preventDefault();if(!contractWritesEnabled||busy)return;
+ setBusy(true);setFeedback('');
+ try{
+ const res=await fetch('/api/comercial/contratos',{method:'POST',headers:{'Content-Type':'application/json'},
+ body:JSON.stringify(contractDraft)});
+ const payload=await res.json();
+ if(!res.ok)throw Error(payload.error||'Contrato não registrado');
+ setFeedback('Contrato registrado; confira a lista e a auditoria.');
+ setContractDraft({proposalId:'',mode:'written',terms:'',confirm:false});
+ setRevision(n=>n+1);
+ }catch(e){setFeedback(e instanceof Error?e.message:'Erro ao registrar contrato');}
+ finally{setBusy(false);}
+ }
  function openForm(type:'proposal'|'contract'|'dome'|'booking'|'ledger'){
   setForm(type);setFeedback('');
   setFields(type==='proposal'?{clientId:'',title:'',model:'per_student',attendees:'30',
@@ -128,11 +143,25 @@ export default function OperacaoV1({writesEnabled}:{writesEnabled:boolean}){
  <div style={{display:'flex',flexWrap:'wrap',gap:10,marginTop:16}}>
  {filtered.map(p=><Link key={String(p.id)} href={'/comercial/documentos/'+encodeURIComponent(String(p.id))} style={{padding:'9px 13px',border:'1px solid #93c5fd',borderRadius:8,color:'#1d4ed8',background:'white',textDecoration:'none'}}>Proposta / minuta: {String(p.client_name)}</Link>)}
  </div></section>}
- {tab==='contratos'&&<section style={base}><h2 style={{fontSize:21,fontWeight:650}}>Contratos e confirmações</h2>{writesEnabled&&<button onClick={()=>openForm('contract')} style={{padding:10,background:'#2563eb',color:'#fff',borderRadius:8}}>+ Novo contrato</button>}
-  <p>Confirmação documental, verbal ou pelo WhatsApp, vinculada à proposta.</p>
-  <p style={{marginTop:12}}>Para conferir uma proposta aprovada e gerar sua minuta não assinada, utilize os documentos disponíveis na aba Propostas. O registro de contratos permanecerá bloqueado até a homologação da nova estrutura.</p>
-  <Rows heads={['Proposta','Modalidade','Situação','Confirmação']}
-  rows={data.contracts.map(c=>[c.proposal_title,c.confirmation_mode,c.status,dateTime(c.confirmed_at)])}/></section>}
+ {tab==='contratos'&&<section style={base}>
+ <h2 style={{fontSize:21,fontWeight:650}}>Contratos e confirmações</h2>
+ <p>Vinculados às propostas aprovadas, com modalidades formal, verbal ou WhatsApp.</p>
+ <p>Documentos não assinados podem ser consultados na aba Propostas. Uma confirmação registrada exige acordo real com o cliente.</p>
+ {!contractWritesEnabled&&<p role="status" style={{padding:12,background:'#fff4df',borderRadius:8}}>Registro de contratos desabilitado durante a homologação. Consultas liberadas.</p>}
+ <Rows heads={['Proposta','Modalidade','Situação','Confirmação']}
+ rows={data.contracts.map(c=>[c.proposal_title,c.confirmation_mode,c.status,dateTime(c.confirmed_at)])}/>
+ {contractWritesEnabled&&<form onSubmit={saveContract} style={{display:'grid',gap:12,maxWidth:650,marginTop:20}}>
+ <h3>Registrar contrato</h3>
+ <label>Proposta aprovada<select required value={contractDraft.proposalId} onChange={e=>setContractDraft(v=>({...v,proposalId:e.target.value}))} style={{display:'block',width:'100%',padding:10}}>
+ <option value="">Selecione</option>{data.proposals.filter(p=>p.status==='accepted').map(p=><option key={String(p.id)} value={String(p.id)}>{String(p.title)} — {String(p.client_name)}</option>)}
+ </select></label>
+ <label>Modalidade<select value={contractDraft.mode} onChange={e=>setContractDraft(v=>({...v,mode:e.target.value}))} style={{display:'block',width:'100%',padding:10}}>
+ <option value="written">Formal por escrito</option><option value="verbal">Verbal</option><option value="whatsapp">WhatsApp</option></select></label>
+ <label>Condições acordadas<textarea required minLength={8} maxLength={4000} value={contractDraft.terms} onChange={e=>setContractDraft(v=>({...v,terms:e.target.value}))} rows={4} style={{display:'block',width:'100%',padding:10}}/></label>
+ <label><input type="checkbox" checked={contractDraft.confirm} onChange={e=>setContractDraft(v=>({...v,confirm:e.target.checked}))}/> Confirmar que o cliente aceitou efetivamente as condições (caso contrário, salvar como pendente)</label>
+ <button disabled={busy} type="submit" style={{padding:12,background:'#1d4ed8',color:'#fff',borderRadius:8}}>Registrar contrato</button>
+ </form>}
+ </section>}
  {tab==='agenda'&&<section style={base}><h2 style={{fontSize:21,fontWeight:650}}>Cúpulas e apresentações</h2>{writesEnabled&&<div style={{display:'flex',gap:8}}><button onClick={()=>openForm('dome')}>+ Cúpula</button><button onClick={()=>openForm('booking')}>+ Reserva</button></div>}
   <p>Equipamentos cadastrados: {data.domes.map(d=>String(d.name)).join(' · ')||'nenhum'}.</p>{eventError&&<p role="alert">{eventError}</p>}
   <Rows heads={['Apresentação','Cúpula','Início','Término','Situação']}
