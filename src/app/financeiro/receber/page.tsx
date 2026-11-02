@@ -1,3 +1,4 @@
+export const dynamic='force-dynamic';
 import {requireOwner} from '@/lib/equipe/auth';
 import {redirect} from 'next/navigation';
 import ReceberClient from './ReceberClient';
