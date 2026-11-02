@@ -21,8 +21,10 @@ export async function GET(){
    sql`SELECT id,name,active FROM public.antares_domes WHERE organization_id=${ctx.organizationId} ORDER BY name`,
    sql`SELECT p.id,p.id AS event_id,p.dome_id,COALESCE(d.name,'Sem cúpula') AS dome_name,
        p.title AS event_title,p.starts_at,p.ends_at,p.status
-       FROM public.presentations p LEFT JOIN public.antares_domes d
-       ON d.id=p.dome_id AND d.organization_id=p.organization_id
+       FROM public.presentations p LEFT JOIN public.antares_dome_links dl
+       ON dl.equipment_id=p.dome_id AND dl.organization_id=p.organization_id
+       LEFT JOIN public.antares_domes d
+       ON d.id=dl.antares_dome_id AND d.organization_id=p.organization_id
        WHERE p.organization_id=${ctx.organizationId} ORDER BY p.starts_at DESC LIMIT 500`,
    sql`SELECT id,entry_type AS category,'settled'::text AS status,description,amount,occurred_on,quote_id AS proposal_id
        FROM public.ledger_entries WHERE organization_id=${ctx.organizationId}
