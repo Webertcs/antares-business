@@ -11,8 +11,10 @@ export async function GET(){
    db`SELECT p.id,p.title AS event_title,p.starts_at,p.ends_at,p.status,
       p.dome_id,COALESCE(d.name,'Sem cúpula') AS dome_name
       FROM public.presentations p
+      LEFT JOIN public.antares_dome_links dl
+        ON dl.equipment_id=p.dome_id AND dl.organization_id=p.organization_id
       LEFT JOIN public.antares_domes d
-        ON d.id=p.dome_id AND d.organization_id=p.organization_id
+        ON d.id=dl.antares_dome_id AND d.organization_id=p.organization_id
       WHERE p.organization_id=${ctx.organizationId}
       ORDER BY p.starts_at DESC LIMIT 1000`,
    db`SELECT id,name,active FROM public.antares_domes
