@@ -26,7 +26,7 @@ try{
  AND p.proname IN ('antares_book_proposal','antares_prepare_proposal_client','antares_create_linked_dome',
  'antares_register_contract','antares_education_create_group','antares_save_provider_profile')`;
  for(const name of functions){
- const g=grants.find(x=>x.signature===''+name);
+ const g=grants.find(x=>x.signature.replace(/^public\./,'')===name);
  check('Funcao '+name,Boolean(g&&g.runtime_execute===true&&g.public_execute===false&&g.inbox_execute===false),
  g?'runtime / publico / inbox: '+[g.runtime_execute,g.public_execute,g.inbox_execute].join(' / '):'ausente');
  }
