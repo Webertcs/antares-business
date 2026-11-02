@@ -7,11 +7,13 @@ type Booking={proposal_id:string;presentation_id:string};
 export default function BookingClient({enabled}:{enabled:boolean}){
  const [data,setData]=useState<{proposals:Proposal[];domes:Dome[];links:Booking[]}|null>(null);
  const [status,setStatus]=useState('Carregando...'),[busy,setBusy]=useState(false);
+ const [domeName,setDomeName]=useState(''),[domeCode,setDomeCode]=useState(''),[capacity,setCapacity]=useState(30);
  const [proposalId,setProposalId]=useState(''),[domeId,setDomeId]=useState(''),[start,setStart]=useState(''),[end,setEnd]=useState('');
  async function load(){const r=await fetch('/api/agenda/reservas',{cache:'no-store'});const v=await r.json();if(!r.ok)throw Error(v.error||'Consulta falhou');setData(v);}
  useEffect(()=>{load().then(()=>setStatus('')).catch(e=>setStatus(e.message));},[]);
  const eligible=data?.proposals.filter(p=>p.mapped&&!data.links.some(l=>l.proposal_id===p.id))||[];
  const domes=data?.domes.filter(d=>d.mapped)||[];
+ async function prepare(body:Record<string,unknown>){if(!enabled||busy)return;setBusy(true);setStatus('');try{const response=await fetch('/api/agenda/preparar',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});const data=await response.json();if(!response.ok)throw Error(data.error||'Não foi possível preparar a Agenda');await load();setStatus('Cadastro preparado para a Agenda.');}catch(e){setStatus(e instanceof Error?e.message:'Erro');}finally{setBusy(false);}}
  async function submit(e:React.FormEvent){e.preventDefault();if(!enabled||busy)return;setBusy(true);setStatus('');
  try{const r=await fetch('/api/agenda/reservas',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({proposalId,domeId,start:new Date(start).toISOString(),end:new Date(end).toISOString()})});const v=await r.json();if(!r.ok)throw Error(v.error||'Reserva não registrada');await load();setStatus('Reserva registrada. Consulte a Agenda.');setProposalId('');setDomeId('');}
  catch(e){setStatus(e instanceof Error?e.message:'Erro');}finally{setBusy(false)}}
@@ -26,6 +28,15 @@ export default function BookingClient({enabled}:{enabled:boolean}){
  {data?.domes.map(d=><p key={d.id}>Cúpula {d.name}: {d.mapped?'Vínculo operacional pronto':'Aguardando vínculo operacional'}</p>)}
  {data&&domes.length===0&&<p>Não existem cúpulas aptas a receber reservas. O cadastro e o vínculo de equipamentos são pré-requisitos.</p>}
  </section>
+ {enabled&&data&&<section style={{border:'1px solid #bdcce4',padding:18,borderRadius:12,marginTop:20,display:'grid',gap:12}}>
+ <h2>Preparar cadastros operacionais</h2>
+ <p>Vincule os clientes das propostas aceitas e cadastre uma cúpula real antes da primeira reserva.</p>
+ {data.proposals.filter(p=>!p.mapped).map(p=><button disabled={busy} key={p.id} onClick={()=>prepare({action:'link-client',proposalId:p.id})} style={{padding:12}}>Vincular cliente: {p.client_name}</button>)}
+ <label>Nome da cúpula<input value={domeName} onChange={e=>setDomeName(e.target.value)} style={{display:'block',padding:10,width:'100%'}}/></label>
+ <label>Código da cúpula<input value={domeCode} onChange={e=>setDomeCode(e.target.value)} style={{display:'block',padding:10,width:'100%'}}/></label>
+ <label>Capacidade por sessão<input type="number" min={1} max={500} value={capacity} onChange={e=>setCapacity(Number(e.target.value))} style={{display:'block',padding:10,width:'100%'}}/></label>
+ <button disabled={busy||!domeName.trim()||!domeCode.trim()} onClick={()=>prepare({action:'create-dome',name:domeName,code:domeCode,capacity})} style={{padding:12}}>Cadastrar e vincular cúpula</button>
+ </section>}
  {enabled&&eligible.length>0&&domes.length>0&&<form onSubmit={submit} style={{marginTop:22,display:'grid',gap:14,border:'1px solid #bdcce4',padding:18,borderRadius:12}}>
  <h2>Reservar apresentação</h2><label>Proposta<select required value={proposalId} onChange={e=>setProposalId(e.target.value)} style={{display:'block',padding:10,width:'100%'}}><option value="">Selecione</option>{eligible.map(p=><option key={p.id} value={p.id}>{p.client_name} — {p.title}</option>)}</select></label>
  <label>Cúpula<select required value={domeId} onChange={e=>setDomeId(e.target.value)} style={{display:'block',padding:10,width:'100%'}}><option value="">Selecione</option>{domes.map(d=><option key={d.id} value={d.id}>{d.name}{d.capacity?' · capacidade '+d.capacity:''}</option>)}</select></label>
