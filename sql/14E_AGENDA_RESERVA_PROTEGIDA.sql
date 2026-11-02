@@ -15,6 +15,7 @@ ALTER TABLE public.antares_client_links FORCE ROW LEVEL SECURITY;
 ALTER TABLE public.antares_dome_links ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.antares_dome_links FORCE ROW LEVEL SECURITY;
 REVOKE ALL ON public.antares_client_links,public.antares_dome_links FROM PUBLIC,antares_team_runtime;
+CREATE UNIQUE INDEX IF NOT EXISTS antares_reservation_unique_proposal ON public.antares_proposal_reservations(organization_id,proposal_id);
 CREATE OR REPLACE FUNCTION public.antares_book_proposal(
  p_subject text,p_org uuid,p_proposal uuid,p_dome uuid,p_start timestamptz,p_end timestamptz)
 RETURNS uuid LANGUAGE plpgsql SECURITY DEFINER SET search_path=pg_catalog,public,pg_temp AS $$
