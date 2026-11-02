@@ -8,6 +8,7 @@ const today=()=>new Date().toLocaleDateString('en-CA',{timeZone:'America/Sao_Pau
 export default function ReceberClient(){
  const [titles,setTitles]=useState<Title[]>([]),[clients,setClients]=useState<Client[]>([]);
  const [status,setStatus]=useState('Carregando...'),[busy,setBusy]=useState(false);
+ const [writesEnabled,setWritesEnabled]=useState(false);
  const [client,setClient]=useState(''),[description,setDescription]=useState(''),[total,setTotal]=useState(''),[due,setDue]=useState(today());
  const [payment,setPayment]=useState<Record<string,string>>({});
  const [draftId,setDraftId]=useState<string|null>(null);
@@ -16,7 +17,7 @@ export default function ReceberClient(){
   const res=await fetch('/api/financeiro/receber',{cache:'no-store'});
   const data=await res.json();
   if(!res.ok)throw Error(data.error||'Consulta indisponível');
-  setTitles(data.titles);setClients(data.clients);setStatus('');
+  setTitles(data.titles);setClients(data.clients);setWritesEnabled(data.writesEnabled===true);setStatus('');
  }
  useEffect(()=>{load().catch(e=>setStatus(e.message))},[]);
  async function post(payload:Record<string,unknown>){
@@ -26,7 +27,7 @@ export default function ReceberClient(){
   return data;
  }
  async function create(){
-  if(busy)return;
+  if(busy||!writesEnabled)return;
   const amount=Number(total.replace(',','.'));
   if(!client||!description.trim()||!Number.isFinite(amount)||amount<=0||!due){setStatus('Preencha cliente, descrição, valor e vencimento.');return;}
   if(!window.confirm('Criar título de '+brl(amount)+'? Isso não registra receita recebida.'))return;
@@ -55,6 +56,7 @@ export default function ReceberClient(){
  <h1>Contas a receber</h1>
  <p>Controle por instituição, vencimento e pagamentos parciais. Títulos não são receitas recebidas.</p>
  {status&&<p role="status" style={{padding:12,background:'#e9effc',borderRadius:8}}>{status}</p>}
+ {!writesEnabled&&<p role="status" style={{padding:14,background:'#fff4e5',border:'1px solid #efc991',borderRadius:9,color:'#864413'}}>Homologação financeira: novos títulos e recebimentos estão bloqueados. Consulta liberada.</p>}
  <section style={box}><h2>Novo título</h2>
  <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(200px,1fr))',gap:15}}>
  <label>Instituição<select style={input} value={client} onChange={e=>{setClient(e.target.value);setDraftId(null);}}><option value="">Selecione</option>{clients.map(c=><option key={c.id} value={c.id}>{c.name}</option>)}</select></label>
@@ -62,7 +64,7 @@ export default function ReceberClient(){
  <label>Valor total (R$)<input style={input} inputMode="decimal" value={total} onChange={e=>{setTotal(e.target.value);setDraftId(null);}} placeholder="0,00"/></label>
  <label>Vencimento<input style={input} type="date" value={due} onChange={e=>{setDue(e.target.value);setDraftId(null);}}/></label>
  </div>
- <button disabled={busy} onClick={create} style={{marginTop:16,padding:12,background:'#2454d3',color:'white',borderRadius:8}}>Criar título</button>
+ <button disabled={busy||!writesEnabled} onClick={create} style={{marginTop:16,padding:12,background:'#2454d3',color:'white',borderRadius:8}}>Criar título</button>
  </section>
  <section style={box}><h2>Títulos cadastrados</h2>
  <div style={{overflowX:'auto'}}><table style={{borderCollapse:'collapse',width:'100%',textAlign:'left'}}>
@@ -74,7 +76,7 @@ export default function ReceberClient(){
  <td style={{padding:10,fontWeight:700}}>{brl(remain)}</td>
  <td style={{padding:10}}>{remain>0&&<div style={{display:'flex',gap:6}}>
  <input aria-label={'Valor recebido de '+t.client_name} value={payment[t.id]||''} placeholder="R$" inputMode="decimal" style={{width:95,padding:7,border:'1px solid #bbcae1'}} onChange={e=>{setPayment(v=>({...v,[t.id]:e.target.value}));setPayIds(v=>{const n={...v};delete n[t.id];return n;});}}/>
- <button type="button" disabled={busy} onClick={()=>pay(t)} style={{padding:8,background:'#2454d3',color:'white',borderRadius:7}}>Receber</button></div>}{remain===0&&'Quitado'}</td>
+ <button type="button" disabled={busy||!writesEnabled} onClick={()=>pay(t)} style={{padding:8,background:'#2454d3',color:'white',borderRadius:7}}>Receber</button></div>}{remain===0&&'Quitado'}</td>
  </tr>})}</tbody></table></div>
  {!titles.length&&<p>Nenhum título cadastrado.</p>}
  <p style={{fontSize:12}}>As baixas confirmadas aparecem no livro-caixa. Estornos preservam o histórico e devolvem o saldo pendente.</p>
