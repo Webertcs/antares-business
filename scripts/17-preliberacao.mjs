@@ -20,7 +20,7 @@ try{
  const grants=await db`SELECT p.proname,p.oid::regprocedure::text AS signature,
  (SELECT bool_or(r.rolname='antares_team_runtime') FROM pg_roles r
  WHERE has_function_privilege(r.oid,p.oid,'EXECUTE') AND r.rolname IN ('antares_team_runtime')) AS runtime_execute,
- has_function_privilege('PUBLIC',p.oid,'EXECUTE') AS public_execute,
+ EXISTS(SELECT 1 FROM aclexplode(coalesce(p.proacl,acldefault('f',p.proowner))) a WHERE a.grantee=0 AND a.privilege_type='EXECUTE') AS public_execute,
  has_function_privilege('antares_public_inbox_login',p.oid,'EXECUTE') AS inbox_execute
  FROM pg_proc p JOIN pg_namespace n ON n.oid=p.pronamespace WHERE n.nspname='public'
  AND p.proname IN ('antares_book_proposal','antares_prepare_proposal_client','antares_create_linked_dome',
