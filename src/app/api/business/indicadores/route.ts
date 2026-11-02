@@ -19,12 +19,12 @@ export async function GET(){
    sql`SELECT count(*)::int AS total,
     count(*) FILTER (WHERE starts_at>=now() AND status IN ('reserved','confirmed'))::int AS futuras,
     count(*) FILTER (WHERE status='completed')::int AS realizadas
-    FROM public.business_bookings WHERE organization_id=${ctx.organizationId}`,
+    FROM public.presentations WHERE organization_id=${ctx.organizationId}`,
    sql`SELECT
-    coalesce(sum(amount) FILTER (WHERE category='income' AND status='settled'),0) AS receitas,
-    coalesce(sum(amount) FILTER (WHERE category='expense' AND status='settled'),0) AS despesas,
-    coalesce(sum(amount) FILTER (WHERE category='income' AND status='planned'),0) AS previsto
-    FROM public.business_ledger WHERE organization_id=${ctx.organizationId}`
+    coalesce(sum(amount) FILTER (WHERE entry_type='income'),0) AS receitas,
+    coalesce(sum(amount) FILTER (WHERE entry_type='expense'),0) AS despesas,
+    0::numeric AS previsto
+    FROM public.ledger_entries WHERE organization_id=${ctx.organizationId}`
   ]);
   return NextResponse.json({proposals:proposals[0],bookings:bookings[0],finance:finance[0]}, {headers});
  }catch{return NextResponse.json({error:'Indicadores V1 indisponíveis antes da implantação.'},{status:503,headers});}
