@@ -7,7 +7,7 @@ export async function GET(){
   const ctx=await requireOwner();
   if(!ctx)return NextResponse.json({error:'Somente proprietário.'},{status:403});
   const sql=getDb();
-  const [clients,proposals,contracts,domes,bookings,ledger,audit]=await Promise.all([
+  const results=await Promise.allSettled([
    sql`SELECT id,name,kind FROM public.crm_clients WHERE organization_id=${ctx.organizationId} ORDER BY name LIMIT 1000`,
    sql`SELECT p.id,p.client_id,c.name AS client_name,p.title,p.pricing_model,p.expected_attendees,
        p.unit_price,p.fixed_price,p.discount,p.deposit,p.total,p.status,p.valid_until,p.created_at
@@ -30,7 +30,10 @@ export async function GET(){
    sql`SELECT id,action,entity_type,entity_id,created_at FROM public.business_audit
        WHERE organization_id=${ctx.organizationId} ORDER BY created_at DESC LIMIT 100`
   ]);
-  return NextResponse.json({clients,proposals,contracts,domes,bookings,ledger,audit},
+  const keys=['clients','proposals','contracts','domes','bookings','ledger','audit'] as const;
+  const data=Object.fromEntries(results.map((result,i)=>[keys[i],result.status==='fulfilled'?result.value:[]]));
+  const unavailable=keys.filter((_,i)=>results[i].status==='rejected');
+  return NextResponse.json({...data,unavailable},
      {headers:{'Cache-Control':'private, no-store'}});
  }catch{
   return NextResponse.json({error:'Núcleo V1 ainda não implantado. Aguardando migração e auditoria.'},
