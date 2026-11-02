@@ -34,6 +34,7 @@ export async function POST(request:Request){
   const normalizedOrigin=origin?new URL(origin):null;
   if(!normalizedOrigin||!host||normalizedOrigin.host!==host||!['http:','https:'].includes(normalizedOrigin.protocol))
     return NextResponse.json({error:'Origem não autorizada.'},{status:403});
+  if(process.env.ANTARES_FINANCE_WRITES_ENABLED!=='true')return NextResponse.json({error:'Gravação financeira bloqueada até validação das permissões.'},{status:503});
   const body=await request.json();
   const id=typeof body.id==='string'?body.id:'';
   const entryType=body.entry_type;
@@ -50,7 +51,7 @@ export async function POST(request:Request){
     ||new Date(occurredOn+'T12:00:00Z').toISOString().slice(0,10)!==occurredOn
     ||(presentationId!==null&&!/^[0-9a-f]{8}-[0-9a-f-]{27}$/i.test(presentationId)))
     return NextResponse.json({error:'Revise os dados do lançamento.'},{status:400});
-  if(process.env.ANTARES_FINANCE_WRITES_ENABLED!=='true')return NextResponse.json({error:'Gravação financeira bloqueada até validação das permissões.'},{status:503});
+
   const capability=process.env.ANTARES_FINANCE_CAPABILITY;
   if(!capability||!/^[0-9a-f]{64}$/i.test(capability))return NextResponse.json({error:'Capacidade financeira ainda não configurada.'},{status:503});
   const db=getTeamWriteDb();
