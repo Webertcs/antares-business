@@ -1,0 +1,30 @@
+import {NextRequest,NextResponse} from 'next/server';
+import {requireOwner,getDb,getTeamWriteDb} from '@/lib/equipe/auth';
+export const dynamic='force-dynamic';export const runtime='nodejs';
+const fail=(error:string,status:number)=>NextResponse.json({error},{status,headers:{'Cache-Control':'no-store'}});
+export async function GET(){
+ const owner=await requireOwner();if(!owner)return fail('Somente proprietário',403);
+ try{const db=getDb();const [proposals,domes,links]=await Promise.all([
+ db`SELECT p.id,p.title,c.name AS client_name FROM public.business_proposals p JOIN public.crm_clients c ON c.id=p.client_id AND c.organization_id=p.organization_id WHERE p.organization_id=${owner.organizationId} AND p.status='accepted' ORDER BY p.created_at DESC`,
+ db`SELECT d.id,d.name,d.capacity FROM public.antares_domes d WHERE d.organization_id=${owner.organizationId} AND d.active ORDER BY d.name`,
+ db`SELECT r.proposal_id,r.presentation_id FROM public.antares_proposal_reservations r WHERE r.organization_id=${owner.organizationId}`
+ ]);return NextResponse.json({proposals,domes,links},{headers:{'Cache-Control':'private, no-store'}});}
+ catch{return fail('Agenda de propostas indisponível até a migração 14E',503);}
+}
+export async function POST(req:NextRequest){
+ const owner=await requireOwner();if(!owner)return fail('Somente proprietário',403);
+ if(process.env.ANTARES_AGENDA_WRITES_ENABLED!=='true')return fail('Reservas bloqueadas durante homologação',503);
+ const origin=req.headers.get('origin'),host=req.headers.get('host');
+ try{if(!origin||!host||new URL(origin).host!==host)return fail('Origem inválida',403);}catch{return fail('Origem inválida',403);}
+ if(req.headers.get('content-type')?.split(';')[0]?.trim()!=='application/json')return fail('Formato inválido',415);
+ try{
+ const v=await req.json(),uuid=/^[0-9a-f]{8}(-[0-9a-f]{4}){3}-[0-9a-f]{12}$/i;
+ if(!v||!uuid.test(v.proposalId)||!uuid.test(v.domeId)||typeof v.start!=='string'||typeof v.end!=='string')return fail('Dados inválidos',400);
+ const start=new Date(v.start),end=new Date(v.end);
+ if(!Number.isFinite(start.getTime())||!Number.isFinite(end.getTime())||end<=start)return fail('Horários inválidos',400);
+ const db=getTeamWriteDb();
+ const rows=await db`SELECT public.antares_book_proposal(${owner.user.id},${owner.organizationId}::uuid,
+ ${v.proposalId}::uuid,${v.domeId}::uuid,${start.toISOString()}::timestamptz,${end.toISOString()}::timestamptz) AS id`;
+ return NextResponse.json({id:rows[0]?.id},{status:201});
+ }catch{return fail('Reserva não realizada: confira vínculo, capacidade, conflitos e proposta',409);}
+}
