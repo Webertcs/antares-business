@@ -20,8 +20,9 @@ export async function GET(request:NextRequest){
  try{
   const sql=getDb();let text='';
   if(type==='financeiro'){
-   const r=await sql`SELECT occurred_on,category,description,status,amount,proposal_id
-    FROM public.business_ledger WHERE organization_id=${owner.organizationId}
+   const r=await sql`SELECT occurred_on,entry_type AS category,description,
+    'settled'::text AS status,amount,quote_id AS proposal_id
+    FROM public.ledger_entries WHERE organization_id=${owner.organizationId}
     ORDER BY occurred_on DESC,created_at DESC LIMIT 10000`;
    text=csv(['Data','Tipo','Descrição','Situação','Valor (R$)','Proposta ID'],
     r.map(x=>[x.occurred_on,x.category,x.description,x.status,x.amount,x.proposal_id]));
