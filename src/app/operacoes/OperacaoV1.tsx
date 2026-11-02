@@ -124,7 +124,10 @@ export default function OperacaoV1({writesEnabled}:{writesEnabled:boolean}){
  {tab==='comercial'&&<section style={base}><h2 style={{fontSize:21,fontWeight:650}}>Propostas e orçamentos</h2>{writesEnabled&&<button onClick={()=>openForm('proposal')} style={{padding:10,background:'#2563eb',color:'#fff',borderRadius:8}}>+ Nova proposta</button>}<p>Valores previstos, negociação e condições comerciais por cliente.</p>
   <input aria-label="Pesquisar proposta" placeholder="Pesquisar proposta ou cliente" value={term} onChange={e=>setTerm(e.target.value)} style={{padding:11,border:'1px solid #94a3b8',borderRadius:8,width:'100%',margin:'10px 0'}}/>
   <Rows heads={['Proposta','Cliente','Total','Situação','Validade']}
-   rows={filtered.map(p=>[p.title,p.client_name,money(p.total),p.status,date(p.valid_until)])}/></section>}
+   rows={filtered.map(p=>[p.title,p.client_name,money(p.total),p.status,date(p.valid_until)])}/>
+ <div style={{display:'flex',flexWrap:'wrap',gap:10,marginTop:16}}>
+ {filtered.map(p=><Link key={String(p.id)} href={'/comercial/documentos/'+encodeURIComponent(String(p.id))} style={{padding:'9px 13px',border:'1px solid #93c5fd',borderRadius:8,color:'#1d4ed8',background:'white',textDecoration:'none'}}>Proposta / minuta: {String(p.client_name)}</Link>)}
+ </div></section>}
  {tab==='contratos'&&<section style={base}><h2 style={{fontSize:21,fontWeight:650}}>Contratos e confirmações</h2>{writesEnabled&&<button onClick={()=>openForm('contract')} style={{padding:10,background:'#2563eb',color:'#fff',borderRadius:8}}>+ Novo contrato</button>}
   <p>Confirmação documental, verbal ou pelo WhatsApp, vinculada à proposta.</p>
   <Rows heads={['Proposta','Modalidade','Situação','Confirmação']}
