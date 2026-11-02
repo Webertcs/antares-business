@@ -6,10 +6,10 @@ export default function SetupReadiness(){
  async function refresh(){
  const errs:string[]=[];
  const [p,a]=await Promise.allSettled([
-  fetch('/api/configuracoes/prestador',{cache:'no-store'}).then(async r=>{if(!r.ok)throw Error('Prestador: HTTP '+r.status);return r.json()}),
+  fetch('/api/configuracoes/prestador',{cache:'no-store'}).then(async r=>{if(!r.ok)throw Error('Minha Empresa: HTTP '+r.status);return r.json()}),
   fetch('/api/agenda/reservas',{cache:'no-store'}).then(async r=>{if(!r.ok)throw Error('Agenda: HTTP '+r.status);return r.json()})
  ]);
- if(p.status==='rejected')errs.push(p.reason instanceof Error?p.reason.message:'Prestador indisponível');
+ if(p.status==='rejected')errs.push(p.reason instanceof Error?p.reason.message:'Minha Empresa indisponível');
  if(a.status==='rejected')errs.push(a.reason instanceof Error?a.reason.message:'Agenda indisponível');
  const v=a.status==='fulfilled'?a.value:null,profile=p.status==='fulfilled'?p.value.profile:null;
  setState({provider:!!profile,domes:Array.isArray(v?.domes)?v.domes.length:0,
@@ -22,7 +22,7 @@ export default function SetupReadiness(){
  return <section style={{border:'1px solid #a8c3e3',padding:18,borderRadius:12,marginBottom:20}}>
  <h2>Estado atual do planetário</h2>
  {!state?<p>Consultando cadastros...</p>:<>
- <p>Prestador: <strong>{state.provider?'Cadastrado':'Pendente'}</strong></p>
+ <p>Minha Empresa: <strong>{state.provider?'Cadastrado':'Pendente'}</strong></p>
  <p>Cúpulas ativas: <strong>{state.domes}</strong> · Vinculadas: <strong>{state.linkedDomes}</strong></p>
  <p>Propostas aceitas: <strong>{state.accepted}</strong> · Clientes vinculados: <strong>{state.linkedClients}</strong> · Reservas: <strong>{state.booked}</strong></p>
  {state.error.map(e=><p role="alert" key={e}>{e}</p>)}
