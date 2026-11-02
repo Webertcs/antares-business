@@ -1,5 +1,5 @@
 -- ANTARES 07E — contas a receber: títulos e baixas parciais auditáveis.
--- Aplicar primeiro na branch de testes; preservar estrutura existente.
+-- Revisado para implantação controlada com snapshot da produção. Não executar antes de conferir todos os pré-requisitos.
 BEGIN;
 CREATE TABLE IF NOT EXISTS public.antares_receivables(
  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -65,8 +65,8 @@ ALTER TABLE public.antares_receivables
  ADD CONSTRAINT antares_receivables_client_fk FOREIGN KEY(client_id,organization_id)
  REFERENCES public.crm_clients(id,organization_id);
 ALTER TABLE public.antares_receivables
- ADD CONSTRAINT antares_receivables_proposal_fk FOREIGN KEY(proposal_id)
- REFERENCES public.business_proposals(id);
+ ADD CONSTRAINT antares_receivables_proposal_fk FOREIGN KEY(proposal_id,organization_id)
+ REFERENCES public.business_proposals(id,organization_id);
 ALTER TABLE public.antares_receivable_payments
  ADD CONSTRAINT antares_receivable_payments_ledger_fk FOREIGN KEY(ledger_id,organization_id)
  REFERENCES public.ledger_entries(id,organization_id);
@@ -124,4 +124,4 @@ REVOKE ALL ON FUNCTION public.antares_pay_receivable(text,text,uuid,uuid,uuid,nu
 GRANT EXECUTE ON FUNCTION public.antares_pay_receivable(text,text,uuid,uuid,uuid,numeric,date) TO antares_team_runtime;
 COMMIT;
 -- O saldo é apurado por receitas vinculadas, excluindo lançamentos já estornados.
--- Aplicar somente na branch de teste antes de homologar produção.
+-- Escritas permanecem desabilitadas até validação autenticada ponta a ponta.
