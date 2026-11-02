@@ -7,7 +7,7 @@ export default async function Page(){
  if(!await requireOwner())redirect('/sem-acesso');
  const agenda=process.env.ANTARES_AGENDA_WRITES_ENABLED==='true';
  const provider=process.env.ANTARES_PROVIDER_WRITES_ENABLED==='true';
- const blocks=[{title:'1. Identificação do prestador',href:'/configuracoes/prestador',detail:'Razão social, CPF/CNPJ, endereço e representante. Esses dados serão usados nos documentos.',enabled:provider},
+ const blocks=[{title:'1. Minha Empresa',href:'/configuracoes/prestador',detail:'Dados do proprietário do planetário, usados em propostas e contratos. Escolas e instituições ficam em Clientes.',enabled:provider},
  {title:'2. Cúpulas do planetário',href:'/agenda/reservas',detail:'Cadastrar cada equipamento com nome, código e capacidade real de participantes.',enabled:agenda},
  {title:'3. Escola e primeira reserva',href:'/agenda/reservas',detail:'Vincular o cliente da proposta aceita à estrutura operacional e selecionar cúpula, data e horário.',enabled:agenda}];
  return <main style={{maxWidth:920,margin:'20px auto',padding:24,fontFamily:'system-ui',color:'#16345b'}}>
