@@ -115,6 +115,19 @@ export default function FidelizacaoClient(){
  </table></div>}
  </section>
  <section style={{border:'1px solid #b6c7de',borderRadius:14,padding:19,marginTop:20}}>
+ <h2 style={{fontSize:21,fontWeight:750}}>Programa de relacionamento por instituição</h2>
+ <p>As categorias representam visitas concluídas no ano, não descontos ou benefícios concedidos automaticamente.</p>
+ <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(210px,1fr))',gap:12,marginTop:14}}>
+ {[
+ {name:'Bronze',count:'1 visita concluída',ideas:'Agradecimento, material de apoio e convite para nova sessão.'},
+ {name:'Prata',count:'2 ou 3 visitas concluídas',ideas:'Avaliar pacote anual, indicação e prioridade de negociação.'},
+ {name:'Ouro',count:'4 ou mais visitas concluídas',ideas:'Planejar agenda anual, sessões temáticas e prioridade de planejamento.'}
+ ].map(t=><div key={t.name} style={{border:'1px solid #d0dbeb',background:'#f8fbff',borderRadius:10,padding:14}}>
+ <strong>{t.name}</strong><div style={{fontSize:13,margin:'6px 0'}}>{t.count}</div><p style={{fontSize:13}}>{t.ideas}</p></div>)}
+ </div>
+ <p style={{fontSize:12,marginTop:12}}>Pacotes anuais, prioridade de agenda e indicações premiadas são possibilidades comerciais sujeitas à aprovação do proprietário, disponibilidade e condições definidas em proposta. Nenhuma vantagem é concedida por este painel.</p>
+ </section>
+ <section style={{border:'1px solid #b6c7de',borderRadius:14,padding:19,marginTop:20}}>
  <h2 id="agenda-relacionamento" style={{fontSize:21,fontWeight:750}}>Agenda interna de relacionamento</h2>
  <p style={{fontSize:13}}>Registre contatos e programe retornos. O ANTARES não envia mensagens automaticamente.</p>
  <div style={{display:'flex',gap:10,flexWrap:'wrap',alignItems:'end',margin:'16px 0'}}>
@@ -133,6 +146,6 @@ export default function FidelizacaoClient(){
  {a.status==='open'&&<div style={{display:'flex',alignItems:'center',gap:8}}><button disabled={saving} onClick={()=>saveAction('complete',a.id)}>Concluir</button><button disabled={saving} onClick={()=>saveAction('dismiss',a.id)}>Dispensar</button></div>}</div>)}
  </div>
  </section>
- <p style={{fontSize:12,opacity:.8,marginTop:16}}>As recomendações são somente orientativas. A agenda permite cadastrar e concluir lembretes internos; não envia mensagens. A gestão das cúpulas virá em etapa posterior.</p>
+ <p style={{fontSize:12,opacity:.8,marginTop:16}}>As recomendações são somente orientativas. A agenda permite cadastrar e concluir lembretes internos; não envia mensagens. A disponibilidade das cúpulas é gerenciada na Agenda.</p>
  </main>;
 }
