@@ -162,7 +162,7 @@ export default function OperacaoV1({writesEnabled,contractWritesEnabled}:{writes
  <button disabled={busy} type="submit" style={{padding:12,background:'#1d4ed8',color:'#fff',borderRadius:8}}>Registrar contrato</button>
  </form>}
  </section>}
- {tab==='agenda'&&<section style={base}><h2 style={{fontSize:21,fontWeight:650}}>Cúpulas e apresentações</h2>{writesEnabled&&<div style={{display:'flex',gap:8}}><button onClick={()=>openForm('dome')}>+ Cúpula</button><button onClick={()=>openForm('booking')}>+ Reserva</button></div>}
+ {tab==='agenda'&&<section style={base}><h2 style={{fontSize:21,fontWeight:650}}>Cúpulas e apresentações</h2><p><Link href="/agenda/reservas" style={{display:"inline-block",padding:"10px 15px",background:"#1d4ed8",color:"white",borderRadius:8,textDecoration:"none"}}>Reservas por proposta aceita</Link></p>{writesEnabled&&<div style={{display:'flex',gap:8}}><button onClick={()=>openForm('dome')}>+ Cúpula</button><button onClick={()=>openForm('booking')}>+ Reserva</button></div>}
   <p>Equipamentos cadastrados: {data.domes.map(d=>String(d.name)).join(' · ')||'nenhum'}.</p>{eventError&&<p role="alert">{eventError}</p>}
   <Rows heads={['Apresentação','Cúpula','Início','Término','Situação']}
   rows={data.bookings.map(b=>[b.event_title,b.dome_name,dateTime(b.starts_at),dateTime(b.ends_at),b.status])}/></section>}
