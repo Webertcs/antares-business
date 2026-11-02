@@ -10,5 +10,6 @@ export default async function Home() {
   if (!session?.user?.id) redirect('/auth/sign-in');
   const context = await requireMember();
   if (!context) redirect('/sem-acesso');
-  return <DashboardClient />;
+  const isDeveloper = context.role === 'owner' && Boolean(process.env.ANTARES_DEVELOPER_SUBJECT) && process.env.ANTARES_DEVELOPER_SUBJECT === context.user.id;
+  return <DashboardClient accountLabel={isDeveloper ? 'Proprietário / Desenvolvedor' : context.role === 'owner' ? 'Proprietário' : 'Colaborador'} />;
 }
