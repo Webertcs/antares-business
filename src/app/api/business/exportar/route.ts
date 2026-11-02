@@ -34,11 +34,11 @@ export async function GET(request:NextRequest){
    text=csv(['Cadastro','Cliente','Proposta','Modelo','Participantes','Total (R$)','Sinal (R$)','Situação','Validade'],
     r.map(x=>[x.created_at,x.client,x.title,x.pricing_model,x.expected_attendees,x.total,x.deposit,x.status,x.valid_until]));
   }else{
-   const r=await sql`SELECT b.starts_at,b.ends_at,d.name dome,e.title event,b.status
-    FROM public.business_bookings b JOIN public.business_domes d
-    ON b.dome_id=d.id AND b.organization_id=d.organization_id
-    JOIN public.crm_events e ON b.event_id=e.id AND b.organization_id=e.organization_id
-    WHERE b.organization_id=${owner.organizationId} ORDER BY b.starts_at DESC LIMIT 10000`;
+   const r=await sql`SELECT p.starts_at,p.ends_at,COALESCE(d.name,'Sem cúpula') dome,
+    p.title event,p.status
+    FROM public.presentations p LEFT JOIN public.antares_domes d
+    ON p.dome_id=d.id AND p.organization_id=d.organization_id
+    WHERE p.organization_id=${owner.organizationId} ORDER BY p.starts_at DESC LIMIT 10000`;
    text=csv(['Início','Término','Cúpula','Apresentação','Situação'],
     r.map(x=>[x.starts_at,x.ends_at,x.dome,x.event,x.status]));
   }
