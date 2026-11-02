@@ -130,6 +130,7 @@ export default function OperacaoV1({writesEnabled}:{writesEnabled:boolean}){
  </div></section>}
  {tab==='contratos'&&<section style={base}><h2 style={{fontSize:21,fontWeight:650}}>Contratos e confirmações</h2>{writesEnabled&&<button onClick={()=>openForm('contract')} style={{padding:10,background:'#2563eb',color:'#fff',borderRadius:8}}>+ Novo contrato</button>}
   <p>Confirmação documental, verbal ou pelo WhatsApp, vinculada à proposta.</p>
+  <p style={{marginTop:12}}>Para conferir uma proposta aprovada e gerar sua minuta não assinada, utilize os documentos disponíveis na aba Propostas. O registro de contratos permanecerá bloqueado até a homologação da nova estrutura.</p>
   <Rows heads={['Proposta','Modalidade','Situação','Confirmação']}
   rows={data.contracts.map(c=>[c.proposal_title,c.confirmation_mode,c.status,dateTime(c.confirmed_at)])}/></section>}
  {tab==='agenda'&&<section style={base}><h2 style={{fontSize:21,fontWeight:650}}>Cúpulas e apresentações</h2>{writesEnabled&&<div style={{display:'flex',gap:8}}><button onClick={()=>openForm('dome')}>+ Cúpula</button><button onClick={()=>openForm('booking')}>+ Reserva</button></div>}
