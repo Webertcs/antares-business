@@ -1,5 +1,5 @@
 'use client';
-import {useState} from 'react';
+import {useEffect,useState} from 'react';
 import Link from 'next/link';
 type D={id:string;title:string;status:string;pricingModel:string;attendees:number;unitPrice:number;fixedPrice:number;discount:number;deposit:number;total:number;notes:string;paymentTerms:string;validUntil:string;clientName:string;clientKind:string};
 const money=(n:number)=>new Intl.NumberFormat('pt-BR',{style:'currency',currency:'BRL'}).format(n);
@@ -8,6 +8,7 @@ export default function DocumentoClient({doc}:{doc:D}){
  const [confirmation,setConfirmation]=useState('formal');
  const [provider,setProvider]=useState({name:'',document:'',address:'',representative:''});
  const [showNotes,setShowNotes]=useState(false);
+ useEffect(()=>{const ctrl=new AbortController();fetch('/api/configuracoes/prestador',{cache:'no-store',signal:ctrl.signal}).then(r=>r.ok?r.json():null).then(v=>{if(v?.profile)setProvider({name:String(v.profile.name||''),document:String(v.profile.document||''),address:String(v.profile.address||''),representative:String(v.profile.representative||'')});}).catch(()=>{});return()=>ctrl.abort();},[]);
  const canPrint=Boolean(provider.name.trim()&&provider.document.trim()&&provider.address.trim()&&provider.representative.trim());
  const statusLabel:Record<string,string>={accepted:'Aceita',draft:'Rascunho',sent:'Enviada',negotiating:'Em negociação',rejected:'Recusada',cancelled:'Cancelada'};
  const today=new Intl.DateTimeFormat('pt-BR',{dateStyle:'long',timeZone:'America/Sao_Paulo'}).format(new Date());
@@ -24,7 +25,7 @@ export default function DocumentoClient({doc}:{doc:D}){
  <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(180px,1fr))',gap:10,marginTop:12}}>
  {([['name','Razão social / nome'],['document','CPF / CNPJ'],['address','Endereço'],['representative','Representante']] as const).map(([key,label])=>
  <label key={key}>{label}<input value={provider[key]} onChange={e=>setProvider(v=>({...v,[key]:e.target.value}))} style={{display:'block',width:'100%',padding:9,border:'1px solid #b6c7dd',borderRadius:6}} /></label>)}
- </div><p style={{fontSize:12}}>Dados preenchidos apenas para impressão; não são armazenados no CRM. Todos os quatro campos são obrigatórios para imprimir.</p>
+ </div><p style={{fontSize:12}}>Os dados salvos nas Configurações são carregados automaticamente, quando disponíveis. Alterações nesta tela valem apenas para a impressão. Todos os campos são obrigatórios.</p>
  <label><input type="checkbox" checked={showNotes} onChange={e=>setShowNotes(e.target.checked)}/> Incluir observações da proposta após revisão (podem conter dados internos)</label>
  </section>
  <article className="document" style={{maxWidth:850,margin:'auto',background:'white',padding:'26px clamp(20px,4vw,42px)',borderRadius:8,boxShadow:'0 5px 25px #1e3c7020'}}>
