@@ -27,7 +27,7 @@ export async function GET(){
    db`SELECT id,name FROM public.crm_clients WHERE organization_id=${owner.organizationId}
       ORDER BY name LIMIT 500`
   ]);
-  return NextResponse.json({titles,clients},{headers:noStore});
+  return NextResponse.json({titles,clients,writesEnabled:process.env.ANTARES_FINANCE_WRITES_ENABLED==='true'&&/^[a-f0-9]{64}$/i.test(process.env.ANTARES_FINANCE_CAPABILITY||'')},{headers:noStore});
  }catch{return NextResponse.json({error:'Contas a receber ainda não implantadas.'},{status:503,headers:noStore});}
 }
 export async function POST(req:Request){
