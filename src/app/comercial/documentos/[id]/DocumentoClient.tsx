@@ -10,7 +10,7 @@ export default function DocumentoClient({doc}:{doc:D}){
  const [showNotes,setShowNotes]=useState(false);
  const today=new Intl.DateTimeFormat('pt-BR',{dateStyle:'long',timeZone:'America/Sao_Paulo'}).format(new Date());
  return <main style={{background:'#e8eef9',minHeight:'100vh',padding:'24px 12px',color:'#142d52',fontFamily:'Arial,sans-serif'}}>
- <style>{`@media print{ @page{size:A4;margin:16mm;} body{background:white!important} .screen-only{display:none!important} .document{box-shadow:none!important;border:none!important;margin:0!important;padding:0!important;max-width:none!important} }`}</style>
+ <style>{`@media print{ @page{size:A4;margin:10mm;} body{background:white!important} .screen-only{display:none!important} .document{box-shadow:none!important;border:none!important;margin:0!important;padding:0!important;max-width:none!important;font-size:11px!important;line-height:1.25!important} .document h1{font-size:19px!important;margin-top:14px!important} .document h2{font-size:14px!important;margin:9px 0!important}.document p{margin:5px 0!important}.document th,.document td{padding:5px!important}.document header{padding-bottom:7px!important}.document section{margin-top:20px!important}.document footer{margin-top:18px!important} }`}</style>
  <div className="screen-only" style={{maxWidth:850,margin:'0 auto 18px',display:'flex',gap:10,alignItems:'center',flexWrap:'wrap'}}>
  <Link href="/operacoes">← Operações</Link>
  <label style={{marginLeft:'auto'}}>Documento <select value={mode} onChange={e=>setMode(e.target.value as 'proposal'|'contract')} style={{padding:9,borderRadius:6}}><option value="proposal">Proposta comercial</option><option value="contract">Minuta de contrato</option></select></label>
@@ -25,7 +25,7 @@ export default function DocumentoClient({doc}:{doc:D}){
  </div><p style={{fontSize:12}}>Dados preenchidos apenas para impressão; não são armazenados no CRM.</p>
  <label><input type="checkbox" checked={showNotes} onChange={e=>setShowNotes(e.target.checked)}/> Incluir observações da proposta após revisão (podem conter dados internos)</label>
  </section>
- <article className="document" style={{maxWidth:850,margin:'auto',background:'white',padding:'42px clamp(22px,5vw,58px)',borderRadius:8,boxShadow:'0 5px 25px #1e3c7020'}}>
+ <article className="document" style={{maxWidth:850,margin:'auto',background:'white',padding:'26px clamp(20px,4vw,42px)',borderRadius:8,boxShadow:'0 5px 25px #1e3c7020'}}>
  <header style={{borderBottom:'3px solid #1f63c7',paddingBottom:15,display:'flex',alignItems:'center',gap:20,flexWrap:'wrap'}}>
  <img src="/images/logo-antares.png" alt="ANTARES Planetário Móvel" style={{width:160,height:'auto'}}/>
  <div style={{marginLeft:'auto',textAlign:'right'}}><strong>ANTARES BUSINESS</strong><div style={{fontSize:12}}>Documento gerado do CRM</div></div>
