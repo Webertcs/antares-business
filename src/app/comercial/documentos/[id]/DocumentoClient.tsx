@@ -6,6 +6,8 @@ const money=(n:number)=>new Intl.NumberFormat('pt-BR',{style:'currency',currency
 export default function DocumentoClient({doc}:{doc:D}){
  const [mode,setMode]=useState<'proposal'|'contract'>('proposal');
  const [confirmation,setConfirmation]=useState('formal');
+ const [provider,setProvider]=useState({name:'',document:'',address:'',representative:''});
+ const [showNotes,setShowNotes]=useState(false);
  const today=new Intl.DateTimeFormat('pt-BR',{dateStyle:'long',timeZone:'America/Sao_Paulo'}).format(new Date());
  return <main style={{background:'#e8eef9',minHeight:'100vh',padding:'24px 12px',color:'#142d52',fontFamily:'Arial,sans-serif'}}>
  <style>{`@media print{ @page{size:A4;margin:16mm;} body{background:white!important} .screen-only{display:none!important} .document{box-shadow:none!important;border:none!important;margin:0!important;padding:0!important;max-width:none!important} }`}</style>
@@ -15,6 +17,14 @@ export default function DocumentoClient({doc}:{doc:D}){
  {mode==='contract'&&<label>Modalidade <select value={confirmation} onChange={e=>setConfirmation(e.target.value)} style={{padding:9}}><option value="formal">Formal</option><option value="verbal">Verbal</option><option value="whatsapp">WhatsApp</option></select></label>}
  <button onClick={()=>window.print()} style={{background:'#1749ac',color:'white',padding:'11px 17px',borderRadius:7}}>Imprimir / Salvar PDF</button>
  </div>
+ <section className="screen-only" style={{maxWidth:850,margin:'0 auto 16px',padding:16,borderRadius:9,background:'white'}}>
+ <strong>Identificação do prestador — preencher antes de imprimir</strong>
+ <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(180px,1fr))',gap:10,marginTop:12}}>
+ {([['name','Razão social / nome'],['document','CPF / CNPJ'],['address','Endereço'],['representative','Representante']] as const).map(([key,label])=>
+ <label key={key}>{label}<input value={provider[key]} onChange={e=>setProvider(v=>({...v,[key]:e.target.value}))} style={{display:'block',width:'100%',padding:9,border:'1px solid #b6c7dd',borderRadius:6}} /></label>)}
+ </div><p style={{fontSize:12}}>Dados preenchidos apenas para impressão; não são armazenados no CRM.</p>
+ <label><input type="checkbox" checked={showNotes} onChange={e=>setShowNotes(e.target.checked)}/> Incluir observações da proposta após revisão (podem conter dados internos)</label>
+ </section>
  <article className="document" style={{maxWidth:850,margin:'auto',background:'white',padding:'42px clamp(22px,5vw,58px)',borderRadius:8,boxShadow:'0 5px 25px #1e3c7020'}}>
  <header style={{borderBottom:'3px solid #1f63c7',paddingBottom:15,display:'flex',alignItems:'center',gap:20,flexWrap:'wrap'}}>
  <img src="/images/logo-antares.png" alt="ANTARES Planetário Móvel" style={{width:160,height:'auto'}}/>
@@ -23,7 +33,10 @@ export default function DocumentoClient({doc}:{doc:D}){
  <h1 style={{fontSize:23,marginTop:30}}>{mode==='proposal'?'PROPOSTA COMERCIAL':'MINUTA DE CONTRATO DE PRESTAÇÃO DE SERVIÇOS'}</h1>
  {mode==='contract'&&<p style={{padding:10,background:'#fff5df',fontWeight:700}}>MINUTA NÃO ASSINADA — sem registro de formalização no CRM</p>}
  <p><strong>Contratante:</strong> {doc.clientName}</p>
- <p><strong>Prestador:</strong> Planetário móvel — dados legais do prestador a preencher antes da assinatura</p>
+ <p><strong>Prestador:</strong> {provider.name||'NÃO INFORMADO — preencher antes de emitir'}</p>
+ <p><strong>Documento do prestador:</strong> {provider.document||'Não informado'}</p>
+ <p><strong>Endereço:</strong> {provider.address||'Não informado'}</p>
+ <p><strong>Representante:</strong> {provider.representative||'Não informado'}</p>
  <p><strong>Objeto:</strong> {doc.title}</p>
  <p><strong>Identificador da proposta:</strong> {doc.id}</p>
  <hr style={{border:0,borderTop:'1px solid #c9d7eb',margin:'24px 0'}}/>
@@ -40,7 +53,7 @@ export default function DocumentoClient({doc}:{doc:D}){
  <p style={{fontSize:12}}>O sinal indicado é uma condição comercial prevista, não comprovação de pagamento.</p>
  <h2 style={{fontSize:17}}>Condições de pagamento</h2>
  <p style={{whiteSpace:'pre-wrap'}}>{doc.paymentTerms||'A definir e confirmar entre as partes.'}</p>
- {doc.notes&&<><h2 style={{fontSize:17}}>Observações</h2><p style={{whiteSpace:'pre-wrap'}}>{doc.notes}</p></>}
+ {showNotes&&doc.notes&&<><h2 style={{fontSize:17}}>Observações revisadas</h2><p style={{whiteSpace:'pre-wrap'}}>{doc.notes}</p></>}
  {mode==='contract'&&<section>
  <h2 style={{fontSize:17}}>Confirmação e execução</h2>
  <p>Modalidade prevista de confirmação: <strong>{confirmation==='formal'?'Instrumento formal':confirmation==='verbal'?'Acordo verbal':'WhatsApp'}</strong>.</p>
