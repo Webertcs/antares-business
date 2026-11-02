@@ -5,8 +5,8 @@ const fail=(error:string,status:number)=>NextResponse.json({error},{status,heade
 export async function GET(){
  const owner=await requireOwner();if(!owner)return fail('Somente proprietário',403);
  try{const db=getDb();const [proposals,domes,links]=await Promise.all([
- db`SELECT p.id,p.title,c.name AS client_name FROM public.business_proposals p JOIN public.crm_clients c ON c.id=p.client_id AND c.organization_id=p.organization_id WHERE p.organization_id=${owner.organizationId} AND p.status='accepted' ORDER BY p.created_at DESC`,
- db`SELECT d.id,d.name,d.capacity FROM public.antares_domes d WHERE d.organization_id=${owner.organizationId} AND d.active ORDER BY d.name`,
+ db`SELECT p.id,p.title,c.name AS client_name, (m.operational_client_id IS NOT NULL) AS mapped FROM public.business_proposals p JOIN public.crm_clients c ON c.id=p.client_id AND c.organization_id=p.organization_id LEFT JOIN public.antares_client_links m ON m.organization_id=p.organization_id AND m.crm_client_id=p.client_id WHERE p.organization_id=${owner.organizationId} AND p.status='accepted' ORDER BY p.created_at DESC`,
+ db`SELECT d.id,d.name,d.capacity, (l.equipment_id IS NOT NULL) AS mapped FROM public.antares_domes d LEFT JOIN public.antares_dome_links l ON l.organization_id=d.organization_id AND l.antares_dome_id=d.id WHERE d.organization_id=${owner.organizationId} AND d.active ORDER BY d.name`,
  db`SELECT r.proposal_id,r.presentation_id FROM public.antares_proposal_reservations r WHERE r.organization_id=${owner.organizationId}`
  ]);return NextResponse.json({proposals,domes,links},{headers:{'Cache-Control':'private, no-store'}});}
  catch{return fail('Agenda de propostas indisponível até a migração 14E',503);}
