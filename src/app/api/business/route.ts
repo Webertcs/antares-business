@@ -18,14 +18,15 @@ export async function GET(){
        FROM public.business_contracts c JOIN public.business_proposals p
        ON p.id=c.proposal_id AND p.organization_id=c.organization_id
        WHERE c.organization_id=${ctx.organizationId} ORDER BY c.created_at DESC LIMIT 500`,
-   sql`SELECT id,name,active FROM public.business_domes WHERE organization_id=${ctx.organizationId} ORDER BY name`,
-   sql`SELECT b.id,b.event_id,b.dome_id,d.name AS dome_name,e.title AS event_title,
-       b.starts_at,b.ends_at,b.status FROM public.business_bookings b
-       JOIN public.business_domes d ON d.id=b.dome_id AND d.organization_id=b.organization_id
-       JOIN public.crm_events e ON e.id=b.event_id AND e.organization_id=b.organization_id
-       WHERE b.organization_id=${ctx.organizationId} ORDER BY b.starts_at DESC LIMIT 500`,
-   sql`SELECT id,category,status,description,amount,occurred_on,proposal_id FROM public.business_ledger
-       WHERE organization_id=${ctx.organizationId} ORDER BY occurred_on DESC,created_at DESC LIMIT 1000`,
+   sql`SELECT id,name,active FROM public.antares_domes WHERE organization_id=${ctx.organizationId} ORDER BY name`,
+   sql`SELECT p.id,p.id AS event_id,p.dome_id,COALESCE(d.name,'Sem cúpula') AS dome_name,
+       p.title AS event_title,p.starts_at,p.ends_at,p.status
+       FROM public.presentations p LEFT JOIN public.antares_domes d
+       ON d.id=p.dome_id AND d.organization_id=p.organization_id
+       WHERE p.organization_id=${ctx.organizationId} ORDER BY p.starts_at DESC LIMIT 500`,
+   sql`SELECT id,entry_type AS category,'settled'::text AS status,description,amount,occurred_on,quote_id AS proposal_id
+       FROM public.ledger_entries WHERE organization_id=${ctx.organizationId}
+       ORDER BY occurred_on DESC,created_at DESC LIMIT 1000`,
    sql`SELECT id,action,entity_type,entity_id,created_at FROM public.business_audit
        WHERE organization_id=${ctx.organizationId} ORDER BY created_at DESC LIMIT 100`
   ]);
