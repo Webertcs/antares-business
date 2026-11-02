@@ -6,5 +6,5 @@ export default async function Page(){
  if(!await requireOwner())redirect('/sem-acesso');
  const writesEnabled=process.env.ANTARES_V1_WRITES_ENABLED==='true'
   && process.env.ANTARES_V1_SECURITY_APPROVED==='true';
- return <OperacaoV1 writesEnabled={writesEnabled}/>;
+ return <OperacaoV1 writesEnabled={writesEnabled} contractWritesEnabled={process.env.ANTARES_CONTRACT_WRITES_ENABLED==='true'}/>;
 }
