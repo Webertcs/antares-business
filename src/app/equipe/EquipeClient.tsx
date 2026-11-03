@@ -105,6 +105,5 @@ export default function EquipeClient({ writesEnabled }: { writesEnabled: boolean
           {writesEnabled && <button onClick={()=>revoke(inv)} style={{marginLeft:12,padding:8,borderRadius:8,color:'#fff',background:'#9f1239'}}>Revogar</button>}
         </li>)}</ul>}
     </section>
-    <p className="team-help">As ações disponíveis dependem das permissões da conta. A transferência de propriedade será tratada separadamente.</p>
   </main>;
 }
