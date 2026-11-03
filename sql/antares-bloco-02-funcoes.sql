@@ -26,7 +26,7 @@ BEGIN
  setup_notes=excluded.setup_notes,updated_at=now();
  INSERT INTO public.business_audit(organization_id,actor_subject,action,entity_type,entity_id)
  VALUES(v_org,p_subject,'event_operation_saved','crm_event',p_event);
-END $;
+END $antares_operacao$;
 CREATE OR REPLACE FUNCTION public.antares_save_event_task(
  p_subject text,p_event uuid,p_task uuid,p_label text,p_done boolean
 ) RETURNS uuid
@@ -50,7 +50,7 @@ BEGIN
  INSERT INTO public.business_audit(organization_id,actor_subject,action,entity_type,entity_id)
  VALUES(v_org,p_subject,'event_task_saved','event_checklist',v_id);
  RETURN v_id;
-END $;
+END $antares_operacao$;
 CREATE OR REPLACE FUNCTION public.antares_save_event_session(
  p_subject text,p_event uuid,p_session uuid,p_label text,p_start time,p_end time,p_students integer
 ) RETURNS uuid
@@ -76,7 +76,7 @@ BEGIN
  INSERT INTO public.business_audit(organization_id,actor_subject,action,entity_type,entity_id)
  VALUES(v_org,p_subject,'event_session_saved','event_session',v_id);
  RETURN v_id;
-END $;
+END $antares_operacao$;
 REVOKE ALL ON FUNCTION public.antares_save_event_operation(text,uuid,text,text,text,text) FROM PUBLIC;
 REVOKE ALL ON FUNCTION public.antares_save_event_task(text,uuid,uuid,text,boolean) FROM PUBLIC;
 REVOKE ALL ON FUNCTION public.antares_save_event_session(text,uuid,uuid,text,time,time,integer) FROM PUBLIC;
