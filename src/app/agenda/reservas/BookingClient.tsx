@@ -22,7 +22,7 @@ export default function BookingClient({enabled}:{enabled:boolean}){
  return <main style={{maxWidth:980,margin:'0 auto',padding:24,fontFamily:'system-ui',color:'#16345e'}}>
  <Link href="/operacoes">← Central de Operações</Link><h1>Reservas vinculadas às propostas</h1>
  <p>Uma proposta aceita pode ser vinculada a uma apresentação. Reservas exigem cliente e cúpula correspondentes na estrutura operacional.</p>
- {!enabled&&<p style={{background:'#fff2d6',padding:15,borderRadius:8}}>Gravações de reservas desabilitadas até a homologação. Somente leitura.</p>}
+ {!enabled&&<p style={{background:'#fff2d6',padding:15,borderRadius:8}}>Reservas temporariamente indisponíveis. Você pode consultar as apresentações existentes.</p>}
  {status&&<p role="status">{status}</p>}
  <section style={{border:'1px solid #bdcce4',borderRadius:12,padding:18,marginTop:18}}><h2>Pré-requisitos de reserva</h2>
  <p>Propostas aceitas: <strong>{data?.proposals.length??'—'}</strong> · Clientes vinculados: <strong>{data?.proposals.filter(x=>x.mapped).length??'—'}</strong> · Cúpulas vinculadas: <strong>{domes.length}</strong> · Reservas vinculadas: <strong>{data?.links.length??'—'}</strong></p>
@@ -32,7 +32,7 @@ export default function BookingClient({enabled}:{enabled:boolean}){
  </section>
  {enabled&&data&&<section style={{border:'1px solid #bdcce4',padding:18,borderRadius:12,marginTop:20,display:'grid',gap:12}}>
  <h2>Preparar cadastros operacionais</h2>
- <p>Vincule os clientes das propostas aceitas e cadastre uma cúpula real antes da primeira reserva.</p>
+ <p>Vincule a instituição contratante e cadastre uma cúpula antes da primeira reserva.</p>
  {data.proposals.filter(p=>!p.mapped).map(p=><button disabled={busy} key={p.id} onClick={()=>prepare({action:'link-client',proposalId:p.id})} style={{padding:12}}>Vincular cliente: {p.client_name}</button>)}
  <label>Nome da cúpula<input value={domeName} onChange={e=>setDomeName(e.target.value)} style={{display:'block',padding:10,width:'100%'}}/></label>
  <label>Código da cúpula<input value={domeCode} onChange={e=>setDomeCode(e.target.value)} style={{display:'block',padding:10,width:'100%'}}/></label>
