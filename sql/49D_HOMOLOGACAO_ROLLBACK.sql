@@ -9,7 +9,7 @@ DECLARE
 BEGIN
  SELECT auth_subject,organization_id INTO v_subject,v_org
  FROM public.team_members WHERE active=true AND role='owner'
- ORDER BY created_at DESC NULLS LAST LIMIT 1;
+ LIMIT 1;
  IF v_subject IS NULL THEN RAISE EXCEPTION 'PENDENTE: proprietario autenticado nao encontrado'; END IF;
 
  v_dome:=public.antares_create_linked_dome(v_subject,v_org,'Cupula teste 49D','TMP-49D',30);
