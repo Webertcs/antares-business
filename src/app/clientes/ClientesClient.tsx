@@ -88,9 +88,9 @@ export default function ClientsPage({ writesEnabled }: { writesEnabled: boolean 
    return ()=>ctrl.abort();
  },[revision]);
  const filtered=useMemo(()=>clients.filter(c=>(showArchived||c.status!=='inactive')&&(kind==='all'||c.kind===kind)&&
-   (c.name+' '+(c.city||'')+' '+(c.email||'')).toLocaleLowerCase('pt-BR').includes(query.toLocaleLowerCase('pt-BR'))),[clients,kind,query,showArchived]);
+   (c.name+' '+(c.city||'')+' '+(c.email||'')).toLocaleLowerCase('pt-BR').includes(query.toLocaleLowerCase('pt-BR'))).sort((a,b)=>a.name.localeCompare(b.name,'pt-BR',{sensitivity:'base',numeric:true})),[clients,kind,query,showArchived]);
  const active=clients.find(c=>c.id===selected);
- const selectedContacts=contacts.filter(c=>c.client_id===selected);
+ const selectedContacts=contacts.filter(c=>c.client_id===selected).sort((a,b)=>Number(b.is_primary)-Number(a.is_primary)||a.full_name.localeCompare(b.full_name,'pt-BR',{sensitivity:'base',numeric:true}));
  const selectedEvents=events.filter(e=>e.client_id===selected);
  async function archiveClient(client:Client,restoreTo?:string){
   if(!writesEnabled||saving)return;
