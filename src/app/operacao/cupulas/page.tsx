@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import {redirect} from 'next/navigation';
 import {requireOwner,getDb} from '@/lib/equipe/auth';
+import NovaCupula from './NovaCupula';
 
 export const dynamic='force-dynamic';
 export const runtime='nodejs';
@@ -46,17 +47,18 @@ export default async function CupulasPage(){
  const domeError=results[0].status==='rejected';
  const reservationsError=results[1].status==='rejected'||results[2].status==='rejected';
  const active=domes.filter(d=>d.active).length;
+ const domeNames=(items:Dome[])=>{const names=items.slice(0,3).map(d=>d.name);return <p className="operation-metric-names">{names.length?names.join(' · '):'Nenhuma'}{items.length>3?` · +${items.length-3} outras`:''}</p>};
  return <main className="operation-detail">
   <Link className="operation-detail-back" href="/?section=operacao">← Voltar</Link>
   <header className="operation-detail-head"><div><h1>Cúpulas e equipamentos</h1><p>Estrutura e programação do planetário.</p></div></header>
   {domeError?<p className="operation-detail-warning" role="alert">Não foi possível consultar as cúpulas neste momento.</p>:<>
    <div className="operation-detail-metrics">
-    <div><span>Cúpulas cadastradas</span><strong>{domes.length}</strong></div>
-    <div><span>Ativas</span><strong>{active}</strong></div>
-    <div><span>Vinculadas à operação</span><strong>{domes.filter(d=>d.mapped).length}</strong></div>
+    <div><span>Cúpulas cadastradas</span><strong>{domes.length}</strong>{domeNames(domes)}</div>
+    <div><span>Ativas</span><strong>{active}</strong>{domeNames(domes.filter(d=>d.active))}</div>
+    <div><span>Vinculadas à operação</span><strong>{domes.filter(d=>d.mapped).length}</strong>{domeNames(domes.filter(d=>d.mapped))}</div>
    </div>
    <section className="operation-detail-panel operation-dome-unified">
-    <h2>Suas cúpulas</h2>
+    <div className="operation-domes-heading"><h2>Suas cúpulas</h2><NovaCupula enabled={process.env.ANTARES_AGENDA_WRITES_ENABLED==='true'}/></div>
     {domes.length===0?<div className="operation-detail-empty"><p>Nenhuma cúpula cadastrada.</p><small>O cadastro será realizado com os dados definitivos do planetário.</small></div>:
     <div className="operation-dome-grid">{domes.map(d=><article className="operation-dome-card" key={d.id}>
      <div className="operation-dome-top"><h3>{d.name}</h3><span className={d.active?'operation-status-active':'operation-status-inactive'}>{d.active?'Ativa':'Inativa'}</span></div>
