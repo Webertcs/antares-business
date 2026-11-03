@@ -5,7 +5,7 @@ BEGIN;
 DO $test$
 DECLARE
   v_subject text; v_org uuid; v_dome uuid; v_equipment uuid; v_result text;
-  v_blocked boolean:=false;
+  v_client uuid; v_presentation uuid; v_blocked boolean:=false;
 BEGIN
  SELECT auth_subject,organization_id INTO v_subject,v_org
  FROM public.team_members WHERE active=true AND role='owner'
@@ -37,8 +37,24 @@ BEGIN
  THEN RAISE EXCEPTION 'FALHOU: reativacao'; END IF;
  RAISE NOTICE 'APROVADO: reativacao';
 
- -- A exclusao de cupulas usadas deve falhar; nao criamos apresentacoes
- -- nesta homologacao. A protecao contra uso e checada na funcao e na revisao de codigo.
+ -- Testa de verdade o bloqueio de exclusao com apresentacao vinculada.
+ -- Todos os registros aqui existem somente dentro desta transacao com ROLLBACK.
+ INSERT INTO public.clients(organization_id,name,kind)
+ VALUES(v_org,'Cliente temporario 49D','school') RETURNING id INTO v_client;
+ INSERT INTO public.presentations(organization_id,client_id,dome_id,title,starts_at,ends_at,status)
+ VALUES(v_org,v_client,v_equipment,'Apresentacao temporaria 49D',
+  '2031-05-12 10:00-03'::timestamptz,'2031-05-12 11:00-03'::timestamptz,'reserved')
+ RETURNING id INTO v_presentation;
+ BEGIN
+  PERFORM public.antares_manage_linked_dome(v_subject,v_org,v_dome,'delete');
+ EXCEPTION WHEN OTHERS THEN v_blocked:=true;
+ END;
+ IF NOT v_blocked OR NOT EXISTS(
+  SELECT 1 FROM public.antares_domes WHERE id=v_dome AND organization_id=v_org)
+ THEN RAISE EXCEPTION 'FALHOU: exclusao de cupula com apresentacao foi permitida'; END IF;
+ RAISE NOTICE 'APROVADO: exclusao bloqueada quando existe apresentacao';
+ DELETE FROM public.presentations WHERE organization_id=v_org AND id=v_presentation;
+ DELETE FROM public.clients WHERE organization_id=v_org AND id=v_client;
  v_result:=public.antares_manage_linked_dome(v_subject,v_org,v_dome,'delete');
  IF v_result<>'deleted' OR EXISTS(
    SELECT 1 FROM public.antares_domes WHERE id=v_dome AND organization_id=v_org)
