@@ -1,24 +1,32 @@
 'use client';
-import {useEffect,useState} from 'react';
+import {useCallback,useEffect,useState} from 'react';
 type Operation={access_instructions:string|null;parking_instructions:string|null;power_requirements:string|null;setup_notes:string|null};
 type Task={id:string;label:string;done:boolean;completed_at:string|null};
 type Session={id:string;label:string;starts_at:string|null;ends_at:string|null;expected_students:number|null};
-type Payload={available:boolean;operations:Operation|null;checklist:Task[];sessions:Session[]};
+type Payload={available:boolean;canEdit:boolean;operations:Operation|null;checklist:Task[];sessions:Session[]};
 const card:React.CSSProperties={background:'#f3f7ff',border:'1px solid #c9d9f5',borderRadius:14,padding:18};
+const field:React.CSSProperties={width:'100%',padding:9,border:'1px solid #a8bfe6',borderRadius:8,background:'#fff',color:'#173a70'};
 export default function EventOperations({eventId}:{eventId:string}){
- const [data,setData]=useState<Payload|null>(null);
- const [loading,setLoading]=useState(true);
- const [error,setError]=useState('');
- useEffect(()=>{const ctrl=new AbortController();setLoading(true);fetch('/api/eventos/'+encodeURIComponent(eventId)+'/operacao',{signal:ctrl.signal,cache:'no-store'}).then(async r=>{const json=await r.json();if(!r.ok)throw Error(json.error||'Consulta indisponível');return json as Payload;}).then(v=>{if(!ctrl.signal.aborted)setData(v)}).catch(e=>{if(!ctrl.signal.aborted)setError(e instanceof Error?e.message:'Consulta indisponível')}).finally(()=>{if(!ctrl.signal.aborted)setLoading(false)});return()=>ctrl.abort()},[eventId]);
+ const [data,setData]=useState<Payload|null>(null),[loading,setLoading]=useState(true),[error,setError]=useState(''),[message,setMessage]=useState(''),[saving,setSaving]=useState(false);
+ const [access,setAccess]=useState(''),[parking,setParking]=useState(''),[power,setPower]=useState(''),[setup,setSetup]=useState('');
+ const [task,setTask]=useState(''),[session,setSession]=useState(''),[start,setStart]=useState(''),[end,setEnd]=useState(''),[students,setStudents]=useState('');
+ const load=useCallback(async(signal?:AbortSignal)=>{const res=await fetch('/api/eventos/'+encodeURIComponent(eventId)+'/operacao',{signal,cache:'no-store'});const json=await res.json();if(!res.ok)throw Error(json.error||'Consulta indisponível');return json as Payload},[eventId]);
+ useEffect(()=>{const ctrl=new AbortController();setLoading(true);load(ctrl.signal).then(v=>{if(ctrl.signal.aborted)return;setData(v);setAccess(v.operations?.access_instructions||'');setParking(v.operations?.parking_instructions||'');setPower(v.operations?.power_requirements||'');setSetup(v.operations?.setup_notes||'')}).catch(e=>{if(!ctrl.signal.aborted)setError(e instanceof Error?e.message:'Consulta indisponível')}).finally(()=>{if(!ctrl.signal.aborted)setLoading(false)});return()=>ctrl.abort()},[load]);
+ async function save(payload:Record<string,unknown>){if(!data?.canEdit||saving)return;setSaving(true);setMessage('');try{const res=await fetch('/api/eventos/'+encodeURIComponent(eventId)+'/operacao/salvar',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});const result=await res.json();if(!res.ok)throw Error(result.error||'Não foi possível salvar');const updated=await load();setData(updated);setMessage('Salvo com sucesso.')}catch(e){setMessage(e instanceof Error?e.message:'Erro ao salvar')}finally{setSaving(false)}}
  if(loading)return <section style={card} role="status">Carregando preparação operacional…</section>;
- if(error)return <section style={card} role="status"><h2>Preparação operacional</h2><p>{error}</p><small>Os dados existentes do evento permanecem preservados.</small></section>;
+ if(error)return <section style={card} role="status"><h2>Preparação operacional</h2><p>{error}</p><small>Os dados principais do evento permanecem preservados.</small></section>;
  if(!data)return null;
- const op=data.operations;
- const disabledMessage=<p style={{fontSize:13,color:'#6b7280'}}>Edição será habilitada após a migração e auditoria de permissões no Neon.</p>;
+ const op=data.operations,edit=data.canEdit;
+ const hint=!edit?<p style={{fontSize:13,color:'#63738c'}}>Edição indisponível até a liberação segura no Neon.</p>:null;
  return <div style={{display:'grid',gap:14}}>
- <section style={card}><h2>Infraestrutura</h2><div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(200px,1fr))',gap:12}}>
- {([['Acesso e entrada',op?.access_instructions],['Estacionamento',op?.parking_instructions],['Energia elétrica',op?.power_requirements],['Montagem',op?.setup_notes]] as const).map(([label,value])=><div key={label}><strong>{label}</strong><p style={{whiteSpace:'pre-wrap'}}>{value||'Não informado'}</p></div>)}</div>{disabledMessage}</section>
- <section style={card}><h2>Checklist operacional</h2>{data.checklist.length?<ul style={{display:'grid',gap:10,paddingLeft:20}}>{data.checklist.map(t=><li key={t.id}>{t.done?'✓ ':'○ '}{t.label}{t.done?' — Concluído':''}</li>)}</ul>:<p>Nenhuma tarefa cadastrada para este evento.</p>}{disabledMessage}</section>
- <section style={card}><h2>Sessões e turmas</h2>{data.sessions.length?<div style={{display:'grid',gap:10}}>{data.sessions.map(s=><div key={s.id} style={{borderBottom:'1px solid #c9d9f5',paddingBottom:8}}><strong>{s.label}</strong><p>{s.starts_at?String(s.starts_at).slice(0,5):'Horário a definir'}{s.ends_at?'–'+String(s.ends_at).slice(0,5):''} · {s.expected_students==null?'Alunos a definir':s.expected_students+' alunos'}</p></div>)}</div>:<p>Nenhuma sessão cadastrada para este evento.</p>}{disabledMessage}</section>
+ {message&&<p role="status" aria-live="polite">{message}</p>}
+ <section style={card}><h2>Infraestrutura</h2>
+ {edit?<form onSubmit={e=>{e.preventDefault();void save({action:'infrastructure',access,parking,power,setup})}} style={{display:'grid',gap:10}}>
+ {([['Acesso e entrada',access,setAccess,2000],['Estacionamento',parking,setParking,2000],['Energia elétrica',power,setPower,2000],['Montagem',setup,setSetup,4000]] as const).map(([label,value,setValue,max])=><label key={label}>{label}<textarea style={field} rows={2} maxLength={max} value={value} onChange={e=>setValue(e.target.value)}/></label>)}
+ <button disabled={saving} type="submit">Salvar infraestrutura</button></form>:<div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(200px,1fr))',gap:12}}>{([['Acesso e entrada',op?.access_instructions],['Estacionamento',op?.parking_instructions],['Energia elétrica',op?.power_requirements],['Montagem',op?.setup_notes]] as const).map(([label,value])=><div key={label}><strong>{label}</strong><p style={{whiteSpace:'pre-wrap'}}>{value||'Não informado'}</p></div>)}</div>}{hint}</section>
+ <section style={card}><h2>Checklist operacional</h2>{data.checklist.length?<ul style={{display:'grid',gap:10,paddingLeft:20}}>{data.checklist.map(t=><li key={t.id}>{edit?<label><input type="checkbox" disabled={saving} checked={t.done} onChange={e=>void save({action:'task',taskId:t.id,label:t.label,done:e.target.checked})}/> {t.label}</label>:<span>{t.done?'✓ ':'○ '}{t.label}</span>}</li>)}</ul>:<p>Nenhuma tarefa cadastrada para este evento.</p>}
+ {edit&&<form onSubmit={e=>{e.preventDefault();void save({action:'task',label:task,done:false}).then(()=>setTask(''))}} style={{display:'flex',gap:8,flexWrap:'wrap'}}><input style={{...field,flex:'1 1 220px'}} aria-label="Nova tarefa" maxLength={180} required value={task} onChange={e=>setTask(e.target.value)}/><button disabled={saving} type="submit">Adicionar tarefa</button></form>}{hint}</section>
+ <section style={card}><h2>Sessões e turmas</h2>{data.sessions.length?<div style={{display:'grid',gap:10}}>{data.sessions.map(s=><div key={s.id} style={{borderBottom:'1px solid #c9d9f5',paddingBottom:8}}><strong>{s.label}</strong><p>{s.starts_at?String(s.starts_at).slice(0,5):'Horário a definir'}{s.ends_at?'–'+String(s.ends_at).slice(0,5):''} · {s.expected_students==null?'Alunos a definir':s.expected_students+' alunos'}</p></div>)}</div>:<p>Nenhuma sessão cadastrada para este evento.</p>}
+ {edit&&<form onSubmit={e=>{e.preventDefault();void save({action:'session',label:session,start,end,students:students===''?null:Number(students)}).then(()=>{setSession('');setStart('');setEnd('');setStudents('')})}} style={{display:'grid',gap:8}}><label>Turma ou sessão<input style={field} maxLength={160} required value={session} onChange={e=>setSession(e.target.value)}/></label><div style={{display:'flex',gap:8,flexWrap:'wrap'}}><label>Início<input style={field} type="time" value={start} onChange={e=>setStart(e.target.value)}/></label><label>Fim<input style={field} type="time" value={end} onChange={e=>setEnd(e.target.value)}/></label><label>Alunos previstos<input style={field} type="number" min="0" max="10000" value={students} onChange={e=>setStudents(e.target.value)}/></label></div><button disabled={saving} type="submit">Adicionar sessão</button></form>}{hint}</section>
  </div>;
 }
