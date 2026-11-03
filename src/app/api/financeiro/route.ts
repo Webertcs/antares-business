@@ -13,7 +13,8 @@ export async function GET(){
     d.name AS dome_name
     FROM public.ledger_entries l
     LEFT JOIN public.presentations p ON p.id=l.presentation_id AND p.organization_id=l.organization_id
-    LEFT JOIN public.antares_domes d ON d.id=p.dome_id AND d.organization_id=l.organization_id
+    LEFT JOIN public.antares_dome_links dl ON dl.equipment_id=p.dome_id AND dl.organization_id=p.organization_id
+    LEFT JOIN public.antares_domes d ON d.id=dl.antares_dome_id AND d.organization_id=l.organization_id
     WHERE l.organization_id=${ctx.organizationId}
     ORDER BY l.occurred_on DESC,l.created_at DESC LIMIT 1000`,
    db`SELECT id,title,starts_at FROM public.presentations WHERE organization_id=${ctx.organizationId} ORDER BY starts_at DESC LIMIT 300`,
