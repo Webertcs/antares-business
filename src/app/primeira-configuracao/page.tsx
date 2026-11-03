@@ -4,7 +4,7 @@ import SetupReadiness from './SetupReadiness';
 import {requireOwner} from '@/lib/equipe/auth';
 export const dynamic='force-dynamic';
 export default async function Page(){
- if(!await requireOwner())redirect('/sem-acesso');
+ const owner=await requireOwner();if(!owner || !process.env.ANTARES_DEVELOPER_SUBJECT || owner.user.id!==process.env.ANTARES_DEVELOPER_SUBJECT)redirect('/sem-acesso');
  const agenda=process.env.ANTARES_AGENDA_WRITES_ENABLED==='true';
  const provider=process.env.ANTARES_PROVIDER_WRITES_ENABLED==='true';
  const blocks=[{title:'1. Minha Empresa',href:'/configuracoes/prestador',detail:'Dados do proprietário do planetário, usados em propostas e contratos. Escolas e instituições ficam em Clientes.',enabled:provider},
