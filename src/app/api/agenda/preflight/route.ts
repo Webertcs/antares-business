@@ -19,7 +19,8 @@ export async function GET(){
       (SELECT count(*)::int FROM pg_proc p WHERE p.oid IN(
        'public.antares_prepare_proposal_client(text,uuid,uuid)'::regprocedure,
        'public.antares_create_linked_dome(text,uuid,text,text,integer)'::regprocedure,
-       'public.antares_book_proposal(text,uuid,uuid,uuid,timestamptz,timestamptz)'::regprocedure
+       'public.antares_book_proposal(text,uuid,uuid,uuid,timestamptz,timestamptz)'::regprocedure,
+       'public.antares_manage_linked_dome(text,uuid,uuid,text,text,text,integer)'::regprocedure
       ) AND p.prosecdef AND pg_get_userbyid(p.proowner)='neondb_owner'
        AND has_function_privilege(r.oid,p.oid,'EXECUTE')
        AND NOT EXISTS(SELECT 1 FROM aclexplode(coalesce(p.proacl,acldefault('f',p.proowner))) acl
@@ -38,7 +39,7 @@ export async function GET(){
       ) AS tables_ok
       FROM pg_roles r WHERE r.rolname=current_user`;
    const x=rows[0];
-   runtimeOk=!!x&&x.runtime_role==='antares_team_runtime'&&x.is_super===false&&x.bypass_rls===false&&Number(x.functions_ok)===3&&x.tables_ok===true;
+   runtimeOk=!!x&&x.runtime_role==='antares_team_runtime'&&x.is_super===false&&x.bypass_rls===false&&Number(x.functions_ok)===4&&x.tables_ok===true;
   }
   const ready=originConfigured&&roleConfigured&&runtimeOk;
   return NextResponse.json({authenticatedOwner:true,originConfigured,roleConfigured,runtimeOk,
