@@ -23,7 +23,8 @@ export async function assertAgendaWriteAllowed(req:NextRequest):Promise<NextResp
       (SELECT count(*)::int FROM pg_proc p WHERE p.oid IN(
        'public.antares_prepare_proposal_client(text,uuid,uuid)'::regprocedure,
        'public.antares_create_linked_dome(text,uuid,text,text,integer)'::regprocedure,
-       'public.antares_book_proposal(text,uuid,uuid,uuid,timestamptz,timestamptz)'::regprocedure
+       'public.antares_book_proposal(text,uuid,uuid,uuid,timestamptz,timestamptz)'::regprocedure,
+       'public.antares_manage_linked_dome(text,uuid,uuid,text,text,text,integer)'::regprocedure
       ) AND p.prosecdef AND pg_get_userbyid(p.proowner)='neondb_owner'
        AND has_function_privilege(r.oid,p.oid,'EXECUTE')
        AND NOT EXISTS(SELECT 1 FROM aclexplode(coalesce(p.proacl,acldefault('f',p.proowner))) acl
@@ -44,7 +45,7 @@ export async function assertAgendaWriteAllowed(req:NextRequest):Promise<NextResp
   const a=rows[0];
   if(!a||a.runtime_role!=='antares_team_runtime'||a.can_login!==true||
      a.is_super!==false||a.bypass_rls!==false||
-     Number(a.functions_ok)!==3||a.tables_ok!==true)
+     Number(a.functions_ok)!==4||a.tables_ok!==true)
     return deny('Permissões de agenda não homologadas.');
  }catch{return deny('Não foi possível validar o isolamento do banco.');}
  return null;
