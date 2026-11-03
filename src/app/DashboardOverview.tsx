@@ -1,7 +1,7 @@
 'use client';
 import {useEffect,useMemo,useState} from 'react';
 import Link from 'next/link';
-import {ArrowUpRight,Bell,CalendarDays,ChevronLeft,ChevronRight,ClipboardCheck,FileText,GraduationCap,Orbit,Users,Wallet,BarChart3,HandCoins,Clock3,BriefcaseBusiness,ContactRound} from 'lucide-react';
+import {ArrowUpRight,Bell,CalendarDays,ChevronLeft,ChevronRight,ClipboardCheck,FileText,GraduationCap,Orbit,Users,Wallet,BarChart3,HandCoins,Clock3,BriefcaseBusiness,ContactRound,Plus} from 'lucide-react';
 type Booking={id:string;event_title:string;dome_name:string;starts_at:string;status:string};
 type Reminder={id:string;client_name:string;due_date:string|null;priority:string;status:string;note:string};
 type Props={cash:string;receivable:string;proposals:string;upcoming:Booking[];reminders:Reminder[];remindersAvailable:boolean;businessReady:boolean;check:boolean[];onCheck:(index:number)=>void;onNavigate:(section:string)=>void};
@@ -41,6 +41,7 @@ export default function DashboardOverview({cash,receivable,proposals,upcoming,re
    {label:'A receber',value:receivable,icon:ArrowUpRight},
    {label:'Propostas abertas',value:proposals,icon:FileText},
    {label:'Próximas sessões',value:String(upcoming.length),icon:CalendarDays}].map(k=><article className="owner-kpi" key={k.label}><span className="owner-kpi-icon"><k.icon size={20}/></span><div><span>{k.label}</span><strong>{k.value}</strong></div></article>)}
+   <button type="button" className="owner-kpi-budget" onClick={()=>onNavigate('comercial')}><Plus size={19}/><span>Novo orçamento</span></button>
   </div>
   <div className="owner-main-grid">
    <section className="owner-tile owner-relationship"><div className="owner-tile-head"><span className="owner-tile-icon"><Users size={20}/></span><div><h2>Inteligência de relacionamento</h2><p>Alertas e lembretes comerciais</p></div></div>
