@@ -10,5 +10,5 @@ export const dynamic='force-dynamic';
 export default async function VisaoProprietarioPage(){
  const owner=await requireOwner();
  if(!owner || !process.env.ANTARES_DEVELOPER_SUBJECT || owner.user.id!==process.env.ANTARES_DEVELOPER_SUBJECT)redirect('/sem-acesso');
- return <DashboardClient accountLabel="Proprietário" ownerPreview/>;
+ return <DashboardClient accountLabel="Proprietário" profileKey={owner.memberId} ownerPreview/>;
 }
