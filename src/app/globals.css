@@ -459,3 +459,33 @@
  .commercial-hub-card{min-height:74px;padding:11px 12px}
 }
 @media(prefers-reduced-motion:reduce){.commercial-hub-card{transition:none}.commercial-hub-card:hover{transform:none}}
+
+/* Bloco 44 — ANTARES Intelligence: acabamento de relatorios do proprietario. */
+.intelligence-refined{max-width:1180px;margin:0 auto;padding:23px 24px 32px;color:#142e56}
+.intelligence-head{display:flex;align-items:center;justify-content:space-between;gap:14px;margin-bottom:17px}
+.intelligence-head h1{font-size:clamp(23px,2.2vw,30px);letter-spacing:-.7px;color:#102c59;margin:7px 0 5px;font-weight:800}
+.intelligence-head p{font-size:12px;color:#61779b;margin:0}
+.intelligence-back{display:inline-flex;align-items:center;gap:5px;background:#dce9ff;color:#1d52ad;border:1px solid #9cbdf6;border-radius:8px;padding:5px 10px;font-size:11px;font-weight:750;cursor:pointer}
+.intelligence-back:hover{background:#c9ddff}
+.intelligence-back:focus-visible,.intelligence-actions a:focus-visible{outline:3px solid #75aafa;outline-offset:2px}
+.intelligence-head-icon{width:48px;height:48px;border-radius:13px;display:grid;place-items:center;background:#dbe9ff;color:#2459c5}
+.intelligence-metrics{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.intelligence-metric{background:#edf4ff;border:1px solid #d2e0f9;border-radius:13px;padding:15px 16px;min-height:77px;display:flex;flex-direction:column;gap:8px}
+.intelligence-metric span{font-size:12px;color:#60789b}
+.intelligence-metric strong{color:#153766;font-size:clamp(17px,1.7vw,23px);line-height:1.15;font-weight:800;font-variant-numeric:tabular-nums}
+.intelligence-recommendations,.intelligence-actions{background:#edf4ff;border:1px solid #d2e0f9;border-radius:15px;padding:17px 19px;margin-top:13px}
+.intelligence-section-head{display:flex;align-items:center;gap:9px;margin-bottom:10px}
+.intelligence-section-icon{display:grid;place-items:center;background:#dbe9ff;color:#2459c5;border-radius:9px;width:35px;height:35px}
+.intelligence-recommendations h2,.intelligence-actions h2{font-size:17px;font-weight:750;margin:0;color:#193763}
+.intelligence-recommendations ul{list-style:none;margin:0;padding:0;display:grid;gap:7px}
+.intelligence-recommendations li{display:flex;align-items:flex-start;gap:9px;background:#f9fbff;border:1px solid #dbe6f7;border-radius:9px;padding:9px 11px;color:#38516f;font-size:12px;line-height:1.45}
+.intelligence-recommendations li svg{color:#316dd4;flex-shrink:0;margin-top:1px}
+.intelligence-recommendations>p:not(.intelligence-footnote){font-size:12px;color:#4c648a}
+.intelligence-footnote{font-size:10px;color:#687e9e;margin:10px 0 0}
+.intelligence-actions nav{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:9px;margin-top:13px}
+.intelligence-actions a{border:1px solid #cbdcf7;background:#f9fbff;color:#2352aa;text-decoration:none;border-radius:9px;padding:10px 9px;font-weight:700;font-size:11px;display:flex;align-items:center;justify-content:space-between;gap:5px}
+.intelligence-actions a:hover{background:#dfeaff;border-color:#99b9ed}
+.intelligence-error{border:1px solid #edd1a4;background:#fff2de;border-radius:10px;padding:13px;color:#8e4b10;font-size:12px}
+.intelligence-loading{padding:16px;color:#55739c}
+@media(max-width:800px){.intelligence-metrics{grid-template-columns:repeat(2,minmax(0,1fr))}.intelligence-actions nav{grid-template-columns:repeat(2,minmax(0,1fr))}.intelligence-refined{padding:15px}}
+@media(max-width:470px){.intelligence-metrics{grid-template-columns:1fr 1fr;gap:7px}.intelligence-metric{padding:11px;min-height:75px}.intelligence-actions nav{grid-template-columns:1fr}.intelligence-head-icon{display:none}}
