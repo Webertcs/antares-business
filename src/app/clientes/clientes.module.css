@@ -60,3 +60,24 @@
 .formActions {display:flex;justify-content:flex-end;position:sticky;bottom:-24px;background:white;padding:16px 0;margin-top:16px;border-top:1px solid #e1eaf5;}
 .formError {padding:12px;background:#edf4ff;border-radius:8px;margin-top:14px;}
 @media(max-width:560px){.formDialog{padding:18px;width:calc(100vw - 20px);max-height:calc(100dvh - 20px);}.formFields{grid-template-columns:1fr;}.formActions{bottom:-18px;}}
+
+/* ANTARES — acabamento premium do modal de cadastro */
+.formDialog {padding:0;width:min(680px,calc(100vw - 32px));border:1px solid #9fc2ef;border-radius:20px;box-shadow:0 28px 90px #071c4370;overflow:auto;}
+.formHeading {margin:0;padding:22px 26px;background:linear-gradient(115deg,#102e63,#1556ae 65%,#2879e7);color:#fff;}
+.formHeading h2 {color:#fff;font-size:23px;font-weight:750;letter-spacing:-.35px;}
+.formHeading button {background:#ffffff24!important;color:#fff!important;border:1px solid #ffffff70!important;border-radius:10px;}
+.formHeading button:hover {background:#ffffff40!important;}
+.formDialog form {padding:22px 26px 0;}
+.formFields {grid-template-columns:repeat(2,minmax(0,1fr));column-gap:18px;row-gap:16px;}
+.formFields label {display:block;min-width:0;color:#234976;font-size:13px;font-weight:700;}
+.formFields label:first-child {grid-column:1/-1;}
+.formFields input,.formFields select {box-sizing:border-box;width:100%!important;min-height:46px;border:1px solid #bfd3ef;border-radius:10px;background:#f7faff;color:#17345b;padding:10px 12px;transition:border-color .2s,box-shadow .2s;}
+.formFields input:focus,.formFields select:focus {outline:none;border-color:#2879e7;box-shadow:0 0 0 3px #2879e726;background:#fff;}
+.formFields label:last-child {grid-column:1/-1;}
+.formActions {bottom:0;margin-top:22px;padding:16px 0 20px;gap:10px;background:#fff;}
+.formActions button {min-width:128px;border-radius:10px;font-weight:700;}
+.formActions button[type='submit'] {background:linear-gradient(110deg,#1453b8,#2879ee);color:#fff;border-color:#2169d8;box-shadow:0 5px 14px #1e62c52a;}
+.formActions button[type='submit']:hover:not(:disabled) {background:linear-gradient(110deg,#10459c,#1765d4);}
+.formActions button[type='button'] {margin-left:0!important;background:#e8f1ff;color:#174e9c;border:1px solid #b8d1f5;}
+.formActions button[type='button']:hover:not(:disabled) {background:#d8e8ff;}
+@media(max-width:560px) {.formDialog{width:calc(100vw - 20px);max-height:calc(100dvh - 20px);}.formHeading{padding:18px;}.formDialog form{padding:18px 18px 0;}.formFields{grid-template-columns:1fr;}.formActions{flex-wrap:wrap;}.formActions button{flex:1;min-width:0;}}
