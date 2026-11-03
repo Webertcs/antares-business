@@ -126,16 +126,18 @@ export default function ClientsPage({ writesEnabled }: { writesEnabled: boolean 
     <section className={styles.metric} key={t}><div>{t}</div><strong style={{fontSize:26}}>{n}</strong></section>)}
   </div>
   <section className={styles.directory} style={{border:'1px solid #94a3b8',borderRadius:14,padding:18,marginBottom:20}}>
-   <div className={styles.sectionHeading}><div><h2>Base de clientes</h2><p>Encontre cadastros e acompanhe o relacionamento.</p></div><span>{filtered.length} na lista</span></div>
-   <div style={{display:'flex',gap:12,flexWrap:'wrap',marginBottom:16}}>
-    <input value={query} onChange={e=>setQuery(e.target.value)} placeholder="Pesquisar cliente, cidade ou e-mail"
-     aria-label="Buscar clientes" style={{padding:12,borderRadius:9,border:'1px solid #94a3b8',flex:'1 1 250px',color:'#111',background:'#fff'}}/>
-    <select value={kind} onChange={e=>setKind(e.target.value)} aria-label="Tipo de cliente"
-     style={{padding:12,borderRadius:9,color:'#111',background:'#fff'}}>
-     <option value="all">Todos os clientes</option>
-     {Object.entries(kinds).map(([key,val])=><option key={key} value={key}>{val}</option>)}
-    </select>
-    <label style={{display:'flex',alignItems:'center',gap:6,fontSize:13,whiteSpace:'nowrap'}}><input type="checkbox" checked={showArchived} onChange={e=>setShowArchived(e.target.checked)}/> Mostrar arquivados</label>
+   <div className={styles.directoryHeader}><div><h2>Base de clientes</h2><p>Encontre cadastros e acompanhe o relacionamento.</p></div><span className={styles.resultCount}>{filtered.length} na lista</span></div>
+   <div className={styles.filterPanel}>
+    <label className={styles.filterSearch}><span>⌕ Pesquisar clientes</span>
+     <input value={query} onChange={e=>setQuery(e.target.value)} placeholder="Nome, cidade ou e-mail" aria-label="Buscar clientes"/>
+    </label>
+    <label className={styles.filterKind}><span>Tipo de cliente <small>▼</small></span>
+     <select value={kind} onChange={e=>setKind(e.target.value)} aria-label="Tipo de cliente">
+      <option value="all">Todos os clientes</option>
+      {Object.entries(kinds).map(([key,val])=><option key={key} value={key}>{val}</option>)}
+     </select>
+    </label>
+    <label className={styles.filterArchived}><input type="checkbox" checked={showArchived} onChange={e=>setShowArchived(e.target.checked)}/><span>Mostrar arquivados</span></label>
    </div>
    {loading?<p>Carregando clientes...</p>:error?<p role="alert">{error}</p>:
     filtered.length===0?<div className={styles.empty}><h3>Nenhum cliente nesta visualização</h3><p>{clients.length===0?(writesEnabled?'Cadastre o primeiro cliente para começar.':'Nenhum cadastro disponível para consulta.'):query||kind!=='all'?'Tente outro nome, cidade ou tipo de cliente.':'Marque Mostrar arquivados para consultar os cadastros guardados.'}</p></div>:
