@@ -20,7 +20,7 @@ export async function GET(_request:Request,{params}:{params:Promise<{id:string}>
    db`SELECT id,label,starts_at,ends_at,expected_students FROM public.antares_event_sessions
       WHERE event_id=${id} AND organization_id=${ctx.organizationId} ORDER BY starts_at NULLS LAST,created_at,id LIMIT 100`
   ]);
-  return NextResponse.json({available:true,operations:operations[0]||null,checklist,sessions},{headers:{'Cache-Control':'private, no-store'}});
+  return NextResponse.json({available:true,canEdit:ctx.role==='owner' && process.env.ANTARES_EVENT_OPERATIONS_WRITES_ENABLED==='true',operations:operations[0]||null,checklist,sessions},{headers:{'Cache-Control':'private, no-store'}});
  }catch{
   return NextResponse.json({available:false,error:'Operação ainda não implantada ou indisponível.'},{status:503,headers:{'Cache-Control':'private, no-store'}});
  }
