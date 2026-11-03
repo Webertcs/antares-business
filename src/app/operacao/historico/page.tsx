@@ -21,7 +21,11 @@ const actions:Record<string,string>={
  payment_reversed:'Recebimento estornado',
  event_created:'Apresentação cadastrada',
  reservation_created:'Reserva cadastrada',
- client_created:'Cliente cadastrado'
+ client_created:'Cliente cadastrado',
+ dome_updated:'Cúpula atualizada',
+ dome_deactivated:'Cúpula desativada',
+ dome_activated:'Cúpula reativada',
+ dome_deleted:'Cúpula excluída'
 };
 const areas:Record<string,string>={
  proposal:'Propostas',client:'Clientes',contract:'Contratos',presentation:'Apresentações',
