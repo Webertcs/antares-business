@@ -89,21 +89,20 @@ export default function ClientsPage({ writesEnabled }: { writesEnabled: boolean 
  }
  const countBy=(k:string)=>clients.filter(c=>c.kind===k).length;
  return <main className={styles.page} style={{maxWidth:1180,margin:'0 auto',padding:'28px 18px',fontFamily:'system-ui'}}>
-  <Link href="/">← Voltar ao painel</Link>
+  <Link href="/" className={styles.backButton}><span aria-hidden="true">←</span> Voltar ao painel</Link>
   <div className={styles.hero} style={{display:'flex',justifyContent:'space-between',alignItems:'center',gap:16,flexWrap:'wrap',margin:'20px 0'}}>
    <div><p style={{letterSpacing:2,fontSize:12}}>ANTARES · RELACIONAMENTO</p>
     <h1 style={{fontSize:30,fontWeight:750}}>Clientes e Eventos</h1>
     <p>Escolas, empresas, associações e apresentações em um só lugar.</p></div>
-   <div style={{display:'flex',gap:8,alignItems:'center',flexWrap:'wrap'}}>
-   <span className={styles.access} style={{border:'1px solid #eab308',padding:'8px 12px',borderRadius:10}}>{writesEnabled?"Cadastros liberados":"Cadastros em homologação"}</span>
-   <Link href="/vitrine/inbox" style={{padding:12,borderRadius:9,border:'1px solid #2563eb',textDecoration:'none'}}>📨 Solicitações da vitrine</Link>
-   <button type="button" disabled={!writesEnabled} onClick={()=>openForm('client')} style={{padding:12,borderRadius:9,background:'#2563eb',color:'#fff',opacity:writesEnabled?1:.5}}>+ Novo cliente</button></div>
+   <div className={styles.headerActions}>
+   {!writesEnabled&&<span className={styles.access}>Somente consulta</span>}
+   <Link href="/vitrine/inbox" className={styles.headerButton}>Solicitações da vitrine</Link>
+   <button type="button" className={styles.headerButton} disabled={!writesEnabled||saving} onClick={()=>openForm('client')}>+ Novo cliente</button></div>
   </div>
   <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(160px,1fr))',gap:12,marginBottom:20}}>
    {[['Clientes cadastrados',clients.length],['Em acompanhamento',clients.filter(c=>c.status!=='inactive').length],['Arquivados',clients.filter(c=>c.status==='inactive').length],['Escolas cadastradas',countBy('school')],['Eventos registrados',events.length]].map(([t,n])=>
-    <section className={styles.metric} key={t} style={{border:'1px solid #94a3b8',padding:18,borderRadius:14}}><div>{t}</div><strong style={{fontSize:26}}>{n}</strong></section>)}
+    <section className={styles.metric} key={t}><div>{t}</div><strong style={{fontSize:26}}>{n}</strong></section>)}
   </div>
-  <p className={styles.caption}>Clientes e escolas cadastrados incluem arquivados. Em acompanhamento reúne ativos e prospectos. Os filtros alteram apenas a lista.</p>
   <section className={styles.directory} style={{border:'1px solid #94a3b8',borderRadius:14,padding:18,marginBottom:20}}>
    <div className={styles.sectionHeading}><div><h2>Base de clientes</h2><p>Encontre cadastros e acompanhe o relacionamento.</p></div><span>{filtered.length} na lista</span></div>
    <div style={{display:'flex',gap:12,flexWrap:'wrap',marginBottom:16}}>
@@ -175,6 +174,5 @@ export default function ClientsPage({ writesEnabled }: { writesEnabled: boolean 
    <div className={styles.actions}><button disabled={saving} onClick={()=>archiveClient(restoreClient,restoreStatus)}>{saving?'Reativando...':'Confirmar reativação'}</button><button disabled={saving} onClick={()=>setRestoreClient(null)}>Cancelar</button></div>
    {feedback&&<p role="status">{feedback}</p>}
   </dialog>}
-  <p style={{marginTop:20,fontSize:13,opacity:.8}}>Dados restritos à organização autenticada. {writesEnabled?"Apenas o proprietário pode cadastrar e alterar registros.":"Gravações bloqueadas até a homologação de segurança."}</p>
  </main>;
 }

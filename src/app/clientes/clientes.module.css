@@ -7,10 +7,13 @@
 .hero {padding:28px;border-radius:22px;background:linear-gradient(125deg,#102d59,#1555a2);color:white;box-shadow:0 12px 30px #14376818;}
 .hero h1 {letter-spacing:-1px;margin:8px 0;}
 .hero p {color:#dbeafe;max-width:510px;}
-.hero a {background:#fff;color:#194577;}
-.hero .access {border-color:#89b4eb!important;color:#deecff;font-size:12px;}
-.metric {background:white;border-color:#dbe6f4!important;box-shadow:0 5px 18px #1c3f6506;position:relative;overflow:hidden;}
-.metric::before {content:'';position:absolute;left:0;top:18px;bottom:18px;width:4px;background:#3b82f6;border-radius:4px;}
+.backButton {display:inline-flex;align-items:center;gap:8px;padding:8px 13px;min-height:38px;border:1px solid #cbdcf0;border-radius:9px;background:#fff;color:#234d80;text-decoration:none;font-size:13px;font-weight:600;}
+.backButton:hover {background:#edf4ff;}
+.headerActions {display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+.hero .headerButton {display:inline-flex;align-items:center;justify-content:center;min-height:36px;padding:7px 12px;border:1px solid #8db3e0;border-radius:8px;background:#204f89;color:#fff;text-decoration:none;font-size:13px;font-weight:600;line-height:20px;white-space:nowrap;}
+.hero .headerButton:hover:not(:disabled) {background:#2d609e;box-shadow:none;}
+.hero .access {color:#deecff;font-size:12px;}
+.metric {background:#fff;border:1px solid #dbe6f4;border-radius:12px;padding:14px 16px;}
 .metric div {font-size:13px;color:#55708e;}
 .metric strong {display:block;margin-top:8px;color:#163b6e;}
 .caption {font-size:13px;color:#5c728d;margin:8px 0 18px;}
