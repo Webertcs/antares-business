@@ -20,9 +20,12 @@ export async function POST(req:NextRequest){
   if(body.action==='update'){
    if(typeof body.name!=='string'||typeof body.code!=='string'||!Number.isInteger(body.capacity))
     return reply('Dados inválidos',400);
-   name=body.name.trim();code=body.code.trim();capacity=body.capacity;
-   if(name.length<2||name.length>100||code.length<1||code.length>30||capacity<1||capacity>500)
+   const parsedName:string=body.name.trim();
+   const parsedCode:string=body.code.trim();
+   const parsedCapacity:number=body.capacity;
+   if(parsedName.length<2||parsedName.length>100||parsedCode.length<1||parsedCode.length>30||parsedCapacity<1||parsedCapacity>500)
     return reply('Dados inválidos',400);
+   name=parsedName;code=parsedCode;capacity=parsedCapacity;
   }
   if(body.action==='delete'&&body.confirm!=='EXCLUIR')
    return reply('Confirmação obrigatória',400);
