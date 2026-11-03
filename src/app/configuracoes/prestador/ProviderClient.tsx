@@ -9,8 +9,8 @@ export default function ProviderClient({enabled}:{enabled:boolean}){
  try{const r=await fetch('/api/configuracoes/prestador',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(form)});const d=await r.json();if(!r.ok)throw Error(d.error||'Erro ao salvar');const verify=await fetch('/api/configuracoes/prestador',{cache:'no-store'});const current=await verify.json();if(!verify.ok||!current.profile||(['name','document','address','representative'] as const).some(k=>current.profile[k]!==form[k].trim()))throw Error('O servidor recebeu o cadastro, mas a conferência de leitura não confirmou todos os campos. Confira antes de tentar novamente.');setMessage('APROVADO: dados salvos e conferidos por nova leitura do banco.');}
  catch(e){setMessage(e instanceof Error?e.message:'Falha');}finally{setBusy(false);}}
  return <main style={{maxWidth:850,margin:'20px auto',padding:24,color:'#16345c',fontFamily:'system-ui'}}>
- <Link href="/">← Painel</Link><h1>Minha Empresa</h1><p>Dados do planetário que presta o serviço. Escolas e instituições contratantes são cadastradas em Clientes.</p>
- {!enabled&&<p style={{padding:14,background:'#fff0d5',borderRadius:8}}>Gravação bloqueada durante homologação. O cadastro definitivo só poderá ser salvo após autorização.</p>}
+ <Link href="/">← Painel</Link><h1>Minha Empresa</h1><p>Dados da empresa responsável pelas apresentações. Escolas e instituições contratantes ficam em Clientes.</p>
+ {!enabled&&<p style={{padding:14,background:'#fff0d5',borderRadius:8}}>Edição temporariamente indisponível. Consulte os dados da empresa nesta página.</p>}
  <p role="status">{message}</p><form onSubmit={save} style={{display:'grid',gap:16}}>
  {([['name','Razão social / nome'],['document','CPF ou CNPJ'],['address','Endereço da empresa'],['representative','Representante']] as const).map(([key,label])=>
  <label key={key}>{label}<input required maxLength={key==='address'?300:180} value={form[key]} disabled={!enabled} onChange={e=>setForm(v=>({...v,[key]:e.target.value}))}
