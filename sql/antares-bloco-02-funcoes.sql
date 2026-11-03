@@ -1,6 +1,8 @@
 -- ANTARES Bloco 02: rotinas de escrita operacional.
 -- REVISAR APÓS BACKUP e após a criação das tabelas em antares-bloco-02-operacao.sql.
 -- Executar como proprietário das tabelas. Nenhum GRANT amplo.
+-- REVISÃO PENDENTE: verificar auditoria e autenticação do ator antes de executar.
+-- O parâmetro p_subject é fornecido pela API e não comprova identidade no banco.
 -- BLOQUEADO: a identidade da role runtime e os privilégios de leitura devem ser verificados no Neon.
 -- O argumento p_subject é informado pela aplicação; somente uma role sem acesso SQL arbitrário pode executar estas funções.
 -- Não aplicar este arquivo até confirmar role, permissões, isolamento e auditoria.
