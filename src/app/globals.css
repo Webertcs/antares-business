@@ -654,3 +654,27 @@
 .team-refined button:disabled{cursor:not-allowed;opacity:.55}
 .team-refined .team-help{font-size:11px;color:#647c9e;margin:14px 0 0}
 @media(max-width:700px){.team-refined{padding:13px}.team-refined .team-panel{padding:12px}.team-invite-form{grid-template-columns:1fr}.team-table{display:block;overflow-x:auto;white-space:nowrap}}
+
+/* Bloco 47 — histórico legível para o proprietário; detalhes técnicos sob demanda. */
+.operation-history .operation-detail-head{margin-bottom:13px}
+.operation-history .operation-detail-panel{padding:14px}
+.operation-history-heading{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:10px}
+.operation-history-heading h2{margin:0;font-size:16px}
+.operation-history-heading>span{font-size:11px;font-weight:750;color:#2759ad;background:#dce9ff;border-radius:8px;padding:6px 10px;white-space:nowrap}
+.operation-history .operation-detail-table-scroll{max-height:min(56dvh,520px);background:#f9fbff}
+.operation-history .operation-detail-table-scroll th{background:#dfeaff;font-size:11px}
+.operation-history .operation-detail-table-scroll td{font-size:12px;padding:10px 11px;vertical-align:middle}
+.operation-history-date{white-space:nowrap;font-variant-numeric:tabular-nums;color:#5b7195}
+.operation-history-action{font-weight:700;color:#173767}
+.operation-history-area{display:inline-flex;align-items:center;font-size:11px;background:#e5efff;color:#2555a3;padding:5px 8px;border-radius:7px;font-weight:650}
+.operation-history-details{position:relative;font-size:11px;color:#2858aa}
+.operation-history-details summary{cursor:pointer;font-weight:750;white-space:nowrap;padding:5px 8px;background:#e7f0ff;border:1px solid #c7daf8;border-radius:7px;list-style:none;display:inline-block}
+.operation-history-details summary::-webkit-details-marker{display:none}
+.operation-history-details summary:hover{background:#dce9ff}
+.operation-history-details summary:focus-visible{outline:3px solid #80b0fd;outline-offset:2px}
+.operation-history-details[open]{max-width:265px}
+.operation-history-details dl{margin:8px 0 0;padding:10px;background:#f0f5ff;border:1px solid #ccdcf6;border-radius:8px;min-width:190px}
+.operation-history-details dt{font-weight:750;color:#365c91;margin:5px 0 2px}
+.operation-history-details dd{margin:0;word-break:break-all;color:#536e96}
+.operation-history-note{font-size:11px;color:#60789b;margin:11px 2px 0}
+@media(max-width:650px){.operation-history .operation-detail-table-scroll{max-height:65dvh}.operation-history .operation-detail-table-scroll table{min-width:610px}}
