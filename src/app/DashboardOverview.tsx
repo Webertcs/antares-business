@@ -37,10 +37,10 @@ export default function DashboardOverview({cash,receivable,proposals,upcoming,re
  const shift=(n:number)=>setMonth(d=>new Date(d.getFullYear(),d.getMonth()+n,1));
  return <div className="owner-overview">
   <div className="owner-kpis">
-   {[{label:'Saldo realizado',value:cash,hint:'Recebimentos menos despesas pagas',icon:Wallet},
-   {label:'A receber',value:receivable,hint:'Previsto, não recebido',icon:ArrowUpRight},
-   {label:'Propostas abertas',value:proposals,hint:'Rascunhos e negociação',icon:FileText},
-   {label:'Próximas sessões',value:String(upcoming.length),hint:'Reservas futuras',icon:CalendarDays}].map(k=><article className="owner-kpi" key={k.label}><span className="owner-kpi-icon"><k.icon size={20}/></span><div><span>{k.label}</span><strong>{k.value}</strong><small>{k.hint}</small></div></article>)}
+   {[{label:'Saldo realizado',value:cash,icon:Wallet},
+   {label:'A receber',value:receivable,icon:ArrowUpRight},
+   {label:'Propostas abertas',value:proposals,icon:FileText},
+   {label:'Próximas sessões',value:String(upcoming.length),icon:CalendarDays}].map(k=><article className="owner-kpi" key={k.label}><span className="owner-kpi-icon"><k.icon size={20}/></span><div><span>{k.label}</span><strong>{k.value}</strong></div></article>)}
   </div>
   <div className="owner-main-grid">
    <section className="owner-tile owner-relationship"><div className="owner-tile-head"><span className="owner-tile-icon"><Users size={20}/></span><div><h2>Inteligência de relacionamento</h2><p>Alertas e lembretes comerciais</p></div></div>
