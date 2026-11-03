@@ -2,6 +2,7 @@ import Link from 'next/link';
 import {redirect} from 'next/navigation';
 import {requireOwner} from '@/lib/equipe/auth';
 import SetupReadiness from '../primeira-configuracao/SetupReadiness';
+import AceiteReadOnly from './AceiteReadOnly';
 export const dynamic='force-dynamic';
 const items=[
  {heading:'Minha Empresa',href:'/configuracoes/prestador',key:'provider',description:'Gravar dados reais do proprietário e conferir no cadastro.'},
@@ -30,7 +31,7 @@ export default async function FechamentoPage(){
  <p style={{fontWeight:700,color:flags[x.key]?'#a06500':'#1d633c'}}>{flags[x.key]?'Gravação habilitada — requer controle':'Gravação desabilitada'}</p>
  <Link href={x.href}>Abrir área</Link>
  </section>)}</div>
- <h2 style={{marginTop:28}}>2. Configuração do cliente</h2>
+ <AceiteReadOnly/><h2 style={{marginTop:28}}>2. Configuração do cliente</h2>
  <SetupReadiness/>
  <p>Confirmar dados jurídicos da empresa, nome/código/capacidade das duas cúpulas, escola e representante. Não cadastrar valores fictícios.</p>
  <Link href="/primeira-configuracao">Abrir Primeira Configuração</Link>
