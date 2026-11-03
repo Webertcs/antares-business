@@ -1,6 +1,7 @@
 import {redirect,notFound} from 'next/navigation';
 import {requireMember,getDb} from '@/lib/equipe/auth';
 import Link from 'next/link';
+import EventOperations from './EventOperations';
 export const dynamic='force-dynamic';
 const uuid=/^[0-9a-f]{8}(-[0-9a-f]{4}){3}-[0-9a-f]{12}$/i;
 export default async function Page({params}:{params:Promise<{id:string}>}){
@@ -25,7 +26,7 @@ export default async function Page({params}:{params:Promise<{id:string}>}){
  <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(190px,1fr))',gap:12}}>
  <div style={card}><small>Instituição</small><h3>{String(e.client_name)}</h3></div><div style={card}><small>Cúpula</small><h3>{String(e.dome_name||'A definir')}</h3></div><div style={card}><small>Público previsto</small><h3>{e.expected_attendees==null?'A definir':String(e.expected_attendees)}</h3></div></div>
  <section style={card}><h2>Local e deslocamento</h2><p>{address||'Endereço ainda não informado.'}</p>{address&&<div style={{display:'flex',gap:12,flexWrap:'wrap'}}><a href={maps} target="_blank" rel="noopener noreferrer">Abrir Google Maps</a><a href={waze} target="_blank" rel="noopener noreferrer">Abrir Waze</a></div>}</section>
- <section style={card}><h2>Preparação operacional</h2><p>Checklist, sessões e confirmação da equipe serão ativados após a migração segura dos dados operacionais. Nenhuma confirmação fictícia será exibida.</p></section>
+ <EventOperations eventId={id}/>
  <section style={card}><h2>Equipe</h2><p>Os colaboradores e suas fotos serão vinculados a este evento por registro autorizado, sem duplicar cadastros.</p></section>
  <section style={card}><h2>Observações</h2><p style={{whiteSpace:'pre-wrap'}}>{String(e.notes||'Nenhuma observação registrada.')}</p></section>
  <Link href="/?section=agenda">Consultar Agenda</Link>
