@@ -26,7 +26,9 @@ BEGIN
  ON CONFLICT(event_id) DO UPDATE SET access_instructions=excluded.access_instructions,
  parking_instructions=excluded.parking_instructions,power_requirements=excluded.power_requirements,
  setup_notes=excluded.setup_notes,updated_at=now();
-END $$;
+ INSERT INTO public.business_audit(organization_id,actor_subject,action,entity_type,entity_id)
+ VALUES(v_org,p_subject,'event_operation_saved','crm_event',p_event);
+END $;
 CREATE OR REPLACE FUNCTION public.antares_save_event_task(
  p_subject text,p_event uuid,p_task uuid,p_label text,p_done boolean
 ) RETURNS uuid
@@ -47,8 +49,10 @@ BEGIN
  WHERE id=p_task AND event_id=p_event AND organization_id=v_org RETURNING id INTO v_id;
  IF v_id IS NULL THEN RAISE EXCEPTION 'Tarefa não encontrada'; END IF;
  END IF;
+ INSERT INTO public.business_audit(organization_id,actor_subject,action,entity_type,entity_id)
+ VALUES(v_org,p_subject,'event_task_saved','event_checklist',v_id);
  RETURN v_id;
-END $$;
+END $;
 CREATE OR REPLACE FUNCTION public.antares_save_event_session(
  p_subject text,p_event uuid,p_session uuid,p_label text,p_start time,p_end time,p_students integer
 ) RETURNS uuid
@@ -71,8 +75,10 @@ BEGIN
  WHERE id=p_session AND event_id=p_event AND organization_id=v_org RETURNING id INTO v_id;
  IF v_id IS NULL THEN RAISE EXCEPTION 'Sessão não encontrada'; END IF;
  END IF;
+ INSERT INTO public.business_audit(organization_id,actor_subject,action,entity_type,entity_id)
+ VALUES(v_org,p_subject,'event_session_saved','event_session',v_id);
  RETURN v_id;
-END $$;
+END $;
 REVOKE ALL ON FUNCTION public.antares_save_event_operation(text,uuid,text,text,text,text) FROM PUBLIC;
 REVOKE ALL ON FUNCTION public.antares_save_event_task(text,uuid,uuid,text,boolean) FROM PUBLIC;
 REVOKE ALL ON FUNCTION public.antares_save_event_session(text,uuid,uuid,text,time,time,integer) FROM PUBLIC;
