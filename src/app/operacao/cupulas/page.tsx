@@ -2,6 +2,7 @@ import Link from 'next/link';
 import {redirect} from 'next/navigation';
 import {requireOwner,getDb} from '@/lib/equipe/auth';
 import NovaCupula from './NovaCupula';
+import GerenciarCupula from './GerenciarCupula';
 
 export const dynamic='force-dynamic';
 export const runtime='nodejs';
@@ -64,7 +65,7 @@ export default async function CupulasPage(){
      <div className="operation-dome-top"><h3>{d.name}</h3><span className={d.active?'operation-status-active':'operation-status-inactive'}>{d.active?'Ativa':'Inativa'}</span></div>
      <dl><div><dt>Código</dt><dd>{d.code||'Não informado'}</dd></div>
      <div><dt>Capacidade</dt><dd>{d.capacity?d.capacity+' pessoas':'Não informada'}</dd></div>
-     <div><dt>Vínculo operacional</dt><dd>{d.mapped?'Vinculada':'Sem vínculo'}</dd></div></dl>
+     <div><dt>Vínculo operacional</dt><dd>{d.mapped?'Vinculada':'Sem vínculo'}</dd></div></dl><GerenciarCupula dome={d} enabled={process.env.ANTARES_AGENDA_WRITES_ENABLED==='true'}/>
     </article>)}</div>}
     <section className="operation-reservations" aria-labelledby="operation-reservations-title">
      <div className="operation-reservations-head"><h2 id="operation-reservations-title">Reservas vinculadas</h2><span className="operation-reservations-badge">{summary?summary.reservations:'—'} registro(s)</span></div>
