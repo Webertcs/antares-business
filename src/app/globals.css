@@ -633,3 +633,24 @@
 .dome-create .dome-create-form input{padding:9px 10px}
 @media(max-width:600px){.dome-create .dome-create-form{width:100%;padding:13px}.operation-detail-metrics>div{padding:9px}.operation-detail-head{margin-bottom:10px}}
 @media(prefers-reduced-motion:reduce){.dome-create-overlay{animation:none}}
+
+/* Bloco 46 — Equipe, convites e permissoes. */
+.team-refined{max-width:1080px;margin:0 auto;padding:18px 23px 28px;color:#173767}
+.team-refined h1{font-size:26px;font-weight:800;margin:12px 0 3px}
+.team-intro{font-size:12px;color:#627a9e;margin:0 0 14px}
+.team-refined>.team-table{margin-bottom:12px}
+.team-table{border-collapse:separate;border-spacing:0;width:100%;text-align:left;background:#f9fbff;border:1px solid #cbdcf7;border-radius:12px;overflow:hidden;font-size:12px}
+.team-table thead{background:#dfeaff}
+.team-table th{padding:12px 11px;text-align:left;color:#32588d;font-size:11px}
+.team-table td{padding:11px;border-top:1px solid #deE8f8;color:#38516f}
+.team-refined .team-panel{margin:13px 0 0;background:#edf4ff;border:1px solid #d2e0f9;border-radius:14px;padding:17px}
+.team-refined .team-panel h2{font-size:17px;font-weight:750;margin:0 0 11px;color:#173767}
+.team-refined .team-panel p{font-size:12px;color:#5c7296}
+.team-invite-form{display:grid;gap:11px;max-width:560px;grid-template-columns:1fr 1fr}
+.team-invite-form label{font-size:12px;font-weight:650;color:#31517b}
+.team-invite-form label input{border:1px solid #bcd1f0;border-radius:9px;margin-top:6px;outline-offset:2px}
+.team-invite-form button{grid-column:1/-1;justify-self:start;border:0}
+.team-refined button{cursor:pointer;font-weight:700}
+.team-refined button:disabled{cursor:not-allowed;opacity:.55}
+.team-refined .team-help{font-size:11px;color:#647c9e;margin:14px 0 0}
+@media(max-width:700px){.team-refined{padding:13px}.team-refined .team-panel{padding:12px}.team-invite-form{grid-template-columns:1fr}.team-table{display:block;overflow-x:auto;white-space:nowrap}}
