@@ -44,9 +44,12 @@ CREATE INDEX IF NOT EXISTS antares_event_sessions_event_idx ON public.antares_ev
 ALTER TABLE public.antares_event_operations ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.antares_event_checklist ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.antares_event_sessions ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.antares_event_operations FORCE ROW LEVEL SECURITY;
-ALTER TABLE public.antares_event_checklist FORCE ROW LEVEL SECURITY;
-ALTER TABLE public.antares_event_sessions FORCE ROW LEVEL SECURITY;
--- Sem GRANT para PUBLIC ou para a role de runtime.
--- APIs de escrita exigirão funções restritas com validação de sessão/organização.
+-- Leitura: exclusivamente via DATABASE_URL (role proprietária) e API autenticada,
+-- com filtros obrigatórios de event_id e organization_id.
+-- A role antares_team_runtime NÃO recebe SELECT/INSERT/UPDATE direto.
+-- RLS permanece habilitado; proprietário das tabelas não sofre RLS sem FORCE.
+-- Escrita: exclusivamente por funções SECURITY DEFINER com EXECUTE restrito.
+REVOKE ALL ON public.antares_event_operations FROM PUBLIC;
+REVOKE ALL ON public.antares_event_checklist FROM PUBLIC;
+REVOKE ALL ON public.antares_event_sessions FROM PUBLIC;
 COMMIT;
