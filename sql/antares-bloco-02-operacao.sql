@@ -1,9 +1,12 @@
 -- ANTARES · Bloco 02 — estrutura operacional (NÃO EXECUTAR SEM BACKUP).
 -- Aplicar manualmente no Neon após revisão. Não altera crm_events.
 BEGIN;
+-- Garante que cada registro operacional pertença à mesma organização do evento.
+CREATE UNIQUE INDEX IF NOT EXISTS crm_events_id_organization_unique ON public.crm_events(id,organization_id);
 CREATE TABLE IF NOT EXISTS public.antares_event_operations (
-  event_id uuid PRIMARY KEY REFERENCES public.crm_events(id) ON DELETE RESTRICT,
+  event_id uuid PRIMARY KEY,
   organization_id uuid NOT NULL REFERENCES public.organizations(id),
+  FOREIGN KEY (event_id,organization_id) REFERENCES public.crm_events(id,organization_id) ON DELETE RESTRICT,
   access_instructions text,
   parking_instructions text,
   power_requirements text,
@@ -16,8 +19,9 @@ CREATE TABLE IF NOT EXISTS public.antares_event_operations (
 );
 CREATE TABLE IF NOT EXISTS public.antares_event_checklist (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  event_id uuid NOT NULL REFERENCES public.crm_events(id) ON DELETE RESTRICT,
+  event_id uuid NOT NULL,
   organization_id uuid NOT NULL REFERENCES public.organizations(id),
+  FOREIGN KEY (event_id,organization_id) REFERENCES public.crm_events(id,organization_id) ON DELETE RESTRICT,
   label text NOT NULL CHECK (length(label) BETWEEN 1 AND 180),
   done boolean NOT NULL DEFAULT false,
   completed_at timestamptz,
@@ -26,8 +30,9 @@ CREATE TABLE IF NOT EXISTS public.antares_event_checklist (
 CREATE INDEX IF NOT EXISTS antares_event_checklist_event_idx ON public.antares_event_checklist(organization_id,event_id);
 CREATE TABLE IF NOT EXISTS public.antares_event_sessions (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  event_id uuid NOT NULL REFERENCES public.crm_events(id) ON DELETE RESTRICT,
+  event_id uuid NOT NULL,
   organization_id uuid NOT NULL REFERENCES public.organizations(id),
+  FOREIGN KEY (event_id,organization_id) REFERENCES public.crm_events(id,organization_id) ON DELETE RESTRICT,
   label text NOT NULL CHECK (length(label) BETWEEN 1 AND 160),
   starts_at time,
   ends_at time,
