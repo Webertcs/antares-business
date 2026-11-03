@@ -373,3 +373,56 @@
  .agenda-compact-content .cal-page .fullcal{padding-top:9px;padding-bottom:8px}
  .agenda-compact-content .cal-events-panel{padding-top:8px;padding-bottom:8px}
 }
+
+/* Bloco 42B — Agenda com respiro visual e movimentos discretos. */
+.agenda-compact-content .cal-page{gap:14px}
+.agenda-compact-content .cal-page .fullcal{
+  background:#edf4ff;
+  border:1px solid #cddffc;
+  box-shadow:0 5px 22px #244b9b0c;
+  padding:15px 17px 14px;
+}
+.agenda-compact-content .cal-page .cal-weeknames span{background:#dfeaff;color:#234a87;padding:7px 2px;font-size:10px}
+.agenda-compact-content .cal-page .cal-day{
+  min-height:clamp(50px,6.8vh,66px);
+  height:clamp(50px,6.8vh,66px);
+  max-height:clamp(50px,6.8vh,66px);
+  background:#f7faff;
+  border-color:#dbe6f8;
+  padding:6px 8px;
+  transition:background-color 180ms ease,border-color 180ms ease,box-shadow 180ms ease;
+}
+.agenda-compact-content .cal-page .cal-day:hover{background:#e0ebff;border-color:#98b9f1;box-shadow:inset 0 0 0 1px #b1c9f8}
+.agenda-compact-content .cal-page .cal-day.chosen{background:#d8e7ff;border-color:#376be1;box-shadow:inset 0 0 0 2px #5584eb;outline:0}
+.agenda-compact-content .cal-page .cal-day.outside{background:#f0f4fc;opacity:.58}
+.agenda-compact-content .cal-page .cal-day>span{font-size:11px;line-height:15px}
+.agenda-compact-content .cal-page .cal-toolbar{margin-bottom:11px}
+.agenda-compact-content .cal-page .cal-toolbar h2{color:#16376e}
+.agenda-compact-content .cal-events-panel{
+  background:#edf4ff;
+  border:1px solid #cddffc;
+  box-shadow:0 5px 22px #244b9b0c;
+  padding:14px 17px;
+}
+.agenda-compact-content .cal-events-table th{background:#dfeaff;color:#395a91}
+.agenda-compact-content .cal-events-table td{background:#f7faff}
+.agenda-compact-content .cal-events-table tr.cal-row-selected td{background:#dbe9ff}
+.agenda-compact-content .cal-controls button{background:#f7faff;border-color:#bfd4f6;transition:background-color 180ms ease,border-color 180ms ease}
+.agenda-compact-content .cal-controls button:hover{background:#dbeaff;border-color:#8eb4ee}
+.agenda-compact-content .cal-page .panel{animation:agenda-card-enter 380ms ease-out both}
+.agenda-compact-content .cal-page .cal-events-panel{animation-delay:90ms}
+@keyframes agenda-card-enter{from{opacity:.75;transform:translateY(5px)}to{opacity:1;transform:translateY(0)}}
+@media(max-width:760px){
+  .agenda-compact-content .cal-page .fullcal,.agenda-compact-content .cal-events-panel{padding:12px}
+  .agenda-compact-content .cal-page .cal-day{min-height:50px;height:50px;max-height:50px;padding:4px}
+}
+@media(max-height:690px) and (min-width:761px){
+  .agenda-compact-content .cal-page{gap:9px}
+  .agenda-compact-content .cal-page .cal-day{height:clamp(41px,6.4vh,48px);min-height:clamp(41px,6.4vh,48px);max-height:clamp(41px,6.4vh,48px)}
+  .agenda-compact-content .cal-page .fullcal{padding:10px 13px}
+  .agenda-compact-content .cal-events-panel{padding:10px 13px}
+}
+@media(prefers-reduced-motion:reduce){
+  .agenda-compact-content .cal-page .panel{animation:none}
+  .agenda-compact-content .cal-page .cal-day,.agenda-compact-content .cal-controls button{transition:none}
+}
