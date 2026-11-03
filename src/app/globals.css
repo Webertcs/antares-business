@@ -264,3 +264,52 @@
  .content:has(.owner-overview) .owner-hero::before{opacity:.28}
  .content:has(.owner-overview) .owner-hero>div{max-width:100%}
 }
+
+/* Bloco 38C — refinamento aprovado: Saturno mais completo e cartoes azul-gelo.
+   Restrito ao Dashboard do proprietario; sem alterar outros modulos. */
+.content:has(.owner-overview) .owner-hero::before{
+  background-size:68% auto;
+  background-position:right 51%;
+}
+.content:has(.owner-overview) .owner-kpi,
+.content:has(.owner-overview) .owner-tile{
+  background-color:#edf4ff;
+  border-color:#d5e3fa;
+}
+.content:has(.owner-overview) .owner-event,
+.content:has(.owner-overview) .owner-quick-link{
+  background-color:#f8fbff;
+  border-color:#cadcf7;
+}
+.content:has(.owner-overview) .owner-insight,
+.content:has(.owner-overview) .owner-check,
+.content:has(.owner-overview) .owner-summary-row{
+  border-color:#d7e5fb;
+}
+.content:has(.owner-overview) .owner-kpi-budget{
+  background:linear-gradient(125deg,#214ed1,#3976f3);
+  color:#fff;
+}
+.content:has(.owner-overview) .owner-vitrine{
+  background:linear-gradient(105deg,#122862,#4b35aa 75%,#1166c3);
+}
+@media(max-width:1050px){
+  .content:has(.owner-overview) .owner-hero::before{
+    background-size:77% auto;
+    background-position:right 51%;
+  }
+}
+@media(max-width:800px){
+  .content:has(.owner-overview) .owner-hero::before{
+    background-size:auto 175%;
+    background-position:right 52%;
+    opacity:.55;
+  }
+}
+@media(max-width:540px){
+  .content:has(.owner-overview) .owner-hero::before{
+    background-size:auto 135%;
+    background-position:right 53%;
+    opacity:.26;
+  }
+}
