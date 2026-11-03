@@ -17,12 +17,12 @@ const destinations=[
  {title:'Leads da vitrine',href:'/vitrine/inbox',detail:'Solicitações recebidas'},
  {title:'Intelligence',href:'/intelligence',detail:'Relatórios e apoio à decisão'},
 ];
-export default function DashboardSearch(){
+export default function DashboardSearch({onHome}:{onHome:()=>void}){
  const [opened,setOpened]=useState(false);
  const [value,setValue]=useState('');
  const filtered=destinations.filter(item=>(item.title+' '+item.detail).toLocaleLowerCase('pt-BR').includes(value.toLocaleLowerCase('pt-BR'))).slice(0,9);
  return <div className="dashboard-search">
    <button type="button" className="icon-button" aria-label="Pesquisar funcionalidades" aria-expanded={opened} onClick={()=>setOpened(x=>!x)}><Search size={19}/></button>
-   {opened&&<div className="dashboard-search-popover"><div className="dashboard-search-title"><strong>Encontrar uma função</strong><button type="button" onClick={()=>setOpened(false)} aria-label="Fechar pesquisa"><X size={17}/></button></div><label className="dashboard-search-label">Pesquisar no CRM<input autoFocus value={value} onChange={e=>setValue(e.target.value)} placeholder="Ex.: contratos, clientes, relatórios"/></label><div className="dashboard-search-results">{filtered.map(item=><Link key={item.href} href={item.href} onClick={()=>setOpened(false)}><strong>{item.title}</strong><small>{item.detail}</small></Link>)}{filtered.length===0&&<p>Nenhuma função encontrada.</p>}</div><p className="dashboard-search-note">Busca por módulos e funcionalidades, não pelo conteúdo dos clientes.</p></div>}
+   {opened&&<div className="dashboard-search-popover"><div className="dashboard-search-title"><strong>Encontrar uma função</strong><button type="button" onClick={()=>setOpened(false)} aria-label="Fechar pesquisa"><X size={17}/></button></div><label className="dashboard-search-label">Pesquisar no CRM<input autoFocus value={value} onChange={e=>setValue(e.target.value)} placeholder="Ex.: contratos, clientes, relatórios"/></label><div className="dashboard-search-results">{filtered.map(item=><Link key={item.href} href={item.href} onClick={()=>{if(item.href==='/')onHome();setOpened(false)}}><strong>{item.title}</strong><small>{item.detail}</small></Link>)}{filtered.length===0&&<p>Nenhuma função encontrada.</p>}</div><p className="dashboard-search-note">Busca por módulos e funcionalidades, não pelo conteúdo dos clientes.</p></div>}
  </div>;
 }
