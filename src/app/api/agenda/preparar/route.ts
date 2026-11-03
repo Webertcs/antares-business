@@ -1,14 +1,12 @@
 import {NextRequest,NextResponse} from 'next/server';
 import {requireOwner,getTeamWriteDb} from '@/lib/equipe/auth';
+import {assertAgendaWriteAllowed} from '@/lib/equipe/agenda-write-guard';
 export const dynamic='force-dynamic';export const runtime='nodejs';
 const fail=(error:string,status:number)=>NextResponse.json({error},{status});
 const uuid=/^[0-9a-f]{8}(-[0-9a-f]{4}){3}-[0-9a-f]{12}$/i;
 export async function POST(request:NextRequest){
  const owner=await requireOwner();if(!owner)return fail('Somente proprietário',403);
- if(process.env.ANTARES_AGENDA_WRITES_ENABLED!=='true')return fail('Preparação de reservas bloqueada até a homologação',503);
- const origin=request.headers.get('origin'),host=request.headers.get('host');
- try{if(!origin||!host||new URL(origin).host!==host)return fail('Origem inválida',403);}catch{return fail('Origem inválida',403);}
- if(request.headers.get('content-type')?.split(';')[0]?.trim()!=='application/json')return fail('Formato inválido',415);
+ const denied=await assertAgendaWriteAllowed(request);if(denied)return denied;
  try{
  const v=await request.json(),db=getTeamWriteDb();
  if(v?.action==='link-client'&&typeof v.proposalId==='string'&&uuid.test(v.proposalId)){
