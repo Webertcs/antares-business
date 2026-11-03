@@ -762,3 +762,6 @@
  .cal-page .cal-day > span { font-size: 13px; }
  .cal-page .cal-day small { font-size: 11px; }
 }
+
+/* Agenda master: dias um pouco mais altos para facilitar a leitura */
+.cal-page .cal-days .cal-day{height:clamp(66px,9vh,82px);min-height:clamp(66px,9vh,82px);max-height:none;padding:8px;gap:5px}
