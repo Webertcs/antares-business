@@ -199,10 +199,10 @@ export default function OficinaV1(){
    <div className="oficina-logo">✦ ANTARES <span>BUSINESS V1</span></div>
    <p className="oficina-caption">OFICINA FUNCIONAL · ETAPA 1</p>
    {groups.map(g=><div key={g.label}><h3>{g.label}</h3>{g.items.map(item=><button key={item.id} onClick={()=>go(item.id)} className={module===item.id?'active':''}><item.icon size={17}/>{names[item.id]}{records[item.id].length>0&&<span>{records[item.id].length}</span>}</button>)}</div>)}
-   <Link href="/" className="oficina-back">← Voltar ao painel existente</Link>
+   <Link href="/" className="oficina-back">← Dashboard principal</Link>
   </aside>
   <main className="oficina-main">
-   <header className="oficina-top"><button onClick={()=>setMobile(v=>!v)} className="oficina-toggle" aria-label="Abrir menu">☰</button><div><strong>ANTARES BUSINESS</strong><span>Oficina V1 · pré-integração</span></div><span className="oficina-pill">Dados locais temporários</span></header>
+   <header className="oficina-top"><button onClick={()=>setMobile(v=>!v)} className="oficina-toggle" aria-label="Abrir menu">☰</button><div><strong>ANTARES BUSINESS</strong><span>Laboratório exclusivo de desenvolvimento</span></div><div className="oficina-header-actions"><span className="oficina-pill">Ambiente demonstrativo</span><Link href="/" className="oficina-return" aria-label="Voltar ao Dashboard principal">← Voltar ao Dashboard</Link></div></header>
    <div className="oficina-content">
     <div className="oficina-heading"><div><p>FLUXOS DO PRODUTO</p><h1>{fieldInfo?.title||names[module]}</h1><span>{fieldInfo?.description||(module==='visao'?'Todos os módulos da etapa 1 em um só lugar':module==='relatorios'?'Indicadores e exportações para conferência':'Vitrine e captação de orçamentos')}</span></div>{fieldInfo&&<button className="oficina-primary" onClick={()=>start()}><Plus size={17}/> Novo registro</button>}</div>
     <div className="oficina-warning" role="status"><strong>Estado do banco:</strong> {dbStatus}. Nenhuma gravação é enviada ao Neon nesta oficina.</div>
