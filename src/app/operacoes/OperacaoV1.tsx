@@ -13,6 +13,7 @@ export default function OperacaoV1({writesEnabled,contractWritesEnabled}:{writes
  const [data,setData]=useState<State>(empty),[error,setError]=useState(''),[loading,setLoading]=useState(true);
  const [unavailable,setUnavailable]=useState<string[]>([]);
  const [tab,setTab]=useState<'comercial'|'contratos'|'agenda'|'financeiro'|'balanco'|'auditoria'>('comercial');
+ useEffect(()=>{const area=new URLSearchParams(window.location.search).get('area');if(area==='comercial'||area==='contratos'||area==='agenda'||area==='financeiro'||area==='balanco'||area==='auditoria')setTab(area)},[]);
  const [term,setTerm]=useState('');
  const [balance,setBalance]=useState<Balance|null>(null);
  const [dataEvents,setDataEvents]=useState<RecordRow[]>([]);
@@ -103,15 +104,15 @@ export default function OperacaoV1({writesEnabled,contractWritesEnabled}:{writes
     style={{display:'inline-block',padding:'9px 12px',border:'1px solid #93c5fd',borderRadius:9,
       color:'#1d4ed8',background:'#eff6ff',textDecoration:'none',fontWeight:600,fontSize:13}}>
    Exportar {type} (CSV)</a>;
- const base:React.CSSProperties={border:'1px solid #cbd5e1',borderRadius:14,padding:18,background:'#f8fafc'};
- return <main style={{maxWidth:1250,margin:'0 auto',padding:'28px 18px',fontFamily:'system-ui',color:'#0f172a'}}>
- <Link href="/">← Painel</Link>
+ const base:React.CSSProperties={border:'1px solid #d2e0f9',borderRadius:14,padding:16,background:'#edf4ff'};
+ return <main className="operations-refined" style={{maxWidth:1250,margin:'0 auto',padding:'18px 22px 26px',fontFamily:'system-ui',color:'#153763'}}>
+ <Link className="operations-back" href="/?section=operacao">← Voltar</Link>
  <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',gap:12,flexWrap:'wrap'}}>
- <div><p style={{fontSize:12,letterSpacing:2,marginBottom:6}}>ANTARES BUSINESS · V1</p><h1 style={{fontSize:30,fontWeight:750}}>Central de Operações</h1>
- <p>Comercial, contratos, cúpulas, caixa e auditoria em uma visão única.</p></div>
+ <div><h1 style={{fontSize:27,fontWeight:800,margin:'9px 0 3px'}}>Central de Operações</h1>
+ <p style={{fontSize:12,margin:'0',color:'#60769a'}}>Acompanhe propostas, contratos, apresentações e registros do planetário.</p></div>
  <Link href="/clientes" style={{background:'#2563eb',color:'white',padding:12,borderRadius:9,textDecoration:'none'}}>Abrir cadastro de clientes</Link></div>
  {loading&&<p role="status">Carregando informações do planetário...</p>}
- {error&&<div role="alert" style={{...base,borderColor:'#b45309',marginTop:20}}>O núcleo da V1 ainda não foi implantado no Neon. {error} As gravações deste módulo permanecem bloqueadas.</div>}
+ {error&&<div role="alert" style={{...base,borderColor:'#b45309',marginTop:20}}>Não foi possível consultar todas as informações. {error} Consulte os dados disponíveis antes de realizar novas operações.</div>}
  {!loading&&!error&&unavailable.length>0&&<div role="status" style={{...base,borderColor:'#f59e0b',marginTop:16}}>Algumas áreas estão em implantação: {unavailable.join(', ')}. Os demais dados estão disponíveis para consulta. Gravações permanecem bloqueadas.</div>}
  {!loading&&!error&&<>
  <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(175px,1fr))',gap:12,margin:'20px 0'}}>
@@ -135,7 +136,7 @@ export default function OperacaoV1({writesEnabled,contractWritesEnabled}:{writes
  <nav aria-label="Áreas operacionais" style={{display:'flex',gap:8,flexWrap:'wrap',margin:'16px 0'}}>
  {([['comercial','Propostas'],['contratos','Contratos'],['agenda','Agenda e cúpulas'],['financeiro','Financeiro'],['balanco','Balanço mensal'],['auditoria','Auditoria']] as const).map(([k,l])=>
  <button key={k} onClick={()=>setTab(k)} aria-current={tab===k?'page':undefined}
- style={{padding:'10px 15px',borderRadius:10,background:tab===k?'#1d4ed8':'#e2e8f0',color:tab===k?'#fff':'#0f172a'}}>{l}</button>)}</nav>
+ style={{padding:'9px 13px',borderRadius:9,border:'1px solid '+(tab===k?'#2558d7':'#c2d7f6'),background:tab===k?'#2458d3':'#f8fbff',color:tab===k?'#fff':'#2352a0',fontWeight:700,fontSize:12,cursor:'pointer'}}>{l}</button>)}</nav>
  {tab==='comercial'&&<section style={base}><h2 style={{fontSize:21,fontWeight:650}}>Propostas e orçamentos</h2>{writesEnabled&&<button onClick={()=>openForm('proposal')} style={{padding:10,background:'#2563eb',color:'#fff',borderRadius:8}}>+ Nova proposta</button>}<p>Valores previstos, negociação e condições comerciais por cliente.</p>
   <input aria-label="Pesquisar proposta" placeholder="Pesquisar proposta ou cliente" value={term} onChange={e=>setTerm(e.target.value)} style={{padding:11,border:'1px solid #94a3b8',borderRadius:8,width:'100%',margin:'10px 0'}}/>
   <Rows heads={['Proposta','Cliente','Total','Situação','Validade']}
