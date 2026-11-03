@@ -1,14 +1,19 @@
 // ANTARES 51A — Apenas GET/POST sem autenticação e sem criar colaboradores.
 // Uso: node --env-file=.env.local scripts/51a-equipe-http-seguro.mjs
+// Execute somente com ANTARES_TEAM_WRITES_ENABLED=false (bloqueio esperado: 503).
+if(process.env.ANTARES_TEAM_WRITES_ENABLED!=='false'){
+ console.error('BLOQUEADO: mantenha ANTARES_TEAM_WRITES_ENABLED=false para este teste.');
+ process.exit(1);
+}
 const base=process.env.ANTARES_APP_ORIGIN||'http://localhost:3000';
 const checks=[
  ['Pré-voo anônimo','/api/equipe/preflight','GET',undefined,403],
  ['Listagem anônima','/api/equipe','GET',undefined,403],
  ['Convites anônimos','/api/equipe/convites','GET',undefined,403],
- ['Gerar convite anônimo','/api/equipe/convites','POST',{name:'Teste sem sessão',email:'sem-sessao@example.invalid'},403],
- ['Revogação anônima','/api/equipe/convites/revogar','POST',{invitationId:'00000000-0000-4000-8000-000000000001'},403],
+ ['Gerar convite anônimo','/api/equipe/convites','POST',{name:'Teste sem sessão',email:'sem-sessao@example.invalid'},503],
+ ['Revogação anônima','/api/equipe/convites/revogar','POST',{invitationId:'00000000-0000-4000-8000-000000000001'},503],
  ['Suspensão anônima','/api/equipe/suspender','POST',{memberId:'00000000-0000-4000-8000-000000000001'},403],
- ['Aceite anônimo','/api/equipe/convites/aceitar','POST',{token:'0'.repeat(64)},403]
+ ['Aceite anônimo','/api/equipe/convites/aceitar','POST',{token:'0'.repeat(64)},503]
 ];
 let failures=0;
 for(const [label,path,method,body,expected] of checks){
