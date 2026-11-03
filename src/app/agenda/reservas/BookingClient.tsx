@@ -21,7 +21,7 @@ export default function BookingClient({enabled}:{enabled:boolean}){
   setStatus('Proposta ou cúpula indisponível para reserva. Atualize a página.');return;
  }
  const fmt=new Intl.DateTimeFormat('pt-BR',{dateStyle:'short',timeStyle:'short'});
- const confirmed=window.confirm('Confirmar reserva permanente?\n\nInstituição: '+chosen.client_name+'\nProposta: '+chosen.title+'\nCúpula: '+chosenDome.name+'\nInício: '+fmt.format(new Date(start))+'\nTérmino: '+fmt.format(new Date(end))+'\n\nA reserva ficará registrada no histórico do CRM.');
+  const confirmed=window.confirm(['Confirmar reserva permanente?','','Instituição: '+chosen.client_name,'Proposta: '+chosen.title,'Cúpula: '+chosenDome.name,'Início: '+fmt.format(new Date(start)),'Término: '+fmt.format(new Date(end)),'','A reserva ficará registrada no histórico do CRM.'].join(String.fromCharCode(10)));
  if(!confirmed)return;
  setBusy(true);setStatus('');
  try{const r=await fetch('/api/agenda/reservas',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({proposalId,domeId,start:new Date(start).toISOString(),end:new Date(end).toISOString()})});const v=await r.json();if(!r.ok)throw Error(v.error||'Reserva não registrada');await load();setStatus('Reserva registrada. Consulte a Agenda.');setProposalId('');setDomeId('');}
