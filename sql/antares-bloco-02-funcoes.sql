@@ -75,7 +75,7 @@ REVOKE ALL ON FUNCTION public.antares_save_event_operation(text,uuid,text,text,t
 REVOKE ALL ON FUNCTION public.antares_save_event_task(text,uuid,uuid,text,boolean) FROM PUBLIC;
 REVOKE ALL ON FUNCTION public.antares_save_event_session(text,uuid,uuid,text,time,time,integer) FROM PUBLIC;
 -- Liberar somente a role de runtime restrita usada por getTeamWriteDb.
--- PENDENTE: conceder EXECUTE apenas à role real e validada de DATABASE_URL_TEAM_RUNTIME.
--- PENDENTE: GRANT de antares_save_event_task após conferência da role.
--- PENDENTE: GRANT de antares_save_event_session após conferência da role.
+GRANT EXECUTE ON FUNCTION public.antares_save_event_operation(text,uuid,text,text,text,text) TO antares_team_runtime;
+GRANT EXECUTE ON FUNCTION public.antares_save_event_task(text,uuid,uuid,text,boolean) TO antares_team_runtime;
+GRANT EXECUTE ON FUNCTION public.antares_save_event_session(text,uuid,uuid,text,time,time,integer) TO antares_team_runtime;
 COMMIT;
