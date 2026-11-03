@@ -23,6 +23,7 @@ export default function ClientsPage({ writesEnabled }: { writesEnabled: boolean 
  const [restoreStatus,setRestoreStatus]=useState('prospect');
  const [showArchived,setShowArchived]=useState(false);
  const [selected,setSelected]=useState<string|null>(null);
+ useEffect(()=>{const id=new URLSearchParams(window.location.search).get('clientId');if(id&&clients.some(c=>c.id===id))setSelected(id);},[clients]);
  const historyDialog=useRef<HTMLDialogElement>(null);
  useEffect(()=>{if(selected)historyDialog.current?.showModal();},[selected]);
  const [form,setForm]=useState<'client'|'contact'|'event'|null>(null);
