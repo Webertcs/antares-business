@@ -7,7 +7,7 @@ export async function GET(){
   const ctx=await requireMember();
   if(!ctx)return NextResponse.json({error:'Acesso não autorizado.'},{status:403});
   const db=getDb();
-  const [bookings,domes]=await Promise.all([
+  const [bookings,domes,crmEvents]=await Promise.all([
    db`SELECT p.id,p.title AS event_title,p.starts_at,p.ends_at,p.status,
       p.dome_id,COALESCE(d.name,'Sem cúpula') AS dome_name
       FROM public.presentations p
@@ -18,8 +18,9 @@ export async function GET(){
       WHERE p.organization_id=${ctx.organizationId}
       ORDER BY p.starts_at DESC LIMIT 1000`,
    db`SELECT id,name,active FROM public.antares_domes
-      WHERE organization_id=${ctx.organizationId} ORDER BY name`
+      WHERE organization_id=${ctx.organizationId} ORDER BY name`,
+   db`SELECT id,title AS event_title,event_date,status FROM public.crm_events WHERE organization_id=${ctx.organizationId} AND event_date IS NOT NULL ORDER BY event_date DESC LIMIT 1000`
   ]);
-  return NextResponse.json({bookings,domes},{headers:{'Cache-Control':'private, no-store'}});
+  return NextResponse.json({bookings,domes,crmEvents},{headers:{'Cache-Control':'private, no-store'}});
  }catch{return NextResponse.json({error:'Agenda indisponível. Confira a estrutura de apresentações.'},{status:503,headers:{'Cache-Control':'no-store'}});}
 }
