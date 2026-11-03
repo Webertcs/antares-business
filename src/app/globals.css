@@ -519,3 +519,41 @@
 .operations-dome-table-title{margin:17px 0 0;border-top:1px solid #cdddf4;padding-top:13px}
 .operations-readonly-note{font-size:11px;color:#647b9a;margin:10px 0 0;padding:8px 11px;background:#edf4ff;border-radius:9px}
 @media(max-width:680px){.operations-dome-kpis{grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}.operations-dome-kpis>div{padding:9px}.operations-dome-kpis strong{font-size:18px}.operations-dome-head{align-items:flex-start}}
+
+/* Bloco 45C — paginas exclusivas: cupulas e historico operacional. */
+.operation-detail{max-width:1180px;margin:0 auto;padding:22px 24px 32px;color:#173767}
+.operation-detail-back{display:inline-flex;align-items:center;padding:6px 12px;background:#dce9ff;border:1px solid #9cbdf6;border-radius:8px;color:#1d52ad;font-size:12px;font-weight:750;text-decoration:none}
+.operation-detail-back:hover{background:#c9ddff}
+.operation-detail-back:focus-visible,.operation-detail-action:focus-visible{outline:3px solid #8db8ff;outline-offset:2px}
+.operation-detail-head{display:flex;align-items:center;justify-content:space-between;gap:13px;flex-wrap:wrap;margin:12px 0 18px}
+.operation-detail-head h1{font-size:clamp(23px,2.4vw,30px);margin:0 0 5px;letter-spacing:-.5px}
+.operation-detail-head p{color:#627a9e;font-size:12px;margin:0}
+.operation-detail-action{display:inline-block;text-decoration:none;background:#2458d3;color:white;font-weight:750;font-size:12px;border-radius:10px;padding:11px 15px}
+.operation-detail-action:hover{background:#1b4ab8}
+.operation-detail-metrics{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:11px;margin-bottom:15px}
+.operation-detail-metrics>div{background:#edf4ff;border:1px solid #d2e0f9;padding:17px;border-radius:13px;display:flex;flex-direction:column;gap:8px}
+.operation-detail-metrics span{color:#5f789d;font-size:12px}
+.operation-detail-metrics strong{font-size:25px;line-height:1.1;font-variant-numeric:tabular-nums}
+.operation-detail-panel{background:#edf4ff;border:1px solid #d2e0f9;border-radius:15px;padding:18px}
+.operation-detail-panel h2{font-size:18px;margin:0 0 15px}
+.operation-detail-empty{background:#f9fbff;border:1px dashed #c7d9f5;border-radius:12px;padding:32px 15px;text-align:center}
+.operation-detail-empty p{font-size:13px;font-weight:700;margin:0 0 7px}
+.operation-detail-empty small{color:#627a9e}
+.operation-dome-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.operation-dome-card{background:#f9fbff;border:1px solid #cbdcf7;border-radius:12px;padding:17px}
+.operation-dome-top{display:flex;gap:8px;align-items:center;justify-content:space-between}
+.operation-dome-top h3{font-size:16px;margin:0}
+.operation-status-active,.operation-status-inactive{font-size:11px;font-weight:750;border-radius:50px;padding:5px 9px;white-space:nowrap}
+.operation-status-active{color:#14653c;background:#e1f5e9}
+.operation-status-inactive{color:#6c5367;background:#ece6ed}
+.operation-dome-card dl{margin:13px 0 0;display:grid;gap:8px}
+.operation-dome-card dl>div{display:flex;justify-content:space-between;gap:8px;border-top:1px solid #e0e9f9;padding-top:9px;font-size:12px}
+.operation-dome-card dt{color:#617a9e}
+.operation-dome-card dd{margin:0;font-weight:700;text-align:right}
+.operation-detail-warning{padding:13px;color:#845319;background:#fff0d7;border-radius:10px;font-size:12px}
+.operation-detail-table-scroll{max-height:430px;overflow:auto;border-radius:10px;border:1px solid #d2e0f9}
+.operation-detail-table-scroll table{width:100%;border-collapse:collapse;font-size:12px;text-align:left;background:#f9fbff}
+.operation-detail-table-scroll th{position:sticky;top:0;background:#dfeaff;color:#31558c;padding:12px 10px}
+.operation-detail-table-scroll td{padding:11px 10px;border-top:1px solid #dfe9f8}
+.operation-detail-id{font-family:ui-monospace,monospace;font-size:11px;color:#547198;word-break:break-all}
+@media(max-width:720px){.operation-detail{padding:14px}.operation-dome-grid{grid-template-columns:1fr}.operation-detail-metrics{gap:6px}.operation-detail-metrics>div{padding:12px}.operation-detail-metrics strong{font-size:20px}.operation-detail-panel{padding:12px}}
