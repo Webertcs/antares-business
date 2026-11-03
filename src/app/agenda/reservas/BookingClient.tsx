@@ -12,7 +12,7 @@ export default function BookingClient({enabled}:{enabled:boolean}){
  useEffect(()=>{load().then(()=>setStatus('')).catch(e=>setStatus(e.message));},[]);
  const eligible=data?.proposals.filter(p=>p.mapped&&!data.links.some(l=>l.proposal_id===p.id))||[];
  const domes=data?.domes.filter(d=>d.mapped)||[];
- async function prepare(body:Record<string,unknown>){if(!enabled||busy)return;setBusy(true);setStatus('');try{const response=await fetch('/api/agenda/preparar',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});const data=await response.json();if(!response.ok)throw Error(data.error||'Não foi possível preparar a Agenda');await load();setStatus('Cadastro preparado para a Agenda.');}catch(e){setStatus(e instanceof Error?e.message:'Erro');}finally{setBusy(false);}}
+ async function prepare(body:Record<string,unknown>){if(!enabled||busy)return;if(!window.confirm('Vincular este cliente à operação? O cadastro ficará salvo no banco e não será removido automaticamente. Não use uma instituição fictícia.'))return;setBusy(true);setStatus('');try{const response=await fetch('/api/agenda/preparar',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});const data=await response.json();if(!response.ok)throw Error(data.error||'Não foi possível preparar a Agenda');await load();setStatus('Cadastro preparado para a Agenda.');}catch(e){setStatus(e instanceof Error?e.message:'Erro');}finally{setBusy(false);}}
  async function submit(e:React.FormEvent){e.preventDefault();if(!enabled||busy)return;
  if(!proposalId||!domeId||!start||!end||!Number.isFinite(new Date(start).getTime())||!Number.isFinite(new Date(end).getTime())||new Date(end)<=new Date(start)){setStatus('Confira a proposta, a cúpula e os horários: término deve ser posterior ao início.');return;}
  const chosen=data?.proposals.find(p=>p.id===proposalId);
@@ -21,7 +21,7 @@ export default function BookingClient({enabled}:{enabled:boolean}){
   setStatus('Proposta ou cúpula indisponível para reserva. Atualize a página.');return;
  }
  const fmt=new Intl.DateTimeFormat('pt-BR',{dateStyle:'short',timeStyle:'short'});
- const confirmed=window.confirm('Confirmar reserva permanente?\\n\\nInstituição: '+chosen.client_name+'\\nProposta: '+chosen.title+'\\nCúpula: '+chosenDome.name+'\\nInício: '+fmt.format(new Date(start))+'\\nTérmino: '+fmt.format(new Date(end))+'\\n\\nA reserva ficará registrada no histórico do CRM.');
+ const confirmed=window.confirm('Confirmar reserva permanente?\n\nInstituição: '+chosen.client_name+'\nProposta: '+chosen.title+'\nCúpula: '+chosenDome.name+'\nInício: '+fmt.format(new Date(start))+'\nTérmino: '+fmt.format(new Date(end))+'\n\nA reserva ficará registrada no histórico do CRM.');
  if(!confirmed)return;
  setBusy(true);setStatus('');
  try{const r=await fetch('/api/agenda/reservas',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({proposalId,domeId,start:new Date(start).toISOString(),end:new Date(end).toISOString()})});const v=await r.json();if(!r.ok)throw Error(v.error||'Reserva não registrada');await load();setStatus('Reserva registrada. Consulte a Agenda.');setProposalId('');setDomeId('');}
