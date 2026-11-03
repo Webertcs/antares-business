@@ -1,6 +1,7 @@
 'use client';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import Link from 'next/link';
+import styles from './clientes.module.css';
 type Client = {id:string;kind:string;name:string;email:string|null;phone:string|null;city:string|null;status:string;notes:string|null;created_at:string};
 type Contact = {id:string;client_id:string;full_name:string;position:string|null;email:string|null;phone:string|null;whatsapp:boolean;is_primary:boolean};
 type Event = {id:string;client_id:string;title:string;event_kind:string;event_date:string|null;expected_attendees:number|null;pricing_model:string;price_per_person:number|null;fixed_amount:number|null;status:string;venue:string|null;notes:string|null};
@@ -16,6 +17,10 @@ export default function ClientsPage({ writesEnabled }: { writesEnabled: boolean 
  const [loading,setLoading]=useState(true);
  const [query,setQuery]=useState('');
  const [kind,setKind]=useState('all');
+ const restoreDialog=useRef<HTMLDialogElement>(null);
+ const [restoreClient,setRestoreClient]=useState<Client|null>(null);
+ useEffect(()=>{if(restoreClient)restoreDialog.current?.showModal();},[restoreClient]);
+ const [restoreStatus,setRestoreStatus]=useState('prospect');
  const [showArchived,setShowArchived]=useState(false);
  const [selected,setSelected]=useState<string|null>(null);
  const [form,setForm]=useState<'client'|'contact'|'event'|null>(null);
@@ -35,7 +40,7 @@ export default function ClientsPage({ writesEnabled }: { writesEnabled: boolean 
  }
  const setField=(key:string,value:string)=>setFields(f=>({...f,[key]:value}));
  async function submit(e:React.FormEvent<HTMLFormElement>){
-   e.preventDefault();if(!writesEnabled || !form)return;
+   e.preventDefault();if(!writesEnabled || !form || saving)return;
    const body={...fields,action:form,id:editing,clientId:selected,
      whatsapp:fields.whatsapp==='true',primary:fields.primary==='true'};
    setFeedback('');setSaving(true);
@@ -63,39 +68,44 @@ export default function ClientsPage({ writesEnabled }: { writesEnabled: boolean 
  const active=clients.find(c=>c.id===selected);
  const selectedContacts=contacts.filter(c=>c.client_id===selected);
  const selectedEvents=events.filter(e=>e.client_id===selected);
- async function archiveClient(client:Client){
+ async function archiveClient(client:Client,restoreTo?:string){
   if(!writesEnabled||saving)return;
   const archive=client.status!=='inactive';
-  if(!window.confirm((archive?'Arquivar':'Reativar')+' o cliente '+client.name+'? O histórico, os eventos e as propostas serão preservados.'))return;
+  if(!archive&&!restoreTo){setFeedback('');setRestoreStatus('prospect');setRestoreClient(client);return;}
+  if(archive&&!window.confirm((archive?'Arquivar':'Reativar')+' o cliente '+client.name+'? O histórico, os eventos e as propostas serão preservados.'))return;
   setSaving(true);setFeedback('');
   try{
    const response=await fetch('/api/crm/clientes',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({
     action:'client',id:client.id,kind:client.kind,name:client.name,email:client.email||'',phone:client.phone||'',
-    city:client.city||'',notes:client.notes||'',status:archive?'inactive':'active'
+    city:client.city||'',notes:client.notes||'',status:archive?'inactive':restoreTo
    })});
    const data=await response.json();if(!response.ok)throw Error(data.error||'Falha ao atualizar cliente');
    setFeedback(archive?'Cliente arquivado; registros e vínculos preservados.':'Cliente reativado.');
+   setRestoreClient(null);
+   if(archive&&selected===client.id){setSelected(null);setForm(null);}
    setRevision(n=>n+1);
   }catch(e){setFeedback(e instanceof Error?e.message:'Operação indisponível');}
   finally{setSaving(false)}
  }
  const countBy=(k:string)=>clients.filter(c=>c.kind===k).length;
- return <main style={{maxWidth:1180,margin:'0 auto',padding:'28px 18px',fontFamily:'system-ui'}}>
+ return <main className={styles.page} style={{maxWidth:1180,margin:'0 auto',padding:'28px 18px',fontFamily:'system-ui'}}>
   <Link href="/">← Voltar ao painel</Link>
-  <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',gap:16,flexWrap:'wrap',margin:'20px 0'}}>
-   <div><p style={{letterSpacing:2,fontSize:12}}>ANTARES BUSINESS · BLOCO 03</p>
+  <div className={styles.hero} style={{display:'flex',justifyContent:'space-between',alignItems:'center',gap:16,flexWrap:'wrap',margin:'20px 0'}}>
+   <div><p style={{letterSpacing:2,fontSize:12}}>ANTARES · RELACIONAMENTO</p>
     <h1 style={{fontSize:30,fontWeight:750}}>Clientes e Eventos</h1>
     <p>Escolas, empresas, associações e apresentações em um só lugar.</p></div>
    <div style={{display:'flex',gap:8,alignItems:'center',flexWrap:'wrap'}}>
-   <span style={{border:'1px solid #eab308',padding:'8px 12px',borderRadius:10}}>{writesEnabled?"Cadastros liberados":"Cadastros em homologação"}</span>
+   <span className={styles.access} style={{border:'1px solid #eab308',padding:'8px 12px',borderRadius:10}}>{writesEnabled?"Cadastros liberados":"Cadastros em homologação"}</span>
    <Link href="/vitrine/inbox" style={{padding:12,borderRadius:9,border:'1px solid #2563eb',textDecoration:'none'}}>📨 Solicitações da vitrine</Link>
    <button type="button" disabled={!writesEnabled} onClick={()=>openForm('client')} style={{padding:12,borderRadius:9,background:'#2563eb',color:'#fff',opacity:writesEnabled?1:.5}}>+ Novo cliente</button></div>
   </div>
   <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(160px,1fr))',gap:12,marginBottom:20}}>
-   {[['Clientes',clients.length],['Escolas',countBy('school')],['Empresas',countBy('company')],['Associações',countBy('association')],['Eventos',events.length]].map(([t,n])=>
-    <section key={t} style={{border:'1px solid #94a3b8',padding:18,borderRadius:14}}><div>{t}</div><strong style={{fontSize:26}}>{n}</strong></section>)}
+   {[['Clientes cadastrados',clients.length],['Em acompanhamento',clients.filter(c=>c.status!=='inactive').length],['Arquivados',clients.filter(c=>c.status==='inactive').length],['Escolas cadastradas',countBy('school')],['Eventos registrados',events.length]].map(([t,n])=>
+    <section className={styles.metric} key={t} style={{border:'1px solid #94a3b8',padding:18,borderRadius:14}}><div>{t}</div><strong style={{fontSize:26}}>{n}</strong></section>)}
   </div>
-  <section style={{border:'1px solid #94a3b8',borderRadius:14,padding:18,marginBottom:20}}>
+  <p className={styles.caption}>Clientes e escolas cadastrados incluem arquivados. Em acompanhamento reúne ativos e prospectos. Os filtros alteram apenas a lista.</p>
+  <section className={styles.directory} style={{border:'1px solid #94a3b8',borderRadius:14,padding:18,marginBottom:20}}>
+   <div className={styles.sectionHeading}><div><h2>Base de clientes</h2><p>Encontre cadastros e acompanhe o relacionamento.</p></div><span>{filtered.length} na lista</span></div>
    <div style={{display:'flex',gap:12,flexWrap:'wrap',marginBottom:16}}>
     <input value={query} onChange={e=>setQuery(e.target.value)} placeholder="Pesquisar cliente, cidade ou e-mail"
      aria-label="Buscar clientes" style={{padding:12,borderRadius:9,border:'1px solid #94a3b8',flex:'1 1 250px',color:'#111',background:'#fff'}}/>
@@ -107,14 +117,14 @@ export default function ClientsPage({ writesEnabled }: { writesEnabled: boolean 
     <label style={{display:'flex',alignItems:'center',gap:6,fontSize:13,whiteSpace:'nowrap'}}><input type="checkbox" checked={showArchived} onChange={e=>setShowArchived(e.target.checked)}/> Mostrar arquivados</label>
    </div>
    {loading?<p>Carregando clientes...</p>:error?<p role="alert">{error}</p>:
-    filtered.length===0?<p>Nenhum cliente encontrado. A inclusão será liberada após a homologação de segurança.</p>:
+    filtered.length===0?<div className={styles.empty}><h3>Nenhum cliente nesta visualização</h3><p>{clients.length===0?(writesEnabled?'Cadastre o primeiro cliente para começar.':'Nenhum cadastro disponível para consulta.'):query||kind!=='all'?'Tente outro nome, cidade ou tipo de cliente.':'Marque Mostrar arquivados para consultar os cadastros guardados.'}</p></div>:
     <div style={{overflowX:'auto'}}><table style={{width:'100%',textAlign:'left',borderCollapse:'collapse'}}>
     <thead><tr>{['Cliente','Tipo','Cidade','Situação','Detalhes'].map(x=><th key={x} style={{padding:'12px 8px',borderBottom:'1px solid #94a3b8'}}>{x}</th>)}</tr></thead>
     <tbody>{filtered.map(c=><tr key={c.id}><td style={{padding:10,borderBottom:'1px solid #94a3b8'}}><strong>{c.name}</strong></td>
-    <td>{kinds[c.kind]||c.kind}</td><td>{c.city||'—'}</td><td>{statuses[c.status]||c.status}</td>
-    <td><button onClick={()=>setSelected(c.id===selected?null:c.id)} style={{padding:8,borderRadius:8,background:'#2563eb',color:'white'}} >{c.id===selected?'Fechar':'Ver histórico'}</button> {writesEnabled&&<><button onClick={()=>openForm('client',c)}>Editar</button> <button type="button" disabled={saving} onClick={()=>archiveClient(c)} style={{padding:8,borderRadius:8,border:'1px solid #a9bddc',background:'#eef4ff',color:'#234d89'}}>{c.status==='inactive'?'Reativar':'Arquivar'}</button></>}</td></tr>)}</tbody></table></div>}
+    <td>{kinds[c.kind]||c.kind}</td><td>{c.city||'—'}</td><td><span className={styles.badge} data-status={c.status}>{c.status==='inactive'?'Arquivado':statuses[c.status]||c.status}</span></td>
+    <td><div className={styles.actions}><button disabled={saving} onClick={()=>setSelected(c.id===selected?null:c.id)} style={{padding:8,borderRadius:8,background:'#2563eb',color:'white'}} >{c.id===selected?'Fechar':'Ver histórico'}</button> {writesEnabled&&<><button disabled={saving} onClick={()=>openForm('client',c)}>Editar</button> <button type="button" disabled={saving} onClick={()=>archiveClient(c)} style={{padding:8,borderRadius:8,border:'1px solid #a9bddc',background:'#eef4ff',color:'#234d89'}}>{c.status==='inactive'?'Reativar':'Arquivar'}</button></>}</div></td></tr>)}</tbody></table></div>}
   </section>
-  {active&&<section style={{border:'1px solid #94a3b8',borderRadius:14,padding:20}}>
+  {active&&<section className={styles.history} style={{border:'1px solid #94a3b8',borderRadius:14,padding:20}}>
    <h2 style={{fontSize:23,fontWeight:700}}>{active.name}</h2>
    <p>{kinds[active.kind]} · {active.city||'Cidade não informada'} · {statuses[active.status]||active.status}</p>
    <p>{active.email||'Sem e-mail'} · {active.phone||'Sem telefone'}</p>
@@ -128,8 +138,8 @@ export default function ClientsPage({ writesEnabled }: { writesEnabled: boolean 
     <ul>{selectedEvents.map(e=><li key={e.id}>{e.title} · {formatDateBR(e.event_date)} · {eventStatuses[e.status]||e.status}
     {e.expected_attendees!=null?' · '+e.expected_attendees+' participantes':''}</li>)}</ul>}
   </section>}
-  {feedback&&<p role="status">{feedback}</p>}
-  {form&&<section style={{border:'1px solid #94a3b8',borderRadius:14,padding:20,marginTop:20}}>
+  {feedback&&<p className={styles.feedback} role="status">{feedback}</p>}
+  {form&&<section className={styles.editor} style={{border:'1px solid #94a3b8',borderRadius:14,padding:20,marginTop:20}}>
    <h2 style={{fontSize:22}}>{form==='client'?(editing?'Editar cliente':'Novo cliente'):form==='contact'?'Novo contato':'Nova apresentação'}</h2>
    <form onSubmit={submit} style={{display:'grid',gap:12}}>
     {(form==='client'?[
@@ -155,8 +165,16 @@ export default function ClientsPage({ writesEnabled }: { writesEnabled: boolean 
         required={key==='name'||key==='title'}
         style={{display:'block',padding:10,width:'100%',color:'#111',background:'#fff'}}/>}</label>)}
     <div><button type="submit" disabled={!writesEnabled||saving}>{saving?"Salvando...":"Salvar"}</button>
-    <button type="button" onClick={()=>setForm(null)} style={{marginLeft:12}}>Cancelar</button></div>
+    <button type="button" disabled={saving} onClick={()=>setForm(null)} style={{marginLeft:12}}>Cancelar</button></div>
    </form></section>}
+  {restoreClient&&<dialog ref={restoreDialog} onCancel={e=>{if(saving)e.preventDefault();else setRestoreClient(null);}} aria-labelledby="restore-title" className={styles.dialog}>
+   <h2 id="restore-title">Reativar {restoreClient.name}</h2>
+   <p>Escolha a situação comercial do cliente. O histórico e os vínculos serão mantidos.</p>
+   <label>Situação ao reativar<select autoFocus value={restoreStatus} disabled={saving} onChange={e=>setRestoreStatus(e.target.value)}><option value="prospect">Prospecto</option><option value="active">Ativo</option></select></label>
+   <p className={styles.caption}>A situação anterior ao arquivamento não foi armazenada.</p>
+   <div className={styles.actions}><button disabled={saving} onClick={()=>archiveClient(restoreClient,restoreStatus)}>{saving?'Reativando...':'Confirmar reativação'}</button><button disabled={saving} onClick={()=>setRestoreClient(null)}>Cancelar</button></div>
+   {feedback&&<p role="status">{feedback}</p>}
+  </dialog>}
   <p style={{marginTop:20,fontSize:13,opacity:.8}}>Dados restritos à organização autenticada. {writesEnabled?"Apenas o proprietário pode cadastrar e alterar registros.":"Gravações bloqueadas até a homologação de segurança."}</p>
  </main>;
 }

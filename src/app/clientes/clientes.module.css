@@ -1,0 +1,47 @@
+.page {color:#17345b;min-height:100vh;line-height:1.55;}
+.page button,.page a,.page input,.page select {transition:background .15s,box-shadow .15s;}
+.page button {cursor:pointer;min-height:42px;padding:9px 14px;border:1px solid #c6d7ee;border-radius:10px;background:#f3f7ff;color:#214d86;font-weight:600;font-size:14px;}
+.page button:disabled {cursor:wait;opacity:.55;}
+.page button:hover:not(:disabled) {box-shadow:0 3px 12px #163c7320;}
+.page :is(button,a,input,select):focus-visible {outline:3px solid #5495ed;outline-offset:3px;}
+.hero {padding:28px;border-radius:22px;background:linear-gradient(125deg,#102d59,#1555a2);color:white;box-shadow:0 12px 30px #14376818;}
+.hero h1 {letter-spacing:-1px;margin:8px 0;}
+.hero p {color:#dbeafe;max-width:510px;}
+.hero a {background:#fff;color:#194577;}
+.hero .access {border-color:#89b4eb!important;color:#deecff;font-size:12px;}
+.metric {background:white;border-color:#dbe6f4!important;box-shadow:0 5px 18px #1c3f6506;position:relative;overflow:hidden;}
+.metric::before {content:'';position:absolute;left:0;top:18px;bottom:18px;width:4px;background:#3b82f6;border-radius:4px;}
+.metric div {font-size:13px;color:#55708e;}
+.metric strong {display:block;margin-top:8px;color:#163b6e;}
+.caption {font-size:13px;color:#5c728d;margin:8px 0 18px;}
+.directory,.history,.editor {background:white;border-color:#dbe6f4!important;box-shadow:0 6px 22px #173a6607;}
+.sectionHeading {display:flex;justify-content:space-between;gap:16px;align-items:center;margin-bottom:22px;}
+.sectionHeading h2 {font-size:20px;font-weight:700;margin:0;}
+.sectionHeading p {font-size:14px;color:#61758e;margin:3px 0;}
+.sectionHeading>span,.badge {background:#edf4ff;border:1px solid #d8e6fa;border-radius:99px;padding:5px 11px;font-size:12px;white-space:nowrap;}
+.page th {font-size:12px;text-transform:uppercase;letter-spacing:.5px;background:#f5f8fd;color:#5c7390;}
+.page td {padding:15px 10px!important;border-bottom:1px solid #e6edf6!important;font-size:14px;}
+.page tbody tr:hover {background:#f8fbff;}
+.badge[data-status='inactive'] {background:#f1f4f8;color:#64748b;border-color:#e2e8f0;}
+.badge[data-status='active'] {background:#e1efff;color:#144f95;}
+.actions {display:flex;gap:8px;align-items:center;flex-wrap:wrap;}
+.empty {padding:42px 20px;text-align:center;border:1px dashed #cbdcf1;border-radius:14px;background:#f8fbff;}
+.empty h3 {font-size:18px;font-weight:650;}
+.empty p {color:#61758e;margin-top:8px;}
+.history h2 {color:#174784;}
+.history h3 {display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;border-top:1px solid #e4ecf7;padding-top:18px;}
+.history li {padding:12px 14px;margin:8px 0;background:#f4f8fe;border-radius:10px;list-style:none;}
+.feedback {padding:14px 18px;background:#e9f2ff;border:1px solid #c5dbf7;border-radius:12px;margin-top:16px;}
+.editor h2 {font-weight:700;margin-bottom:20px;}
+.editor form {grid-template-columns:repeat(2,minmax(0,1fr));}
+.editor label {font-size:13px;font-weight:600;}
+.editor input,.editor select,.dialog select {border:1px solid #cbd9ea;border-radius:9px;margin-top:6px;background:white;color:#17345b;min-height:44px;}
+.editor form>div {grid-column:1/-1;padding-top:12px;}
+.editor button[type='submit'],.dialog button:first-child {background:#2563eb;color:white;border-color:#2563eb;}
+.overlay {position:fixed;inset:0;background:#0d244f80;display:grid;place-items:center;padding:20px;z-index:100;}
+.dialog::backdrop {background:#0d244f80;}
+.dialog {margin:auto;border:0;color:#17345b;background:white;padding:28px;border-radius:20px;max-width:480px;width:100%;box-shadow:0 20px 70px #102a5350;}
+.dialog h2 {font-size:23px;font-weight:700;margin-bottom:12px;}
+.dialog label {display:block;margin:20px 0 8px;}
+.dialog select {display:block;width:100%;padding:10px;}
+@media(max-width:640px) {.hero {padding:22px 18px;}.hero h1 {font-size:26px!important;}.editor form {grid-template-columns:1fr;}.sectionHeading {align-items:flex-start;}.page td {min-width:105px;}.actions {min-width:150px;}.dialog .actions {min-width:0;}}
