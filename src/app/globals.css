@@ -557,3 +557,30 @@
 .operation-detail-table-scroll td{padding:11px 10px;border-top:1px solid #dfe9f8}
 .operation-detail-id{font-family:ui-monospace,monospace;font-size:11px;color:#547198;word-break:break-all}
 @media(max-width:720px){.operation-detail{padding:14px}.operation-dome-grid{grid-template-columns:1fr}.operation-detail-metrics{gap:6px}.operation-detail-metrics>div{padding:12px}.operation-detail-metrics strong{font-size:20px}.operation-detail-panel{padding:12px}}
+
+/* Bloco 45D — reservas reais integradas abaixo das cupulas. */
+.operation-dome-unified{padding:17px 18px}
+.operation-reservations{margin-top:19px;border-top:1px solid #c9daf5;padding-top:17px}
+.operation-reservations-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px}
+.operation-reservations-head h2{margin:0;font-size:17px;color:#173767}
+.operation-reservations-badge{font-size:11px;white-space:nowrap;font-weight:700;padding:6px 10px;border-radius:9px;background:#dce9ff;color:#2859b6}
+.operation-reservations-metrics{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin:0 0 16px}
+.operation-reservations-metrics>div{border:1px solid #cbdcf7;background:#f9fbff;border-radius:10px;padding:12px;display:flex;justify-content:space-between;align-items:center;gap:9px}
+.operation-reservations-metrics span{font-size:11px;color:#58759e;line-height:1.4}
+.operation-reservations-metrics strong{font-size:20px;color:#183a70;font-variant-numeric:tabular-nums}
+.operation-reservations h3{font-size:14px;margin:0 0 9px;font-weight:750;color:#234674}
+.operation-reservations-empty{padding:19px 12px}
+.operation-reservations-items{display:grid;gap:7px}
+.operation-reservation-item{display:flex;justify-content:space-between;align-items:center;gap:12px;background:#f9fbff;border:1px solid #d2e0f9;border-radius:10px;padding:11px 13px}
+.operation-reservation-item>div{display:flex;flex-direction:column;gap:5px;min-width:0}
+.operation-reservation-item strong{font-size:12px;color:#173767;overflow-wrap:anywhere}
+.operation-reservation-item span{font-size:11px;color:#657c9c}
+.operation-reservation-item time{font-size:12px;font-weight:750;color:#2355b1;text-align:right}
+.operation-reservation-item>div:last-child span{text-align:right}
+.operation-reservations-more{font-size:11px;color:#687e9e;margin:11px 0 0}
+@media(max-width:700px){
+ .operation-reservations-metrics{grid-template-columns:1fr;gap:6px}
+ .operation-reservations-metrics>div{padding:9px 11px}
+ .operation-reservation-item{align-items:flex-start}
+ .operation-dome-unified{padding:13px}
+}
