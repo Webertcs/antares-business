@@ -108,17 +108,17 @@ export default function OperacaoV1({writesEnabled,contractWritesEnabled}:{writes
  return <main className="operations-refined" style={{maxWidth:1250,margin:'0 auto',padding:'18px 22px 26px',fontFamily:'system-ui',color:'#153763'}}>
  <Link className="operations-back" href="/?section=operacao">← Voltar</Link>
  <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',gap:12,flexWrap:'wrap'}}>
- <div><h1 style={{fontSize:27,fontWeight:800,margin:'9px 0 3px'}}>Central de Operações</h1>
- <p style={{fontSize:12,margin:'0',color:'#60769a'}}>Acompanhe propostas, contratos, apresentações e registros do planetário.</p></div>
- <Link href="/clientes" style={{background:'#2563eb',color:'white',padding:12,borderRadius:9,textDecoration:'none'}}>Abrir cadastro de clientes</Link></div>
+ <div><h1 style={{fontSize:27,fontWeight:800,margin:'9px 0 3px'}}>Gestão Operacional</h1>
+ <p style={{fontSize:12,margin:'0',color:'#60769a'}}>Organize cúpulas, apresentações e atividades do planetário.</p></div>
+ {tab!=='agenda'&&<Link href="/clientes" style={{background:'#2563eb',color:'white',padding:12,borderRadius:9,textDecoration:'none'}}>Abrir cadastro de clientes</Link>}</div>
  {loading&&<p role="status">Carregando informações do planetário...</p>}
  {error&&<div role="alert" style={{...base,borderColor:'#b45309',marginTop:20}}>Não foi possível consultar todas as informações. {error} Consulte os dados disponíveis antes de realizar novas operações.</div>}
  {!loading&&!error&&unavailable.length>0&&<div role="status" style={{...base,borderColor:'#f59e0b',marginTop:16}}>Algumas áreas estão em implantação: {unavailable.join(', ')}. Os demais dados estão disponíveis para consulta. Gravações permanecem bloqueadas.</div>}
  {!loading&&!error&&<>
- <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(175px,1fr))',gap:12,margin:'20px 0'}}>
+ {tab!=='agenda'&&<div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(175px,1fr))',gap:12,margin:'20px 0'}}>
   {([['Clientes',data.clients.length],['Propostas',data.proposals.length],['Valor proposto',money(forecast)],['Saldo realizado',money(cash)],['Fluxo previsto',money(pending)],['Reservas',data.bookings.length]] as [string,string|number][]).map(([t,v])=><div key={t} style={base}><small>{t}</small><div style={{fontSize:25,fontWeight:750}}>{v}</div></div>)}
- </div>
- <section style={{...base,margin:'16px 0'}} aria-label="Resumo gerencial">
+ </div>}
+ {tab!=='agenda'&&<section style={{...base,margin:'16px 0'}} aria-label="Resumo gerencial">
   <h2 style={{fontWeight:700,fontSize:20,marginBottom:8}}>Resumo gerencial</h2>
   <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(165px,1fr))',gap:14}}>
    <div><small>Receitas recebidas</small><div style={{fontWeight:700,fontSize:21}}>{money(received)}</div></div>
@@ -129,10 +129,10 @@ export default function OperacaoV1({writesEnabled,contractWritesEnabled}:{writes
   {nextBookings.length>0&&<div style={{marginTop:12}}><strong>Próximas apresentações</strong>
    <ul style={{paddingLeft:20}}>{nextBookings.map(b=><li key={String(b.id)}>
      {dateTime(b.starts_at)} · {String(b.event_title)} · {String(b.dome_name)}</li>)}</ul></div>}
- </section>
- <div style={{display:'flex',gap:8,flexWrap:'wrap',margin:'10px 0'}}>
+ </section>}
+ {tab!=='agenda'&&<div style={{display:'flex',gap:8,flexWrap:'wrap',margin:'10px 0'}}>
   {reportLink('propostas')}{reportLink('agenda')}{reportLink('financeiro')}
- </div>
+ </div>}
  <nav aria-label="Áreas operacionais" style={{display:'flex',gap:8,flexWrap:'wrap',margin:'16px 0'}}>
  {([['comercial','Propostas'],['contratos','Contratos'],['agenda','Agenda e cúpulas'],['financeiro','Financeiro'],['balanco','Balanço mensal'],['auditoria','Auditoria']] as const).map(([k,l])=>
  <button key={k} onClick={()=>setTab(k)} aria-current={tab===k?'page':undefined}
@@ -163,9 +163,9 @@ export default function OperacaoV1({writesEnabled,contractWritesEnabled}:{writes
  <button disabled={busy} type="submit" style={{padding:12,background:'#1d4ed8',color:'#fff',borderRadius:8}}>Registrar contrato</button>
  </form>}
  </section>}
- {tab==='agenda'&&<section style={base}><h2 style={{fontSize:21,fontWeight:650}}>Cúpulas e apresentações</h2><p><Link href="/agenda/reservas" style={{display:"inline-block",padding:"10px 15px",background:"#1d4ed8",color:"white",borderRadius:8,textDecoration:"none"}}>Reservas por proposta aceita</Link></p>{writesEnabled&&<div style={{display:'flex',gap:8}}><button onClick={()=>openForm('dome')}>+ Cúpula</button><button onClick={()=>openForm('booking')}>+ Reserva</button></div>}
-  <p>Equipamentos cadastrados: {data.domes.map(d=>String(d.name)).join(' · ')||'nenhum'}.</p>{eventError&&<p role="alert">{eventError}</p>}
-  <Rows heads={['Apresentação','Cúpula','Início','Término','Situação']}
+ {tab==='agenda'&&<section className="operations-dome-panel" style={base}><div className="operations-dome-head"><div><h2 style={{fontSize:21,fontWeight:700,margin:0}}>Cúpulas e apresentações</h2><p>Estrutura e programação das sessões.</p></div><Link className="operations-dome-action" href="/agenda/reservas">Gerenciar reservas ↗</Link></div><div className="operations-dome-kpis"><div><span>Cúpulas cadastradas</span><strong>{data.domes.length}</strong></div><div><span>Reservas registradas</span><strong>{data.bookings.length}</strong></div><div><span>Próximas apresentações</span><strong>{nextBookings.length}</strong></div></div>{writesEnabled&&<div style={{display:'flex',gap:8,marginTop:12}}><button onClick={()=>openForm('dome')}>+ Cúpula</button><button onClick={()=>openForm('booking')}>+ Reserva</button></div>}
+  <div className="operations-dome-list"><h3>Cúpulas</h3>{data.domes.length?<div className="operations-dome-chips">{data.domes.map(d=><span key={String(d.id)}>{String(d.name)}</span>)}</div>:<p>Nenhuma cúpula cadastrada.</p>}</div>{eventError&&<p role="alert">{eventError}</p>}
+  <h3 className="operations-dome-table-title">Apresentações</h3><Rows heads={['Apresentação','Cúpula','Início','Término','Situação']}
   rows={data.bookings.map(b=>[b.event_title,b.dome_name,dateTime(b.starts_at),dateTime(b.ends_at),b.status])}/></section>}
  {tab==='financeiro'&&<section style={base}><h2 style={{fontSize:21,fontWeight:650}}>Extrato operacional</h2>{writesEnabled&&<button onClick={()=>openForm('ledger')}>+ Lançamento</button>}
   <p>Somente lançamentos liquidados compõem o saldo. Previsto não é recebido.</p>
@@ -244,7 +244,7 @@ export default function OperacaoV1({writesEnabled,contractWritesEnabled}:{writes
    </div>
   </form>
  </section>}
- <p style={{fontSize:13,marginTop:18,opacity:.8}}>Módulo comercial em implantação. Gravações liberadas somente após migração e aprovação de segurança.</p>
+ {!writesEnabled&&<p className="operations-readonly-note">Consultas disponíveis. Novos registros e alterações permanecem desabilitados.</p>}
  </main>;
 }
 function Rows({heads,rows}:{heads:string[];rows:unknown[][]}){
