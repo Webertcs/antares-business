@@ -23,6 +23,8 @@ export default function ClientsPage({ writesEnabled }: { writesEnabled: boolean 
  const [restoreStatus,setRestoreStatus]=useState('prospect');
  const [showArchived,setShowArchived]=useState(false);
  const [selected,setSelected]=useState<string|null>(null);
+ const historyDialog=useRef<HTMLDialogElement>(null);
+ useEffect(()=>{if(selected)historyDialog.current?.showModal();},[selected]);
  const [form,setForm]=useState<'client'|'contact'|'event'|null>(null);
  const formDialog=useRef<HTMLDialogElement>(null);
  const initialFields=useRef<Record<string,string>>({});
@@ -145,9 +147,11 @@ export default function ClientsPage({ writesEnabled }: { writesEnabled: boolean 
     <thead><tr>{['Cliente','Tipo','Cidade','Situação','Detalhes'].map(x=><th key={x} style={{padding:'12px 8px',borderBottom:'1px solid #94a3b8'}}>{x}</th>)}</tr></thead>
     <tbody>{filtered.map(c=><tr key={c.id}><td style={{padding:10,borderBottom:'1px solid #94a3b8'}}><strong>{c.name}</strong></td>
     <td>{kinds[c.kind]||c.kind}</td><td>{c.city||'—'}</td><td><span className={styles.badge} data-status={c.status}>{c.status==='inactive'?'Arquivado':statuses[c.status]||c.status}</span></td>
-    <td><div className={styles.actions}><button disabled={saving} onClick={()=>setSelected(c.id===selected?null:c.id)} style={{padding:8,borderRadius:8,background:'#2563eb',color:'white'}} >{c.id===selected?'Fechar':'Ver histórico'}</button> {writesEnabled&&<><button disabled={saving} onClick={()=>openForm('client',c)}>Editar</button> <button type="button" disabled={saving} onClick={()=>archiveClient(c)} style={{padding:8,borderRadius:8,border:'1px solid #a9bddc',background:'#eef4ff',color:'#234d89'}}>{c.status==='inactive'?'Reativar':'Arquivar'}</button></>}</div></td></tr>)}</tbody></table></div>}
+    <td><div className={styles.actions}><button disabled={saving} onClick={()=>setSelected(c.id)} style={{padding:8,borderRadius:8,background:'#2563eb',color:'white'}} >Ver histórico</button> {writesEnabled&&<><button disabled={saving} onClick={()=>openForm('client',c)}>Editar</button> <button type="button" disabled={saving} onClick={()=>archiveClient(c)} style={{padding:8,borderRadius:8,border:'1px solid #a9bddc',background:'#eef4ff',color:'#234d89'}}>{c.status==='inactive'?'Reativar':'Arquivar'}</button></>}</div></td></tr>)}</tbody></table></div>}
   </section>
-  {active&&<section className={styles.history} style={{border:'1px solid #94a3b8',borderRadius:14,padding:20}}>
+  {active&&<dialog ref={historyDialog} aria-modal="true" aria-labelledby="history-title" className={styles.historyDialog} onCancel={e=>{e.preventDefault();setSelected(null);}}>
+   <div className={styles.historyHeading}><h2 id="history-title">Histórico do cliente</h2><button type="button" onClick={()=>setSelected(null)} aria-label="Fechar histórico">×</button></div>
+   <section className={styles.historyBody}>
    <h2 style={{fontSize:23,fontWeight:700}}>{active.name}</h2>
    <p>{kinds[active.kind]} · {active.city||'Cidade não informada'} · {statuses[active.status]||active.status}</p>
    <p>{active.email||'Sem e-mail'} · {active.phone||'Sem telefone'}</p>
@@ -160,7 +164,7 @@ export default function ClientsPage({ writesEnabled }: { writesEnabled: boolean 
    {selectedEvents.length===0?<p>Sem eventos registrados.</p>:
     <ul>{selectedEvents.map(e=><li key={e.id}>{e.title} · {formatDateBR(e.event_date)} · {eventStatuses[e.status]||e.status}
     {e.expected_attendees!=null?' · '+e.expected_attendees+' participantes':''}</li>)}</ul>}
-  </section>}
+  </section><div className={styles.historyFooter}><button type="button" onClick={()=>setSelected(null)}>Fechar histórico</button></div></dialog>}
   {feedback&&!form&&<p className={styles.feedback} role="status">{feedback}</p>}
   {form&&<dialog ref={formDialog} aria-labelledby="client-form-title" aria-modal="true" className={`${styles.editor} ${styles.formDialog}`} onCancel={e=>{e.preventDefault();closeForm();}}>
    <div className={styles.formHeading}>
