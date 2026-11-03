@@ -489,3 +489,13 @@
 .intelligence-loading{padding:16px;color:#55739c}
 @media(max-width:800px){.intelligence-metrics{grid-template-columns:repeat(2,minmax(0,1fr))}.intelligence-actions nav{grid-template-columns:repeat(2,minmax(0,1fr))}.intelligence-refined{padding:15px}}
 @media(max-width:470px){.intelligence-metrics{grid-template-columns:1fr 1fr;gap:7px}.intelligence-metric{padding:11px;min-height:75px}.intelligence-actions nav{grid-template-columns:1fr}.intelligence-head-icon{display:none}}
+
+/* Bloco 45 — navegacao e superficies da Central de Operacoes. */
+.operations-refined .operations-back{display:inline-flex;align-items:center;gap:5px;background:#dce9ff;border:1px solid #9cbdf6;color:#1d52ad;padding:5px 10px;border-radius:8px;text-decoration:none;font-size:11px;font-weight:750}
+.operations-refined .operations-back:hover{background:#c9ddff}
+.operations-refined .operations-back:focus-visible{outline:3px solid #75aafa;outline-offset:2px}
+.operations-refined nav[aria-label="Áreas operacionais"]{margin:12px 0!important;gap:8px}
+.operations-refined nav[aria-label="Áreas operacionais"] button:hover{filter:brightness(.96)}
+.operations-refined [aria-label="Resumo gerencial"]{box-shadow:0 5px 22px #244b9b0c}
+.operations-refined section{scroll-margin-top:16px}
+@media(max-width:760px){.operations-refined{padding:13px!important}.operations-refined nav[aria-label="Áreas operacionais"] button{flex:1 1 125px}}
