@@ -113,3 +113,8 @@
 .filterArchived:has(input:checked) {background:#c8e0ff;border-color:#3778d5;}
 @media(max-width:850px) {.filterPanel{grid-template-columns:minmax(0,1fr) minmax(160px,220px);}.filterArchived{grid-column:1/-1;justify-content:flex-start;}}
 @media(max-width:560px) {.directoryHeader{align-items:flex-start;flex-direction:column;}.filterPanel{grid-template-columns:1fr;}.filterArchived{grid-column:auto;}}
+
+/* Situação do cliente — destaque semântico e brilho discreto */
+.badge[data-status='active'] {background:linear-gradient(120deg,#d8eaff,#bcdcff);color:#104b9b;border:1px solid #8dbcf5;font-weight:750;box-shadow:0 0 0 2px #cde4ff55,0 3px 9px #2677d024;}
+.badge[data-status='inactive'] {background:#f1f3f6;color:#8995a5;border:1px solid #e0e5eb;font-weight:600;box-shadow:none;}
+.badge[data-status='prospect'] {background:#edf3ff;color:#466a9d;border:1px solid #d7e4f8;box-shadow:none;}
