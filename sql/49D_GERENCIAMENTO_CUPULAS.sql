@@ -62,6 +62,8 @@ BEGIN
     WHERE organization_id=p_org AND id=p_dome;
    UPDATE public.equipment SET name=v_name,asset_code=v_code
     WHERE organization_id=p_org AND id=v_equipment;
+   INSERT INTO public.business_audit(organization_id,actor_subject,action,entity_type,entity_id)
+    VALUES(p_org,p_subject,'dome_updated','dome',p_dome);
    RETURN 'updated';
  ELSIF p_action='deactivate' THEN
    IF EXISTS(
@@ -71,10 +73,14 @@ BEGIN
    ) THEN RAISE EXCEPTION 'Existem apresentacoes futuras vinculadas'; END IF;
    UPDATE public.antares_domes SET active=false WHERE organization_id=p_org AND id=p_dome;
    UPDATE public.equipment SET active=false WHERE organization_id=p_org AND id=v_equipment;
+   INSERT INTO public.business_audit(organization_id,actor_subject,action,entity_type,entity_id)
+    VALUES(p_org,p_subject,'dome_deactivated','dome',p_dome);
    RETURN 'deactivated';
  ELSIF p_action='activate' THEN
    UPDATE public.antares_domes SET active=true WHERE organization_id=p_org AND id=p_dome;
    UPDATE public.equipment SET active=true WHERE organization_id=p_org AND id=v_equipment;
+   INSERT INTO public.business_audit(organization_id,actor_subject,action,entity_type,entity_id)
+    VALUES(p_org,p_subject,'dome_activated','dome',p_dome);
    RETURN 'activated';
  ELSIF p_action='delete' THEN
    -- Nunca apagar cupulas ja utilizadas em apresentacoes, inclusive canceladas ou passadas.
@@ -86,6 +92,8 @@ BEGIN
     WHERE organization_id=p_org AND antares_dome_id=p_dome AND equipment_id=v_equipment;
    DELETE FROM public.equipment WHERE organization_id=p_org AND id=v_equipment;
    DELETE FROM public.antares_domes WHERE organization_id=p_org AND id=p_dome;
+   INSERT INTO public.business_audit(organization_id,actor_subject,action,entity_type,entity_id)
+    VALUES(p_org,p_subject,'dome_deleted','dome',p_dome);
    RETURN 'deleted';
  END IF;
  RAISE EXCEPTION 'Operacao desconhecida';
