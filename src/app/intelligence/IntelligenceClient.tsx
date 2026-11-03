@@ -12,6 +12,8 @@ export default function IntelligenceClient(){
  const [data,setData]=useState<Metrics|null>(null),[error,setError]=useState('');
  useEffect(()=>{const ac=new AbortController();fetch('/api/intelligence',{cache:'no-store',signal:ac.signal}).then(async r=>{const d=await r.json();if(!r.ok)throw Error(d.error||'Não foi possível carregar os indicadores.');return d;}).then(setData).catch(e=>{if(e?.name!=='AbortError')setError(e.message)});return()=>ac.abort();},[]);
  function goBack(){
+   const returnTo=new URLSearchParams(window.location.search).get('returnTo');
+   if(returnTo==='comercial'){router.push('/?section=comercial');return;}
    try{
      if(document.referrer && new URL(document.referrer).origin===window.location.origin && window.history.length>1){router.back();return;}
    }catch{}
