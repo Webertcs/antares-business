@@ -156,3 +156,45 @@
 }
 @media (max-width:430px){.owner-kpis{gap:7px}.owner-kpi{padding:9px;gap:6px}.owner-kpi strong{font-size:18px}.owner-kpi-icon{width:30px;height:30px}.owner-tile{padding:12px}}
 @media(prefers-reduced-motion:reduce){.owner-nav-link,.owner-quick-link,.owner-vitrine{transition:none}}
+
+/* 37 — Busca real do menu, perfil e acao de conta no Dashboard */
+.dashboard-search{position:relative;display:flex;align-items:center}
+.dashboard-search-popover{position:absolute;right:-45px;top:calc(100% + 18px);width:min(380px,calc(100vw - 24px));background:#fff;border:1px solid #d5e1f2;border-radius:14px;padding:14px;box-shadow:0 18px 48px #14294430;z-index:90;color:#152845}
+.dashboard-search-title{display:flex;align-items:center;justify-content:space-between;font-size:14px;margin-bottom:12px}
+.dashboard-search-title button{border:0;background:transparent;color:#38527e}
+.dashboard-search-label{font-size:11px;color:#607294;display:flex;flex-direction:column;gap:5px}
+.dashboard-search-label input{height:39px;border:1px solid #cad8ee;border-radius:9px;padding:0 11px;background:#f9fbff;color:#182c4f}
+.dashboard-search-results{display:flex;flex-direction:column;max-height:290px;overflow-y:auto;margin-top:9px}
+.dashboard-search-results>a{display:flex;flex-direction:column;gap:3px;border-bottom:1px solid #edf1f8;padding:9px 7px;border-radius:7px;font-size:12px}
+.dashboard-search-results>a:hover{background:#f1f6ff}
+.dashboard-search-results small{font-size:10px;color:#7889a5}
+.dashboard-search-note{font-size:10px;color:#7889a5;margin:11px 0 0}
+.owner-profile-link{color:#dce8ff;text-decoration:none}
+.owner-profile-link:hover{background:#263858;border-radius:10px}
+.owner-profile-link>div:nth-child(2){min-width:0;flex:1}
+.owner-profile-link strong{max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.owner-profile-photo{object-fit:cover;object-position:center}
+.owner-header-profile{display:inline-flex;align-items:center;border-radius:50%;text-decoration:none}
+.owner-header-profile:focus-visible{outline:3px solid #74b5f7;outline-offset:3px}
+.profile-page{min-height:100vh;background:#f5f7fc;padding:35px 24px;color:#182b4c}
+.profile-page>*{max-width:800px;margin-left:auto;margin-right:auto}
+.profile-back{display:block;color:#2552bc;font-size:13px;font-weight:700;margin-bottom:20px}
+.profile-panel{background:white;border:1px solid #e0e7f5;border-radius:18px;padding:26px;box-shadow:0 9px 26px #20375f0d}
+.profile-panel h1{font-size:28px;margin:3px 0 8px}
+.profile-panel>div:first-child>p:last-child{font-size:13px;color:#687993}
+.profile-eyebrow{font-size:10px;letter-spacing:1.5px;color:#3b5bc1;font-weight:750}
+.profile-form-layout{display:grid;grid-template-columns:190px 1fr;gap:25px;margin-top:26px}
+.profile-photo-area{display:flex;flex-direction:column;align-items:center;gap:12px}
+.profile-photo-area>img,.profile-photo-area>span{height:120px;width:120px;object-fit:cover;border-radius:50%;display:grid;place-items:center;background:#e6edfb;border:3px solid #d9e4f8;color:#516ba0}
+.profile-photo-button{display:flex;align-items:center;gap:7px;cursor:pointer;border:1px solid #bdd0ee;background:#f2f7ff;color:#244fb6;border-radius:10px;font-weight:700;font-size:12px;padding:10px 13px}
+.profile-photo-button input{display:none}
+.profile-fields{display:flex;flex-direction:column;gap:13px}
+.profile-fields label{display:flex;flex-direction:column;gap:5px;color:#344969;font-size:12px;font-weight:650}
+.profile-fields input{height:40px;padding:0 11px;border-radius:9px;border:1px solid #cbd8ed;background:#fff;color:#132b4f}
+.profile-fields input:disabled{background:#f1f4f9;color:#69798e}
+.profile-fields .primary-button{align-self:flex-start;margin-top:3px}
+.profile-feedback{font-size:12px;color:#245a9c}
+.profile-warning{display:flex;align-items:flex-start;gap:10px;background:#fff6e8;color:#704e16;border-radius:12px;padding:13px 15px;margin-top:22px}
+.profile-warning p{font-size:12px;line-height:1.6;margin:0}
+.profile-warning svg{flex-shrink:0}
+@media(max-width:600px){.profile-form-layout{grid-template-columns:1fr}.profile-panel{padding:18px}.dashboard-search-popover{right:-90px}}
