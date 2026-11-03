@@ -217,3 +217,50 @@
  .content:has(.owner-overview) .owner-hero::before{opacity:.3}
  .content:has(.owner-overview) .owner-hero>div{max-width:100%}
 }
+
+/* Bloco 38B — saudacao com fundo destacado e planeta centralizado verticalmente. */
+.content:has(.owner-overview) .owner-hero{
+  min-height:112px;
+  padding:15px 19px;
+  margin-bottom:13px;
+  border:1px solid #d3e2fa;
+  border-radius:16px;
+  background-color:#e6efff;
+  align-items:center;
+}
+.content:has(.owner-overview) .owner-hero::before{
+  background-image:url('/images/dashboard-planeta.png');
+  background-size:80% auto;
+  background-position:right 34%;
+  background-repeat:no-repeat;
+  opacity:1;
+}
+.content:has(.owner-overview) .owner-hero>div{max-width:66%}
+.content:has(.owner-overview) .owner-hero .eyebrow{color:#4266a2}
+.content:has(.owner-overview) .owner-hero h1{color:#12284d}
+.content:has(.owner-overview) .owner-hero p{color:#405b86}
+.owner-kpis{grid-template-columns:repeat(4,minmax(0,1fr)) minmax(118px,.86fr);gap:9px}
+.owner-kpi{min-height:66px;padding:12px 9px;gap:8px}
+.owner-kpi strong{font-size:clamp(16px,1.2vw,22px)}
+.owner-kpi-budget{min-width:0;min-height:66px;border:0;border-radius:13px;background:linear-gradient(125deg,#214ed1,#3976f3);color:white;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;padding:10px;cursor:pointer;font-size:12px;font-weight:750;text-align:center;box-shadow:0 5px 15px #275be62b}
+.owner-kpi-budget:hover{background:linear-gradient(125deg,#1741b9,#2865e8)}
+.owner-kpi-budget:focus-visible{outline:3px solid #69aaf9;outline-offset:3px}
+@media(max-width:1050px){
+ .content:has(.owner-overview) .owner-hero::before{background-size:95% auto;background-position:right 29%;opacity:.9}
+ .owner-kpis{gap:7px}
+ .owner-kpi{padding:10px 8px}
+ .owner-kpi-icon{width:30px;height:30px}
+ .owner-kpi-budget{font-size:11px}
+}
+@media(max-width:800px){
+ .owner-kpis{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .owner-kpi-budget{grid-column:1/-1;min-height:43px;flex-direction:row}
+ .content:has(.owner-overview) .owner-hero{min-height:106px}
+ .content:has(.owner-overview) .owner-hero::before{background-size:auto 220%;background-position:right 34%;opacity:.6}
+ .content:has(.owner-overview) .owner-hero>div{max-width:78%}
+}
+@media(max-width:540px){
+ .content:has(.owner-overview) .owner-hero{padding:12px;min-height:100px}
+ .content:has(.owner-overview) .owner-hero::before{opacity:.28}
+ .content:has(.owner-overview) .owner-hero>div{max-width:100%}
+}
