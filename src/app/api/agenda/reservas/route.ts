@@ -1,5 +1,6 @@
 import {NextRequest,NextResponse} from 'next/server';
 import {requireOwner,getDb,getTeamWriteDb} from '@/lib/equipe/auth';
+import {assertAgendaWriteAllowed} from '@/lib/equipe/agenda-write-guard';
 export const dynamic='force-dynamic';export const runtime='nodejs';
 const fail=(error:string,status:number)=>NextResponse.json({error},{status,headers:{'Cache-Control':'no-store'}});
 export async function GET(){
@@ -13,10 +14,7 @@ export async function GET(){
 }
 export async function POST(req:NextRequest){
  const owner=await requireOwner();if(!owner)return fail('Somente proprietário',403);
- if(process.env.ANTARES_AGENDA_WRITES_ENABLED!=='true')return fail('Reservas bloqueadas durante homologação',503);
- const origin=req.headers.get('origin'),host=req.headers.get('host');
- try{if(!origin||!host||new URL(origin).host!==host)return fail('Origem inválida',403);}catch{return fail('Origem inválida',403);}
- if(req.headers.get('content-type')?.split(';')[0]?.trim()!=='application/json')return fail('Formato inválido',415);
+ const denied=await assertAgendaWriteAllowed(req);if(denied)return denied;
  try{
  const v=await req.json(),uuid=/^[0-9a-f]{8}(-[0-9a-f]{4}){3}-[0-9a-f]{12}$/i;
  if(!v||!uuid.test(v.proposalId)||!uuid.test(v.domeId)||typeof v.start!=='string'||typeof v.end!=='string')return fail('Dados inválidos',400);
