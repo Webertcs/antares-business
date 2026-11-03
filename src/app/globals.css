@@ -584,3 +584,23 @@
  .operation-reservation-item{align-items:flex-start}
  .operation-dome-unified{padding:13px}
 }
+
+/* Bloco 45E — nomes nos indicadores e formulario seguro de cupulas. */
+.operation-detail-metrics .operation-metric-names{margin:0;min-height:18px;font-size:11px;line-height:1.4;font-weight:650;color:#2a5aaf;overflow-wrap:anywhere}
+.operation-domes-heading{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;margin-bottom:14px;flex-wrap:wrap}
+.operation-domes-heading h2{margin:5px 0 0}
+.dome-create{max-width:100%;display:flex;flex-direction:column;align-items:flex-end;gap:9px}
+.dome-create-toggle{border:1px solid #2458d3;border-radius:9px;padding:9px 13px;background:#2458d3;color:#fff;font-size:12px;font-weight:750;cursor:pointer}
+.dome-create-toggle:hover{background:#1848b8}
+.dome-create-toggle:focus-visible,.dome-create-form input:focus-visible,.dome-create-actions button:focus-visible{outline:3px solid #87b1fc;outline-offset:2px}
+.dome-create-form{width:min(520px,calc(100vw - 58px));display:grid;grid-template-columns:1fr 1fr;gap:11px;padding:15px;background:#f9fbff;border:1px solid #cbdcf7;border-radius:12px}
+.dome-create-form label{display:grid;gap:5px;font-weight:700;font-size:11px;color:#31517b}
+.dome-create-form label:first-child{grid-column:1/-1}
+.dome-create-form input{background:white;border:1px solid #c5d7f3;border-radius:8px;padding:10px 11px;color:#173767;font-size:13px;width:100%;min-width:0}
+.dome-create-notice{grid-column:1/-1;font-size:11px;line-height:1.5;color:#835b1e;background:#fff3dc;padding:10px;border-radius:9px;margin:0}
+.dome-create-actions{display:flex;justify-content:flex-end;grid-column:1/-1;gap:8px}
+.dome-create-actions button{border:1px solid #c0d2ee;border-radius:8px;padding:9px 12px;background:#e9f1ff;color:#2555a9;font-size:12px;font-weight:700;cursor:pointer}
+.dome-create-actions button[type=submit]{background:#2458d3;color:#fff;border-color:#2458d3}
+.dome-create-actions button:disabled{opacity:.5;cursor:not-allowed}
+.dome-create-message{font-size:11px;color:#265998;margin:0}
+@media(max-width:600px){.dome-create{align-items:stretch;width:100%}.dome-create-form{width:100%}.operation-detail-metrics>div{padding:10px}}
