@@ -499,3 +499,23 @@
 .operations-refined [aria-label="Resumo gerencial"]{box-shadow:0 5px 22px #244b9b0c}
 .operations-refined section{scroll-margin-top:16px}
 @media(max-width:760px){.operations-refined{padding:13px!important}.operations-refined nav[aria-label="Áreas operacionais"] button{flex:1 1 125px}}
+
+/* Bloco 45B — Gestao Operacional: cúpulas sem excesso de indicadores gerais. */
+.operations-dome-panel{margin-top:12px}
+.operations-dome-head{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+.operations-dome-head p{margin:5px 0 0;font-size:12px;color:#60789b}
+.operations-dome-action{background:#2458d3;border:1px solid #2458d3;border-radius:9px;color:white;font-size:12px;font-weight:750;text-decoration:none;padding:10px 13px}
+.operations-dome-action:hover{background:#1849bd}
+.operations-dome-action:focus-visible{outline:3px solid #8cb5ff;outline-offset:3px}
+.operations-dome-kpis{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:15px}
+.operations-dome-kpis>div{border:1px solid #cbdcf7;background:#f9fbff;border-radius:10px;padding:14px;display:flex;flex-direction:column;gap:7px}
+.operations-dome-kpis span{font-size:11px;color:#577299}
+.operations-dome-kpis strong{font-size:23px;color:#17396e;font-variant-numeric:tabular-nums}
+.operations-dome-list{margin-top:16px;border-top:1px solid #cdddf4;padding-top:12px}
+.operations-dome-list h3,.operations-dome-table-title{font-size:15px;font-weight:750;margin:0 0 9px;color:#193763}
+.operations-dome-list p{font-size:12px;color:#60789b;margin:0}
+.operations-dome-chips{display:flex;flex-wrap:wrap;gap:7px}
+.operations-dome-chips span{font-size:11px;font-weight:650;color:#2853a0;background:#f9fbff;border:1px solid #c6d8f5;border-radius:9px;padding:8px 11px}
+.operations-dome-table-title{margin:17px 0 0;border-top:1px solid #cdddf4;padding-top:13px}
+.operations-readonly-note{font-size:11px;color:#647b9a;margin:10px 0 0;padding:8px 11px;background:#edf4ff;border-radius:9px}
+@media(max-width:680px){.operations-dome-kpis{grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}.operations-dome-kpis>div{padding:9px}.operations-dome-kpis strong{font-size:18px}.operations-dome-head{align-items:flex-start}}
