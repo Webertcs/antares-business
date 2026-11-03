@@ -16,7 +16,7 @@ export default async function Page({params}:{params:Promise<{id:string}>}){
  const address=String(e.venue||'').trim();
  const maps='https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(address);
  const waze='https://waze.com/ul?q='+encodeURIComponent(address)+'&navigate=yes';
- const date=e.event_date?new Intl.DateTimeFormat('pt-BR',{timeZone:'UTC'}).format(new Date(String(e.event_date).slice(0,10)+'T12:00:00Z')):'A definir';
+ const date=(()=>{if(!e.event_date)return 'A definir';const raw=e.event_date;const parsed=raw instanceof Date?raw:new Date(String(raw));return Number.isNaN(parsed.getTime())?'Data indisponível':new Intl.DateTimeFormat('pt-BR',{timeZone:'UTC'}).format(parsed);})();
  const card:React.CSSProperties={background:'#f3f7ff',border:'1px solid #c9d9f5',borderRadius:14,padding:18};
  return <div style={{display:'grid',gap:18,color:'#183c70'}}>
  <div><span style={{fontSize:12,fontWeight:700,color:'#3863a2'}}>CENTRAL DO EVENTO · ANTARES</span><h1 style={{fontSize:28,margin:'8px 0'}}>{String(e.title)}</h1><span>{date} · {String(e.start_time||'').slice(0,5)||'Horário a definir'}{e.end_time?'–'+String(e.end_time).slice(0,5):''} · {String(e.status)}</span></div>
