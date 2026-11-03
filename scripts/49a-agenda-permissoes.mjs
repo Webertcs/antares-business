@@ -16,7 +16,8 @@ try{
     WHERE p.oid IN (
       'public.antares_prepare_proposal_client(text,uuid,uuid)'::regprocedure,
       'public.antares_create_linked_dome(text,uuid,text,text,integer)'::regprocedure,
-      'public.antares_book_proposal(text,uuid,uuid,uuid,timestamptz,timestamptz)'::regprocedure
+      'public.antares_book_proposal(text,uuid,uuid,uuid,timestamptz,timestamptz)'::regprocedure,
+       'public.antares_manage_linked_dome(text,uuid,uuid,text,text,text,integer)'::regprocedure
     ) AND p.prosecdef
       AND pg_get_userbyid(p.proowner)='neondb_owner'
       AND has_function_privilege(r.oid,p.oid,'EXECUTE')
@@ -42,7 +43,7 @@ try{
  const row=rows[0];
  check('Papel runtime limitado',row?.role_name==='antares_team_runtime'&&row?.can_login===true&&row?.is_super===false&&row?.bypass_rls===false);
  check('Sem acesso direto às tabelas operacionais',row?.no_table_access===true);
- check('Três funções protegidas com EXECUTE restrito',Number(row?.allowed_functions)===3);
+ check('Quatro funções protegidas com EXECUTE restrito',Number(row?.allowed_functions)===4);
  console.log(fail?'BLOQUEADO | Nao habilitar gravacoes de Agenda.':'APROVADO | Permissoes verificadas somente por leitura. Falta homologar HTTP autenticado e gravacao real controlada.');
 }catch{console.error('FALHOU | Nao foi possivel verificar as permissoes; nenhuma gravacao realizada.');fail++;}
 if(fail)process.exitCode=1;
