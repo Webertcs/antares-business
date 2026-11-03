@@ -50,7 +50,7 @@ export default async function CupulasPage(){
  const domeNames=(items:Dome[])=>{const names=items.slice(0,3).map(d=>d.name);return <p className="operation-metric-names">{names.length?names.join(' · '):'Nenhuma'}{items.length>3?` · +${items.length-3} outras`:''}</p>};
  return <main className="operation-detail">
   <Link className="operation-detail-back" href="/?section=operacao">← Voltar</Link>
-  <header className="operation-detail-head"><div><h1>Cúpulas e equipamentos</h1><p>Estrutura e programação do planetário.</p></div></header>
+  <header className="operation-detail-head"><div><h1>Cúpulas</h1><p>Estrutura e programação do planetário.</p></div></header>
   {domeError?<p className="operation-detail-warning" role="alert">Não foi possível consultar as cúpulas neste momento.</p>:<>
    <div className="operation-detail-metrics">
     <div><span>Cúpulas cadastradas</span><strong>{domes.length}</strong>{domeNames(domes)}</div>
