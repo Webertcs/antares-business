@@ -678,3 +678,18 @@
 .operation-history-details dd{margin:0;word-break:break-all;color:#536e96}
 .operation-history-note{font-size:11px;color:#60789b;margin:11px 2px 0}
 @media(max-width:650px){.operation-history .operation-detail-table-scroll{max-height:65dvh}.operation-history .operation-detail-table-scroll table{min-width:610px}}
+
+/* Bloco 47B — detalhes da auditoria em janela flutuante. */
+.operation-audit-open{font-size:11px;color:#2858aa;background:#e7f0ff;border:1px solid #c7daf8;border-radius:7px;padding:6px 10px;font-weight:750;cursor:pointer}
+.operation-audit-open:hover{background:#dce9ff}
+.operation-audit-open:focus-visible,.operation-audit-dialog button:focus-visible{outline:3px solid #80b0fd;outline-offset:2px}
+.operation-audit-dialog{position:fixed;margin:auto;width:min(420px,calc(100vw - 26px));max-height:calc(100dvh - 28px);overflow:auto;padding:20px;background:#f7fbff;color:#173767;border:1px solid #c1d6f6;border-radius:14px;box-shadow:0 18px 70px #081f4d55}
+.operation-audit-dialog::backdrop{background:#0b244e88}
+.operation-audit-dialog-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px}
+.operation-audit-dialog-head h3{margin:0;font-size:18px;font-weight:800;color:#173767}
+.operation-audit-dialog-head button{font-size:23px;line-height:1;background:#e5eeff;border:1px solid #c1d5f4;border-radius:8px;color:#2458d3;cursor:pointer;width:32px;height:32px}
+.operation-audit-dialog dl{display:grid;gap:5px;margin:0}
+.operation-audit-dialog dt{font-size:11px;color:#647c9e;font-weight:750;margin-top:8px}
+.operation-audit-dialog dd{font-size:13px;font-weight:600;margin:0;overflow-wrap:anywhere;color:#234574;padding:9px 11px;background:#eaf2ff;border:1px solid #d2e0f9;border-radius:8px}
+.operation-audit-dialog form{display:flex;justify-content:flex-end;margin-top:17px}
+.operation-audit-close{padding:9px 17px;border-radius:8px;border:0;background:#2458d3;color:#fff;font-size:12px;font-weight:750;cursor:pointer}
