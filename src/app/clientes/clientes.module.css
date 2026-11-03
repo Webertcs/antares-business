@@ -81,3 +81,18 @@
 .formActions button[type='button'] {margin-left:0!important;background:#e8f1ff;color:#174e9c;border:1px solid #b8d1f5;}
 .formActions button[type='button']:hover:not(:disabled) {background:#d8e8ff;}
 @media(max-width:560px) {.formDialog{width:calc(100vw - 20px);max-height:calc(100dvh - 20px);}.formHeading{padding:18px;}.formDialog form{padding:18px 18px 0;}.formFields{grid-template-columns:1fr;}.formActions{flex-wrap:wrap;}.formActions button{flex:1;min-width:0;}}
+
+/* Distribuição corrigida: formulário ocupa toda a largura do modal.
+   O grid pertence ao fieldset; cada campo é uma célula, não um grid aninhado. */
+.formDialog {width:min(740px,calc(100vw - 32px));}
+.formDialog .formFields {display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px 20px;width:100%;}
+.formDialog .formFields label {display:block;width:100%;min-width:0;grid-column:auto;}
+.formDialog .formFields label:first-child,
+.formDialog .formFields label:last-child {grid-column:1/-1;}
+.formDialog .formFields input,
+.formDialog .formFields select {display:block;width:100%!important;max-width:none!important;box-sizing:border-box;}
+.formDialog .formFields label:nth-child(6) {grid-column:auto;}
+@media(max-width:560px){
+ .formDialog .formFields {grid-template-columns:minmax(0,1fr);}
+ .formDialog .formFields label {grid-column:1/-1;}
+}
