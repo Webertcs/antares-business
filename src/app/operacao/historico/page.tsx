@@ -51,7 +51,7 @@ export default async function HistoricoPage(){
     <td><span className="operation-history-area">{readable(e.entity_type,areas)}</span></td>
     <td><AuditDetails action={e.action} entityType={e.entity_type} entityId={e.entity_id}/></td>
    </tr>)}</tbody></table></div>}
-   {!error&&entries.length>0&&<p className="operation-history-note">Exibindo até 100 atividades mais recentes. Os detalhes técnicos continuam disponíveis para conferência.</p>}
+   {!error&&entries.length>0&&<p className="operation-history-note">Exibindo até 100 atividades mais recentes.</p>}
   </section>
  </main>;
 }
