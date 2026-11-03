@@ -16,6 +16,7 @@ export default function ClientsPage({ writesEnabled }: { writesEnabled: boolean 
  const [loading,setLoading]=useState(true);
  const [query,setQuery]=useState('');
  const [kind,setKind]=useState('all');
+ const [showArchived,setShowArchived]=useState(false);
  const [selected,setSelected]=useState<string|null>(null);
  const [form,setForm]=useState<'client'|'contact'|'event'|null>(null);
  const [editing,setEditing]=useState<string|null>(null);
@@ -57,11 +58,27 @@ export default function ClientsPage({ writesEnabled }: { writesEnabled: boolean 
     .finally(()=>setLoading(false));
    return ()=>ctrl.abort();
  },[revision]);
- const filtered=useMemo(()=>clients.filter(c=>(kind==='all'||c.kind===kind)&&
-   (c.name+' '+(c.city||'')+' '+(c.email||'')).toLocaleLowerCase('pt-BR').includes(query.toLocaleLowerCase('pt-BR'))),[clients,kind,query]);
+ const filtered=useMemo(()=>clients.filter(c=>(showArchived||c.status!=='inactive')&&(kind==='all'||c.kind===kind)&&
+   (c.name+' '+(c.city||'')+' '+(c.email||'')).toLocaleLowerCase('pt-BR').includes(query.toLocaleLowerCase('pt-BR'))),[clients,kind,query,showArchived]);
  const active=clients.find(c=>c.id===selected);
  const selectedContacts=contacts.filter(c=>c.client_id===selected);
  const selectedEvents=events.filter(e=>e.client_id===selected);
+ async function archiveClient(client:Client){
+  if(!writesEnabled||saving)return;
+  const archive=client.status!=='inactive';
+  if(!window.confirm((archive?'Arquivar':'Reativar')+' o cliente '+client.name+'? O histórico, os eventos e as propostas serão preservados.'))return;
+  setSaving(true);setFeedback('');
+  try{
+   const response=await fetch('/api/crm/clientes',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({
+    action:'client',id:client.id,kind:client.kind,name:client.name,email:client.email||'',phone:client.phone||'',
+    city:client.city||'',notes:client.notes||'',status:archive?'inactive':'active'
+   })});
+   const data=await response.json();if(!response.ok)throw Error(data.error||'Falha ao atualizar cliente');
+   setFeedback(archive?'Cliente arquivado; registros e vínculos preservados.':'Cliente reativado.');
+   setRevision(n=>n+1);
+  }catch(e){setFeedback(e instanceof Error?e.message:'Operação indisponível');}
+  finally{setSaving(false)}
+ }
  const countBy=(k:string)=>clients.filter(c=>c.kind===k).length;
  return <main style={{maxWidth:1180,margin:'0 auto',padding:'28px 18px',fontFamily:'system-ui'}}>
   <Link href="/">← Voltar ao painel</Link>
@@ -87,6 +104,7 @@ export default function ClientsPage({ writesEnabled }: { writesEnabled: boolean 
      <option value="all">Todos os clientes</option>
      {Object.entries(kinds).map(([key,val])=><option key={key} value={key}>{val}</option>)}
     </select>
+    <label style={{display:'flex',alignItems:'center',gap:6,fontSize:13,whiteSpace:'nowrap'}}><input type="checkbox" checked={showArchived} onChange={e=>setShowArchived(e.target.checked)}/> Mostrar arquivados</label>
    </div>
    {loading?<p>Carregando clientes...</p>:error?<p role="alert">{error}</p>:
     filtered.length===0?<p>Nenhum cliente encontrado. A inclusão será liberada após a homologação de segurança.</p>:
@@ -94,7 +112,7 @@ export default function ClientsPage({ writesEnabled }: { writesEnabled: boolean 
     <thead><tr>{['Cliente','Tipo','Cidade','Situação','Detalhes'].map(x=><th key={x} style={{padding:'12px 8px',borderBottom:'1px solid #94a3b8'}}>{x}</th>)}</tr></thead>
     <tbody>{filtered.map(c=><tr key={c.id}><td style={{padding:10,borderBottom:'1px solid #94a3b8'}}><strong>{c.name}</strong></td>
     <td>{kinds[c.kind]||c.kind}</td><td>{c.city||'—'}</td><td>{statuses[c.status]||c.status}</td>
-    <td><button onClick={()=>setSelected(c.id===selected?null:c.id)} style={{padding:8,borderRadius:8,background:'#2563eb',color:'white'}} >{c.id===selected?'Fechar':'Ver histórico'}</button> {writesEnabled&&<button onClick={()=>openForm('client',c)}>Editar</button>}</td></tr>)}</tbody></table></div>}
+    <td><button onClick={()=>setSelected(c.id===selected?null:c.id)} style={{padding:8,borderRadius:8,background:'#2563eb',color:'white'}} >{c.id===selected?'Fechar':'Ver histórico'}</button> {writesEnabled&&<><button onClick={()=>openForm('client',c)}>Editar</button> <button type="button" disabled={saving} onClick={()=>archiveClient(c)} style={{padding:8,borderRadius:8,border:'1px solid #a9bddc',background:'#eef4ff',color:'#234d89'}}>{c.status==='inactive'?'Reativar':'Arquivar'}</button></>}</td></tr>)}</tbody></table></div>}
   </section>
   {active&&<section style={{border:'1px solid #94a3b8',borderRadius:14,padding:20}}>
    <h2 style={{fontSize:23,fontWeight:700}}>{active.name}</h2>
