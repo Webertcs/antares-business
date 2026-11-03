@@ -56,7 +56,7 @@ export default function ReceberClient(){
  <h1>Contas a receber</h1>
  <p>Controle por instituição, vencimento e pagamentos parciais. Títulos não são receitas recebidas.</p>
  {status&&<p role="status" style={{padding:12,background:'#e9effc',borderRadius:8}}>{status}</p>}
- {!writesEnabled&&<p role="status" style={{padding:14,background:'#fff4e5',border:'1px solid #efc991',borderRadius:9,color:'#864413'}}>Homologação financeira: novos títulos e recebimentos estão bloqueados. Consulta liberada.</p>}
+ {!writesEnabled&&<p role="status" style={{padding:14,background:'#fff4e5',border:'1px solid #efc991',borderRadius:9,color:'#864413'}}>Novos lançamentos estão temporariamente indisponíveis. Você ainda pode consultar os títulos e recebimentos existentes.</p>}
  <section style={box}><h2>Novo título</h2>
  <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(200px,1fr))',gap:15}}>
  <label>Instituição<select style={input} value={client} onChange={e=>{setClient(e.target.value);setDraftId(null);}}><option value="">Selecione</option>{clients.map(c=><option key={c.id} value={c.id}>{c.name}</option>)}</select></label>
