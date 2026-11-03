@@ -164,7 +164,7 @@ export default function ClientsPage({ writesEnabled }: { writesEnabled: boolean 
    <div className={styles.formHeading}>
    <h2 id="client-form-title" style={{fontSize:22}}>{form==='client'?(editing?'Editar cliente':'Novo cliente'):form==='contact'?'Novo contato':'Nova apresentação'}</h2>
    <button type="button" disabled={saving} onClick={closeForm} aria-label="Fechar formulário">×</button></div>
-   <form onSubmit={submit} style={{display:'grid',gap:12}}>
+   <form onSubmit={submit} style={{display:'flex',flexDirection:'column',gap:12,width:'100%'}}>
     <fieldset disabled={saving} className={styles.formFields}>
     {(form==='client'?[
       ['name','Nome'],['kind','Tipo'],['email','E-mail'],['phone','Telefone'],['city','Cidade'],['status','Situação'],['notes','Observações']
