@@ -19,27 +19,32 @@ export default function BookingClient({enabled}:{enabled:boolean}){
  setBusy(true);setStatus('');
  try{const r=await fetch('/api/agenda/reservas',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({proposalId,domeId,start:new Date(start).toISOString(),end:new Date(end).toISOString()})});const v=await r.json();if(!r.ok)throw Error(v.error||'Reserva não registrada');await load();setStatus('Reserva registrada. Consulte a Agenda.');setProposalId('');setDomeId('');}
  catch(e){setStatus(e instanceof Error?e.message:'Erro');}finally{setBusy(false)}}
- return <main style={{maxWidth:980,margin:'0 auto',padding:24,fontFamily:'system-ui',color:'#16345e'}}>
- <Link href="/operacoes">← Central de Operações</Link><h1>Reservas vinculadas às propostas</h1>
- <p>Uma proposta aceita pode ser vinculada a uma apresentação. Reservas exigem cliente e cúpula correspondentes na estrutura operacional.</p>
- {!enabled&&<p style={{background:'#fff2d6',padding:15,borderRadius:8}}>Reservas temporariamente indisponíveis. Você pode consultar as apresentações existentes.</p>}
- {status&&<p role="status">{status}</p>}
- <section style={{border:'1px solid #bdcce4',borderRadius:12,padding:18,marginTop:18}}><h2>Pré-requisitos de reserva</h2>
- <p>Propostas aceitas: <strong>{data?.proposals.length??'—'}</strong> · Clientes vinculados: <strong>{data?.proposals.filter(x=>x.mapped).length??'—'}</strong> · Cúpulas vinculadas: <strong>{domes.length}</strong> · Reservas vinculadas: <strong>{data?.links.length??'—'}</strong></p>
- {data?.proposals.map(p=><p key={p.id}>{p.client_name} — {p.title}: <strong>{p.mapped?'Cliente operacional vinculado':'Aguardando vínculo de cliente'}</strong>{data.links.some(l=>l.proposal_id===p.id)?' · Reserva registrada':''}</p>)}
- {data?.domes.map(d=><p key={d.id}>Cúpula {d.name}: {d.mapped?'Vínculo operacional pronto':'Aguardando vínculo operacional'}</p>)}
- {data&&domes.length===0&&<p>Não existem cúpulas aptas a receber reservas. O cadastro e o vínculo de equipamentos são pré-requisitos.</p>}
+ return <main className="booking-refined">
+ <Link href="/?section=operacao" className="operation-detail-back">← Voltar</Link>
+ <div className="booking-heading"><div><h1>Reservas</h1><p>Agende apresentações com cúpulas e instituições vinculadas.</p></div><Link className="booking-calendar-link" href="/?section=agenda">Ver calendário ↗</Link></div>
+ {status&&<p role="status" className="booking-status">{status}</p>}
+ <section className="booking-panel" aria-labelledby="booking-readiness-heading">
+  <div className="booking-section-heading"><h2 id="booking-readiness-heading">Preparação para agendamentos</h2><span className="booking-pill">{enabled?'Cadastro disponível':'Somente consulta'}</span></div>
+  <div className="booking-metrics">
+   <div><span>Propostas aceitas</span><strong>{data?.proposals.length??'—'}</strong></div>
+   <div><span>Clientes vinculados</span><strong>{data?.proposals.filter(x=>x.mapped).length??'—'}</strong></div>
+   <div><span>Cúpulas vinculadas</span><strong>{domes.length}</strong></div>
+   <div><span>Reservas registradas</span><strong>{data?.links.length??'—'}</strong></div>
+  </div>
+  {data?.proposals.length?<div className="booking-readiness-list">{data.proposals.map(p=><div key={p.id} className="booking-readiness-row"><div><strong>{p.client_name}</strong><span>{p.title}</span></div><span className={p.mapped?'booking-ready':'booking-pending'}>{data.links.some(l=>l.proposal_id===p.id)?'Reservada':p.mapped?'Cliente vinculado':'Aguardando vínculo'}</span></div>)}</div>:data&&<p className="booking-empty">Nenhuma proposta aceita disponível.</p>}
+  {data?.domes.length?<p className="booking-dome-names">Cúpulas: {data.domes.map(d=>d.name+(d.mapped?' ✓':' — vínculo pendente')).join(' · ')}</p>:data&&<p className="booking-empty">Ainda não há cúpulas cadastradas. Utilize a página Cúpulas para consultar a estrutura.</p>}
+  {!enabled&&<p className="booking-readonly">Os agendamentos ainda não estão liberados para gravação. A configuração será validada antes da entrega.</p>}
  </section>
  {enabled&&data&&<section style={{border:'1px solid #bdcce4',padding:18,borderRadius:12,marginTop:20,display:'grid',gap:12}}>
- <h2>Preparar cadastros operacionais</h2>
- <p>Vincule a instituição contratante e cadastre uma cúpula antes da primeira reserva.</p>
+ <h2>Preparar cadastros para a primeira reserva</h2>
+ <p>Vincule o cliente à proposta e prepare a cúpula para agendamento.</p>
  {data.proposals.filter(p=>!p.mapped).map(p=><button disabled={busy} key={p.id} onClick={()=>prepare({action:'link-client',proposalId:p.id})} style={{padding:12}}>Vincular cliente: {p.client_name}</button>)}
  <label>Nome da cúpula<input value={domeName} onChange={e=>setDomeName(e.target.value)} style={{display:'block',padding:10,width:'100%'}}/></label>
  <label>Código da cúpula<input value={domeCode} onChange={e=>setDomeCode(e.target.value)} style={{display:'block',padding:10,width:'100%'}}/></label>
  <label>Capacidade por sessão<input type="number" min={1} max={500} value={capacity} onChange={e=>setCapacity(Number(e.target.value))} style={{display:'block',padding:10,width:'100%'}}/></label>
  <button disabled={busy||domeName.trim().length<2||!domeCode.trim()||!Number.isInteger(capacity)||capacity<1||capacity>500} onClick={()=>prepare({action:'create-dome',name:domeName,code:domeCode,capacity})} style={{padding:12}}>Cadastrar e vincular cúpula</button>
  </section>}
- {enabled&&eligible.length>0&&domes.length>0&&<form onSubmit={submit} style={{marginTop:22,display:'grid',gap:14,border:'1px solid #bdcce4',padding:18,borderRadius:12}}>
+ {enabled&&eligible.length>0&&domes.length>0&&<form onSubmit={submit} className="booking-panel booking-form">
  <h2>Reservar apresentação</h2><label>Proposta<select required value={proposalId} onChange={e=>setProposalId(e.target.value)} style={{display:'block',padding:10,width:'100%'}}><option value="">Selecione</option>{eligible.map(p=><option key={p.id} value={p.id}>{p.client_name} — {p.title}</option>)}</select></label>
  <label>Cúpula<select required value={domeId} onChange={e=>setDomeId(e.target.value)} style={{display:'block',padding:10,width:'100%'}}><option value="">Selecione</option>{domes.map(d=><option key={d.id} value={d.id}>{d.name}{d.capacity?' · capacidade '+d.capacity:''}</option>)}</select></label>
  <label>Início<input required type="datetime-local" value={start} onChange={e=>setStart(e.target.value)} style={{display:'block',padding:10,width:'100%'}}/></label>
