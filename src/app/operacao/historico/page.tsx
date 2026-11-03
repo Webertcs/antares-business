@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import {redirect} from 'next/navigation';
 import {requireOwner,getDb} from '@/lib/equipe/auth';
+import AuditDetails from './AuditDetails';
 
 export const dynamic='force-dynamic';
 export const runtime='nodejs';
@@ -48,7 +49,7 @@ export default async function HistoricoPage(){
     <td className="operation-history-date">{Number.isFinite(new Date(e.created_at).getTime())?formatter.format(new Date(e.created_at)):'—'}</td>
     <td className="operation-history-action">{readable(e.action,actions)}</td>
     <td><span className="operation-history-area">{readable(e.entity_type,areas)}</span></td>
-    <td><details className="operation-history-details"><summary>Consultar</summary><dl><dt>Ação original</dt><dd>{e.action}</dd><dt>Tipo de registro</dt><dd>{e.entity_type}</dd><dt>Identificador</dt><dd>{e.entity_id||'—'}</dd></dl></details></td>
+    <td><AuditDetails action={e.action} entityType={e.entity_type} entityId={e.entity_id}/></td>
    </tr>)}</tbody></table></div>}
    {!error&&entries.length>0&&<p className="operation-history-note">Exibindo até 100 atividades mais recentes. Os detalhes técnicos continuam disponíveis para conferência.</p>}
   </section>
