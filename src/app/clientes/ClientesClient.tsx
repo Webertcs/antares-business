@@ -23,7 +23,8 @@ export default function ClientsPage({ writesEnabled }: { writesEnabled: boolean 
  const [restoreStatus,setRestoreStatus]=useState('prospect');
  const [showArchived,setShowArchived]=useState(false);
  const [selected,setSelected]=useState<string|null>(null);
- useEffect(()=>{const id=new URLSearchParams(window.location.search).get('clientId');if(id&&clients.some(c=>c.id===id))setSelected(id);},[clients]);
+ const [linkedEventId,setLinkedEventId]=useState<string|null>(null);
+ useEffect(()=>{const params=new URLSearchParams(window.location.search);const id=params.get('clientId');if(id&&clients.some(c=>c.id===id)){setSelected(id);setLinkedEventId(params.get('eventId'));}},[clients]);
  const historyDialog=useRef<HTMLDialogElement>(null);
  useEffect(()=>{if(selected)historyDialog.current?.showModal();},[selected]);
  const [form,setForm]=useState<'client'|'contact'|'event'|null>(null);
@@ -163,7 +164,7 @@ export default function ClientsPage({ writesEnabled }: { writesEnabled: boolean 
      {c.is_primary?' · Principal':''} · {c.phone||c.email||'Sem contato'}</li>)}</ul>}
    <h3 style={{fontSize:18,marginTop:20}}>Apresentações e oportunidades ({selectedEvents.length}) {writesEnabled&&<button onClick={()=>openForm('event')}>+ Evento</button>}</h3>
    {selectedEvents.length===0?<p>Sem eventos registrados.</p>:
-    <ul>{selectedEvents.map(e=><li key={e.id}>{e.title} · {formatDateBR(e.event_date)} · {eventStatuses[e.status]||e.status}
+    <ul>{selectedEvents.map(e=><li key={e.id} style={linkedEventId===e.id?{border:'2px solid #2563eb',borderRadius:10,background:'#dbeafe',boxShadow:'0 0 0 4px rgba(37,99,235,.13), 0 4px 16px rgba(37,99,235,.16)',padding:'12px 14px',color:'#123c7a',fontWeight:700}:undefined}>{linkedEventId===e.id&&<span style={{display:'block',fontSize:12,color:'#1d4ed8',marginBottom:5}}>🚀 Evento localizado pela Agenda</span>}{e.title} · {formatDateBR(e.event_date)} · {eventStatuses[e.status]||e.status}
     {e.expected_attendees!=null?' · '+e.expected_attendees+' participantes':''}</li>)}</ul>}
   </section><div className={styles.historyFooter}><button type="button" onClick={()=>setSelected(null)}>Fechar histórico</button></div></dialog>}
   {feedback&&!form&&<p className={styles.feedback} role="status">{feedback}</p>}
