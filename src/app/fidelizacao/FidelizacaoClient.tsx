@@ -1,6 +1,5 @@
 'use client';
 import {useEffect,useMemo,useState} from 'react';
-import Link from 'next/link';
 
 type Client={id:string;name:string;kind:string;status:string;city:string|null};
 type Event={id:string;client_id:string;status:string;event_date:string|null;title:string};
@@ -81,7 +80,7 @@ export default function FidelizacaoClient(){
  const count=(tier:string)=>items.filter(i=>i.tier===tier).length;
  const dateLabel=(d:Date|null)=>d?d.toLocaleDateString('pt-BR',{timeZone:'UTC'}):'Nenhuma visita concluída';
  return <main style={{maxWidth:1180,margin:'0 auto',padding:'28px 18px',fontFamily:'system-ui'}}>
- <Link href="/">← Voltar ao painel</Link>
+
  <div style={{margin:'22px 0'}}><div style={{fontSize:12,letterSpacing:2,color:'#315a96'}}>ANTARES BUSINESS · BLOCO 06E</div>
  <h1 style={{fontSize:30,fontWeight:800}}>Fidelização e Relacionamento</h1>
  <p>Alertas internos para ajudar o proprietário a decidir quem merece atenção. Nenhuma mensagem é enviada automaticamente.</p></div>

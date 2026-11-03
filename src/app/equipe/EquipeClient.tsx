@@ -76,7 +76,7 @@ export default function EquipeClient({ writesEnabled }: { writesEnabled: boolean
     finally { setSending(false); }
   }
   return <main className="team-refined">
-    <a className="operation-detail-back" href="/?section=operacao">← Voltar</a>
+
     <h1>Equipe e permissões</h1>
     <p className="team-intro">Colaboradores e acessos do planetário.</p>
     {loading ? <p>Carregando...</p> : error ? <p role="alert">{error}</p> : <table className="team-table">

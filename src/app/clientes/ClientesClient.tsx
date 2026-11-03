@@ -89,7 +89,7 @@ export default function ClientsPage({ writesEnabled }: { writesEnabled: boolean 
  }
  const countBy=(k:string)=>clients.filter(c=>c.kind===k).length;
  return <main className={styles.page} style={{maxWidth:1180,margin:'0 auto',padding:'28px 18px',fontFamily:'system-ui'}}>
-  <Link href="/" className={styles.backButton}><span aria-hidden="true">←</span> Voltar ao painel</Link>
+
   <div className={styles.hero} style={{display:'flex',justifyContent:'space-between',alignItems:'center',gap:16,flexWrap:'wrap',margin:'20px 0'}}>
    <div><p style={{letterSpacing:2,fontSize:12}}>ANTARES · RELACIONAMENTO</p>
     <h1 style={{fontSize:30,fontWeight:750}}>Clientes e Eventos</h1>

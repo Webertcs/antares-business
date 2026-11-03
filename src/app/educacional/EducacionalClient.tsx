@@ -1,6 +1,5 @@
 'use client';
 import {useEffect,useState} from 'react';
-import Link from 'next/link';
 type School={id:string;name:string};
 type Group={id:string;school:string;label:string;grade_level:string;student_count:number;teacher_name:string;teacher_contact:string;notes:string};
 export default function EducacionalClient({writesEnabled}:{writesEnabled:boolean}){
@@ -18,7 +17,7 @@ export default function EducacionalClient({writesEnabled}:{writesEnabled:boolean
  }catch(e){setError(e instanceof Error?e.message:'Falha de cadastro');}finally{setSaving(false);}}
  const change=(key:keyof typeof form,value:string|number)=>setForm(v=>({...v,[key]:value}));
  return <main style={{maxWidth:1150,margin:'0 auto',padding:28,fontFamily:'system-ui',color:'#16325b'}}>
- <Link href="/">← Painel</Link><h1 style={{fontSize:30,marginTop:20}}>Alunos e Professores</h1>
+ <h1 style={{fontSize:30,marginTop:20}}>Alunos e Professores</h1>
  <p>Turmas por escola, quantidade de alunos e professor responsável. Não armazenamos nomes nem identificadores individuais de crianças.</p>
  {!writesEnabled&&<p role="status" style={{padding:15,background:'#fff2d9',borderRadius:9}}>Cadastros temporariamente indisponíveis. As turmas existentes continuam disponíveis para consulta.</p>}
  {loading?<p>Carregando...</p>:error?<p role="alert">{error}</p>:null}
