@@ -755,3 +755,10 @@
 .relationship-content>main {padding:0!important;max-width:none!important;min-height:0!important;}
 .sidebar .owner-nav-link.active {background:#283d65;color:#fff;box-shadow:inset 3px 0 #62d8f0;border-radius:10px;}
 @media(max-width:640px){.relationship-content{padding:18px 14px;}}
+
+/* ANTARES: calendário com maior área útil no desktop */
+@media (min-width: 741px) {
+ .cal-page .cal-day { min-height: 112px; max-height: none; padding: 10px; gap: 6px; }
+ .cal-page .cal-day > span { font-size: 13px; }
+ .cal-page .cal-day small { font-size: 11px; }
+}
