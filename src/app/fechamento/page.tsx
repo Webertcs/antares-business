@@ -12,7 +12,7 @@ const items=[
  {heading:'Financeiro',href:'/financeiro/receber',key:'finance',description:'Conferir contas reais e recebimentos documentados.'}
 ] as const;
 export default async function FechamentoPage(){
- if(!await requireOwner())redirect('/sem-acesso');
+ const owner=await requireOwner();if(!owner || !process.env.ANTARES_DEVELOPER_SUBJECT || owner.user.id!==process.env.ANTARES_DEVELOPER_SUBJECT)redirect('/sem-acesso');
  const flags:Record<string,boolean>={
  provider:process.env.ANTARES_PROVIDER_WRITES_ENABLED==='true',
  agenda:process.env.ANTARES_AGENDA_WRITES_ENABLED==='true',
