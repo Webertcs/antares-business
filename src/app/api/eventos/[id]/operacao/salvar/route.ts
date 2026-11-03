@@ -15,6 +15,26 @@ export async function POST(req:NextRequest,{params}:{params:Promise<{id:string}>
  const {id}=await params;if(!uuid.test(id))return NextResponse.json({error:'Evento inválido.'},{status:400});
  try{
   const body=await req.json();const sql=getTeamWriteDb();
+  const safety=await sql`SELECT
+    current_user='antares_team_runtime' AND r.rolcanlogin AND NOT r.rolsuper AND NOT r.rolbypassrls AS safe_role,
+    (SELECT count(*)=3 FROM pg_class c
+      WHERE c.oid IN ('public.antares_event_operations'::regclass,'public.antares_event_checklist'::regclass,'public.antares_event_sessions'::regclass)
+      AND c.relrowsecurity
+      AND NOT has_table_privilege(current_user,c.oid,'SELECT')
+      AND NOT has_table_privilege(current_user,c.oid,'INSERT')
+      AND NOT has_table_privilege(current_user,c.oid,'UPDATE')
+      AND NOT has_table_privilege(current_user,c.oid,'DELETE')) AS safe_tables,
+    (SELECT count(*)=3 FROM pg_proc p
+      WHERE p.pronamespace='public'::regnamespace
+      AND p.proname IN ('antares_save_event_operation','antares_save_event_task','antares_save_event_session')
+      AND p.prosecdef
+      AND pg_get_userbyid(p.proowner)='neondb_owner'
+      AND has_function_privilege(current_user,p.oid,'EXECUTE')
+      AND NOT EXISTS(SELECT 1 FROM aclexplode(coalesce(p.proacl,acldefault('f',p.proowner))) acl
+        WHERE acl.grantee=0 AND acl.privilege_type='EXECUTE')) AS safe_functions
+    FROM pg_roles r WHERE r.rolname=current_user`;
+  if(!safety[0]?.safe_role||!safety[0]?.safe_tables||!safety[0]?.safe_functions)
+    return NextResponse.json({error:'Isolamento operacional não verificado.'},{status:503});
   if(body.action==='infrastructure'){
    const access=clean(body.access,2000),parking=clean(body.parking,2000),power=clean(body.power,2000),setup=clean(body.setup,4000);
    await sql`SELECT public.antares_save_event_operation(${ctx.user.id},${id}::uuid,${access},${parking},${power},${setup})`;
