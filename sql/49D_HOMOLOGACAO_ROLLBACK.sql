@@ -8,7 +8,8 @@ DECLARE
   v_client uuid; v_presentation uuid; v_blocked boolean:=false;
 BEGIN
  SELECT auth_subject,organization_id INTO v_subject,v_org
- FROM public.team_members WHERE active=true AND role='owner'
+ FROM public.team_members tm WHERE tm.active=true AND tm.role='owner'
+  AND EXISTS(SELECT 1 FROM public.crm_clients c WHERE c.organization_id=tm.organization_id)
  LIMIT 1;
  IF v_subject IS NULL THEN RAISE EXCEPTION 'PENDENTE: proprietario autenticado nao encontrado'; END IF;
 
@@ -40,7 +41,8 @@ BEGIN
  -- Testa de verdade o bloqueio de exclusao com apresentacao vinculada.
  -- Todos os registros aqui existem somente dentro desta transacao com ROLLBACK.
  INSERT INTO public.clients(organization_id,name,kind)
- VALUES(v_org,'Cliente temporario 49D','school') RETURNING id INTO v_client;
+ SELECT v_org,'Cliente temporario 49D',c.kind FROM public.crm_clients c
+ WHERE c.organization_id=v_org LIMIT 1 RETURNING id INTO v_client;
  INSERT INTO public.presentations(organization_id,client_id,dome_id,title,starts_at,ends_at,status)
  VALUES(v_org,v_client,v_equipment,'Apresentacao temporaria 49D',
   '2031-05-12 10:00-03'::timestamptz,'2031-05-12 11:00-03'::timestamptz,'reserved')
