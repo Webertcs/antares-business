@@ -96,3 +96,20 @@
  .formDialog .formFields {grid-template-columns:minmax(0,1fr);}
  .formDialog .formFields label {grid-column:1/-1;}
 }
+
+/* Base de clientes — filtros visíveis e organizados */
+.directoryHeader {display:flex;justify-content:space-between;align-items:center;gap:16px;padding:18px 20px;margin:-18px -18px 18px;background:linear-gradient(110deg,#e9f2ff,#f3f8ff);border-bottom:1px solid #c9ddfa;border-radius:14px 14px 0 0;}
+.directoryHeader h2 {margin:0;color:#124785;font-size:21px;font-weight:750;}
+.directoryHeader p {margin:4px 0 0;color:#52739b;font-size:13px;}
+.resultCount {background:#1d60c3;color:#fff;border-radius:99px;padding:7px 13px;font-size:12px;font-weight:700;white-space:nowrap;}
+.filterPanel {display:grid;grid-template-columns:minmax(220px,1fr) minmax(175px,220px) auto;align-items:end;gap:12px;background:#f0f6ff;border:1px solid #c9defb;border-radius:14px;padding:15px;margin-bottom:18px;}
+.filterSearch,.filterKind {display:flex;flex-direction:column;gap:7px;min-width:0;color:#174a8c;font-size:13px;font-weight:700;}
+.filterKind small {color:#1d60c3;font-size:11px;margin-left:5px;}
+.filterSearch input,.filterKind select {box-sizing:border-box;width:100%;min-height:45px;padding:10px 12px;border:1px solid #aac8ef;border-radius:9px;background:#fff;color:#193c68;font-size:14px;}
+.filterSearch input:focus,.filterKind select:focus {outline:3px solid #9ac4ff;outline-offset:1px;}
+.filterKind select {cursor:pointer;font-weight:600;}
+.filterArchived {display:flex;align-items:center;justify-content:center;gap:9px;min-height:45px;padding:8px 13px;border:1px solid #b6d0f3;border-radius:9px;background:#e0edff;color:#174a8c;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap;}
+.filterArchived input {width:18px;height:18px;accent-color:#1c61c8;cursor:pointer;}
+.filterArchived:has(input:checked) {background:#c8e0ff;border-color:#3778d5;}
+@media(max-width:850px) {.filterPanel{grid-template-columns:minmax(0,1fr) minmax(160px,220px);}.filterArchived{grid-column:1/-1;justify-content:flex-start;}}
+@media(max-width:560px) {.directoryHeader{align-items:flex-start;flex-direction:column;}.filterPanel{grid-template-columns:1fr;}.filterArchived{grid-column:auto;}}
