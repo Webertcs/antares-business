@@ -57,3 +57,9 @@
 .antares-dark-logo{position:relative;width:100%;line-height:0}
 .antares-dark-logo .antares-brand-image{display:block}
 .antares-dark-logo .antares-wordmark-light{position:absolute;inset:0;width:100%;height:100%;max-height:none;object-fit:contain;object-position:left center;filter:brightness(0) invert(1);clip-path:inset(0 0 0 33%);pointer-events:none}
+
+/* ANTARES: acabamento visual sem alterar fluxos ou regras de negocio */
+:where(.card,.metric,.panel,.cal-events-panel){transition:box-shadow .18s ease,transform .18s ease}
+:where(.card,.metric,.panel,.cal-events-panel):hover{box-shadow:0 10px 28px rgba(18,46,95,.09)}
+:where(a,button,input,select,textarea):focus-visible{outline:3px solid #63a4ff;outline-offset:3px}
+@media (prefers-reduced-motion:reduce){:where(.card,.metric,.panel,.cal-events-panel){transition:none}}
