@@ -24,19 +24,41 @@ export default function ClientsPage({ writesEnabled }: { writesEnabled: boolean 
  const [showArchived,setShowArchived]=useState(false);
  const [selected,setSelected]=useState<string|null>(null);
  const [form,setForm]=useState<'client'|'contact'|'event'|null>(null);
+ const formDialog=useRef<HTMLDialogElement>(null);
+ const initialFields=useRef<Record<string,string>>({});
  const [editing,setEditing]=useState<string|null>(null);
  const [fields,setFields]=useState<Record<string,string>>({});
  const [feedback,setFeedback]=useState('');
  const [revision,setRevision]=useState(0);
  const [saving,setSaving]=useState(false);
+ const dirty=JSON.stringify(fields)!==JSON.stringify(initialFields.current);
+ useEffect(()=>{
+  if(!form)return;
+  formDialog.current?.showModal();
+  const previousOverflow=document.body.style.overflow;
+  document.body.style.overflow='hidden';
+  return()=>{document.body.style.overflow=previousOverflow;};
+ },[form]);
+ useEffect(()=>{
+  if(!form||(!dirty&&!saving))return;
+  const warn=(e:BeforeUnloadEvent)=>{e.preventDefault();e.returnValue='';};
+  window.addEventListener('beforeunload',warn);
+  return()=>window.removeEventListener('beforeunload',warn);
+ },[form,dirty,saving]);
+ function closeForm(){
+  if(saving)return;
+  if(dirty&&!window.confirm('Descartar as alterações não salvas?'))return;
+  setForm(null);setFeedback('');
+ }
  function openForm(type:'client'|'contact'|'event',client?:Client){
-   setForm(type);setEditing(type==='client'?client?.id||null:null);
-   setFields(type==='client'?{name:client?.name||'',kind:client?.kind||'school',
+   setFeedback('');setForm(type);setEditing(type==='client'?client?.id||null:null);
+   const nextFields:Record<string,string>=type==='client'?{name:client?.name||'',kind:client?.kind||'school',
     email:client?.email||'',phone:client?.phone||'',city:client?.city||'',
     notes:client?.notes||'',status:client?.status||'prospect'}:
     type==='contact'?{name:'',position:'',email:'',phone:''}:
     {title:'',kind:'presentation',date:'',attendees:'',pricing:'per_student',price:'',fixed:'',
-      status:'lead',venue:'',notes:''});
+      status:'lead',venue:'',notes:''};
+   initialFields.current=nextFields;setFields(nextFields);
  }
  const setField=(key:string,value:string)=>setFields(f=>({...f,[key]:value}));
  async function submit(e:React.FormEvent<HTMLFormElement>){
@@ -137,10 +159,13 @@ export default function ClientsPage({ writesEnabled }: { writesEnabled: boolean 
     <ul>{selectedEvents.map(e=><li key={e.id}>{e.title} · {formatDateBR(e.event_date)} · {eventStatuses[e.status]||e.status}
     {e.expected_attendees!=null?' · '+e.expected_attendees+' participantes':''}</li>)}</ul>}
   </section>}
-  {feedback&&<p className={styles.feedback} role="status">{feedback}</p>}
-  {form&&<section className={styles.editor} style={{border:'1px solid #94a3b8',borderRadius:14,padding:20,marginTop:20}}>
-   <h2 style={{fontSize:22}}>{form==='client'?(editing?'Editar cliente':'Novo cliente'):form==='contact'?'Novo contato':'Nova apresentação'}</h2>
+  {feedback&&!form&&<p className={styles.feedback} role="status">{feedback}</p>}
+  {form&&<dialog ref={formDialog} aria-labelledby="client-form-title" aria-modal="true" className={`${styles.editor} ${styles.formDialog}`} onCancel={e=>{e.preventDefault();closeForm();}}>
+   <div className={styles.formHeading}>
+   <h2 id="client-form-title" style={{fontSize:22}}>{form==='client'?(editing?'Editar cliente':'Novo cliente'):form==='contact'?'Novo contato':'Nova apresentação'}</h2>
+   <button type="button" disabled={saving} onClick={closeForm} aria-label="Fechar formulário">×</button></div>
    <form onSubmit={submit} style={{display:'grid',gap:12}}>
+    <fieldset disabled={saving} className={styles.formFields}>
     {(form==='client'?[
       ['name','Nome'],['kind','Tipo'],['email','E-mail'],['phone','Telefone'],['city','Cidade'],['status','Situação'],['notes','Observações']
     ]:form==='contact'?[
@@ -158,14 +183,16 @@ export default function ClientsPage({ writesEnabled }: { writesEnabled: boolean 
          key==='pricing'?[['per_student','Por participante'],['fixed','Valor fechado'],['complimentary','Gratuito']]:
          [['false','Não'],['true','Sim']]).map(([v,l])=><option key={v} value={v}>{l}</option>)}
        </select>:
-       <input value={fields[key]||''} onChange={e=>setField(key,e.target.value)}
+       <input autoFocus={key==='name'||key==='title'} value={fields[key]||''} onChange={e=>setField(key,e.target.value)}
         type={key==='date'?'date':key==='email'?'email':key==='attendees'||key==='price'||key==='fixed'?'number':'text'}
         step={key==='price'||key==='fixed'?'0.01':undefined}
         required={key==='name'||key==='title'}
         style={{display:'block',padding:10,width:'100%',color:'#111',background:'#fff'}}/>}</label>)}
-    <div><button type="submit" disabled={!writesEnabled||saving}>{saving?"Salvando...":"Salvar"}</button>
-    <button type="button" disabled={saving} onClick={()=>setForm(null)} style={{marginLeft:12}}>Cancelar</button></div>
-   </form></section>}
+    </fieldset>
+    {feedback&&<p className={styles.formError} role="alert">{feedback}</p>}
+    <div className={styles.formActions}><button type="submit" disabled={!writesEnabled||saving}>{saving?"Salvando...":"Salvar"}</button>
+    <button type="button" disabled={saving} onClick={closeForm} style={{marginLeft:12}}>Cancelar</button></div>
+   </form></dialog>}
   {restoreClient&&<dialog ref={restoreDialog} onCancel={e=>{if(saving)e.preventDefault();else setRestoreClient(null);}} aria-labelledby="restore-title" className={styles.dialog}>
    <h2 id="restore-title">Reativar {restoreClient.name}</h2>
    <p>Escolha a situação comercial do cliente. O histórico e os vínculos serão mantidos.</p>
