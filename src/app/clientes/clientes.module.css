@@ -118,3 +118,19 @@
 .badge[data-status='active'] {background:linear-gradient(120deg,#d8eaff,#bcdcff);color:#104b9b;border:1px solid #8dbcf5;font-weight:750;box-shadow:0 0 0 2px #cde4ff55,0 3px 9px #2677d024;}
 .badge[data-status='inactive'] {background:#f1f3f6;color:#8995a5;border:1px solid #e0e5eb;font-weight:600;box-shadow:none;}
 .badge[data-status='prospect'] {background:#edf3ff;color:#466a9d;border:1px solid #d7e4f8;box-shadow:none;}
+
+/* Histórico do cliente em modal central protegido */
+.historyDialog {position:fixed;inset:0;margin:auto;padding:0;width:min(760px,calc(100vw - 28px));max-height:calc(100dvh - 28px);overflow:auto;border:1px solid #a5c6f0;border-radius:19px;background:#fff;color:#17345b;box-shadow:0 28px 90px #071c4370;}
+.historyDialog::backdrop {background:#0e234b85;backdrop-filter:blur(2px);}
+.historyHeading {position:sticky;top:0;z-index:1;display:flex;justify-content:space-between;align-items:center;gap:14px;padding:20px 24px;background:linear-gradient(115deg,#102e63,#1556ae 65%,#2879e7);color:#fff;}
+.historyHeading h2 {margin:0;font-size:23px;font-weight:750;color:#fff;}
+.historyHeading button {background:#ffffff24;color:#fff;border:1px solid #ffffff70;font-size:22px;min-width:40px;}
+.historyBody {padding:22px 26px;}
+.historyBody h2 {font-size:22px;color:#174784;font-weight:750;margin:0 0 8px;}
+.historyBody h3 {display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-top:22px;padding-top:18px;border-top:1px solid #dce8f8;font-size:17px;font-weight:750;color:#174784;}
+.historyBody p {margin:8px 0;color:#426184;}
+.historyBody ul {padding:0;margin:12px 0;}
+.historyBody li {padding:13px 15px;margin:8px 0;list-style:none;border:1px solid #d9e7fa;border-radius:10px;background:#f3f8ff;}
+.historyFooter {position:sticky;bottom:0;display:flex;justify-content:flex-end;padding:14px 24px;background:#f2f7ff;border-top:1px solid #d8e6f8;}
+.historyFooter button {background:#1d62ce;color:#fff;border:1px solid #1d62ce;}
+@media(max-width:560px){.historyHeading{padding:16px;}.historyBody{padding:18px;}.historyFooter{padding:12px 16px;}}
