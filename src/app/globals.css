@@ -313,3 +313,10 @@
     opacity:.26;
   }
 }
+
+/* Bloco 40 — aviso de checklist temporario sem aumentar a altura do Dashboard. */
+.content:has(.owner-overview) .owner-check input:disabled{cursor:not-allowed;opacity:.5}
+.content:has(.owner-overview) .owner-check:has(input:disabled){color:#7386a5;cursor:default}
+.content:has(.owner-overview) .owner-check-note{margin:6px 0 0;font-size:10px;line-height:1.35;color:#627aa1}
+.content:has(.owner-overview) .owner-calendar-grid button:focus-visible{outline:2px solid #2458d3;outline-offset:1px}
+.content:has(.owner-overview) .owner-calendar-grid button.has-session::after{content:"";display:block;margin:0 auto;width:4px;height:4px;border-radius:50%;background:#2458d3}
