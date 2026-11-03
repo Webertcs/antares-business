@@ -10,7 +10,7 @@ import DashboardSearch from './DashboardSearch';
 import {Orbit,GraduationCap,LayoutDashboard,CalendarDays,BriefcaseBusiness,ClipboardCheck,Wallet,Settings2,Bell,Plus,ChevronLeft,ArrowUpRight,Search,CheckCircle2,Clock3,Users,ChevronRight,Menu,X,FileText,ShieldCheck,Sparkles,Rocket,ExternalLink} from 'lucide-react';
 const pages=[{id:'inicio',name:'Início',icon:LayoutDashboard},{id:'agenda',name:'Agenda',icon:CalendarDays},{id:'comercial',name:'Comercial',icon:BriefcaseBusiness},{id:'operacao',name:'Operação',icon:ClipboardCheck},{id:'financeiro',name:'Financeiro',icon:Wallet}];
 type Reminder={id:string;client_name:string;due_date:string|null;priority:string;status:string;note:string};
-type BusinessData={unavailable?:string[];proposals:{status:string}[];bookings:{id:string;event_title:string;dome_name:string;starts_at:string;status:string}[];ledger:{id:string;status:string;category:string;amount:number;description:string}[]};
+type BusinessData={unavailable?:string[];proposals:{status:string}[];bookings:{id:string;event_title:string;dome_name:string;starts_at:string;status:string;crmDateOnly?:boolean}[];ledger:{id:string;status:string;category:string;amount:number;description:string}[]};
 const brl=(n:number)=>new Intl.NumberFormat('pt-BR',{style:'currency',currency:'BRL'}).format(n);
 export default function Home({accountLabel,ownerPreview=false,profileKey,children,moduleTitle}:{accountLabel:string;ownerPreview?:boolean;profileKey:string;children?:React.ReactNode;moduleTitle?:string}){
  const router=useRouter();const pathname=usePathname();
@@ -42,7 +42,7 @@ export default function Home({accountLabel,ownerPreview=false,profileKey,childre
  .then(d=>{setBusiness(d);setBusinessError('');})
  .catch(e=>{if(e?.name!=='AbortError')setBusinessError('Dados reais aguardam implantação ou autorização.');});
  return()=>ctrl.abort();},[]);
- useEffect(()=>{const controller=new AbortController();fetch('/api/agenda',{cache:'no-store',signal:controller.signal}).then(r=>r.ok?r.json():null).then(d=>{if(!controller.signal.aborted&&d&&Array.isArray(d.bookings)){setAgendaBookings(d.bookings);setAgendaAvailable(true)}}).catch(()=>{if(!controller.signal.aborted)setAgendaAvailable(false)});return()=>controller.abort();},[]);
+ useEffect(()=>{const controller=new AbortController();fetch('/api/agenda',{cache:'no-store',signal:controller.signal}).then(r=>r.ok?r.json():null).then(d=>{if(!controller.signal.aborted&&d&&Array.isArray(d.bookings)){const crmBookings=(Array.isArray(d.crmEvents)?d.crmEvents:[]).filter((e:{event_date?:string;status?:string})=>e.event_date&&!['cancelled','canceled'].includes(String(e.status||'').toLowerCase())).map((e:{id:string;event_title:string;event_date:string;status:string})=>({id:'crm-'+e.id,event_title:e.event_title,starts_at:String(e.event_date).slice(0,10)+'T12:00:00-03:00',dome_name:'A definir',status:e.status==='confirmed'?'confirmed':'reserved',crmDateOnly:true}));setAgendaBookings([...d.bookings,...crmBookings]);setAgendaAvailable(true)}}).catch(()=>{if(!controller.signal.aborted)setAgendaAvailable(false)});return()=>controller.abort();},[]);
  const settled=(kind:string)=>business?.ledger.filter(x=>x.category===kind&&x.status==='settled').reduce((a,x)=>a+Number(x.amount||0),0)||0;
  const cash=settled('income')-settled('expense');
  const pending=business?.ledger.filter(x=>x.category==='income'&&x.status==='planned').reduce((a,x)=>a+Number(x.amount||0),0)||0;
@@ -67,7 +67,7 @@ function CalendarFull({bookings,loading,initialSelectedDate}:{bookings:BusinessD
  const calendarEvents=bookings.filter(b=>!['cancelled','canceled','completed'].includes(b.status)&&!Number.isNaN(new Date(b.starts_at).getTime())).map(b=>{
  const d=new Date(b.starts_at);
  const date=new Intl.DateTimeFormat('en-CA',{timeZone:'America/Sao_Paulo',year:'numeric',month:'2-digit',day:'2-digit'}).format(d);
- const time=new Intl.DateTimeFormat('pt-BR',{timeZone:'America/Sao_Paulo',hour:'2-digit',minute:'2-digit',hour12:false}).format(d);
+ const time=b.crmDateOnly?'A definir':new Intl.DateTimeFormat('pt-BR',{timeZone:'America/Sao_Paulo',hour:'2-digit',minute:'2-digit',hour12:false}).format(d);
  return {id:b.id,date,name:b.event_title,time,dome:b.dome_name,status:b.status==='confirmed'?'Confirmado':'Reservado'};
  });
  const year=month.getFullYear(),m=month.getMonth();
