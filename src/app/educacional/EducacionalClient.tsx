@@ -20,7 +20,7 @@ export default function EducacionalClient({writesEnabled}:{writesEnabled:boolean
  return <main style={{maxWidth:1150,margin:'0 auto',padding:28,fontFamily:'system-ui',color:'#16325b'}}>
  <Link href="/">← Painel</Link><h1 style={{fontSize:30,marginTop:20}}>Alunos e Professores</h1>
  <p>Turmas por escola, quantidade de alunos e professor responsável. Não armazenamos nomes nem identificadores individuais de crianças.</p>
- {!writesEnabled&&<p role="status" style={{padding:15,background:'#fff2d9',borderRadius:9}}>Cadastro bloqueado durante a homologação. Consultas liberadas.</p>}
+ {!writesEnabled&&<p role="status" style={{padding:15,background:'#fff2d9',borderRadius:9}}>Cadastros temporariamente indisponíveis. As turmas existentes continuam disponíveis para consulta.</p>}
  {loading?<p>Carregando...</p>:error?<p role="alert">{error}</p>:null}
  <div style={{display:'flex',gap:14,flexWrap:'wrap',margin:'20px 0'}}>
  <div style={{padding:18,border:'1px solid #c8d6ed',borderRadius:10}}>Escolas <strong>{schools.length}</strong></div>
