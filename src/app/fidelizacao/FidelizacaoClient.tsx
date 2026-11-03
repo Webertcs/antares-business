@@ -97,7 +97,7 @@ export default function FidelizacaoClient(){
  </div>
  <h3 style={{fontWeight:700,marginBottom:10}}>Oportunidades sugeridas</h3>
  {loading?<p>Carregando...</p>:error?<p role="alert">{error}</p>:radar.suggestions.length===0?<p>Sem oportunidades identificadas.</p>:<div style={{display:'grid',gap:9}}>{radar.suggestions.slice(0,12).map(o=><div key={o.id+o.rank} style={{padding:12,border:'1px solid #cad8e9',borderRadius:10,display:'flex',justifyContent:'space-between',gap:12,flexWrap:'wrap'}}><div><strong>{o.name}</strong><div style={{fontSize:13}}>{o.reason}</div><div style={{fontSize:13,color:'#315a96'}}>{o.tip}</div></div><button type="button" onClick={()=>{setSelected(o.id);document.getElementById('agenda-relacionamento')?.scrollIntoView({behavior:'smooth'});}}>Programar contato</button></div>)}</div>}
- <p style={{fontSize:12,opacity:.75,marginTop:12}}>Sugestões gerenciais, não constatações de abandono. A consulta atual considera até 500 eventos cadastrados na API; revisar este limite antes de uso em escala.</p>
+ <p style={{fontSize:12,opacity:.75,marginTop:12}}>Indicadores de relacionamento são estimativas para auxiliar o acompanhamento das instituições, não conclusões definitivas.</p>
  </section>
  <section style={{border:'1px solid #b6c7de',borderRadius:14,padding:19,marginTop:20}}>
  <h2 style={{fontWeight:750,fontSize:21}}>Central de atenção aos clientes</h2>
