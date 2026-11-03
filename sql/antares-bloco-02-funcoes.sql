@@ -1,6 +1,9 @@
 -- ANTARES Bloco 02: rotinas de escrita operacional.
 -- REVISAR APÓS BACKUP e após a criação das tabelas em antares-bloco-02-operacao.sql.
 -- Executar como proprietário das tabelas. Nenhum GRANT amplo.
+-- BLOQUEADO: a identidade da role runtime e os privilégios de leitura devem ser verificados no Neon.
+-- O argumento p_subject é informado pela aplicação; somente uma role sem acesso SQL arbitrário pode executar estas funções.
+-- Não aplicar este arquivo até confirmar role, permissões, isolamento e auditoria.
 BEGIN;
 CREATE OR REPLACE FUNCTION public.antares_save_event_operation(
   p_subject text,p_event uuid,p_access text,p_parking text,p_power text,p_setup text
@@ -72,7 +75,7 @@ REVOKE ALL ON FUNCTION public.antares_save_event_operation(text,uuid,text,text,t
 REVOKE ALL ON FUNCTION public.antares_save_event_task(text,uuid,uuid,text,boolean) FROM PUBLIC;
 REVOKE ALL ON FUNCTION public.antares_save_event_session(text,uuid,uuid,text,time,time,integer) FROM PUBLIC;
 -- Liberar somente a role de runtime restrita usada por getTeamWriteDb.
-GRANT EXECUTE ON FUNCTION public.antares_save_event_operation(text,uuid,text,text,text,text) TO antares_team_runtime;
-GRANT EXECUTE ON FUNCTION public.antares_save_event_task(text,uuid,uuid,text,boolean) TO antares_team_runtime;
-GRANT EXECUTE ON FUNCTION public.antares_save_event_session(text,uuid,uuid,text,time,time,integer) TO antares_team_runtime;
+-- PENDENTE: conceder EXECUTE apenas à role real e validada de DATABASE_URL_TEAM_RUNTIME.
+-- PENDENTE: GRANT de antares_save_event_task após conferência da role.
+-- PENDENTE: GRANT de antares_save_event_session após conferência da role.
 COMMIT;
