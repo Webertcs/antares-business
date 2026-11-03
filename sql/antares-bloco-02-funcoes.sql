@@ -1,4 +1,5 @@
 -- ANTARES Bloco 02: rotinas de escrita operacional.
+-- Delimitador nomeado para facilitar reconhecimento de cada corpo PL/pgSQL no editor Neon.
 -- REVISAR APÓS BACKUP e após a criação das tabelas em antares-bloco-02-operacao.sql.
 -- Executar como proprietário das tabelas. Nenhum GRANT amplo.
 -- Auditoria transacional em business_audit; p_subject vem da sessão validada pela API.
@@ -7,7 +8,7 @@ BEGIN;
 CREATE OR REPLACE FUNCTION public.antares_save_event_operation(
   p_subject text,p_event uuid,p_access text,p_parking text,p_power text,p_setup text
 ) RETURNS void
-LANGUAGE plpgsql SECURITY DEFINER SET search_path=pg_catalog,public AS $$
+LANGUAGE plpgsql SECURITY DEFINER SET search_path=pg_catalog,public AS $antares_operacao$
 DECLARE v_org uuid;
 BEGIN
  SELECT e.organization_id INTO v_org FROM public.crm_events e WHERE e.id=p_event;
@@ -29,7 +30,7 @@ END $;
 CREATE OR REPLACE FUNCTION public.antares_save_event_task(
  p_subject text,p_event uuid,p_task uuid,p_label text,p_done boolean
 ) RETURNS uuid
-LANGUAGE plpgsql SECURITY DEFINER SET search_path=pg_catalog,public AS $$
+LANGUAGE plpgsql SECURITY DEFINER SET search_path=pg_catalog,public AS $antares_operacao$
 DECLARE v_org uuid;v_id uuid;
 BEGIN
  SELECT e.organization_id INTO v_org FROM public.crm_events e WHERE e.id=p_event;
@@ -53,7 +54,7 @@ END $;
 CREATE OR REPLACE FUNCTION public.antares_save_event_session(
  p_subject text,p_event uuid,p_session uuid,p_label text,p_start time,p_end time,p_students integer
 ) RETURNS uuid
-LANGUAGE plpgsql SECURITY DEFINER SET search_path=pg_catalog,public AS $$
+LANGUAGE plpgsql SECURITY DEFINER SET search_path=pg_catalog,public AS $antares_operacao$
 DECLARE v_org uuid;v_id uuid;
 BEGIN
  SELECT e.organization_id INTO v_org FROM public.crm_events e WHERE e.id=p_event;
