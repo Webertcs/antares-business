@@ -198,3 +198,22 @@
 .profile-warning p{font-size:12px;line-height:1.6;margin:0}
 .profile-warning svg{flex-shrink:0}
 @media(max-width:600px){.profile-form-layout{grid-template-columns:1fr}.profile-panel{padding:18px}.dashboard-search-popover{right:-90px}}
+
+/* Bloco 38 — arte aprovada pelo proprietario no cabecalho, sem degrade. */
+.content:has(.owner-overview) .owner-hero{position:relative;isolation:isolate;min-height:95px;padding:10px 0;overflow:hidden}
+.content:has(.owner-overview) .owner-hero::before{content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;background-image:url('/images/dashboard-planeta.png');background-size:cover;background-repeat:no-repeat;background-position:right 46%;opacity:1}
+.content:has(.owner-overview) .owner-hero>div{position:relative;z-index:1;max-width:70%}
+.content:has(.owner-overview) .owner-hero>.primary-button{position:relative;z-index:1}
+.content:has(.owner-overview) .owner-hero h1{color:#132446}
+.content:has(.owner-overview) .owner-hero p{color:#5c7092}
+.owner-kpi{min-height:74px}
+.owner-kpi strong{margin-bottom:0}
+@media(max-width:840px){
+ .content:has(.owner-overview) .owner-hero::before{background-size:auto 100%;background-position:right top;opacity:.65}
+ .content:has(.owner-overview) .owner-hero>div{max-width:75%}
+}
+@media(max-width:600px){
+ .content:has(.owner-overview) .owner-hero{min-height:106px}
+ .content:has(.owner-overview) .owner-hero::before{opacity:.3}
+ .content:has(.owner-overview) .owner-hero>div{max-width:100%}
+}
