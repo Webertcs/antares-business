@@ -1,5 +1,5 @@
 'use client';
-import {useMemo,useState} from 'react';
+import {useState} from 'react';
 import Link from 'next/link';
 import {useRouter} from 'next/navigation';
 type EventItem={id:string;title:string;date:string|null;status:string;attendees:number|null;client:string};
@@ -39,17 +39,20 @@ export default function EventsList({events,total,page,pages,years,counts,filters
  </div>
  <section style={{background:'#fff',border:'1px solid #d5e1f5',borderRadius:16,padding:'clamp(14px,2vw,20px)'}}>
   <div style={{display:'flex',flexWrap:'wrap',gap:10,marginBottom:12,background:'#eaf3ff',padding:10,borderRadius:11,border:'1px solid #d2e2f8'}}>
-   <select aria-label="Período dos eventos" value={filters.view} onChange={e=>navigate({view:e.target.value})} style={{minHeight:44,borderRadius:9,border:'1px solid #c5d6ee',background:'#fff',color:'#183c70',padding:8}}><option value="upcoming">Próximos eventos</option><option value="history">Histórico</option><option value="all">Todos os eventos</option></select>
-   <select aria-label="Ano dos eventos" value={filters.year} onChange={e=>navigate({year:e.target.value})} style={{minHeight:44,borderRadius:9,border:'1px solid #c5d6ee',background:'#fff',color:'#183c70',padding:8}}><option value="all">Todos os anos</option>{years.map(y=><option key={y} value={String(y)}>{y}</option>)}</select>
    <input aria-label="Pesquisar eventos" placeholder="Pesquisar evento ou instituição" value={query} onChange={e=>setQuery(e.target.value)} onKeyDown={e=>{if(e.key==='Enter')navigate({q:query.trim()})}} style={{flex:'1 1 240px',minWidth:0,minHeight:44,padding:'10px 12px',fontSize:14,border:'1px solid #c5d6ee',borderRadius:9,color:'#183c70',background:'#fff'}}/>
-   <button type="button" onClick={()=>navigate({q:query.trim()})} style={{minHeight:44,padding:'8px 12px',borderRadius:9,border:'none',background:'#2058cb',color:'#fff',cursor:'pointer'}}>Buscar</button>
    <select aria-label="Filtrar situação" value={filters.status} onChange={e=>navigate({status:e.target.value})} style={{flex:'0 1 190px',minHeight:44,padding:'10px 12px',fontSize:14,border:'1px solid #c5d6ee',borderRadius:9,color:'#183c70',background:'#fff'}}>
     <option value="all">Todas as situações</option>{Object.entries(statusNames).filter(([v])=>v!=='canceled').map(([v,label])=><option key={v} value={v}>{label}</option>)}
    </select>
+   <button type="button" aria-pressed={filters.view==='history'} onClick={()=>navigate({view:filters.view==='history'?'all':'history',year:'all'})} style={{minHeight:44,padding:'8px 14px',borderRadius:9,border:'1px solid #b5d0f4',background:filters.view==='history'?'#2058cb':'#e3efff',color:filters.view==='history'?'#fff':'#174985',fontWeight:600,cursor:'pointer'}}>Histórico</button>
   </div>
-  <p role="status" aria-live="polite" style={{fontSize:12,color:'#365e94',marginBottom:9}}>{total} {total===1?'evento encontrado':'eventos encontrados'} · Página {page} de {pages}</p>
+  {filters.view==='history'&&<div style={{display:'flex',alignItems:'center',flexWrap:'wrap',gap:10,marginBottom:12,padding:'10px 12px',background:'#eaf3ff',border:'1px solid #d2e2f8',borderRadius:10}}>
+   <strong style={{color:'#174985',fontSize:13}}>Histórico por ano</strong>
+   <select aria-label="Ano do histórico" value={filters.year} onChange={e=>navigate({year:e.target.value})} style={{minHeight:44,borderRadius:9,border:'1px solid #c5d6ee',background:'#fff',color:'#183c70',padding:'8px 12px'}}><option value="all">Todos os anos</option>{years.map(y=><option key={y} value={String(y)}>{y}</option>)}</select>
+   <span style={{fontSize:12,color:'#365e94'}}>Do mais recente para o mais antigo</span>
+  </div>}
+  <p role="status" aria-live="polite" style={{fontSize:12,color:'#365e94',marginBottom:9}}>{total} {total===1?'evento encontrado':'eventos encontrados'}{pages>1?' · Página '+page+' de '+pages:''}</p>
   {filtered.length===0?<p style={{padding:20,background:'#f3f7ff',borderRadius:10,color:'#365e94'}}>Nenhum evento encontrado para os filtros selecionados.</p>:<div style={{display:'grid',gap:8}}>
-   {filtered.map(e=><article key={e.id} style={{display:'flex',justifyContent:'space-between',alignItems:'center',gap:10,flexWrap:'wrap',border:'1px solid #d4e2f7',borderRadius:10,padding:'10px 12px',background:'#f3f7ff'}}>
+   {filtered.map((e,i)=><div key={e.id}>{filters.view==='history'&&filters.year==='all'&&e.date&&((i===0)||(filtered[i-1].date?.slice(0,4)!==e.date.slice(0,4)))&&<h3 style={{fontSize:16,color:'#174985',margin:'12px 0 8px',paddingBottom:5,borderBottom:'1px solid #c9dcfa'}}>{e.date.slice(0,4)}</h3>}<article key={e.id} style={{display:'flex',justifyContent:'space-between',alignItems:'center',gap:10,flexWrap:'wrap',border:'1px solid #d4e2f7',borderRadius:10,padding:'10px 12px',background:'#f3f7ff'}}>
     <div style={{flex:'1 1 260px',minWidth:0}}>
      <div style={{display:'flex',alignItems:'center',gap:8,flexWrap:'wrap',marginBottom:3}}>
       <h2 style={{fontSize:15,fontWeight:700,lineHeight:1.3,margin:0,color:'#153d76'}}>{e.title}</h2>
@@ -62,8 +65,8 @@ export default function EventsList({events,total,page,pages,years,counts,filters
      </div>
     </div>
     <Link href={'/eventos/'+e.id} aria-label={'Abrir operação do evento '+e.title} style={{display:'inline-flex',alignItems:'center',justifyContent:'center',minHeight:44,padding:'10px 16px',borderRadius:9,background:'#2058cb',color:'#fff',fontSize:14,fontWeight:600,textDecoration:'none',whiteSpace:'nowrap'}}>Abrir operação →</Link>
-   </article>)}
+   </article></div>)}
   </div>}
-  <nav aria-label="Paginação dos eventos" style={{display:'flex',justifyContent:'center',alignItems:'center',gap:12,marginTop:14}}><button type="button" disabled={page<=1} onClick={()=>navigate({page:page-1})} style={{padding:'8px 12px',borderRadius:8,border:'1px solid #c5d6ee',background:'#eaf3ff',color:'#153d76',opacity:page<=1?.5:1}}>Anterior</button><span style={{fontSize:13,color:'#365e94'}}>{page} / {pages}</span><button type="button" disabled={page>=pages} onClick={()=>navigate({page:page+1})} style={{padding:'8px 12px',borderRadius:8,border:'1px solid #c5d6ee',background:'#eaf3ff',color:'#153d76',opacity:page>=pages?.5:1}}>Próxima</button></nav>
+  {pages>1&&<nav aria-label="Paginação dos eventos" style={{display:'flex',justifyContent:'center',alignItems:'center',gap:12,marginTop:14}}><button type="button" disabled={page<=1} onClick={()=>navigate({page:page-1})} style={{padding:'8px 12px',borderRadius:8,border:'1px solid #c5d6ee',background:'#eaf3ff',color:'#153d76',opacity:page<=1?.5:1}}>Anterior</button><span style={{fontSize:13,color:'#365e94'}}>{page} / {pages}</span><button type="button" disabled={page>=pages} onClick={()=>navigate({page:page+1})} style={{padding:'8px 12px',borderRadius:8,border:'1px solid #c5d6ee',background:'#eaf3ff',color:'#153d76',opacity:page>=pages?.5:1}}>Próxima</button></nav>}
  </section></>;
 }
