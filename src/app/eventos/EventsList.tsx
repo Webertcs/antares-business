@@ -21,8 +21,14 @@ export default function EventsList({events}:{events:EventItem[]}){
  const [query,setQuery]=useState('');
  const [filter,setFilter]=useState('all');
  const filtered=useMemo(()=>events.filter(e=>(filter==='all'||e.status===filter)&&[e.title,e.client,e.status,statusNames[e.status]||''].join(' ').toLocaleLowerCase('pt-BR').includes(query.toLocaleLowerCase('pt-BR').trim())),[events,filter,query]);
- return <section style={{background:'#fff',border:'1px solid #d5e1f5',borderRadius:16,padding:'clamp(14px,2vw,20px)'}}>
-  <div style={{display:'flex',flexWrap:'wrap',gap:12,marginBottom:16}}>
+ const confirmed=events.filter(e=>e.status==='confirmed').length;
+ const opportunities=events.filter(e=>e.status==='lead').length;
+ return <>
+ <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(170px,1fr))',gap:10,marginBottom:14}}>
+  {([{label:'Total de eventos',value:events.length,icon:'📅'},{label:'Confirmados',value:confirmed,icon:'✓'},{label:'Oportunidades',value:opportunities,icon:'✦'}]).map(item=><div key={item.label} style={{background:'#eef5ff',border:'1px solid #c9dcfa',borderRadius:12,padding:'12px 14px',display:'flex',alignItems:'center',gap:12,minHeight:70}}><span aria-hidden="true" style={{display:'grid',placeItems:'center',width:36,height:36,borderRadius:10,background:'#dbeaff',color:'#1853a7',fontSize:19}}>{item.icon}</span><div><div style={{fontSize:12,color:'#365c8b',lineHeight:1.4}}>{item.label}</div><div style={{fontSize:22,fontWeight:700,color:'#153d76',lineHeight:1.25}}>{item.value}</div></div></div>)}
+ </div>
+ <section style={{background:'#fff',border:'1px solid #d5e1f5',borderRadius:16,padding:'clamp(14px,2vw,20px)'}}>
+  <div style={{display:'flex',flexWrap:'wrap',gap:12,marginBottom:16,background:'#eaf3ff',padding:12,borderRadius:11,border:'1px solid #d2e2f8'}}>
    <input aria-label="Pesquisar eventos" placeholder="Pesquisar evento ou instituição" value={query} onChange={e=>setQuery(e.target.value)} style={{flex:'1 1 240px',minWidth:0,minHeight:44,padding:'10px 12px',fontSize:14,border:'1px solid #c5d6ee',borderRadius:9,color:'#183c70',background:'#fff'}}/>
    <select aria-label="Filtrar situação" value={filter} onChange={e=>setFilter(e.target.value)} style={{flex:'0 1 190px',minHeight:44,padding:'10px 12px',fontSize:14,border:'1px solid #c5d6ee',borderRadius:9,color:'#183c70',background:'#fff'}}>
     <option value="all">Todas as situações</option>{Object.entries(statusNames).filter(([v])=>v!=='canceled').map(([v,label])=><option key={v} value={v}>{label}</option>)}
@@ -45,5 +51,5 @@ export default function EventsList({events}:{events:EventItem[]}){
     <Link href={'/eventos/'+e.id} aria-label={'Abrir operação do evento '+e.title} style={{display:'inline-flex',alignItems:'center',justifyContent:'center',minHeight:44,padding:'10px 16px',borderRadius:9,background:'#2058cb',color:'#fff',fontSize:14,fontWeight:600,textDecoration:'none',whiteSpace:'nowrap'}}>Abrir operação →</Link>
    </article>)}
   </div>}
- </section>;
+ </section></>;
 }
