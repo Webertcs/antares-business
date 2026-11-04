@@ -2,6 +2,7 @@ import {redirect,notFound} from 'next/navigation';
 import {requireMember,getDb} from '@/lib/equipe/auth';
 import Link from 'next/link';
 import EventOperations from './EventOperations';
+import EventTeamPanel from './EventTeamPanel';
 export const dynamic='force-dynamic';
 const uuid=/^[0-9a-f]{8}(-[0-9a-f]{4}){3}-[0-9a-f]{12}$/i;
 const infoCard:React.CSSProperties={background:'linear-gradient(145deg,#fff 0%,#e9f1ff 100%)',border:'1px solid #c4d8ff',borderRadius:16,padding:'14px 16px',boxShadow:'0 6px 20px rgba(25,67,140,.07)',minWidth:0};
@@ -38,7 +39,7 @@ export default async function Page({params}:{params:Promise<{id:string}>}){
  <details style={{...infoCard,padding:0,overflow:'hidden'}}>
  <summary style={{cursor:'pointer',padding:'16px 18px',fontWeight:800,background:'linear-gradient(90deg,#e4f0ff,#f0f6ff)'}}>📍 Local e deslocamento <span style={{fontSize:12,fontWeight:500,marginLeft:8}}>{address||'Endereço ainda não informado'}</span></summary>
  <div style={{padding:'12px 18px'}}><p>{address||'Endereço ainda não informado.'}</p>{address&&<div style={{display:'flex',gap:12,flexWrap:'wrap'}}><a href={maps} target="_blank" rel="noopener noreferrer">Abrir Google Maps</a><a href={waze} target="_blank" rel="noopener noreferrer">Abrir Waze</a></div>}</div></details>
- <section style={{...infoCard,border:'1px solid #f3c17d',background:'linear-gradient(110deg,#fff7e9,#fff 60%,#edf4ff)',padding:'18px 20px'}}><div style={{display:'flex',justifyContent:'space-between',alignItems:'center',flexWrap:'wrap',gap:10}}><div><h2 style={{fontSize:18,margin:'0 0 5px'}}>👥 Equipe do Evento</h2><p style={{margin:0,fontSize:13,color:'#6d5c47'}}>Proprietário e colaboradores responsáveis pela apresentação</p></div><Link href="/equipe" style={{background:'#b96c10',color:'#fff',padding:'9px 14px',borderRadius:10,fontWeight:700,fontSize:12}}>Gerenciar equipe</Link></div><div style={{display:'flex',alignItems:'center',gap:14,marginTop:14,flexWrap:'wrap'}}><div aria-hidden="true" style={{width:52,height:52,borderRadius:'50%',display:'grid',placeItems:'center',background:'linear-gradient(135deg,#dceaff,#eadcff)',fontSize:24,border:'2px solid #fff',boxShadow:'0 3px 12px #163b7530'}}>👤</div><p style={{margin:0,fontSize:13,color:'#5b6880'}}>Fotos e nomes aparecerão aqui após a vinculação autorizada dos integrantes ao evento.</p></div></section>
+ <EventTeamPanel profileKey={ctx.memberId} ownerName="Proprietário"/>
  <EventOperations eventId={id}/>
 
  <details style={{...infoCard,padding:0,overflow:'hidden',borderColor:'#d7c3fa'}}><summary style={{cursor:'pointer',padding:'16px 18px',fontWeight:800,background:'linear-gradient(90deg,#eee4ff,#f9f5ff)'}}>📝 Observações <span style={{fontWeight:500,fontSize:12}}> · {e.notes?'Consultar registro':'Nenhuma observação'}</span></summary><p style={{padding:'0 18px 16px',whiteSpace:'pre-wrap'}}>{String(e.notes||'Nenhuma observação registrada.')}</p></details>
