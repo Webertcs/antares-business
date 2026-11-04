@@ -2,6 +2,7 @@ import {redirect,notFound} from 'next/navigation';
 import {requireMember,getDb} from '@/lib/equipe/auth';
 import EventOperations from './EventOperations';
 import EventTeamPanel from './EventTeamPanel';
+import EventNotes from './EventNotes';
 export const dynamic='force-dynamic';
 const uuid=/^[0-9a-f]{8}(-[0-9a-f]{4}){3}-[0-9a-f]{12}$/i;
 const infoCard:React.CSSProperties={background:'linear-gradient(145deg,#fff 0%,#e9f1ff 100%)',border:'1px solid #c4d8ff',borderRadius:16,padding:'14px 16px',boxShadow:'0 6px 20px rgba(25,67,140,.07)',minWidth:0};
@@ -34,6 +35,6 @@ export default async function Page({params}:{params:Promise<{id:string}>}){
  <EventTeamPanel profileKey={ctx.memberId} ownerName="Proprietário"/>
  <EventOperations eventId={id} address={address}/>
 
- <details style={{...infoCard,padding:0,overflow:'hidden',borderColor:'#a9c9f9'}}><summary style={{cursor:'pointer',padding:'16px 18px',fontWeight:800,background:'linear-gradient(90deg,#dbeaff,#f3f8ff)'}}>📝 Observações <span style={{fontWeight:500,fontSize:12}}> · {e.notes?'Consultar registro':'Nenhuma observação'}</span></summary><p style={{padding:'0 18px 16px',whiteSpace:'pre-wrap'}}>{String(e.notes||'Nenhuma observação registrada.')}</p></details>
+ <EventNotes eventId={id} initialNotes={String(e.notes||'')} canEdit={ctx.role==='owner' && process.env.ANTARES_EVENT_OPERATIONS_WRITES_ENABLED==='true'}/>
  </div>;
 }
