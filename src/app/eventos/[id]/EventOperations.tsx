@@ -3,6 +3,7 @@ import {useCallback,useEffect,useState} from 'react';
 type Operation={access_instructions:string|null;parking_instructions:string|null;power_requirements:string|null;setup_notes:string|null};
 type Task={id:string;label:string;done:boolean;completed_at:string|null};
 type Session={id:string;label:string;starts_at:string|null;ends_at:string|null;expected_students:number|null};
+type Template={id:string;name:string;items:string[]};
 type Payload={available:boolean;canEdit:boolean;operations:Operation|null;checklist:Task[];sessions:Session[]};
 const card:React.CSSProperties={background:'#f3f7ff',border:'1px solid #c9d9f5',borderRadius:14,padding:18};
 const field:React.CSSProperties={width:'100%',padding:9,border:'1px solid #a8bfe6',borderRadius:8,background:'#fff',color:'#173a70'};
@@ -10,9 +11,28 @@ export default function EventOperations({eventId}:{eventId:string}){
  const [feedbackKind,setFeedbackKind]=useState<'success'|'error'|null>(null);
  const [data,setData]=useState<Payload|null>(null),[loading,setLoading]=useState(true),[error,setError]=useState(''),[message,setMessage]=useState(''),[saving,setSaving]=useState(false);
  const [access,setAccess]=useState(''),[parking,setParking]=useState(''),[power,setPower]=useState(''),[setup,setSetup]=useState('');
+ const [templates,setTemplates]=useState<Template[]>([]),[selectedTemplate,setSelectedTemplate]=useState(''),[templateName,setTemplateName]=useState(''),[templateItems,setTemplateItems]=useState(''),[templateBusy,setTemplateBusy]=useState(false);
  const [task,setTask]=useState(''),[session,setSession]=useState(''),[start,setStart]=useState(''),[end,setEnd]=useState(''),[students,setStudents]=useState('');
  const load=useCallback(async(signal?:AbortSignal)=>{const res=await fetch('/api/eventos/'+encodeURIComponent(eventId)+'/operacao',{signal,cache:'no-store'});const json=await res.json();if(!res.ok)throw Error(json.error||'Consulta indisponível');return json as Payload},[eventId]);
  useEffect(()=>{const ctrl=new AbortController();setLoading(true);load(ctrl.signal).then(v=>{if(ctrl.signal.aborted)return;setData(v);setAccess(v.operations?.access_instructions||'');setParking(v.operations?.parking_instructions||'');setPower(v.operations?.power_requirements||'');setSetup(v.operations?.setup_notes||'')}).catch(e=>{if(!ctrl.signal.aborted)setError(e instanceof Error?e.message:'Consulta indisponível')}).finally(()=>{if(!ctrl.signal.aborted)setLoading(false)});return()=>ctrl.abort()},[load]);
+ const loadTemplates=useCallback(async()=>{const res=await fetch('/api/eventos/'+encodeURIComponent(eventId)+'/operacao/modelos',{cache:'no-store'});if(!res.ok)throw Error('Não foi possível carregar os modelos');const json=await res.json();setTemplates(json.templates||[])},[eventId]);
+ useEffect(()=>{void loadTemplates().catch(()=>{})},[loadTemplates]);
+ async function templateAction(action:'save'|'apply'){
+  if(!data?.canEdit||templateBusy)return;
+  setTemplateBusy(true);setMessage('');setFeedbackKind(null);
+  try{
+   const payload=action==='save'
+    ?{action,name:templateName,items:templateItems.split('\\n').map(x=>x.trim()).filter(Boolean)}
+    :{action,templateId:selectedTemplate};
+   const res=await fetch('/api/eventos/'+encodeURIComponent(eventId)+'/operacao/modelos',{
+    method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
+   const json=await res.json();if(!res.ok)throw Error(json.error||'Falha ao processar modelo');
+   await loadTemplates();if(action==='apply')setData(await load());
+   if(action==='save'){setTemplateName('');setTemplateItems('')}
+   setFeedbackKind('success');setMessage(action==='save'?'Modelo salvo com sucesso.':json.added+' tarefa(s) adicionada(s) ao evento.');
+  }catch(e){setFeedbackKind('error');setMessage(e instanceof Error?e.message:'Falha ao processar modelo')}
+  finally{setTemplateBusy(false)}
+ }
  async function save(payload:Record<string,unknown>):Promise<boolean>{if(!data?.canEdit||saving)return false;setSaving(true);setMessage('');setFeedbackKind(null);try{const res=await fetch('/api/eventos/'+encodeURIComponent(eventId)+'/operacao/salvar',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});const result=await res.json();if(!res.ok)throw Error(result.error||'Não foi possível salvar');const updated=await load();setData(updated);setMessage('Alterações salvas com sucesso no CRM.');setFeedbackKind('success');return true}catch(e){setMessage(e instanceof Error?e.message:'Erro ao salvar');setFeedbackKind('error');return false}finally{setSaving(false)}}
  if(loading)return <section style={card} role="status">Carregando preparação operacional…</section>;
  if(error)return <section style={card} role="status"><h2>Preparação operacional</h2><p>{error}</p><small>Os dados principais do evento permanecem preservados.</small></section>;
@@ -26,6 +46,21 @@ export default function EventOperations({eventId}:{eventId:string}){
  {([['Acesso e entrada',access,setAccess,2000,'Ex.: Entrada principal da escola'],['Estacionamento',parking,setParking,2000,'Ex.: Área reservada para descarga'],['Energia elétrica',power,setPower,2000,'Ex.: Tomada 220V disponível'],['Montagem',setup,setSetup,4000,'Ex.: Montagem 1 hora antes']] as const).map(([label,value,setValue,max,example])=><label key={label}>{label}<textarea style={{...field,resize:'vertical'}} rows={1} placeholder={example} maxLength={max} value={value} onChange={e=>setValue(e.target.value)}/></label>)}
  <button disabled={saving} type="submit" style={{gridColumn:"1 / -1",justifySelf:"start",background:"#2058cb",color:"#fff",padding:"10px 18px",borderRadius:8,fontWeight:700}}>{saving?"Salvando…":"Salvar infraestrutura"}</button></form>:<div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(200px,1fr))',gap:12}}>{([['Acesso e entrada',op?.access_instructions],['Estacionamento',op?.parking_instructions],['Energia elétrica',op?.power_requirements],['Montagem',op?.setup_notes]] as const).map(([label,value])=><div key={label}><strong>{label}</strong><p style={{whiteSpace:'pre-wrap'}}>{value||'Não informado'}</p></div>)}</div>}{hint}</section>
  <section style={card}><h2>Checklist operacional</h2>{data.checklist.length?<ul style={{display:'grid',gap:10,paddingLeft:20}}>{data.checklist.map(t=><li key={t.id}>{edit?<label><input type="checkbox" disabled={saving} checked={t.done} onChange={e=>void save({action:'task',taskId:t.id,label:t.label,done:e.target.checked})}/> {t.label}</label>:<span>{t.done?'✓ ':'○ '}{t.label}</span>}</li>)}</ul>:<p>Nenhuma tarefa cadastrada para este evento.</p>}
+ {edit&&<div style={{border:'1px solid #c9d9f5',borderRadius:10,padding:14,marginBottom:12,display:'grid',gap:10}}>
+ <strong>Modelos reutilizáveis</strong>
+ <p style={{fontSize:13,color:'#526b92'}}>Crie um checklist padrão uma vez e aplique em outros eventos. Tarefas já existentes não serão duplicadas.</p>
+ <div style={{display:'flex',gap:8,flexWrap:'wrap'}}>
+ <select aria-label="Modelo de checklist" style={{...field,flex:'1 1 220px'}} value={selectedTemplate} onChange={e=>setSelectedTemplate(e.target.value)}>
+ <option value="">Selecione um modelo salvo</option>{templates.map(t=><option key={t.id} value={t.id}>{t.name} ({t.items.length} tarefas)</option>)}
+ </select>
+ <button type="button" disabled={!selectedTemplate||templateBusy||saving} onClick={()=>void templateAction('apply')} style={{background:'#2058cb',color:'#fff',borderRadius:8,padding:'8px 14px'}}>Aplicar checklist</button>
+ </div>
+ <details><summary style={{cursor:'pointer',fontWeight:600}}>Criar modelo padrão</summary>
+ <form onSubmit={e=>{e.preventDefault();void templateAction('save')}} style={{display:'grid',gap:8,marginTop:10}}>
+ <label>Nome do modelo<input style={field} maxLength={120} required placeholder="Ex.: Visita escolar — padrão" value={templateName} onChange={e=>setTemplateName(e.target.value)}/></label>
+ <label>Tarefas (uma por linha)<textarea style={field} rows={4} required placeholder={'Verificar ar-condicionado\\nConferir projetor\\nPreparar cúpula'} value={templateItems} onChange={e=>setTemplateItems(e.target.value)}/></label>
+ <button type="submit" disabled={templateBusy||saving} style={{justifySelf:'start',background:'#2058cb',color:'#fff',borderRadius:8,padding:'8px 14px'}}>{templateBusy?'Aguarde…':'Salvar modelo'}</button>
+ </form></details></div>}
  {edit&&<form onSubmit={e=>{e.preventDefault();void save({action:'task',label:task,done:false}).then(ok=>{if(ok)setTask('')})}} style={{display:'flex',gap:8,flexWrap:'wrap'}}><input style={{...field,flex:'1 1 220px'}} aria-label="Nova tarefa" placeholder="Ex.: Verificar ar-condicionado" maxLength={180} required value={task} onChange={e=>setTask(e.target.value)}/><button disabled={saving} type="submit">Adicionar tarefa</button></form>}{hint}</section>
  <section style={card}><h2>Sessões e turmas</h2>{data.sessions.length?<div style={{display:'grid',gap:10}}>{data.sessions.map(s=><div key={s.id} style={{borderBottom:'1px solid #c9d9f5',paddingBottom:8}}><strong>{s.label}</strong><p>{s.starts_at?String(s.starts_at).slice(0,5):'Horário a definir'}{s.ends_at?'–'+String(s.ends_at).slice(0,5):''} · {s.expected_students==null?'Alunos a definir':s.expected_students+' alunos'}</p></div>)}</div>:<p>Nenhuma sessão cadastrada para este evento.</p>}
  {edit&&<form onSubmit={e=>{e.preventDefault();void save({action:'session',label:session,start,end,students:students===''?null:Number(students)}).then(ok=>{if(ok){setSession('');setStart('');setEnd('');setStudents('')}})}} style={{display:'grid',gap:8}}><label>Turma ou sessão<input style={field} maxLength={160} placeholder="Ex.: Turma 01 — manhã" required value={session} onChange={e=>setSession(e.target.value)}/></label><div style={{display:'flex',gap:8,flexWrap:'wrap'}}><label>Início<input style={field} type="time" value={start} onChange={e=>setStart(e.target.value)}/></label><label>Fim<input style={field} type="time" value={end} onChange={e=>setEnd(e.target.value)}/></label><label>Alunos previstos<input style={field} type="number" placeholder="Ex.: 30" min="0" max="10000" value={students} onChange={e=>setStudents(e.target.value)}/></label></div><button disabled={saving} type="submit">Adicionar sessão</button></form>}{hint}</section>
