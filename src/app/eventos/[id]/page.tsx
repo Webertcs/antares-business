@@ -1,6 +1,5 @@
 import {redirect,notFound} from 'next/navigation';
 import {requireMember,getDb} from '@/lib/equipe/auth';
-import Link from 'next/link';
 import EventOperations from './EventOperations';
 import EventTeamPanel from './EventTeamPanel';
 export const dynamic='force-dynamic';
@@ -41,6 +40,5 @@ export default async function Page({params}:{params:Promise<{id:string}>}){
  <EventOperations eventId={id} address={address}/>
 
  <details style={{...infoCard,padding:0,overflow:'hidden',borderColor:'#d7c3fa'}}><summary style={{cursor:'pointer',padding:'16px 18px',fontWeight:800,background:'linear-gradient(90deg,#eee4ff,#f9f5ff)'}}>📝 Observações <span style={{fontWeight:500,fontSize:12}}> · {e.notes?'Consultar registro':'Nenhuma observação'}</span></summary><p style={{padding:'0 18px 16px',whiteSpace:'pre-wrap'}}>{String(e.notes||'Nenhuma observação registrada.')}</p></details>
- <Link href="/?section=agenda" style={{color:'#1255bf',fontWeight:700}}>Consultar Agenda</Link>
  </div>;
 }
