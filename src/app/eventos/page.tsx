@@ -1,5 +1,4 @@
 import {redirect} from 'next/navigation';
-import BackButton from '../BackButton';
 import RelationshipShell from '../RelationshipShell';
 import {requireMember,getDb} from '@/lib/equipe/auth';
 import EventsList from './EventsList';
@@ -13,10 +12,11 @@ export default async function Page(){
  WHERE e.organization_id=${ctx.organizationId}
  ORDER BY e.event_date DESC NULLS LAST,e.created_at DESC LIMIT 300`;
  const events=rows.map(r=>({id:String(r.id),title:String(r.title),date:r.event_date?String(r.event_date).slice(0,10):null,status:String(r.status||''),attendees:r.expected_attendees==null?null:Number(r.expected_attendees),client:String(r.client_name)}));
- return <RelationshipShell title="Eventos"><main style={{maxWidth:1100,margin:'0 auto',padding:'32px 22px',color:'#163968'}}>
- <BackButton/>
- <h1 style={{fontSize:30,fontWeight:800,marginBottom:6}}>Eventos</h1>
- <p style={{marginBottom:22,color:'#52719b'}}>Acompanhe os eventos cadastrados e abra a preparação operacional.</p>
+ return <RelationshipShell title="Eventos"><main style={{maxWidth:1100,margin:'0 auto',padding:'24px clamp(14px,2.5vw,26px)',color:'#163968'}}>
+ <header style={{marginBottom:18}}>
+  <h1 style={{fontSize:'clamp(24px,2.5vw,30px)',fontWeight:750,lineHeight:1.2,margin:'0 0 6px'}}>Eventos</h1>
+  <p style={{fontSize:14,lineHeight:1.5,margin:0,color:'#42648e'}}>Consulte os eventos cadastrados e abra a preparação operacional.</p>
+ </header>
  <EventsList events={events}/>
  </main></RelationshipShell>;
 }
