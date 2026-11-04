@@ -38,6 +38,15 @@ export async function POST(req:NextRequest,{params}:{params:Promise<{id:string}>
   if(body.action==='infrastructure'){
    const access=clean(body.access,2000),parking=clean(body.parking,2000),power=clean(body.power,2000),setup=clean(body.setup,4000);
    await sql`SELECT public.antares_save_event_operation(${ctx.user.id},${id}::uuid,${access},${parking},${power},${setup})`;
+  }else if(body.action==='notes'){
+   if(typeof body.notes!=='string'||body.notes.length>4000)return NextResponse.json({error:'Observação inválida.'},{status:400});
+   const privilege=await sql`SELECT p.prosecdef AND pg_get_userbyid(p.proowner)='neondb_owner'
+     AND has_function_privilege(current_user,p.oid,'EXECUTE')
+     AND NOT EXISTS(SELECT 1 FROM aclexplode(coalesce(p.proacl,acldefault('f',p.proowner))) a
+       WHERE a.grantee=0 AND a.privilege_type='EXECUTE') AS safe
+     FROM pg_proc p WHERE p.oid=to_regprocedure('public.antares_save_event_notes(text,uuid,text)')`;
+   if(!privilege[0]?.safe)return NextResponse.json({error:'Permissão de observações não verificada.'},{status:503});
+   await sql`SELECT public.antares_save_event_notes(${ctx.user.id},${id}::uuid,${body.notes.trim()})`;
   }else if(body.action==='task'){
    const label=clean(body.label,180),taskId=body.taskId==null?null:String(body.taskId);
    if(!label||taskId&&!uuid.test(taskId)||typeof body.done!=='boolean')return NextResponse.json({error:'Tarefa inválida.'},{status:400});
