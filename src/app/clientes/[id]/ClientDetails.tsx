@@ -33,14 +33,12 @@ export default function ClientDetails({id}:{id:string}){
  const panel:React.CSSProperties={background:'#f8fbff',border:'1px solid #cbdcf5',borderRadius:12,padding:18,marginBottom:14};
  const heading:React.CSSProperties={fontSize:18,color:'#174987',margin:'0 0 12px'};
  const row:React.CSSProperties={padding:'10px 12px',background:'#eaf3ff',border:'1px solid #d5e5fa',borderRadius:8,marginBottom:7,overflowWrap:'anywhere'};
- const back=()=>{if(window.history.length>1)window.history.back();else window.location.assign('/clientes');};
  return <main style={{maxWidth:1180,margin:'0 auto',padding:'16px 20px 36px',fontFamily:'system-ui',color:'#16325b'}}>
- <button type="button" onClick={back} style={{marginBottom:12,border:'1px solid #b6cef5',background:'#e5efff',color:'#2457a7',borderRadius:7,padding:'6px 12px',cursor:'pointer'}}>‹ Voltar</button>
  {loading?<p>Carregando ficha...</p>:error?<p role="alert">{error}</p>:client&&<>
  <header style={{background:'linear-gradient(110deg,#102c63,#1162ba)',color:'#fff',borderRadius:14,padding:'23px 25px',marginBottom:13}}>
- <div style={{fontSize:11,fontWeight:700,letterSpacing:2,color:'#b8dcff'}}>ANTARES · RELACIONAMENTO</div>
- <h1 style={{fontSize:27,margin:'7px 0 5px'}}>Ficha da {client.kind==='school'?'Escola':client.kind==='company'?'Empresa':client.kind==='association'?'Associação':'Cliente'}</h1>
- <p style={{margin:0,color:'#e0eeff'}}>{client.name}</p>
+ <div style={{fontSize:11,fontWeight:700,letterSpacing:2,color:'#b8dcff'}}>ANTARES · CLIENTES</div>
+ <h1 style={{fontSize:27,margin:'7px 0 5px'}}>{client.name}</h1>
+ <p style={{margin:0,color:'#e0eeff',fontSize:13}}>{kinds[client.kind]||'Cliente'} · Ficha cadastral</p>
  </header>
  <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(170px,1fr))',gap:10,marginBottom:14}}>
  {([['Contatos',contacts.length],['Apresentações',events.length],...(client.kind==='school'?[['Turmas',groups.length],['Alunos previstos',groups.reduce((a,g)=>a+Number(g.student_count||0),0)]]:[])] as [string,number][]).map(([label,value])=>
