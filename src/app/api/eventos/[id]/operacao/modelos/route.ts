@@ -13,8 +13,8 @@ async function verifyRuntime(){
   AND NOT has_table_privilege(current_user,c.oid,'INSERT')
   AND NOT has_table_privilege(current_user,c.oid,'UPDATE')
   AND NOT has_table_privilege(current_user,c.oid,'DELETE')) AS safe_tables,
- (SELECT count(*)=2 FROM pg_proc p WHERE p.pronamespace='public'::regnamespace
-  AND p.proname IN ('antares_save_checklist_template','antares_apply_checklist_template')
+ (SELECT count(*)=3 FROM pg_proc p WHERE p.pronamespace='public'::regnamespace
+  AND p.proname IN ('antares_save_checklist_template','antares_apply_checklist_template','antares_delete_checklist_template')
   AND p.prosecdef AND pg_get_userbyid(p.proowner)='neondb_owner'
   AND has_function_privilege(current_user,p.oid,'EXECUTE')
   AND NOT EXISTS(SELECT 1 FROM aclexplode(coalesce(p.proacl,acldefault('f',p.proowner))) a
@@ -64,6 +64,12 @@ export async function POST(req:NextRequest,{params}:{params:Promise<{id:string}>
    const labels=items.map((x:string)=>x.trim());
    const result=await sql`SELECT public.antares_save_checklist_template(${ctx.user.id},${ctx.organizationId}::uuid,${templateId}::uuid,${name},${labels}::text[]) AS id`;
    return NextResponse.json({ok:true,id:result[0]?.id},{headers:noStore});
+  }
+  if(body.action==='delete'){
+   const templateId=typeof body.templateId==='string'?body.templateId:'';
+   if(!uuid.test(templateId))return NextResponse.json({error:'Modelo inválido.'},{status:400});
+   const result=await sql`SELECT public.antares_delete_checklist_template(${ctx.user.id},${ctx.organizationId}::uuid,${templateId}::uuid) AS deleted`;
+   return NextResponse.json({ok:result[0]?.deleted===true},{headers:noStore});
   }
   if(body.action==='apply'){
    const templateId=typeof body.templateId==='string'?body.templateId:'';
