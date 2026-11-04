@@ -33,7 +33,7 @@ export default async function Page({params}:{params:Promise<{id:string}>}){
  </div>
 
  <EventTeamPanel profileKey={ctx.memberId} ownerName="Proprietário"/>
- <EventOperations eventId={id} address={address}/>
+ <EventOperations eventId={id}/>
 
  <EventNotes eventId={id} initialNotes={String(e.notes||'')} canEdit={ctx.role==='owner' && process.env.ANTARES_EVENT_OPERATIONS_WRITES_ENABLED==='true'}/>
  </div>;
