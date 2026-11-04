@@ -51,6 +51,16 @@ export async function POST(req:NextRequest,{params}:{params:Promise<{id:string}>
    const label=clean(body.label,180),taskId=body.taskId==null?null:String(body.taskId);
    if(!label||taskId&&!uuid.test(taskId)||typeof body.done!=='boolean')return NextResponse.json({error:'Tarefa inválida.'},{status:400});
    await sql`SELECT public.antares_save_event_task(${ctx.user.id},${id}::uuid,${taskId}::uuid,${label},${body.done})`;
+  }else if(body.action==='delete_session'){
+   const sessionId=typeof body.sessionId==='string'?body.sessionId:'';
+   if(!uuid.test(sessionId))return NextResponse.json({error:'Sessão inválida.'},{status:400});
+   const privilege=await sql`SELECT p.prosecdef AND pg_get_userbyid(p.proowner)='neondb_owner'
+     AND has_function_privilege(current_user,p.oid,'EXECUTE')
+     AND NOT EXISTS(SELECT 1 FROM aclexplode(coalesce(p.proacl,acldefault('f',p.proowner))) a
+       WHERE a.grantee=0 AND a.privilege_type='EXECUTE') AS safe
+     FROM pg_proc p WHERE p.oid=to_regprocedure('public.antares_delete_event_session(text,uuid,uuid)')`;
+   if(!privilege[0]?.safe)return NextResponse.json({error:'Permissão de exclusão não verificada.'},{status:503});
+   await sql`SELECT public.antares_delete_event_session(${ctx.user.id},${id}::uuid,${sessionId}::uuid)`;
   }else if(body.action==='session'){
    const label=clean(body.label,160),sessionId=body.sessionId==null?null:String(body.sessionId);
    const start=clean(body.start,5)||null,end=clean(body.end,5)||null;
