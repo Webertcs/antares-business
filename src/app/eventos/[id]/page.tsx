@@ -20,11 +20,11 @@ export default async function Page({params}:{params:Promise<{id:string}>}){
  const maps='https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(address);
  const waze='https://waze.com/ul?q='+encodeURIComponent(address)+'&navigate=yes';
  const date=(()=>{if(!e.event_date)return 'A definir';const raw=e.event_date;const parsed=raw instanceof Date?raw:new Date(String(raw));return Number.isNaN(parsed.getTime())?'Data indisponível':new Intl.DateTimeFormat('pt-BR',{timeZone:'UTC'}).format(parsed);})();
- return <div style={{display:'grid',gap:14,color:'#173668',paddingBottom:24}}>
- <header style={{position:'relative',overflow:'hidden',borderRadius:20,padding:'clamp(20px,3vw,34px)',color:'#fff',minHeight:174,background:'radial-gradient(ellipse at 80% 12%,rgba(0,159,255,.32),transparent 42%),linear-gradient(115deg,#061c51 0%,#0c348b 65%,#0a4ea1 100%)',boxShadow:'0 12px 28px rgba(12,39,111,.2)'}}>
+ return <div style={{display:'grid',gap:9,color:'#173668',paddingBottom:12}}>
+ <header style={{position:'relative',overflow:'hidden',borderRadius:14,padding:'clamp(12px,1.6vw,20px)',color:'#fff',minHeight:100,background:'radial-gradient(ellipse at 80% 12%,rgba(0,159,255,.32),transparent 42%),linear-gradient(115deg,#061c51 0%,#0c348b 65%,#0a4ea1 100%)',boxShadow:'0 12px 28px rgba(12,39,111,.2)'}}>
  <div style={{position:'relative',zIndex:1,maxWidth:'75%'}}>
  <div style={{fontSize:12,fontWeight:800,letterSpacing:1.5,color:'#9edcff'}}>CENTRAL DO EVENTO · ANTARES</div>
- <h1 style={{fontSize:'clamp(24px,3vw,36px)',fontWeight:800,margin:'10px 0',lineHeight:1.15,color:'#fff'}}>{String(e.title)}</h1>
+ <h1 style={{fontSize:'clamp(22px,2.4vw,29px)',fontWeight:800,margin:'5px 0',lineHeight:1.15,color:'#fff'}}>{String(e.title)}</h1>
  <div style={{display:'flex',alignItems:'center',gap:10,flexWrap:'wrap',fontWeight:600}}>
  <span>{date} · {String(e.start_time||'').slice(0,5)||'Horário a definir'}{e.end_time?'–'+String(e.end_time).slice(0,5):''}</span>
  </div></div></header>
