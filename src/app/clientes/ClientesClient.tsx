@@ -6,6 +6,7 @@ type Client = {id:string;kind:string;name:string;email:string|null;phone:string|
 type Contact = {id:string;client_id:string;full_name:string;position:string|null;email:string|null;phone:string|null;whatsapp:boolean;is_primary:boolean};
 type Event = {id:string;client_id:string;title:string;event_kind:string;event_date:string|null;expected_attendees:number|null;pricing_model:string;price_per_person:number|null;fixed_amount:number|null;status:string;venue:string|null;notes:string|null};
 const kinds:Record<string,string>={school:'Escola',company:'Empresa',association:'Associação',private:'Particular',other:'Outro'};
+const viewLabel=(kind:string)=>kind==='school'?'Ver escola':kind==='company'?'Ver empresa':kind==='association'?'Ver associação':kind==='private'?'Ver particular':'Ver cliente';
 const statuses:Record<string,string>={prospect:'Prospecto',active:'Ativo',inactive:'Inativo'};
 const eventStatuses:Record<string,string>={lead:'Oportunidade',quoted:'Orçado',reserved:'Reservado',confirmed:'Confirmado',completed:'Realizado',cancelled:'Cancelado'};
 const formatDateBR=(value:string|null)=>value?new Intl.DateTimeFormat('pt-BR',{timeZone:'UTC'}).format(new Date(value)):'Sem data';
@@ -24,7 +25,17 @@ export default function ClientsPage({ writesEnabled }: { writesEnabled: boolean 
  const [showArchived,setShowArchived]=useState(false);
  const [selected,setSelected]=useState<string|null>(null);
  const [linkedEventId,setLinkedEventId]=useState<string|null>(null);
+ const [schoolGroups,setSchoolGroups]=useState<{id:string;client_id:string;label:string;grade_level:string;student_count:number;teacher_name:string;teacher_contact:string}[]>([]);
+ const [educationError,setEducationError]=useState('');
+ const [educationLoading,setEducationLoading]=useState(false);
  useEffect(()=>{const params=new URLSearchParams(window.location.search);const id=params.get('clientId');if(id&&clients.some(c=>c.id===id)){setSelected(id);setLinkedEventId(params.get('eventId'));}},[clients]);
+ useEffect(()=>{if(!selected||clients.find(c=>c.id===selected)?.kind!=='school'){setSchoolGroups([]);setEducationError('');return;}
+ const ctrl=new AbortController();setEducationLoading(true);setEducationError('');
+ fetch('/api/educacional',{cache:'no-store',signal:ctrl.signal}).then(async r=>{const data=await r.json();if(!r.ok)throw Error(data.error||'Consulta indisponível');setSchoolGroups((data.groups||[]).filter((g:{client_id:string})=>g.client_id===selected));})
+ .catch(e=>{if(e.name!=='AbortError')setEducationError('Não foi possível consultar as turmas desta escola.');})
+ .finally(()=>{if(!ctrl.signal.aborted)setEducationLoading(false);});
+ return()=>ctrl.abort();
+ },[selected,clients]);
  const historyDialog=useRef<HTMLDialogElement>(null);
  useEffect(()=>{if(selected)historyDialog.current?.showModal();},[selected]);
  const [form,setForm]=useState<'client'|'contact'|'event'|null>(null);
@@ -149,15 +160,22 @@ export default function ClientsPage({ writesEnabled }: { writesEnabled: boolean 
     <thead><tr>{['Cliente','Tipo','Cidade','Situação','Detalhes'].map(x=><th key={x} style={{padding:'12px 8px',borderBottom:'1px solid #94a3b8'}}>{x}</th>)}</tr></thead>
     <tbody>{filtered.map(c=><tr key={c.id}><td style={{padding:10,borderBottom:'1px solid #94a3b8'}}><strong className={styles.clientName}>{c.name}</strong></td>
     <td>{kinds[c.kind]||c.kind}</td><td>{c.city||'—'}</td><td><span className={styles.badge} data-status={c.status}>{c.status==='inactive'?'Arquivado':statuses[c.status]||c.status}</span></td>
-    <td><div className={styles.actions}><button disabled={saving} onClick={()=>setSelected(c.id)} style={{padding:8,borderRadius:8,background:'#2563eb',color:'white'}} >Ver histórico</button> {writesEnabled&&<><button disabled={saving} onClick={()=>openForm('client',c)}>Editar</button> <button type="button" disabled={saving} onClick={()=>archiveClient(c)} style={{padding:8,borderRadius:8,border:'1px solid #a9bddc',background:'#eef4ff',color:'#234d89'}}>{c.status==='inactive'?'Reativar':'Arquivar'}</button></>}</div></td></tr>)}</tbody></table></div>}
+    <td><div className={styles.actions}><button disabled={saving} onClick={()=>setSelected(c.id)} style={{padding:8,borderRadius:8,background:'#2563eb',color:'white'}} >{viewLabel(c.kind)}</button> {writesEnabled&&<><button disabled={saving} onClick={()=>openForm('client',c)}>Editar</button> <button type="button" disabled={saving} onClick={()=>archiveClient(c)} style={{padding:8,borderRadius:8,border:'1px solid #a9bddc',background:'#eef4ff',color:'#234d89'}}>{c.status==='inactive'?'Reativar':'Arquivar'}</button></>}</div></td></tr>)}</tbody></table></div>}
   </section>
   {active&&<dialog ref={historyDialog} aria-modal="true" aria-labelledby="history-title" className={styles.historyDialog} onCancel={e=>{e.preventDefault();setSelected(null);}}>
-   <div className={styles.historyHeading}><h2 id="history-title">Histórico do cliente</h2><button type="button" onClick={()=>setSelected(null)} aria-label="Fechar histórico">×</button></div>
+   <div className={styles.historyHeading}><h2 id="history-title">{active.kind==='school'?'Ficha da escola':active.kind==='company'?'Ficha da empresa':active.kind==='association'?'Ficha da associação':'Ficha do cliente'}</h2><button type="button" onClick={()=>setSelected(null)} aria-label="Fechar histórico">×</button></div>
    <section className={styles.historyBody}>
    <h2 style={{fontSize:23,fontWeight:700}}>{active.name}</h2>
    <p>{kinds[active.kind]} · {active.city||'Cidade não informada'} · {statuses[active.status]||active.status}</p>
    <p>{active.email||'Sem e-mail'} · {active.phone||'Sem telefone'}</p>
    {active.notes&&<p>Observações: {active.notes}</p>}
+   {active.kind==='school'&&<section aria-label="Turmas e professores" style={{marginTop:20,padding:'14px 15px',background:'#eff6ff',border:'1px solid #c5dbfa',borderRadius:10}}>
+   <h3 style={{fontSize:18,margin:'0 0 8px',color:'#174987'}}>Turmas e Professores</h3>
+   {educationLoading?<p>Carregando turmas...</p>:educationError?<p role="alert">{educationError}</p>:schoolGroups.length===0?<p style={{margin:0}}>Nenhuma turma vinculada a esta escola.</p>:
+   <div style={{overflowX:'auto'}}><table style={{width:'100%',borderCollapse:'collapse',fontSize:13,textAlign:'left'}}>
+   <thead><tr>{['Turma','Série / ano','Alunos','Professor responsável','Contato'].map(x=><th key={x} style={{padding:'8px 6px',borderBottom:'1px solid #c5dbfa'}}>{x}</th>)}</tr></thead>
+   <tbody>{schoolGroups.map(g=><tr key={g.id}>{[g.label,g.grade_level,g.student_count,g.teacher_name,g.teacher_contact].map((v,i)=><td key={i} style={{padding:'8px 6px',borderBottom:'1px solid #dbeafe',overflowWrap:'anywhere'}}>{v??'—'}</td>)}</tr>)}</tbody></table></div>}
+   </section>}
    <h3 style={{fontSize:18,marginTop:20}}>Contatos ({selectedContacts.length}) {writesEnabled&&<button onClick={()=>openForm('contact')}>+ Contato</button>}</h3>
    {selectedContacts.length===0?<p>Sem contatos cadastrados.</p>:
     <ul>{selectedContacts.map(c=><li key={c.id}>{c.full_name}{c.position?' · '+c.position:''}
