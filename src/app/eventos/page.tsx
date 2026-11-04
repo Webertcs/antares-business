@@ -10,7 +10,7 @@ export default async function Page({searchParams}:{searchParams:Promise<Params>}
  const page=Math.max(1,Math.min(100000,Number.parseInt(params.page||'1',10)||1));
  const year=/^\d{4}$/.test(params.year||'')?params.year!:'all';
  const status=['lead','quoted','reserved','confirmed','completed','cancelled'].includes(params.status||'')?params.status!:'all';
- const view=['upcoming','history','all'].includes(params.view||'')?params.view!:'upcoming';
+ const view=['upcoming','history','all'].includes(params.view||'')?params.view!:'all';
  const q=(params.q||'').trim().slice(0,120);
  const db=getDb();
  const counts=await db`SELECT COUNT(*)::int AS total,
