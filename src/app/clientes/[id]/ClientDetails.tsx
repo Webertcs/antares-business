@@ -47,7 +47,7 @@ export default function ClientDetails({id,writesEnabled}:{id:string;writesEnable
  }catch(e){if(!ctrl.signal.aborted)setError(e instanceof Error?e.message:'Erro de consulta');}
  finally{if(!ctrl.signal.aborted)setLoading(false);}
  })();return()=>ctrl.abort();},[id]);
- const panel:React.CSSProperties={background:'linear-gradient(125deg,#f0f6ff 0%,#ffffff 58%,#eaf3ff 100%)',border:'1px solid #bfd5f4',borderLeft:'4px solid #6099e8',borderRadius:14,padding:18,marginBottom:16,boxShadow:'0 10px 24px rgba(18,62,132,.13),0 2px 5px rgba(18,62,132,.06)'};
+ const panel:React.CSSProperties={background:'linear-gradient(125deg,#f3f8ff 0%,#ffffff 60%,#edf5ff 100%)',border:'1px solid #c6d9f4',borderLeft:'4px solid #4d8de2',borderRadius:14,padding:18,marginBottom:16,boxShadow:'0 9px 23px rgba(18,62,132,.12),0 2px 5px rgba(18,62,132,.06)'};
  const heading:React.CSSProperties={fontSize:17,fontWeight:700,lineHeight:1.35,color:'#174987',margin:'0 0 12px'};
  const row:React.CSSProperties={padding:'11px 13px',background:'linear-gradient(100deg,#e1efff,#f4f9ff)',border:'1px solid #c5dcfa',borderLeft:'4px solid #4b8ce5',borderRadius:9,marginBottom:8,overflowWrap:'anywhere',fontSize:13,lineHeight:1.5};
  return <main style={{maxWidth:1180,margin:'0 auto',padding:'16px 20px 36px',fontFamily:'system-ui',color:'#16325b'}}>
@@ -59,22 +59,22 @@ export default function ClientDetails({id,writesEnabled}:{id:string;writesEnable
  </header>
  <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(170px,1fr))',gap:10,marginBottom:14}}>
  {([['Contatos',contacts.length],['Apresentações',events.length],...(client.kind==='school'?[['Turmas',groups.length],['Alunos previstos',groups.reduce((a,g)=>a+Number(g.student_count||0),0)]]:[])] as [string,number][]).map(([label,value])=>
- <div key={label} style={{background:'linear-gradient(135deg,#dcecff 0%,#f1f7ff 65%,#ffffff 100%)',border:'1px solid #b6d0f5',borderTop:'4px solid #327cdb',borderRadius:12,padding:'12px 15px',boxShadow:'0 8px 18px rgba(25,76,150,.15),0 2px 4px rgba(25,76,150,.06)'}}><div style={{fontSize:12,fontWeight:600,color:'#42628b'}}>{label}</div><strong style={{fontSize:23,color:'#143e82'}}>{value}</strong></div>)}
+ <div key={label} style={{background:'linear-gradient(135deg,#e0eeff 0%,#f4f8ff 65%,#ffffff 100%)',border:'1px solid #bdd3f3',borderTop:`4px solid ${label==='Contatos'?'#397fda':label==='Apresentações'?'#d69b3a':label==='Turmas'?'#169caa':'#6c73d9'}`,borderRadius:12,padding:'12px 15px',boxShadow:'0 8px 18px rgba(25,76,150,.13),0 2px 4px rgba(25,76,150,.06)'}}><div style={{fontSize:12,fontWeight:600,color:'#42628b'}}>{label}</div><strong style={{fontSize:23,color:'#143e82'}}>{value}</strong></div>)}
  </div>
- <section style={panel}><h2 style={heading}>Dados da instituição</h2>
+ <section style={{...panel,borderLeftColor:'#397fda'}}><h2 style={heading}>Dados da instituição</h2>
  <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(210px,1fr))',gap:12,fontSize:13}}>
  {([['Tipo',kinds[client.kind]||client.kind],['Situação',statuses[client.status]||client.status],['Cidade',client.city||'—'],['E-mail',client.email||'—'],['Telefone',client.phone||'—']] as [string,string][]).map(([label,value])=><div key={label}><strong style={{color:'#315e94'}}>{label}</strong><div style={{marginTop:4,overflowWrap:'anywhere'}}>{value}</div></div>)}
  </div>{client.notes&&<p style={{fontSize:13,marginBottom:0}}><strong>Observações:</strong> {client.notes}</p>}</section>
- {client.kind==='school'&&<section style={panel}><div style={{display:'flex',alignItems:'center',justifyContent:'space-between',gap:12,flexWrap:'wrap',marginBottom:12}}><h2 style={{...heading,margin:0}}>Turmas e Professores</h2>{writesEnabled&&<button type="button" onClick={()=>{setGroupForm(emptyGroup);setNewGroup(true);}} style={{border:'1px solid #2b62b7',borderRadius:8,background:'linear-gradient(135deg,#367bdc,#174fa8)',color:'#fff',padding:'6px 11px',fontSize:12,fontWeight:700,lineHeight:1.4,boxShadow:'0 3px 8px rgba(28,80,160,.22)',cursor:'pointer'}}>+ Nova turma</button>}</div>
+ {client.kind==='school'&&<section style={{...panel,borderLeftColor:'#169caa',background:'linear-gradient(125deg,#effafb 0%,#ffffff 60%,#edf6ff 100%)'}}><div style={{display:'flex',alignItems:'center',justifyContent:'space-between',gap:12,flexWrap:'wrap',marginBottom:12}}><h2 style={{...heading,margin:0}}>Turmas e Professores</h2>{writesEnabled&&<button type="button" onClick={()=>{setGroupForm(emptyGroup);setNewGroup(true);}} style={{border:'1px solid #2b62b7',borderRadius:8,background:'linear-gradient(135deg,#367bdc,#174fa8)',color:'#fff',padding:'6px 11px',fontSize:12,fontWeight:700,lineHeight:1.4,boxShadow:'0 3px 8px rgba(28,80,160,.22)',cursor:'pointer'}}>+ Nova turma</button>}</div>
  {educationError?<p role="alert">{educationError}</p>:groups.length===0?<p style={{fontSize:13}}>Nenhuma turma vinculada a esta escola.</p>:<div style={{overflowX:'auto'}}><table style={{width:'100%',borderCollapse:'collapse',fontSize:13,textAlign:'left'}}>
  <thead><tr>{['Turma','Série / ano','Alunos','Professor responsável','Contato institucional'].map(t=><th key={t} style={{padding:10,background:'#dceaff',color:'#174987'}}>{t}</th>)}</tr></thead>
  <tbody>{groups.map(g=><tr key={g.id}>{[g.label,g.grade_level,g.student_count,g.teacher_name,g.teacher_contact].map((v,i)=><td key={i} style={{padding:10,borderBottom:'1px solid #d5e5fa'}}>{v??'—'}</td>)}</tr>)}</tbody></table></div>}
  {!writesEnabled&&<p style={{fontSize:12,color:'#60799c',marginBottom:0}}>Cadastro de turmas permanece bloqueado até a validação de segurança.</p>}
  </section>}
- <section style={panel}><h2 style={heading}>Contatos ({contacts.length})</h2>
+ <section style={{...panel,borderLeftColor:'#6c73d9',background:'linear-gradient(125deg,#f3f3ff 0%,#ffffff 60%,#eef5ff 100%)'}}><h2 style={heading}>Contatos ({contacts.length})</h2>
  {contacts.length===0?<p>Sem contatos cadastrados.</p>:contacts.map(c=><div key={c.id} style={row}><strong>{c.full_name}</strong>{c.position?' · '+c.position:''}{c.is_primary?' · Principal':''}<div style={{fontSize:12,marginTop:3}}>{c.phone||c.email||'Sem contato informado'}</div></div>)}
  </section>
- <section style={panel}><h2 style={heading}>Histórico de apresentações e oportunidades ({events.length})</h2>
+ <section style={{...panel,borderLeftColor:'#d69b3a',background:'linear-gradient(125deg,#fff8ec 0%,#ffffff 60%,#edf5ff 100%)'}}><h2 style={heading}>Histórico de apresentações e oportunidades ({events.length})</h2>
  {events.length===0?<p>Sem eventos registrados.</p>:events.map(e=><div key={e.id} style={row}><strong>{e.title}</strong> · {dateBR(e.event_date)} · {eventStatuses[e.status]||e.status}{e.expected_attendees!=null?' · '+e.expected_attendees+' participantes':''}</div>)}
  </section>
  {newGroup&&<dialog ref={groupDialog} aria-modal="true" aria-labelledby="new-group-title" onCancel={e=>{e.preventDefault();closeGroup();}} style={{width:'min(560px,calc(100vw - 32px))',maxHeight:'88vh',overflowY:'auto',border:'1px solid #b7cfee',borderRadius:14,padding:0,boxShadow:'0 20px 70px #001a4466',color:'#173966'}}>
