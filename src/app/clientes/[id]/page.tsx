@@ -5,5 +5,5 @@ export const dynamic='force-dynamic';
 export default async function Page({params}:{params:Promise<{id:string}>}){
  if(!await requireOwner())redirect('/sem-acesso');
  const {id}=await params;
- return <ClientDetails id={id}/>;
+ return <ClientDetails id={id} writesEnabled={process.env.ANTARES_EDUCATION_WRITES_ENABLED==='true'}/>;
 }
