@@ -47,9 +47,9 @@ export default function ClientDetails({id,writesEnabled}:{id:string;writesEnable
  }catch(e){if(!ctrl.signal.aborted)setError(e instanceof Error?e.message:'Erro de consulta');}
  finally{if(!ctrl.signal.aborted)setLoading(false);}
  })();return()=>ctrl.abort();},[id]);
- const panel:React.CSSProperties={background:'linear-gradient(145deg,#ffffff 0%,#f4f8ff 100%)',border:'1px solid #d3e1f6',borderRadius:14,padding:18,marginBottom:14,boxShadow:'0 5px 16px rgba(22,64,122,.065)'};
+ const panel:React.CSSProperties={background:'linear-gradient(125deg,#f0f6ff 0%,#ffffff 58%,#eaf3ff 100%)',border:'1px solid #bfd5f4',borderLeft:'4px solid #6099e8',borderRadius:14,padding:18,marginBottom:16,boxShadow:'0 10px 24px rgba(18,62,132,.13),0 2px 5px rgba(18,62,132,.06)'};
  const heading:React.CSSProperties={fontSize:17,fontWeight:700,lineHeight:1.35,color:'#174987',margin:'0 0 12px'};
- const row:React.CSSProperties={padding:'11px 13px',background:'linear-gradient(100deg,#edf5ff,#f6faff)',border:'1px solid #d5e5fa',borderLeft:'3px solid #73a9f3',borderRadius:9,marginBottom:8,overflowWrap:'anywhere',fontSize:13,lineHeight:1.5};
+ const row:React.CSSProperties={padding:'11px 13px',background:'linear-gradient(100deg,#e1efff,#f4f9ff)',border:'1px solid #c5dcfa',borderLeft:'4px solid #4b8ce5',borderRadius:9,marginBottom:8,overflowWrap:'anywhere',fontSize:13,lineHeight:1.5};
  return <main style={{maxWidth:1180,margin:'0 auto',padding:'16px 20px 36px',fontFamily:'system-ui',color:'#16325b'}}>
  {loading?<p>Carregando ficha...</p>:error?<p role="alert">{error}</p>:client&&<>
  <header style={{background:'linear-gradient(110deg,#102c63,#1162ba)',color:'#fff',borderRadius:14,padding:'19px 24px',marginBottom:14,boxShadow:'0 8px 22px rgba(14,62,130,.18)'}}>
@@ -59,7 +59,7 @@ export default function ClientDetails({id,writesEnabled}:{id:string;writesEnable
  </header>
  <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(170px,1fr))',gap:10,marginBottom:14}}>
  {([['Contatos',contacts.length],['Apresentações',events.length],...(client.kind==='school'?[['Turmas',groups.length],['Alunos previstos',groups.reduce((a,g)=>a+Number(g.student_count||0),0)]]:[])] as [string,number][]).map(([label,value])=>
- <div key={label} style={{background:'linear-gradient(135deg,#e7f1ff,#f4f8ff)',border:'1px solid #c7dcfb',borderTop:'3px solid #478ce3',borderRadius:11,padding:'11px 14px',boxShadow:'0 4px 12px rgba(21,69,132,.07)'}}><div style={{fontSize:12,fontWeight:600,color:'#42628b'}}>{label}</div><strong style={{fontSize:23,color:'#143e82'}}>{value}</strong></div>)}
+ <div key={label} style={{background:'linear-gradient(135deg,#dcecff 0%,#f1f7ff 65%,#ffffff 100%)',border:'1px solid #b6d0f5',borderTop:'4px solid #327cdb',borderRadius:12,padding:'12px 15px',boxShadow:'0 8px 18px rgba(25,76,150,.15),0 2px 4px rgba(25,76,150,.06)'}}><div style={{fontSize:12,fontWeight:600,color:'#42628b'}}>{label}</div><strong style={{fontSize:23,color:'#143e82'}}>{value}</strong></div>)}
  </div>
  <section style={panel}><h2 style={heading}>Dados da instituição</h2>
  <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(210px,1fr))',gap:12,fontSize:13}}>
