@@ -36,11 +36,9 @@ export default async function Page({params}:{params:Promise<{id:string}>}){
  <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(170px,1fr))',gap:10}}>
  {([['Instituição',String(e.client_name),'🏫'],['Cúpula',String(e.dome_name||'A definir'),'🪐'],['Público previsto',e.expected_attendees==null?'A definir':String(e.expected_attendees),'👥']] as const).map(([label,value,icon])=><div key={label} style={infoCard}><div style={{display:'flex',alignItems:'center',gap:10}}><span aria-hidden="true" style={{fontSize:23,background:'#d9eaff',borderRadius:12,padding:8}}>{icon}</span><div style={{minWidth:0}}><small style={{color:'#41659e'}}>{label}</small><div style={{fontWeight:800,overflowWrap:'anywhere'}}>{value}</div></div></div></div>)}
  </div>
- <details style={{...infoCard,padding:0,overflow:'hidden'}}>
- <summary style={{cursor:'pointer',padding:'16px 18px',fontWeight:800,background:'linear-gradient(90deg,#e4f0ff,#f0f6ff)'}}>📍 Local e deslocamento <span style={{fontSize:12,fontWeight:500,marginLeft:8}}>{address||'Endereço ainda não informado'}</span></summary>
- <div style={{padding:'12px 18px'}}><p>{address||'Endereço ainda não informado.'}</p>{address&&<div style={{display:'flex',gap:12,flexWrap:'wrap'}}><a href={maps} target="_blank" rel="noopener noreferrer">Abrir Google Maps</a><a href={waze} target="_blank" rel="noopener noreferrer">Abrir Waze</a></div>}</div></details>
+
  <EventTeamPanel profileKey={ctx.memberId} ownerName="Proprietário"/>
- <EventOperations eventId={id}/>
+ <EventOperations eventId={id} address={address}/>
 
  <details style={{...infoCard,padding:0,overflow:'hidden',borderColor:'#d7c3fa'}}><summary style={{cursor:'pointer',padding:'16px 18px',fontWeight:800,background:'linear-gradient(90deg,#eee4ff,#f9f5ff)'}}>📝 Observações <span style={{fontWeight:500,fontSize:12}}> · {e.notes?'Consultar registro':'Nenhuma observação'}</span></summary><p style={{padding:'0 18px 16px',whiteSpace:'pre-wrap'}}>{String(e.notes||'Nenhuma observação registrada.')}</p></details>
  <Link href="/?section=agenda" style={{color:'#1255bf',fontWeight:700}}>Consultar Agenda</Link>
