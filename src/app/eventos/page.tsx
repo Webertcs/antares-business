@@ -13,24 +13,27 @@ export default async function Page({searchParams}:{searchParams:Promise<Params>}
  const view=['upcoming','history','all'].includes(params.view||'')?params.view!:'upcoming';
  const q=(params.q||'').trim().slice(0,120);
  const db=getDb();
- const where=db`e.organization_id=${ctx.organizationId}
- AND (${year}='all' OR EXTRACT(YEAR FROM e.event_date)::text=${year})
- AND (${status}='all' OR e.status=${status} OR (${status}='cancelled' AND e.status='canceled'))
- AND (${q}='' OR e.title ILIKE ${'%'+q+'%'} OR c.name ILIKE ${'%'+q+'%'})
- AND (${view}='all' OR (${view}='upcoming' AND (e.event_date>=CURRENT_DATE OR e.event_date IS NULL) AND e.status NOT IN ('completed','cancelled','canceled')) OR (${view}='history' AND (e.event_date<CURRENT_DATE OR e.status IN ('completed','cancelled','canceled'))))`;
  const counts=await db`SELECT COUNT(*)::int AS total,
  COUNT(*) FILTER (WHERE e.status='confirmed')::int AS confirmed,
  COUNT(*) FILTER (WHERE e.status='lead')::int AS opportunities
  FROM public.crm_events e JOIN public.crm_clients c ON c.id=e.client_id AND c.organization_id=e.organization_id
  WHERE e.organization_id=${ctx.organizationId}`;
  const yearsRows=await db`SELECT DISTINCT EXTRACT(YEAR FROM event_date)::int AS year FROM public.crm_events WHERE organization_id=${ctx.organizationId} AND event_date IS NOT NULL ORDER BY year DESC`;
- const totalRows=await db`SELECT COUNT(*)::int AS total FROM public.crm_events e JOIN public.crm_clients c ON c.id=e.client_id AND c.organization_id=e.organization_id WHERE ${where}`;
+ const totalRows=await db`SELECT COUNT(*)::int AS total FROM public.crm_events e JOIN public.crm_clients c ON c.id=e.client_id AND c.organization_id=e.organization_id WHERE e.organization_id=${ctx.organizationId}
+ AND (${year}='all' OR EXTRACT(YEAR FROM e.event_date)::text=${year})
+ AND (${status}='all' OR e.status=${status} OR (${status}='cancelled' AND e.status='canceled'))
+ AND (${q}='' OR e.title ILIKE ${'%'+q+'%'} OR c.name ILIKE ${'%'+q+'%'})
+ AND (${view}='all' OR (${view}='upcoming' AND (e.event_date>=CURRENT_DATE OR e.event_date IS NULL) AND e.status NOT IN ('completed','cancelled','canceled')) OR (${view}='history' AND (e.event_date<CURRENT_DATE OR e.status IN ('completed','cancelled','canceled'))))`;
  const total=Number(totalRows[0]?.total||0);
  const pages=Math.max(1,Math.ceil(total/20));
  const current=Math.min(page,pages);
  const rows=await db`SELECT e.id,e.title,e.event_date,e.status,e.expected_attendees,c.name AS client_name
  FROM public.crm_events e JOIN public.crm_clients c ON c.id=e.client_id AND c.organization_id=e.organization_id
- WHERE ${where}
+ WHERE e.organization_id=${ctx.organizationId}
+ AND (${year}='all' OR EXTRACT(YEAR FROM e.event_date)::text=${year})
+ AND (${status}='all' OR e.status=${status} OR (${status}='cancelled' AND e.status='canceled'))
+ AND (${q}='' OR e.title ILIKE ${'%'+q+'%'} OR c.name ILIKE ${'%'+q+'%'})
+ AND (${view}='all' OR (${view}='upcoming' AND (e.event_date>=CURRENT_DATE OR e.event_date IS NULL) AND e.status NOT IN ('completed','cancelled','canceled')) OR (${view}='history' AND (e.event_date<CURRENT_DATE OR e.status IN ('completed','cancelled','canceled'))))
  ORDER BY CASE WHEN ${view}='upcoming' THEN e.event_date END ASC NULLS LAST,
  CASE WHEN ${view}<>'upcoming' THEN e.event_date END DESC NULLS LAST,e.created_at DESC
  LIMIT 20 OFFSET ${(current-1)*20}`;
