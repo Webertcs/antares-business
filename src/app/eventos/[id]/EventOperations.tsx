@@ -22,14 +22,14 @@ export default function EventOperations({eventId}:{eventId:string}){
   setTemplateBusy(true);setMessage('');setFeedbackKind(null);
   try{
    const payload=action==='save'
-    ?{action,name:templateName,items:templateItems.split('\\n').map(x=>x.trim()).filter(Boolean)}
+    ?{action,name:templateName,items:templateItems.split(/\r?\n/).map(x=>x.trim()).filter(Boolean)}
     :{action,templateId:selectedTemplate};
    const res=await fetch('/api/eventos/'+encodeURIComponent(eventId)+'/operacao/modelos',{
     method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
    const json=await res.json();if(!res.ok)throw Error(json.error||'Falha ao processar modelo');
    await loadTemplates();if(action==='apply')setData(await load());
    if(action==='save'){setTemplateName('');setTemplateItems('')}
-   setFeedbackKind('success');setMessage(action==='save'?'Modelo salvo com sucesso.':json.added+' tarefa(s) adicionada(s) ao evento.');
+   setFeedbackKind('success');setMessage(action==='save'?'Modelo salvo com sucesso.':json.added===0?'Nenhuma tarefa nova adicionada. Confira se as tarefas já existem no evento.':json.added+' tarefa(s) adicionada(s) ao evento.');
   }catch(e){setFeedbackKind('error');setMessage(e instanceof Error?e.message:'Falha ao processar modelo')}
   finally{setTemplateBusy(false)}
  }
@@ -45,7 +45,7 @@ export default function EventOperations({eventId}:{eventId:string}){
  {edit?<form onSubmit={e=>{e.preventDefault();void save({action:'infrastructure',access,parking,power,setup})}} style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(280px,1fr))',gap:12}}>
  {([['Acesso e entrada',access,setAccess,2000,'Ex.: Entrada principal da escola'],['Estacionamento',parking,setParking,2000,'Ex.: Área reservada para descarga'],['Energia elétrica',power,setPower,2000,'Ex.: Tomada 220V disponível'],['Montagem',setup,setSetup,4000,'Ex.: Montagem 1 hora antes']] as const).map(([label,value,setValue,max,example])=><label key={label}>{label}<textarea style={{...field,resize:'vertical'}} rows={1} placeholder={example} maxLength={max} value={value} onChange={e=>setValue(e.target.value)}/></label>)}
  <button disabled={saving} type="submit" style={{gridColumn:"1 / -1",justifySelf:"start",background:"#2058cb",color:"#fff",padding:"10px 18px",borderRadius:8,fontWeight:700}}>{saving?"Salvando…":"Salvar infraestrutura"}</button></form>:<div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(200px,1fr))',gap:12}}>{([['Acesso e entrada',op?.access_instructions],['Estacionamento',op?.parking_instructions],['Energia elétrica',op?.power_requirements],['Montagem',op?.setup_notes]] as const).map(([label,value])=><div key={label}><strong>{label}</strong><p style={{whiteSpace:'pre-wrap'}}>{value||'Não informado'}</p></div>)}</div>}{hint}</section>
- <section style={card}><h2>Checklist operacional</h2>{data.checklist.length?<ul style={{display:'grid',gap:10,paddingLeft:20}}>{data.checklist.map(t=><li key={t.id}>{edit?<label><input type="checkbox" disabled={saving} checked={t.done} onChange={e=>void save({action:'task',taskId:t.id,label:t.label,done:e.target.checked})}/> {t.label}</label>:<span>{t.done?'✓ ':'○ '}{t.label}</span>}</li>)}</ul>:<p>Nenhuma tarefa cadastrada para este evento.</p>}
+ <section style={card}><h2>Checklist operacional</h2>{data.checklist.length?<ul style={{display:'grid',gap:10,padding:0,listStyle:'none'}}>{data.checklist.map(t=><li key={t.id} style={{padding:'10px 12px',border:'1px solid #d3e0f5',borderRadius:9,background:'#fff',overflowWrap:'anywhere',lineHeight:1.5}}>{edit?<label style={{display:'flex',alignItems:'flex-start',gap:10,cursor:'pointer'}}><input style={{marginTop:4,flexShrink:0}} type="checkbox" disabled={saving} checked={t.done} onChange={e=>void save({action:'task',taskId:t.id,label:t.label,done:e.target.checked})}/> {t.label}</label>:<span>{t.done?'✓ ':'○ '}{t.label}</span>}</li>)}</ul>:<p>Nenhuma tarefa cadastrada para este evento.</p>}
  {edit&&<div style={{border:'1px solid #c9d9f5',borderRadius:10,padding:14,marginBottom:12,display:'grid',gap:10}}>
  <strong>Modelos reutilizáveis</strong>
  <p style={{fontSize:13,color:'#526b92'}}>Crie um checklist padrão uma vez e aplique em outros eventos. Tarefas já existentes não serão duplicadas.</p>
@@ -58,7 +58,7 @@ export default function EventOperations({eventId}:{eventId:string}){
  <details><summary style={{cursor:'pointer',fontWeight:600}}>Criar modelo padrão</summary>
  <form onSubmit={e=>{e.preventDefault();void templateAction('save')}} style={{display:'grid',gap:8,marginTop:10}}>
  <label>Nome do modelo<input style={field} maxLength={120} required placeholder="Ex.: Visita escolar — padrão" value={templateName} onChange={e=>setTemplateName(e.target.value)}/></label>
- <label>Tarefas (uma por linha)<textarea style={field} rows={4} required placeholder={'Verificar ar-condicionado\\nConferir projetor\\nPreparar cúpula'} value={templateItems} onChange={e=>setTemplateItems(e.target.value)}/></label>
+ <label>Tarefas (uma por linha)<textarea style={field} rows={4} required placeholder={'Verificar ar-condicionado\nConferir projetor\nPreparar cúpula'} value={templateItems} onChange={e=>setTemplateItems(e.target.value)}/></label>
  <button type="submit" disabled={templateBusy||saving} style={{justifySelf:'start',background:'#2058cb',color:'#fff',borderRadius:8,padding:'8px 14px'}}>{templateBusy?'Aguarde…':'Salvar modelo'}</button>
  </form></details></div>}
  {edit&&<form onSubmit={e=>{e.preventDefault();void save({action:'task',label:task,done:false}).then(ok=>{if(ok)setTask('')})}} style={{display:'flex',gap:8,flexWrap:'wrap'}}><input style={{...field,flex:'1 1 220px'}} aria-label="Nova tarefa" placeholder="Ex.: Verificar ar-condicionado" maxLength={180} required value={task} onChange={e=>setTask(e.target.value)}/><button disabled={saving} type="submit">Adicionar tarefa</button></form>}{hint}</section>
