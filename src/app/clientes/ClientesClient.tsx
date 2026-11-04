@@ -145,9 +145,9 @@ export default function ClientsPage({ writesEnabled }: { writesEnabled: boolean 
    </div>
    {loading?<p>Carregando clientes...</p>:error?<p role="alert">{error}</p>:
     filtered.length===0?<div className={styles.empty}><h3>Nenhum cliente nesta visualização</h3><p>{clients.length===0?(writesEnabled?'Cadastre o primeiro cliente para começar.':'Nenhum cadastro disponível para consulta.'):query||kind!=='all'?'Tente outro nome, cidade ou tipo de cliente.':'Marque Mostrar arquivados para consultar os cadastros guardados.'}</p></div>:
-    <div style={{overflowX:'auto'}}><table style={{width:'100%',textAlign:'left',borderCollapse:'collapse'}}>
+    <div style={{overflowX:'auto'}}><table className={styles.clientsTable} style={{width:'100%',textAlign:'left',borderCollapse:'collapse'}}>
     <thead><tr>{['Cliente','Tipo','Cidade','Situação','Detalhes'].map(x=><th key={x} style={{padding:'12px 8px',borderBottom:'1px solid #94a3b8'}}>{x}</th>)}</tr></thead>
-    <tbody>{filtered.map(c=><tr key={c.id}><td style={{padding:10,borderBottom:'1px solid #94a3b8'}}><strong>{c.name}</strong></td>
+    <tbody>{filtered.map(c=><tr key={c.id}><td style={{padding:10,borderBottom:'1px solid #94a3b8'}}><strong className={styles.clientName}>{c.name}</strong></td>
     <td>{kinds[c.kind]||c.kind}</td><td>{c.city||'—'}</td><td><span className={styles.badge} data-status={c.status}>{c.status==='inactive'?'Arquivado':statuses[c.status]||c.status}</span></td>
     <td><div className={styles.actions}><button disabled={saving} onClick={()=>setSelected(c.id)} style={{padding:8,borderRadius:8,background:'#2563eb',color:'white'}} >Ver histórico</button> {writesEnabled&&<><button disabled={saving} onClick={()=>openForm('client',c)}>Editar</button> <button type="button" disabled={saving} onClick={()=>archiveClient(c)} style={{padding:8,borderRadius:8,border:'1px solid #a9bddc',background:'#eef4ff',color:'#234d89'}}>{c.status==='inactive'?'Reativar':'Arquivar'}</button></>}</div></td></tr>)}</tbody></table></div>}
   </section>
