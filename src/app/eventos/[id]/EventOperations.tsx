@@ -7,7 +7,7 @@ type Template={id:string;name:string;items:string[]};
 type Payload={available:boolean;canEdit:boolean;operations:Operation|null;checklist:Task[];sessions:Session[]};
 const card:React.CSSProperties={background:'#f3f7ff',border:'1px solid #c9d9f5',borderRadius:14,padding:18};
 const field:React.CSSProperties={width:'100%',padding:9,border:'1px solid #a8bfe6',borderRadius:8,background:'#fff',color:'#173a70'};
-export default function EventOperations({eventId}:{eventId:string}){
+export default function EventOperations({eventId,address}:{eventId:string;address:string}){
  const [feedbackKind,setFeedbackKind]=useState<'success'|'error'|null>(null);
  const [data,setData]=useState<Payload|null>(null),[loading,setLoading]=useState(true),[error,setError]=useState(''),[message,setMessage]=useState(''),[saving,setSaving]=useState(false);
  const [access,setAccess]=useState(''),[parking,setParking]=useState(''),[power,setPower]=useState(''),[setup,setSetup]=useState('');
@@ -43,10 +43,18 @@ export default function EventOperations({eventId}:{eventId:string}){
  const hint=!edit?<p style={{fontSize:13,color:'#63738c'}}>Edição indisponível até a liberação segura no Neon.</p>:null;
  return <div style={{display:'grid',gap:14}}>
  {message&&<p role={feedbackKind==='error'?'alert':'status'} aria-live="polite" style={{position:'sticky',top:12,zIndex:3,padding:'12px 16px',borderRadius:10,fontWeight:700,background:feedbackKind==='error'?'#fff0ef':'#e6f7ed',color:feedbackKind==='error'?'#9b2626':'#14633b',border:'1px solid '+(feedbackKind==='error'?'#efb3b3':'#9dd7b4')}}>{feedbackKind==='success'?'✓ ':'⚠ '}{message}</p>}
- <section style={card}><h2>Infraestrutura</h2>
- {edit?<form onSubmit={e=>{e.preventDefault();void save({action:'infrastructure',access,parking,power,setup})}} style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(280px,1fr))',gap:12}}>
- {([['Acesso e entrada',access,setAccess,2000,'Ex.: Entrada principal da escola'],['Estacionamento',parking,setParking,2000,'Ex.: Área reservada para descarga'],['Energia elétrica',power,setPower,2000,'Ex.: Tomada 220V disponível'],['Montagem',setup,setSetup,4000,'Ex.: Montagem 1 hora antes']] as const).map(([label,value,setValue,max,example])=><label key={label}>{label}<textarea style={{...field,resize:'vertical'}} rows={1} placeholder={example} maxLength={max} value={value} onChange={e=>setValue(e.target.value)}/></label>)}
- <button disabled={saving} type="submit" style={{gridColumn:"1 / -1",justifySelf:"start",background:"#2058cb",color:"#fff",padding:"10px 18px",borderRadius:8,fontWeight:700}}>{saving?"Salvando…":"Salvar infraestrutura"}</button></form>:<div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(200px,1fr))',gap:12}}>{([['Acesso e entrada',op?.access_instructions],['Estacionamento',op?.parking_instructions],['Energia elétrica',op?.power_requirements],['Montagem',op?.setup_notes]] as const).map(([label,value])=><div key={label}><strong>{label}</strong><p style={{whiteSpace:'pre-wrap'}}>{value||'Não informado'}</p></div>)}</div>}{hint}</section>
+ <details style={{...card,padding:0,overflow:'hidden',background:'linear-gradient(110deg,#e5f0ff,#f5f9ff)',boxShadow:'0 5px 18px #174a8a12'}}>
+ <summary style={{cursor:'pointer',padding:'15px 18px',fontWeight:800,color:'#173668'}}>📍 Local e deslocamento <span style={{fontSize:12,fontWeight:500,color:'#5e7498',marginLeft:8}}>{address||'Endereço ainda não informado'}</span></summary>
+ <div style={{padding:'0 18px 18px'}}>
+ <p style={{fontSize:13,color:'#42618b'}}>{address||'Endereço ainda não informado.'}</p>
+ {address&&<div style={{display:'flex',gap:14,marginBottom:12,flexWrap:'wrap'}}><a href={'https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(address)} target="_blank" rel="noopener noreferrer">Google Maps</a><a href={'https://waze.com/ul?q='+encodeURIComponent(address)+'&navigate=yes'} target="_blank" rel="noopener noreferrer">Waze</a></div>}
+ <h3 style={{fontSize:14,margin:'12px 0 5px',color:'#173668'}}>Orientações do local <span style={{fontWeight:400,color:'#6b7c98'}}>(opcional)</span></h3>
+ {edit?<form onSubmit={e=>{e.preventDefault();void save({action:'infrastructure',access,parking,power,setup})}} style={{display:'grid',gap:9}}>
+ <textarea aria-label="Orientações do local" style={{...field,resize:'vertical'}} rows={2} maxLength={4000} placeholder="Ex.: Acesso pelo portão lateral; espaço liberado a partir das 8h." value={setup} onChange={e=>setSetup(e.target.value)}/>
+ <button disabled={saving} type="submit" style={{justifySelf:'start',background:'#2058cb',color:'#fff',padding:'9px 15px',border:0,borderRadius:9,fontWeight:700}}>{saving?'Salvando…':'Salvar orientações'}</button>
+ </form>:<p style={{whiteSpace:'pre-wrap',fontSize:13}}>{op?.setup_notes||'Nenhuma orientação cadastrada.'}</p>}
+ {hint}
+ </div></details>
  <section style={card}><h2>Checklist operacional</h2>{data.checklist.length?<ul style={{display:'grid',gap:10,padding:0,listStyle:'none'}}>{data.checklist.map(t=><li key={t.id} style={{padding:'10px 12px',border:'1px solid #d3e0f5',borderRadius:9,background:'#fff',overflowWrap:'anywhere',lineHeight:1.5}}>{edit?<label style={{display:'flex',alignItems:'flex-start',gap:10,cursor:'pointer'}}><input style={{marginTop:4,flexShrink:0}} type="checkbox" disabled={saving} checked={t.done} onChange={e=>void save({action:'task',taskId:t.id,label:t.label,done:e.target.checked})}/> {t.label}</label>:<span>{t.done?'✓ ':'○ '}{t.label}</span>}</li>)}</ul>:<p>Nenhuma tarefa cadastrada para este evento.</p>}
  {edit&&<div style={{border:'1px solid #c9d9f5',borderRadius:10,padding:14,marginBottom:12,display:'grid',gap:10}}>
  <strong>Checklist padrão reutilizável</strong>
