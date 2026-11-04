@@ -19,15 +19,15 @@ export default function EventNotes({eventId,initialNotes,canEdit}:{eventId:strin
  <span style={{fontSize:12,color:'#d9eaff'}}>{notes.trim()?'Aviso operacional':'Nenhuma observação'}</span>
  </div>
  <div style={{padding:'9px 12px'}}>
- <div role="note" style={{whiteSpace:'pre-wrap',overflowWrap:'anywhere',lineHeight:1.45,fontSize:10,padding:'8px 10px',border:'1px solid #a9c8f6',borderRadius:10,background:'#dcecff',color:'#123b7d',fontWeight:notes.trim()?700:400}}>
+ <div role="note" style={{whiteSpace:'pre-wrap',overflowWrap:'anywhere',lineHeight:1.5,fontSize:14,padding:'8px 10px',border:'1px solid #a9c8f6',borderRadius:10,background:'#dcecff',color:'#123b7d',fontWeight:notes.trim()?700:400}}>
  {notes.trim()||'Nenhuma observação registrada para este evento.'}
  </div>
  {canEdit&&<details style={{marginTop:12}}>
- <summary style={{cursor:'pointer',fontWeight:700,color:'#154a9a',padding:'4px 0',fontSize:12}}>{notes.trim()?'Editar observação':'Criar observação'}</summary>
+ <summary style={{cursor:'pointer',fontWeight:700,color:'#154a9a',padding:'8px 0',fontSize:14}}>{notes.trim()?'Editar observação':'Criar observação'}</summary>
  <form onSubmit={submit} style={{display:'grid',gap:12,marginTop:10}}>
  <label htmlFor="antares-event-notes" style={{fontWeight:700,color:'#153e7c'}}>Observações do evento</label>
  <textarea id="antares-event-notes" rows={4} maxLength={4000} value={notes} onChange={e=>setNotes(e.target.value)} placeholder="Ex.: Orientações, ocorrências e informações importantes para a equipe." style={{width:'100%',padding:12,border:'1px solid #9cbcf0',borderRadius:10,background:'#fff',color:'#173668',resize:'vertical'}}/>
- <button type="submit" disabled={busy||notes===initialNotes} style={{justifySelf:'start',padding:'6px 10px',fontSize:12,border:0,borderRadius:10,fontWeight:800,color:'#fff',background:'linear-gradient(135deg,#2875e7,#073f9b)',opacity:busy||notes===initialNotes?.65:1}}>{busy?'Salvando…':'Salvar observação'}</button>
+ <button type="submit" disabled={busy||notes===initialNotes} style={{justifySelf:'start',padding:'9px 12px',fontSize:14,border:0,borderRadius:10,fontWeight:800,color:'#fff',background:'linear-gradient(135deg,#2875e7,#073f9b)',opacity:busy||notes===initialNotes?.65:1}}>{busy?'Salvando…':'Salvar observação'}</button>
  </form></details>}
  {feedback&&<p role={failed?'alert':'status'} style={{marginTop:10,fontWeight:700,color:failed?'#a02c2c':'#14633b'}}>{feedback}</p>}
  </div></section>;
