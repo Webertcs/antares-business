@@ -48,7 +48,7 @@ export default function EventsList({events,total,page,pages,years,counts,filters
   {filters.view==='history'&&<div style={{display:'flex',alignItems:'center',flexWrap:'wrap',gap:10,marginBottom:12,padding:'10px 12px',background:'#dcecff',border:'1px solid #a9c9f4',borderRadius:10}}>
    <strong style={{color:'#174985',fontSize:13}}>Histórico por ano</strong>
    <select aria-label="Ano do histórico" value={filters.year} onChange={e=>navigate({year:e.target.value})} style={{minHeight:44,borderRadius:9,border:'1px solid #c5d6ee',background:'#edf5ff',color:'#183c70',padding:'8px 12px'}}><option value="all">Todos os anos</option>{years.map(y=><option key={y} value={String(y)}>{y}</option>)}</select>
-   <span style={{fontSize:12,color:'#365e94'}}>Do mais recente para o mais antigo</span>
+
   </div>}
   <p role="status" aria-live="polite" style={{fontSize:12,color:'#365e94',marginBottom:9}}>{total} {total===1?'evento encontrado':'eventos encontrados'}{pages>1?' · Página '+page+' de '+pages:''}</p>
   {filtered.length===0?<p style={{padding:20,background:'#eaf3ff',borderRadius:10,color:'#365e94'}}>Nenhum evento encontrado para os filtros selecionados.</p>:<div style={{display:'grid',gap:8}}>
