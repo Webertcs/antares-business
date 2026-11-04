@@ -51,6 +51,16 @@ export async function POST(req:NextRequest,{params}:{params:Promise<{id:string}>
    const label=clean(body.label,180),taskId=body.taskId==null?null:String(body.taskId);
    if(!label||taskId&&!uuid.test(taskId)||typeof body.done!=='boolean')return NextResponse.json({error:'Tarefa inválida.'},{status:400});
    await sql`SELECT public.antares_save_event_task(${ctx.user.id},${id}::uuid,${taskId}::uuid,${label},${body.done})`;
+  }else if(body.action==='delete_task'){
+   const taskId=typeof body.taskId==='string'?body.taskId:'';
+   if(!uuid.test(taskId))return NextResponse.json({error:'Item inválido.'},{status:400});
+   const privilege=await sql`SELECT p.prosecdef AND pg_get_userbyid(p.proowner)='neondb_owner'
+     AND has_function_privilege(current_user,p.oid,'EXECUTE')
+     AND NOT EXISTS(SELECT 1 FROM aclexplode(coalesce(p.proacl,acldefault('f',p.proowner))) a
+       WHERE a.grantee=0 AND a.privilege_type='EXECUTE') AS safe
+     FROM pg_proc p WHERE p.oid=to_regprocedure('public.antares_delete_event_task(text,uuid,uuid)')`;
+   if(!privilege[0]?.safe)return NextResponse.json({error:'Exclusão ainda não habilitada com segurança no Neon.'},{status:503});
+   await sql`SELECT public.antares_delete_event_task(${ctx.user.id},${id}::uuid,${taskId}::uuid)`;
   }else if(body.action==='delete_session'){
    const sessionId=typeof body.sessionId==='string'?body.sessionId:'';
    if(!uuid.test(sessionId))return NextResponse.json({error:'Sessão inválida.'},{status:400});
