@@ -1,0 +1,9 @@
+import {redirect} from 'next/navigation';
+import {requireOwner} from '@/lib/equipe/auth';
+import ClientDetails from './ClientDetails';
+export const dynamic='force-dynamic';
+export default async function Page({params}:{params:Promise<{id:string}>}){
+ if(!await requireOwner())redirect('/sem-acesso');
+ const {id}=await params;
+ return <ClientDetails id={id}/>;
+}
