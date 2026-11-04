@@ -47,25 +47,25 @@ export default function ClientDetails({id,writesEnabled}:{id:string;writesEnable
  }catch(e){if(!ctrl.signal.aborted)setError(e instanceof Error?e.message:'Erro de consulta');}
  finally{if(!ctrl.signal.aborted)setLoading(false);}
  })();return()=>ctrl.abort();},[id]);
- const panel:React.CSSProperties={background:'#f8fbff',border:'1px solid #cbdcf5',borderRadius:12,padding:18,marginBottom:14};
- const heading:React.CSSProperties={fontSize:18,color:'#174987',margin:'0 0 12px'};
- const row:React.CSSProperties={padding:'10px 12px',background:'#eaf3ff',border:'1px solid #d5e5fa',borderRadius:8,marginBottom:7,overflowWrap:'anywhere'};
+ const panel:React.CSSProperties={background:'linear-gradient(145deg,#ffffff 0%,#f4f8ff 100%)',border:'1px solid #d3e1f6',borderRadius:14,padding:18,marginBottom:14,boxShadow:'0 5px 16px rgba(22,64,122,.065)'};
+ const heading:React.CSSProperties={fontSize:17,fontWeight:700,lineHeight:1.35,color:'#174987',margin:'0 0 12px'};
+ const row:React.CSSProperties={padding:'11px 13px',background:'linear-gradient(100deg,#edf5ff,#f6faff)',border:'1px solid #d5e5fa',borderLeft:'3px solid #73a9f3',borderRadius:9,marginBottom:8,overflowWrap:'anywhere',fontSize:13,lineHeight:1.5};
  return <main style={{maxWidth:1180,margin:'0 auto',padding:'16px 20px 36px',fontFamily:'system-ui',color:'#16325b'}}>
  {loading?<p>Carregando ficha...</p>:error?<p role="alert">{error}</p>:client&&<>
- <header style={{background:'linear-gradient(110deg,#102c63,#1162ba)',color:'#fff',borderRadius:14,padding:'23px 25px',marginBottom:13}}>
+ <header style={{background:'linear-gradient(110deg,#102c63,#1162ba)',color:'#fff',borderRadius:14,padding:'19px 24px',marginBottom:14,boxShadow:'0 8px 22px rgba(14,62,130,.18)'}}>
  <div style={{fontSize:11,fontWeight:700,letterSpacing:2,color:'#b8dcff'}}>ANTARES · CLIENTES</div>
- <h1 style={{fontSize:27,margin:'7px 0 5px'}}>{client.name}</h1>
- <p style={{margin:0,color:'#e0eeff',fontSize:13}}>{kinds[client.kind]||'Cliente'} · Ficha cadastral</p>
+ <h1 style={{fontSize:25,lineHeight:1.25,margin:'7px 0 0'}}>{client.name}</h1>
+ 
  </header>
  <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(170px,1fr))',gap:10,marginBottom:14}}>
  {([['Contatos',contacts.length],['Apresentações',events.length],...(client.kind==='school'?[['Turmas',groups.length],['Alunos previstos',groups.reduce((a,g)=>a+Number(g.student_count||0),0)]]:[])] as [string,number][]).map(([label,value])=>
- <div key={label} style={{background:'#eaf3ff',border:'1px solid #c7dcfb',borderRadius:10,padding:'12px 14px'}}><div style={{fontSize:12,color:'#42628b'}}>{label}</div><strong style={{fontSize:24,color:'#143e82'}}>{value}</strong></div>)}
+ <div key={label} style={{background:'linear-gradient(135deg,#e7f1ff,#f4f8ff)',border:'1px solid #c7dcfb',borderTop:'3px solid #478ce3',borderRadius:11,padding:'11px 14px',boxShadow:'0 4px 12px rgba(21,69,132,.07)'}}><div style={{fontSize:12,fontWeight:600,color:'#42628b'}}>{label}</div><strong style={{fontSize:23,color:'#143e82'}}>{value}</strong></div>)}
  </div>
  <section style={panel}><h2 style={heading}>Dados da instituição</h2>
  <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(210px,1fr))',gap:12,fontSize:13}}>
  {([['Tipo',kinds[client.kind]||client.kind],['Situação',statuses[client.status]||client.status],['Cidade',client.city||'—'],['E-mail',client.email||'—'],['Telefone',client.phone||'—']] as [string,string][]).map(([label,value])=><div key={label}><strong style={{color:'#315e94'}}>{label}</strong><div style={{marginTop:4,overflowWrap:'anywhere'}}>{value}</div></div>)}
  </div>{client.notes&&<p style={{fontSize:13,marginBottom:0}}><strong>Observações:</strong> {client.notes}</p>}</section>
- {client.kind==='school'&&<section style={panel}><div style={{display:'flex',alignItems:'center',justifyContent:'space-between',gap:12,flexWrap:'wrap',marginBottom:12}}><h2 style={{...heading,margin:0}}>Turmas e Professores</h2>{writesEnabled&&<button type="button" onClick={()=>{setGroupForm(emptyGroup);setNewGroup(true);}} style={{border:0,borderRadius:8,background:'#2058c5',color:'#fff',padding:'9px 13px',cursor:'pointer'}}>+ Nova turma</button>}</div>
+ {client.kind==='school'&&<section style={panel}><div style={{display:'flex',alignItems:'center',justifyContent:'space-between',gap:12,flexWrap:'wrap',marginBottom:12}}><h2 style={{...heading,margin:0}}>Turmas e Professores</h2>{writesEnabled&&<button type="button" onClick={()=>{setGroupForm(emptyGroup);setNewGroup(true);}} style={{border:'1px solid #2b62b7',borderRadius:8,background:'linear-gradient(135deg,#367bdc,#174fa8)',color:'#fff',padding:'6px 11px',fontSize:12,fontWeight:700,lineHeight:1.4,boxShadow:'0 3px 8px rgba(28,80,160,.22)',cursor:'pointer'}}>+ Nova turma</button>}</div>
  {educationError?<p role="alert">{educationError}</p>:groups.length===0?<p style={{fontSize:13}}>Nenhuma turma vinculada a esta escola.</p>:<div style={{overflowX:'auto'}}><table style={{width:'100%',borderCollapse:'collapse',fontSize:13,textAlign:'left'}}>
  <thead><tr>{['Turma','Série / ano','Alunos','Professor responsável','Contato institucional'].map(t=><th key={t} style={{padding:10,background:'#dceaff',color:'#174987'}}>{t}</th>)}</tr></thead>
  <tbody>{groups.map(g=><tr key={g.id}>{[g.label,g.grade_level,g.student_count,g.teacher_name,g.teacher_contact].map((v,i)=><td key={i} style={{padding:10,borderBottom:'1px solid #d5e5fa'}}>{v??'—'}</td>)}</tr>)}</tbody></table></div>}
@@ -87,7 +87,7 @@ export default function ClientDetails({id,writesEnabled}:{id:string;writesEnable
  {groupError&&<p role="alert" style={{color:'#b91c1c'}}>{groupError}</p>}
  <div style={{display:'flex',justifyContent:'flex-end',gap:9}}><button type="button" disabled={saving} onClick={closeGroup}>Cancelar</button><button type="submit" disabled={saving||!writesEnabled} style={{background:'#2058c5',color:'#fff',border:0,borderRadius:8,padding:'10px 15px'}}>{saving?'Salvando...':'Cadastrar turma'}</button></div>
  </form></dialog>}
- <p style={{fontSize:12,color:'#60799c'}}>As informações desta ficha são consultadas nos cadastros existentes do CRM.</p>
+ 
  </>}
  </main>;
 }
