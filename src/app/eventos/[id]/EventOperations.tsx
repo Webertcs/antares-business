@@ -12,24 +12,26 @@ export default function EventOperations({eventId}:{eventId:string}){
  const [data,setData]=useState<Payload|null>(null),[loading,setLoading]=useState(true),[error,setError]=useState(''),[message,setMessage]=useState(''),[saving,setSaving]=useState(false);
  const [access,setAccess]=useState(''),[parking,setParking]=useState(''),[power,setPower]=useState(''),[setup,setSetup]=useState('');
  const [templates,setTemplates]=useState<Template[]>([]),[selectedTemplate,setSelectedTemplate]=useState(''),[templateName,setTemplateName]=useState(''),[templateItems,setTemplateItems]=useState(''),[templateBusy,setTemplateBusy]=useState(false);
+ const [editingTemplate,setEditingTemplate]=useState<string|null>(null);
  const [task,setTask]=useState(''),[session,setSession]=useState(''),[start,setStart]=useState(''),[end,setEnd]=useState(''),[students,setStudents]=useState('');
  const load=useCallback(async(signal?:AbortSignal)=>{const res=await fetch('/api/eventos/'+encodeURIComponent(eventId)+'/operacao',{signal,cache:'no-store'});const json=await res.json();if(!res.ok)throw Error(json.error||'Consulta indisponível');return json as Payload},[eventId]);
  useEffect(()=>{const ctrl=new AbortController();setLoading(true);load(ctrl.signal).then(v=>{if(ctrl.signal.aborted)return;setData(v);setAccess(v.operations?.access_instructions||'');setParking(v.operations?.parking_instructions||'');setPower(v.operations?.power_requirements||'');setSetup(v.operations?.setup_notes||'')}).catch(e=>{if(!ctrl.signal.aborted)setError(e instanceof Error?e.message:'Consulta indisponível')}).finally(()=>{if(!ctrl.signal.aborted)setLoading(false)});return()=>ctrl.abort()},[load]);
  const loadTemplates=useCallback(async()=>{const res=await fetch('/api/eventos/'+encodeURIComponent(eventId)+'/operacao/modelos',{cache:'no-store'});if(!res.ok)throw Error('Não foi possível carregar os modelos');const json=await res.json();setTemplates(json.templates||[])},[eventId]);
  useEffect(()=>{void loadTemplates().catch(()=>{})},[loadTemplates]);
- async function templateAction(action:'save'|'apply'){
+ async function templateAction(action:'save'|'apply'|'delete'){
   if(!data?.canEdit||templateBusy)return;
   setTemplateBusy(true);setMessage('');setFeedbackKind(null);
   try{
    const payload=action==='save'
-    ?{action,name:templateName,items:templateItems.split(/\r?\n/).map(x=>x.trim()).filter(Boolean)}
+    ?{action,templateId:editingTemplate,name:templateName,items:templateItems.split(/\r?\n/).map(x=>x.trim()).filter(Boolean)}
     :{action,templateId:selectedTemplate};
    const res=await fetch('/api/eventos/'+encodeURIComponent(eventId)+'/operacao/modelos',{
     method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
    const json=await res.json();if(!res.ok)throw Error(json.error||'Falha ao processar modelo');
    await loadTemplates();if(action==='apply')setData(await load());
-   if(action==='save'){setTemplateName('');setTemplateItems('')}
-   setFeedbackKind('success');setMessage(action==='save'?'Modelo salvo com sucesso.':json.added===0?'Nenhuma tarefa nova adicionada. Confira se as tarefas já existem no evento.':json.added+' tarefa(s) adicionada(s) ao evento.');
+   if(action==='save'){setTemplateName('');setTemplateItems('');setEditingTemplate(null)}
+   if(action==='delete'){setSelectedTemplate('');setEditingTemplate(null);setTemplateName('');setTemplateItems('')}
+   setFeedbackKind('success');setMessage(action==='save'?'Modelo salvo com sucesso.':action==='delete'?'Modelo excluído. As tarefas dos eventos foram preservadas.':json.added===0?'Nenhuma tarefa nova adicionada. Confira se as tarefas já existem no evento.':json.added+' tarefa(s) adicionada(s) ao evento.');
   }catch(e){setFeedbackKind('error');setMessage(e instanceof Error?e.message:'Falha ao processar modelo')}
   finally{setTemplateBusy(false)}
  }
@@ -47,20 +49,23 @@ export default function EventOperations({eventId}:{eventId:string}){
  <button disabled={saving} type="submit" style={{gridColumn:"1 / -1",justifySelf:"start",background:"#2058cb",color:"#fff",padding:"10px 18px",borderRadius:8,fontWeight:700}}>{saving?"Salvando…":"Salvar infraestrutura"}</button></form>:<div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(200px,1fr))',gap:12}}>{([['Acesso e entrada',op?.access_instructions],['Estacionamento',op?.parking_instructions],['Energia elétrica',op?.power_requirements],['Montagem',op?.setup_notes]] as const).map(([label,value])=><div key={label}><strong>{label}</strong><p style={{whiteSpace:'pre-wrap'}}>{value||'Não informado'}</p></div>)}</div>}{hint}</section>
  <section style={card}><h2>Checklist operacional</h2>{data.checklist.length?<ul style={{display:'grid',gap:10,padding:0,listStyle:'none'}}>{data.checklist.map(t=><li key={t.id} style={{padding:'10px 12px',border:'1px solid #d3e0f5',borderRadius:9,background:'#fff',overflowWrap:'anywhere',lineHeight:1.5}}>{edit?<label style={{display:'flex',alignItems:'flex-start',gap:10,cursor:'pointer'}}><input style={{marginTop:4,flexShrink:0}} type="checkbox" disabled={saving} checked={t.done} onChange={e=>void save({action:'task',taskId:t.id,label:t.label,done:e.target.checked})}/> {t.label}</label>:<span>{t.done?'✓ ':'○ '}{t.label}</span>}</li>)}</ul>:<p>Nenhuma tarefa cadastrada para este evento.</p>}
  {edit&&<div style={{border:'1px solid #c9d9f5',borderRadius:10,padding:14,marginBottom:12,display:'grid',gap:10}}>
- <strong>Modelos reutilizáveis</strong>
+ <strong>Checklist padrão reutilizável</strong>
  <p style={{fontSize:13,color:'#526b92'}}>Crie um checklist padrão uma vez e aplique em outros eventos. Tarefas já existentes não serão duplicadas.</p>
+ <details><summary style={{cursor:'pointer',fontWeight:700}}>Gerenciar modelo padrão</summary><div style={{display:'grid',gap:10,marginTop:12}}>
  <div style={{display:'flex',gap:8,flexWrap:'wrap'}}>
  <select aria-label="Modelo de checklist" style={{...field,flex:'1 1 220px'}} value={selectedTemplate} onChange={e=>setSelectedTemplate(e.target.value)}>
  <option value="">Selecione um modelo salvo</option>{templates.map(t=><option key={t.id} value={t.id}>{t.name} ({t.items.length} tarefas)</option>)}
  </select>
  <button type="button" disabled={!selectedTemplate||templateBusy||saving} onClick={()=>void templateAction('apply')} style={{background:'#2058cb',color:'#fff',borderRadius:8,padding:'8px 14px'}}>Aplicar checklist</button>
+ <button type="button" disabled={!selectedTemplate||templateBusy||saving} onClick={()=>{const t=templates.find(x=>x.id===selectedTemplate);if(!t)return;setEditingTemplate(t.id);setTemplateName(t.name);setTemplateItems(t.items.join('\n'));}} style={{border:'1px solid #9cb8e6',borderRadius:8,padding:'8px 14px'}}>Editar</button>
+ <button type="button" disabled={!selectedTemplate||templateBusy||saving} onClick={()=>{const t=templates.find(x=>x.id===selectedTemplate);if(t&&window.confirm('Excluir o modelo "'+t.name+'"? As tarefas já aplicadas aos eventos serão mantidas.'))void templateAction('delete')}} style={{border:'1px solid #d39b9b',color:'#9b2626',borderRadius:8,padding:'8px 14px'}}>Excluir</button>
  </div>
- <details><summary style={{cursor:'pointer',fontWeight:600}}>Criar modelo padrão</summary>
+ <details open={editingTemplate!==null} key={editingTemplate||'new'}><summary style={{cursor:'pointer',fontWeight:600}}>{editingTemplate?'Editar modelo':'Criar modelo padrão'}</summary>
  <form onSubmit={e=>{e.preventDefault();void templateAction('save')}} style={{display:'grid',gap:8,marginTop:10}}>
  <label>Nome do modelo<input style={field} maxLength={120} required placeholder="Ex.: Visita escolar — padrão" value={templateName} onChange={e=>setTemplateName(e.target.value)}/></label>
  <label>Tarefas (uma por linha)<textarea style={field} rows={4} required placeholder={'Verificar ar-condicionado\nConferir projetor\nPreparar cúpula'} value={templateItems} onChange={e=>setTemplateItems(e.target.value)}/></label>
- <button type="submit" disabled={templateBusy||saving} style={{justifySelf:'start',background:'#2058cb',color:'#fff',borderRadius:8,padding:'8px 14px'}}>{templateBusy?'Aguarde…':'Salvar modelo'}</button>
- </form></details></div>}
+ <button type="submit" disabled={templateBusy||saving} style={{justifySelf:'start',background:'#2058cb',color:'#fff',borderRadius:8,padding:'8px 14px'}}>{templateBusy?'Aguarde…':editingTemplate?'Salvar alterações':'Salvar modelo'}</button>{editingTemplate&&<button type="button" onClick={()=>{setEditingTemplate(null);setTemplateName('');setTemplateItems('')}}>Cancelar edição</button>}
+ </form></details></div></details></div>}
  {edit&&<form onSubmit={e=>{e.preventDefault();void save({action:'task',label:task,done:false}).then(ok=>{if(ok)setTask('')})}} style={{display:'flex',gap:8,flexWrap:'wrap'}}><input style={{...field,flex:'1 1 220px'}} aria-label="Nova tarefa" placeholder="Ex.: Verificar ar-condicionado" maxLength={180} required value={task} onChange={e=>setTask(e.target.value)}/><button disabled={saving} type="submit">Adicionar tarefa</button></form>}{hint}</section>
  <section style={card}><h2>Sessões e turmas</h2>{data.sessions.length?<div style={{display:'grid',gap:10}}>{data.sessions.map(s=><div key={s.id} style={{borderBottom:'1px solid #c9d9f5',paddingBottom:8}}><strong>{s.label}</strong><p>{s.starts_at?String(s.starts_at).slice(0,5):'Horário a definir'}{s.ends_at?'–'+String(s.ends_at).slice(0,5):''} · {s.expected_students==null?'Alunos a definir':s.expected_students+' alunos'}</p></div>)}</div>:<p>Nenhuma sessão cadastrada para este evento.</p>}
  {edit&&<form onSubmit={e=>{e.preventDefault();void save({action:'session',label:session,start,end,students:students===''?null:Number(students)}).then(ok=>{if(ok){setSession('');setStart('');setEnd('');setStudents('')}})}} style={{display:'grid',gap:8}}><label>Turma ou sessão<input style={field} maxLength={160} placeholder="Ex.: Turma 01 — manhã" required value={session} onChange={e=>setSession(e.target.value)}/></label><div style={{display:'flex',gap:8,flexWrap:'wrap'}}><label>Início<input style={field} type="time" value={start} onChange={e=>setStart(e.target.value)}/></label><label>Fim<input style={field} type="time" value={end} onChange={e=>setEnd(e.target.value)}/></label><label>Alunos previstos<input style={field} type="number" placeholder="Ex.: 30" min="0" max="10000" value={students} onChange={e=>setStudents(e.target.value)}/></label></div><button disabled={saving} type="submit">Adicionar sessão</button></form>}{hint}</section>
