@@ -19,7 +19,7 @@ export default function EventNotes({eventId,initialNotes,canEdit}:{eventId:strin
  <span style={{fontSize:12,color:'#d9eaff'}}>{notes.trim()?'Aviso operacional':'Nenhuma observação'}</span>
  </div>
  <div style={{padding:'9px 12px'}}>
- <div role="note" style={{whiteSpace:'pre-wrap',overflowWrap:'anywhere',lineHeight:1.55,padding:'8px 10px',border:'1px solid #a9c8f6',borderRadius:10,background:'#dcecff',color:'#123b7d',fontWeight:notes.trim()?700:400}}>
+ <div role="note" style={{whiteSpace:'pre-wrap',overflowWrap:'anywhere',lineHeight:1.45,fontSize:10,padding:'8px 10px',border:'1px solid #a9c8f6',borderRadius:10,background:'#dcecff',color:'#123b7d',fontWeight:notes.trim()?700:400}}>
  {notes.trim()||'Nenhuma observação registrada para este evento.'}
  </div>
  {canEdit&&<details style={{marginTop:12}}>
