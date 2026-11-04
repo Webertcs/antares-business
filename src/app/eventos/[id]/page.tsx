@@ -5,7 +5,7 @@ import EventTeamPanel from './EventTeamPanel';
 import EventNotes from './EventNotes';
 export const dynamic='force-dynamic';
 const uuid=/^[0-9a-f]{8}(-[0-9a-f]{4}){3}-[0-9a-f]{12}$/i;
-const infoCard:React.CSSProperties={background:'linear-gradient(145deg,#fff 0%,#e9f1ff 100%)',border:'1px solid #c4d8ff',borderRadius:16,padding:'14px 16px',boxShadow:'0 6px 20px rgba(25,67,140,.07)',minWidth:0};
+const infoCard:React.CSSProperties={background:'linear-gradient(145deg,#fff 0%,#e9f1ff 100%)',border:'1px solid #c4d8ff',borderRadius:12,padding:'10px 12px',boxShadow:'0 6px 20px rgba(25,67,140,.07)',minWidth:0};
 export default async function Page({params}:{params:Promise<{id:string}>}){
  const ctx=await requireMember();if(!ctx)redirect('/sem-acesso');
  const {id}=await params;if(!uuid.test(id))notFound();
@@ -29,7 +29,7 @@ export default async function Page({params}:{params:Promise<{id:string}>}){
  <span>{date} · {String(e.start_time||'').slice(0,5)||'Horário a definir'}{e.end_time?'–'+String(e.end_time).slice(0,5):''}</span>
  </div></div></header>
  <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(170px,1fr))',gap:10}}>
- {([['Instituição',String(e.client_name),'🏫'],['Cúpula',String(e.dome_name||'A definir'),'🪐'],['Público previsto',e.expected_attendees==null?'A definir':String(e.expected_attendees),'👥']] as const).map(([label,value,icon])=><div key={label} style={infoCard}><div style={{display:'flex',alignItems:'center',gap:10}}><span aria-hidden="true" style={{fontSize:23,background:'#d9eaff',borderRadius:12,padding:8}}>{icon}</span><div style={{minWidth:0}}><small style={{color:'#41659e'}}>{label}</small><div style={{fontWeight:800,overflowWrap:'anywhere'}}>{value}</div></div></div></div>)}
+ {([['Instituição',String(e.client_name),'🏫'],['Cúpula',String(e.dome_name||'A definir'),'🪐'],['Público previsto',e.expected_attendees==null?'A definir':String(e.expected_attendees),'👥']] as const).map(([label,value,icon])=><div key={label} style={infoCard}><div style={{display:'flex',alignItems:'center',gap:10}}><span aria-hidden="true" style={{fontSize:23,background:'#d9eaff',borderRadius:12,padding:8}}>{icon}</span><div style={{minWidth:0}}><div style={{fontSize:14,fontWeight:750,color:'#28589b',lineHeight:1.3}}>{label}</div><div style={{fontSize:15,fontWeight:800,overflowWrap:'anywhere',lineHeight:1.35}}>{value}</div></div></div></div>)}
  </div>
 
  <EventTeamPanel profileKey={ctx.memberId} ownerName="Proprietário"/>
