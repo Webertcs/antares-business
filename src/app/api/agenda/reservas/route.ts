@@ -23,7 +23,8 @@ export async function POST(req:NextRequest){
  const db=getTeamWriteDb();
  // Verificação antecipada para evitar conflito comum; a proteção definitiva
  // contra gravações simultâneas deve ocorrer atomicamente no banco.
- const conflicts=await db`SELECT p.id FROM public.antares_dome_links l
+ const readDb=getDb();
+ const conflicts=await readDb`SELECT p.id FROM public.antares_dome_links l
  JOIN public.presentations p ON p.organization_id=l.organization_id AND p.dome_id=l.equipment_id
  WHERE l.organization_id=${owner.organizationId}::uuid AND l.antares_dome_id=${v.domeId}::uuid
  AND p.status NOT IN ('cancelled') AND p.starts_at<${end.toISOString()}::timestamptz
