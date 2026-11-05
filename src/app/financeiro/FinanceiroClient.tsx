@@ -1,6 +1,7 @@
 'use client';
 import {useEffect,useState} from 'react';
 import Link from 'next/link';
+import BackButton from '../BackButton';
 type Entry={id:string;entry_type:'income'|'expense';amount:number;description:string;occurred_on:string;reversal_of:string|null;presentation_title:string|null;dome_name:string|null};
 type Data={entries:Entry[];income:number;expenses:number;balance:number;writesEnabled:boolean;limited:boolean;domes:{id:string;name:string;active:boolean}[];presentations:{id:string;title:string;starts_at:string}[]};
 type Report={months:{periodo:string;receitas:number;despesas:number}[];years:{ano:number;receitas:number;despesas:number}[];domes:{cupula:string;receitas:number;despesas:number}[];proposals:{id:string;title:string;total:number;status:string}[];notes:string[]};
@@ -72,9 +73,9 @@ export default function FinanceiroClient(){
  .finance-report-print table { border-collapse:collapse !important; width:100% !important; font-size:10pt !important; }
  .finance-report-print th,.finance-report-print td { border-bottom:1px solid #ddd !important; padding:6px !important; }
  .finance-report-print tr { break-inside:avoid !important; }
- }`}</style><main style={{background:'#f3f6fc',color:'#11264d',minHeight:'100vh',padding:'clamp(20px,5vw,52px)',fontFamily:'Arial,sans-serif'}}>
+ }`}</style><main style={{background:'#f3f6fc',color:'#11264d',minHeight:'100%',padding:'clamp(16px,3vw,32px)',fontFamily:'Arial,sans-serif'}}>
  <div style={{maxWidth:1120,margin:'0 auto'}}>
- <div className="finance-print-hide"><Link href="/" style={{color:'#2854a3'}}>← Voltar ao painel</Link></div>
+ <div className="finance-print-hide"><BackButton /></div>
  <p className="finance-print-hide" style={{letterSpacing:2,fontSize:12,marginTop:25}}>ANTARES BUSINESS · BLOCO 07C</p>
  <h1 className="finance-print-hide" style={{fontSize:32,margin:'8px 0'}}>Gestão financeira</h1>
  <div className="finance-print-hide" style={{marginBottom:15}}><Link href="/financeiro/receber" style={{display:'inline-block',padding:'10px 16px',background:'#2454d3',color:'white',borderRadius:8}}>Contas a receber</Link></div>
