@@ -34,3 +34,31 @@ export async function POST(req:NextRequest){
  return NextResponse.json({id:rows[0]?.id},{status:201});
  }catch{return fail('Reserva não realizada: confira os vínculos, horários e a situação da proposta',409);}
 }
+
+/** Edição/cancelamento: fail-closed até existir a função transacional auditável no Neon. */
+export async function PATCH(req:NextRequest){
+ const owner=await requireOwner();if(!owner)return fail('Somente proprietário',403);
+ const denied=await assertAgendaWriteAllowed(req);if(denied)return denied;
+ try{
+  const v=await req.json();
+  const uuid=/^[0-9a-f]{8}(-[0-9a-f]{4}){3}-[0-9a-f]{12}$/i;
+  if(!v||!uuid.test(v.presentationId)||!['edit','cancel'].includes(v.action))return fail('Operação inválida',400);
+  let domeId:string|null=null,start:string|null=null,end:string|null=null;
+  if(v.action==='edit'){
+   if(!uuid.test(v.domeId)||typeof v.start!=='string'||typeof v.end!=='string')return fail('Dados de edição inválidos',400);
+   const a=new Date(v.start),b=new Date(v.end);
+   if(!Number.isFinite(a.getTime())||!Number.isFinite(b.getTime())||b<=a)return fail('Horários inválidos',400);
+   domeId=v.domeId;start=a.toISOString();end=b.toISOString();
+  }else if(v.confirm!=='CANCELAR')return fail('Confirmação de cancelamento obrigatória',400);
+  const db=getTeamWriteDb();
+  const safety=await db`SELECT p.prosecdef AND pg_get_userbyid(p.proowner)='neondb_owner'
+   AND has_function_privilege(current_user,p.oid,'EXECUTE')
+   AND NOT EXISTS(SELECT 1 FROM aclexplode(coalesce(p.proacl,acldefault('f',p.proowner))) x WHERE x.grantee=0 AND x.privilege_type='EXECUTE') AS safe
+   FROM pg_proc p WHERE p.oid=to_regprocedure('public.antares_change_proposal_reservation(text,uuid,uuid,text,uuid,timestamptz,timestamptz)')`;
+  if(!safety[0]?.safe)return fail('Edição e cancelamento aguardam a função transacional auditável no Neon.',503);
+  const result=await db`SELECT public.antares_change_proposal_reservation(
+   ${owner.user.id},${owner.organizationId}::uuid,${v.presentationId}::uuid,${v.action},
+   ${domeId}::uuid,${start}::timestamptz,${end}::timestamptz) AS id`;
+  return NextResponse.json({ok:true,id:result[0]?.id},{headers:{'Cache-Control':'no-store'}});
+ }catch{return fail('Operação não concluída: verifique conflitos, situação da reserva e permissões.',409);}
+}
