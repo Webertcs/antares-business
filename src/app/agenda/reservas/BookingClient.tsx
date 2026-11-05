@@ -1,7 +1,6 @@
 'use client';
 import {useEffect,useState} from 'react';
 import Link from 'next/link';
-import BackButton from '../../BackButton';
 type Proposal={id:string;title:string;client_name:string;mapped:boolean};
 type Dome={id:string;name:string;capacity:number|null;mapped:boolean};
 type Booking={proposal_id:string;presentation_id:string};
@@ -28,7 +27,6 @@ export default function BookingClient({enabled}:{enabled:boolean}){
  try{const r=await fetch('/api/agenda/reservas',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({proposalId,domeId,start:new Date(start).toISOString(),end:new Date(end).toISOString()})});const v=await r.json();if(!r.ok)throw Error(v.error||'Reserva não registrada');await load();setStatus('Reserva registrada. Consulte a Agenda.');setProposalId('');setDomeId('');}
  catch(e){setStatus(e instanceof Error?e.message:'Erro');}finally{setBusy(false)}}
  return <main className="booking-refined">
- <BackButton/>
  <div className="booking-heading"><div><h1>Reservas</h1><p>Agende apresentações com cúpulas e instituições vinculadas.</p></div><Link className="booking-calendar-link" href="/?section=agenda">Ver calendário ↗</Link></div>
  {status&&<p role="status" className="booking-status">{status}</p>}
  <section className="booking-panel" aria-labelledby="booking-readiness-heading">
