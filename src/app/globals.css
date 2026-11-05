@@ -769,3 +769,28 @@
 /* ANTARES V3: avatares discretamente maiores */
 .owner-profile-link .avatar{width:44px;height:44px;flex-shrink:0;object-fit:cover}
 .owner-header-profile .avatar.mini{width:38px;height:38px;object-fit:cover}
+
+/* Perfil — identidade visual azul e navegacao padronizada */
+.profile-page{background:radial-gradient(circle at 85% 12%,#dceafe 0,transparent 35%),linear-gradient(160deg,#edf4ff 0%,#f7faff 60%,#eaf1fd 100%);padding:28px 24px 60px}
+.profile-navigation{margin-bottom:16px}
+.profile-navigation .owner-back-button{display:inline-flex;align-items:center;gap:5px;background:#e8f1ff;border:1px solid #bfd3f6;color:#1e4fa7;border-radius:9px;padding:8px 13px;font-size:12px;font-weight:750;box-shadow:0 2px 6px #153d7a12}
+.profile-navigation .owner-back-button:hover{background:#d9e9ff;transform:translateY(-1px)}
+.profile-panel{padding:0;overflow:hidden;border:1px solid #c9dcfa;border-radius:19px;box-shadow:0 20px 55px #143c7b1c,0 4px 12px #143c7b0d}
+.profile-header{background:linear-gradient(115deg,#0c285b 0%,#1753b5 55%,#2d79ed 100%);padding:27px 32px 25px;color:#fff;position:relative;overflow:hidden}
+.profile-header::after{content:"";position:absolute;width:220px;height:220px;right:-48px;top:-140px;border:1px solid #ffffff35;border-radius:50%;box-shadow:0 0 0 36px #ffffff0a,0 0 0 78px #ffffff08;pointer-events:none}
+.profile-header .profile-eyebrow{color:#c2dcff;letter-spacing:2px;font-size:11px;margin:0 0 9px}
+.profile-header h1{color:#fff;font-size:29px;font-weight:800;margin:0;letter-spacing:-.4px}
+.profile-form-layout{margin:0;padding:32px;gap:35px;grid-template-columns:190px minmax(0,1fr);background:linear-gradient(180deg,#fff 0%,#f8fbff 100%)}
+.profile-photo-area{background:#edf5ff;border:1px solid #d4e3fb;border-radius:15px;padding:22px 12px;align-self:start;box-shadow:0 6px 14px #214d9c0b}
+.profile-photo-area>img,.profile-photo-area>span{border:4px solid white;box-shadow:0 7px 20px #143c7b30;width:126px;height:126px}
+.profile-photo-button{background:#fff;border:1px solid #a9c8fa;color:#164ea8;padding:11px 15px;box-shadow:0 3px 9px #1c58a01c}
+.profile-photo-button:hover{background:#dceaff;transform:translateY(-1px)}
+.profile-fields{gap:17px}
+.profile-fields label{color:#1d4077;font-size:12px;font-weight:750;gap:7px}
+.profile-fields input{height:45px;border-color:#bed3f1;border-radius:10px;background:#fff;font-size:14px;box-shadow:inset 0 1px 2px #123c6b08}
+.profile-fields input:focus{border-color:#3979e6;box-shadow:0 0 0 3px #3979e622;outline:none}
+.profile-fields input:disabled{background:#edf3fc;color:#59708f}
+.profile-fields .primary-button{background:linear-gradient(110deg,#1648c3,#3478f4);border:0;border-radius:10px;padding:13px 20px;color:#fff;font-weight:800;box-shadow:0 8px 18px #245fe43d}
+.profile-fields .primary-button:hover{background:linear-gradient(110deg,#103caa,#2266e3);transform:translateY(-2px);box-shadow:0 11px 22px #245fe44d}
+.profile-feedback{background:#e9f3ff;border:1px solid #bdd8fa;border-radius:9px;padding:10px 12px;color:#164c98;font-weight:650}
+@media(max-width:600px){.profile-page{padding:16px 12px 35px}.profile-header{padding:22px}.profile-form-layout{padding:20px;grid-template-columns:1fr;gap:20px}.profile-photo-area{max-width:230px;justify-self:center;width:100%}.profile-fields .primary-button{width:100%;justify-content:center}}
