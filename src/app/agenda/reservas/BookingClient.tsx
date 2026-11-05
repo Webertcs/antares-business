@@ -1,5 +1,5 @@
 'use client';
-import {useEffect,useState} from 'react';
+import {useEffect,useMemo,useState} from 'react';
 import Link from 'next/link';
 type Proposal={id:string;title:string;client_name:string;mapped:boolean};
 type Dome={id:string;name:string;capacity:number|null;mapped:boolean};
@@ -8,6 +8,7 @@ export default function BookingClient({enabled}:{enabled:boolean}){
  const [data,setData]=useState<{proposals:Proposal[];domes:Dome[];links:Booking[]}|null>(null);
  const [status,setStatus]=useState('Carregando...'),[busy,setBusy]=useState(false);
  const [detailId,setDetailId]=useState<string|null>(null);
+ const [query,setQuery]=useState(''),[year,setYear]=useState('all'),[month,setMonth]=useState('all'),[stateFilter,setStateFilter]=useState('all'),[sort,setSort]=useState('desc'),[page,setPage]=useState(1);
  const [proposalId,setProposalId]=useState(''),[domeId,setDomeId]=useState(''),[start,setStart]=useState(''),[end,setEnd]=useState('');
  async function load(){const r=await fetch('/api/agenda/reservas',{cache:'no-store'});const v=await r.json();if(!r.ok)throw Error(v.error||'Consulta falhou');setData(v);}
  useEffect(()=>{load().then(()=>setStatus('')).catch(e=>setStatus(e.message));},[]);
@@ -15,6 +16,9 @@ export default function BookingClient({enabled}:{enabled:boolean}){
  const domes=data?.domes.filter(d=>d.mapped)||[];
  const selectedBooking=data?.links.find(l=>l.presentation_id===detailId);
  const selectedProposal=data?.proposals.find(p=>p.id===selectedBooking?.proposal_id);
+ const bookings=useMemo(()=>{const rows=(data?.links||[]).map(b=>({...b,proposal:data?.proposals.find(p=>p.id===b.proposal_id)}));return rows.filter(b=>{const d=new Date(b.starts_at);return (year==='all'||String(d.getFullYear())===year)&&(month==='all'||String(d.getMonth()+1)===month)&&(stateFilter==='all'||b.status===stateFilter)&&(!query||[b.proposal?.client_name,b.proposal?.title,b.dome_name].some(v=>v?.toLocaleLowerCase('pt-BR').includes(query.toLocaleLowerCase('pt-BR'))));}).sort((a,b)=>sort==='asc'?new Date(a.starts_at).getTime()-new Date(b.starts_at).getTime():new Date(b.starts_at).getTime()-new Date(a.starts_at).getTime());},[data,year,month,stateFilter,query,sort]);
+ const years=Array.from(new Set((data?.links||[]).map(b=>String(new Date(b.starts_at).getFullYear())))).sort((a,b)=>b.localeCompare(a));
+ const pageCount=Math.max(1,Math.ceil(bookings.length/10));const currentPage=Math.min(page,pageCount);
  const formatDate=(value:string)=>new Intl.DateTimeFormat('pt-BR',{dateStyle:'short',timeStyle:'short',timeZone:'America/Sao_Paulo'}).format(new Date(value));
  async function prepare(body:Record<string,unknown>){if(!enabled||busy)return;if(!window.confirm('Vincular este cliente à operação? O cadastro ficará salvo no banco e não será removido automaticamente. Não use uma instituição fictícia.'))return;setBusy(true);setStatus('');try{const response=await fetch('/api/agenda/preparar',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});const data=await response.json();if(!response.ok)throw Error(data.error||'Não foi possível preparar a Agenda');await load();setStatus('Cadastro preparado para a Agenda.');}catch(e){setStatus(e instanceof Error?e.message:'Erro');}finally{setBusy(false);}}
  async function submit(e:React.FormEvent){e.preventDefault();if(!enabled||busy)return;
@@ -41,7 +45,16 @@ export default function BookingClient({enabled}:{enabled:boolean}){
    <div><span>Cúpulas vinculadas</span><strong>{domes.length}</strong></div>
    <div><span>Reservas registradas</span><strong>{data?.links.length??'—'}</strong></div>
   </div>
-  {data?.proposals.length?<div className="booking-readiness-list">{data.proposals.map(p=>{const booking=data.links.find(l=>l.proposal_id===p.id);return <div key={p.id} className="booking-readiness-row"><div><strong>{p.client_name}</strong><span>{p.title}</span></div><div style={{display:'flex',alignItems:'center',gap:12,flexWrap:'wrap'}}><span className={p.mapped?'booking-ready':'booking-pending'}>{booking?'Reservada':p.mapped?'Cliente vinculado':'Aguardando vínculo'}</span>{booking&&<button type="button" onClick={()=>setDetailId(booking.presentation_id)} style={{border:'1px solid #b7cbee',background:'#fff',color:'#1d4ed8',padding:'7px 12px',borderRadius:8,cursor:'pointer'}}>Ver detalhes</button>}</div></div>})}</div>:data&&<p className="booking-empty">Nenhuma proposta aceita disponível.</p>}
+  <div style={{display:'flex',gap:10,flexWrap:'wrap',marginTop:16,marginBottom:12}}>
+   <input aria-label="Buscar reservas" placeholder="Buscar instituição, proposta ou cúpula" value={query} onChange={e=>{setQuery(e.target.value);setPage(1)}} style={{flex:'2 1 220px',minWidth:160,padding:10,borderRadius:8,border:'1px solid #bdcce4'}}/>
+   <select aria-label="Ano" value={year} onChange={e=>{setYear(e.target.value);setPage(1)}} style={{padding:10,borderRadius:8}}><option value="all">Todos os anos</option>{years.map(y=><option key={y} value={y}>{y}</option>)}</select>
+   <select aria-label="Mês" value={month} onChange={e=>{setMonth(e.target.value);setPage(1)}} style={{padding:10,borderRadius:8}}><option value="all">Todos os meses</option>{Array.from({length:12},(_,i)=><option key={i} value={String(i+1)}>{new Intl.DateTimeFormat('pt-BR',{month:'long'}).format(new Date(2026,i,1))}</option>)}</select>
+   <select aria-label="Situação" value={stateFilter} onChange={e=>{setStateFilter(e.target.value);setPage(1)}} style={{padding:10,borderRadius:8}}><option value="all">Todas as situações</option><option value="reserved">Reservadas</option><option value="confirmed">Confirmadas</option><option value="completed">Concluídas</option><option value="cancelled">Canceladas</option></select>
+   <select aria-label="Ordenação" value={sort} onChange={e=>{setSort(e.target.value);setPage(1)}} style={{padding:10,borderRadius:8}}><option value="desc">Mais recentes</option><option value="asc">Mais antigas</option></select>
+  </div>
+  <div className="booking-readiness-list">{bookings.slice((currentPage-1)*10,currentPage*10).map(b=><div key={b.presentation_id} className="booking-readiness-row"><div><strong>{b.proposal?.client_name||'Instituição não identificada'}</strong><span>{b.proposal?.title||'Proposta não identificada'} · {formatDate(b.starts_at)} · {b.dome_name||'Cúpula não informada'}</span></div><div style={{display:'flex',gap:10,alignItems:'center',flexWrap:'wrap'}}><span className="booking-ready">{b.status==='reserved'?'Reservada':b.status==='confirmed'?'Confirmada':b.status==='completed'?'Concluída':b.status==='cancelled'?'Cancelada':b.status}</span><button type="button" onClick={()=>setDetailId(b.presentation_id)} style={{border:'1px solid #b7cbee',background:'#fff',color:'#1d4ed8',padding:'7px 12px',borderRadius:8,cursor:'pointer'}}>Ver detalhes</button></div></div>)}</div>
+  {data&&bookings.length===0&&<p className="booking-empty">Nenhuma reserva encontrada para os filtros selecionados.</p>}
+  <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',gap:12,marginTop:12,flexWrap:'wrap'}}><span style={{fontSize:13}}>Exibindo {bookings.length?((currentPage-1)*10+1):0}–{Math.min(currentPage*10,bookings.length)} de {bookings.length} reservas</span><div style={{display:'flex',alignItems:'center',gap:8}}><button type="button" disabled={currentPage<=1} onClick={()=>setPage(p=>Math.max(1,p-1))}>Anterior</button><span>{currentPage} de {pageCount}</span><button type="button" disabled={currentPage>=pageCount} onClick={()=>setPage(p=>Math.min(pageCount,p+1))}>Próxima</button></div></div>
   {data?.domes.length?<p className="booking-dome-names">Cúpulas: {data.domes.map(d=>d.name+(d.mapped?' ✓':' — vínculo pendente')).join(' · ')}</p>:data&&<p className="booking-empty">Ainda não há cúpulas cadastradas. Utilize a página Cúpulas para consultar a estrutura.</p>}
   {!enabled&&<p className="booking-readonly">Os agendamentos ainda não estão liberados para gravação. A configuração será validada antes da entrega.</p>}
  </section>
