@@ -21,8 +21,16 @@ export async function POST(req:NextRequest){
  const start=new Date(v.start),end=new Date(v.end);
  if(!Number.isFinite(start.getTime())||!Number.isFinite(end.getTime())||end<=start)return fail('Horários inválidos',400);
  const db=getTeamWriteDb();
+ // Verificação antecipada para evitar conflito comum; a proteção definitiva
+ // contra gravações simultâneas deve ocorrer atomicamente no banco.
+ const conflicts=await db`SELECT p.id FROM public.antares_dome_links l
+ JOIN public.presentations p ON p.organization_id=l.organization_id AND p.dome_id=l.equipment_id
+ WHERE l.organization_id=${owner.organizationId}::uuid AND l.antares_dome_id=${v.domeId}::uuid
+ AND p.status NOT IN ('cancelled') AND p.starts_at<${end.toISOString()}::timestamptz
+ AND p.ends_at>${start.toISOString()}::timestamptz LIMIT 1`;
+ if(conflicts.length)return fail('Esta cúpula já possui apresentação no período selecionado. Escolha outro horário ou cúpula.',409);
  const rows=await db`SELECT public.antares_book_proposal(${owner.user.id},${owner.organizationId}::uuid,
  ${v.proposalId}::uuid,${v.domeId}::uuid,${start.toISOString()}::timestamptz,${end.toISOString()}::timestamptz) AS id`;
  return NextResponse.json({id:rows[0]?.id},{status:201});
- }catch{return fail('Reserva não realizada: confira vínculo, capacidade, conflitos e proposta',409);}
+ }catch{return fail('Reserva não realizada: confira os vínculos, horários e a situação da proposta',409);}
 }
