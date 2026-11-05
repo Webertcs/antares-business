@@ -5,5 +5,5 @@ export default async function RelationshipShell({children,title}:{children:React
  const ctx=await requireMember();
  if(!ctx)redirect('/sem-acesso');
  const developer=ctx.role==='owner'&&Boolean(process.env.ANTARES_DEVELOPER_SUBJECT)&&process.env.ANTARES_DEVELOPER_SUBJECT===ctx.user.id;
- return <DashboardClient profileKey={ctx.memberId} accountLabel={developer?'Proprietário / Desenvolvedor':ctx.role==='owner'?'Proprietário':'Colaborador'} moduleTitle={title}>{children}</DashboardClient>;
+ return <DashboardClient role={ctx.role} profileKey={ctx.memberId} accountLabel={developer?'Proprietário / Desenvolvedor':ctx.role==='owner'?'Proprietário':'Colaborador'} moduleTitle={title}>{children}</DashboardClient>;
 }
