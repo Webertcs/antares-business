@@ -1,6 +1,6 @@
 'use client';
 import {useEffect,useState} from 'react';
-import BackButton from '../../BackButton';
+
 type Title={id:string;client_id:string;client_name:string;description:string;total:number;paid:number;due_on:string};
 type Client={id:string;name:string};
 const brl=(v:number)=>new Intl.NumberFormat('pt-BR',{style:'currency',currency:'BRL'}).format(v);
@@ -52,7 +52,7 @@ export default function ReceberClient(){
  const box={padding:22,border:'1px solid #cad6ea',borderRadius:14,background:'white',marginBottom:18};
  return <main style={{minHeight:'100%',background:'#f2f6fd',color:'#102a56',padding:'clamp(16px,3vw,32px)',fontFamily:'Arial,sans-serif'}}>
  <div style={{maxWidth:1050,margin:'auto'}}>
- <BackButton />
+ 
  <h1>Contas a receber</h1>
  <p>Controle por instituição, vencimento e pagamentos parciais. Títulos não são receitas recebidas.</p>
  {status&&<p role="status" style={{padding:12,background:'#e9effc',borderRadius:8}}>{status}</p>}
