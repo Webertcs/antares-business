@@ -57,3 +57,752 @@
 .antares-dark-logo{position:relative;width:100%;line-height:0}
 .antares-dark-logo .antares-brand-image{display:block}
 .antares-dark-logo .antares-wordmark-light{position:absolute;inset:0;width:100%;height:100%;max-height:none;object-fit:contain;object-position:left center;filter:brightness(0) invert(1);clip-path:inset(0 0 0 33%);pointer-events:none}
+
+/* ANTARES: acabamento visual sem alterar fluxos ou regras de negocio */
+:where(.card,.metric,.panel,.cal-events-panel){transition:box-shadow .18s ease,transform .18s ease}
+:where(.card,.metric,.panel,.cal-events-panel):hover{box-shadow:0 10px 28px rgba(18,46,95,.09)}
+:where(a,button,input,select,textarea):focus-visible{outline:3px solid #63a4ff;outline-offset:3px}
+@media (prefers-reduced-motion:reduce){:where(.card,.metric,.panel,.cal-events-panel){transition:none}}
+
+/* Logo do Dashboard: arte em tamanho compacto e legenda tipografica nitida. */
+.antares-logo-home{display:flex;flex-direction:column;align-items:stretch;justify-content:center;width:100%;max-width:195px;text-decoration:none;color:#fff;gap:0;border-radius:7px;line-height:1}
+.antares-logo-home:hover{filter:brightness(1.12)}
+.antares-logo-home:focus-visible{outline:2px solid #80cfff;outline-offset:4px}
+.antares-logo-art{display:block;width:100%;height:70px;max-height:70px;object-fit:contain;object-position:left center}
+.antares-logo-subtitle{display:block;width:100%;max-width:195px;font-family:Arial,Helvetica,sans-serif;font-size:10.5px;font-weight:400;letter-spacing:.08px;white-space:nowrap;line-height:1.35;color:#f5faff;text-align:center;text-shadow:0 1px 2px #061735;margin-top:0}
+@media(max-width:760px){.antares-logo-home{max-width:185px}.antares-logo-art{height:68px;max-height:68px}.antares-logo-subtitle{font-size:10px}}
+
+/* 36 — Dashboard do proprietario: layout compacto, sem perder atalhos operacionais. */
+.owner-nav-link{min-height:36px;display:flex;align-items:center;gap:12px;padding:8px 14px;border-radius:10px;color:#cfddf4;font-size:13px;font-weight:600}
+.owner-nav-link:hover{background:#283d65;color:#fff}
+.owner-nav-vitrine{background:linear-gradient(105deg,#5146c8,#1675bc);color:white;margin:4px 0 12px;font-weight:750}
+.sidebar:has(.owner-nav-link){overflow-y:auto;scrollbar-width:thin;scrollbar-color:#58709d transparent;padding-top:16px;padding-bottom:12px}
+.sidebar:has(.owner-nav-link) .brand{margin-bottom:25px}
+.sidebar:has(.owner-nav-link) .nav-item{height:39px;min-height:39px}
+.sidebar:has(.owner-nav-link) nav{gap:3px}
+.sidebar:has(.owner-nav-link) .sidebar-bottom{margin-top:12px}
+.sidebar:has(.owner-nav-link) .sidebar-bottom .nav-label{margin:9px 13px 5px}
+.sidebar:has(.owner-nav-link) .preview-link{margin-bottom:6px;padding:9px 11px;font-size:12px}
+.sidebar:has(.owner-nav-link) .profile{padding-top:11px;margin-top:8px}
+.owner-overview{display:flex;flex-direction:column;gap:13px}
+.content:has(.owner-overview){padding-top:20px;padding-bottom:12px}
+.content:has(.owner-overview) .page-head{margin-bottom:15px}
+.content:has(.owner-overview) .page-head h1{font-size:clamp(23px,2vw,30px);margin-bottom:5px}
+.content:has(.owner-overview) .eyebrow{margin-bottom:6px}
+.owner-kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+.owner-kpi{display:flex;gap:12px;align-items:center;min-width:0;padding:14px 13px;border-radius:14px;border:1px solid #e1e8f5;background:#fff;box-shadow:0 5px 18px #223d6608}
+.owner-kpi-icon,.owner-tile-icon{width:36px;height:36px;flex-shrink:0;display:grid;place-items:center;border-radius:10px;background:#edf2ff;color:#2a5ce7}
+.owner-kpi>div{min-width:0}
+.owner-kpi>div>span,.owner-kpi strong,.owner-kpi small{display:block}
+.owner-kpi>div>span{font-size:11px;font-weight:700;line-height:1.3}
+.owner-kpi strong{font-size:22px;letter-spacing:-.6px;margin:3px 0;color:#142448}
+.owner-kpi small{font-size:10px;line-height:1.35;color:#687da1}
+.owner-main-grid{display:grid;grid-template-columns:1fr 1.12fr 1fr;gap:12px;min-width:0}
+.owner-bottom-grid{display:grid;grid-template-columns:.89fr 1.18fr 1fr;gap:12px;min-width:0}
+.owner-tile{background:white;border:1px solid #e1e8f5;border-radius:15px;padding:14px;box-shadow:0 5px 18px #223d6608;min-width:0}
+.owner-tile-head{display:flex;align-items:center;gap:10px;min-width:0;margin-bottom:10px}
+.owner-tile-head>div{min-width:0;flex:1}
+.owner-tile-head h2{font-size:14px;line-height:1.25;margin:0 0 3px;font-weight:750;color:#16264a}
+.owner-tile-head p{font-size:10.5px;color:#7281a0;margin:0;line-height:1.3}
+.owner-inline{border:0;background:transparent;color:#2459dc;display:inline-flex;align-items:center;gap:3px;font-weight:700;font-size:10.5px;white-space:nowrap;padding:5px}
+.owner-insight{display:flex;align-items:center;gap:10px;border-top:1px solid #ecf0f6;padding:10px 2px;font-size:12px;color:#24385f}
+.owner-insight strong{flex:1}.owner-insight svg{color:#4365a2}
+.owner-upcoming{display:flex;flex-direction:column;gap:7px}
+.owner-event{display:flex;align-items:center;gap:8px;border:1px solid #e2e9f5;background:#f9fbff;border-radius:10px;padding:8px;width:100%;text-align:left;color:#1a2e50;min-width:0}
+.owner-event>span:nth-child(2){min-width:0;flex:1}
+.owner-event strong,.owner-event small{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.owner-event strong{font-size:11px}.owner-event small{font-size:10px;color:#77839b;margin-top:3px}
+.owner-date{display:grid;place-items:center;background:#e8f1ff;border-radius:8px;color:#2158c9;font-size:12px;font-weight:750;padding:8px;min-width:53px;text-align:center}
+.owner-empty{font-size:12px;color:#7988a3;padding:18px 3px}
+.owner-check{display:flex;align-items:center;gap:9px;border-bottom:1px solid #edf1f7;font-size:11px;line-height:1.2;padding:8px 1px;cursor:pointer}
+.owner-check:last-child{border-bottom:0}
+.owner-check input{width:16px;height:16px;accent-color:#2d65eb;flex-shrink:0}
+.owner-month-nav{display:flex;align-items:center;justify-content:space-between;gap:4px;margin:4px 0 7px;text-transform:capitalize;font-size:12px}
+.owner-month-nav button{border:0;background:#f1f5fc;color:#184b9b;border-radius:7px;width:27px;height:27px;display:grid;place-items:center}
+.owner-calendar-grid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:2px;text-align:center}
+.owner-calendar-grid .owner-weekday{font-size:10px;color:#607291;font-weight:700;padding:4px 0}
+.owner-calendar-grid button{min-width:0;min-height:25px;background:transparent;border:0;border-radius:7px;font-size:11px;color:#1d3150}
+.owner-calendar-grid button:hover,.owner-calendar-grid button.has-session{background:#dbe9ff;color:#164ac5;font-weight:800}
+.owner-quick-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px}
+.owner-quick-link{display:flex;align-items:center;justify-content:center;gap:5px;flex-direction:column;min-width:0;min-height:57px;border:1px solid #dce5f6;background:#f8faff;border-radius:10px;color:#153365;font-size:11px;font-weight:700;text-align:center;padding:6px}
+.owner-quick-link:hover{background:#e8f1ff;border-color:#8fb3ff}
+.owner-quick-link svg{color:#245be2}
+.owner-quick-link:last-child{grid-column:1/-1;min-height:38px;flex-direction:row}
+.owner-right-column{display:grid;gap:10px;grid-template-rows:1fr auto;min-width:0}
+.owner-summary-row{display:flex;justify-content:space-between;gap:8px;padding:6px 3px;border-top:1px solid #edf1f7;font-size:11px}
+.owner-summary-row strong{color:#193667}
+.owner-vitrine{background:linear-gradient(105deg,#122862,#4b35aa 75%,#1166c3);border-radius:13px;min-height:78px;padding:12px;color:white;display:flex;align-items:center;gap:10px;overflow:hidden;position:relative}
+.owner-vitrine>span:first-child{flex:1;min-width:0;z-index:1}
+.owner-vitrine strong,.owner-vitrine small{display:block}
+.owner-vitrine strong{font-size:17px}.owner-vitrine small{font-size:10px;color:#d3e0ff;line-height:1.4;margin-top:4px}
+.owner-vitrine-action{display:inline-flex;align-items:center;gap:4px;white-space:nowrap;padding:7px;border-radius:30px;background:#fff;color:#1946b3;font-size:10px;font-weight:750;z-index:1}
+.owner-vitrine-planet{position:absolute;right:4px;top:-15px;font-size:63px;opacity:.25;pointer-events:none}
+@media (min-width:1440px) and (min-height:780px){
+ .content:has(.owner-overview){padding-top:17px}
+ .owner-tile{padding:15px}
+ .owner-overview{gap:14px}
+}
+@media (max-width:1180px){
+ .owner-main-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .owner-main-grid>.owner-tile:last-child{grid-column:1/-1}
+ .owner-bottom-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .owner-right-column{grid-column:1/-1;grid-template-columns:1fr 1fr;grid-template-rows:auto}
+}
+@media (max-width:800px){
+ .owner-kpis{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .owner-main-grid,.owner-bottom-grid{grid-template-columns:1fr}
+ .owner-main-grid>.owner-tile:last-child,.owner-right-column{grid-column:auto}
+ .owner-right-column{grid-template-columns:1fr}
+}
+@media (max-width:430px){.owner-kpis{gap:7px}.owner-kpi{padding:9px;gap:6px}.owner-kpi strong{font-size:18px}.owner-kpi-icon{width:30px;height:30px}.owner-tile{padding:12px}}
+@media(prefers-reduced-motion:reduce){.owner-nav-link,.owner-quick-link,.owner-vitrine{transition:none}}
+
+/* 37 — Busca real do menu, perfil e acao de conta no Dashboard */
+.dashboard-search{position:relative;display:flex;align-items:center}
+.dashboard-search-popover{position:absolute;right:-45px;top:calc(100% + 18px);width:min(380px,calc(100vw - 24px));background:#fff;border:1px solid #d5e1f2;border-radius:14px;padding:14px;box-shadow:0 18px 48px #14294430;z-index:90;color:#152845}
+.dashboard-search-title{display:flex;align-items:center;justify-content:space-between;font-size:14px;margin-bottom:12px}
+.dashboard-search-title button{border:0;background:transparent;color:#38527e}
+.dashboard-search-label{font-size:11px;color:#607294;display:flex;flex-direction:column;gap:5px}
+.dashboard-search-label input{height:39px;border:1px solid #cad8ee;border-radius:9px;padding:0 11px;background:#f9fbff;color:#182c4f}
+.dashboard-search-results{display:flex;flex-direction:column;max-height:290px;overflow-y:auto;margin-top:9px}
+.dashboard-search-results>a{display:flex;flex-direction:column;gap:3px;border-bottom:1px solid #edf1f8;padding:9px 7px;border-radius:7px;font-size:12px}
+.dashboard-search-results>a:hover{background:#f1f6ff}
+.dashboard-search-results small{font-size:10px;color:#7889a5}
+.dashboard-search-note{font-size:10px;color:#7889a5;margin:11px 0 0}
+.owner-profile-link{color:#dce8ff;text-decoration:none}
+.owner-profile-link:hover{background:#263858;border-radius:10px}
+.owner-profile-link>div:nth-child(2){min-width:0;flex:1}
+.owner-profile-link strong{max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.owner-profile-photo{object-fit:cover;object-position:center}
+.owner-header-profile{display:inline-flex;align-items:center;border-radius:50%;text-decoration:none}
+.owner-header-profile:focus-visible{outline:3px solid #74b5f7;outline-offset:3px}
+.profile-page{min-height:100vh;background:#f5f7fc;padding:35px 24px;color:#182b4c}
+.profile-page>*{max-width:800px;margin-left:auto;margin-right:auto}
+.profile-back{display:block;color:#2552bc;font-size:13px;font-weight:700;margin-bottom:20px}
+.profile-panel{background:white;border:1px solid #e0e7f5;border-radius:18px;padding:26px;box-shadow:0 9px 26px #20375f0d}
+.profile-panel h1{font-size:28px;margin:3px 0 8px}
+.profile-panel>div:first-child>p:last-child{font-size:13px;color:#687993}
+.profile-eyebrow{font-size:10px;letter-spacing:1.5px;color:#3b5bc1;font-weight:750}
+.profile-form-layout{display:grid;grid-template-columns:190px 1fr;gap:25px;margin-top:26px}
+.profile-photo-area{display:flex;flex-direction:column;align-items:center;gap:12px}
+.profile-photo-area>img,.profile-photo-area>span{height:120px;width:120px;object-fit:cover;border-radius:50%;display:grid;place-items:center;background:#e6edfb;border:3px solid #d9e4f8;color:#516ba0}
+.profile-photo-button{display:flex;align-items:center;gap:7px;cursor:pointer;border:1px solid #bdd0ee;background:#f2f7ff;color:#244fb6;border-radius:10px;font-weight:700;font-size:12px;padding:10px 13px}
+.profile-photo-button input{display:none}
+.profile-fields{display:flex;flex-direction:column;gap:13px}
+.profile-fields label{display:flex;flex-direction:column;gap:5px;color:#344969;font-size:12px;font-weight:650}
+.profile-fields input{height:40px;padding:0 11px;border-radius:9px;border:1px solid #cbd8ed;background:#fff;color:#132b4f}
+.profile-fields input:disabled{background:#f1f4f9;color:#69798e}
+.profile-fields .primary-button{align-self:flex-start;margin-top:3px}
+.profile-feedback{font-size:12px;color:#245a9c}
+.profile-warning{display:flex;align-items:flex-start;gap:10px;background:#fff6e8;color:#704e16;border-radius:12px;padding:13px 15px;margin-top:22px}
+.profile-warning p{font-size:12px;line-height:1.6;margin:0}
+.profile-warning svg{flex-shrink:0}
+@media(max-width:600px){.profile-form-layout{grid-template-columns:1fr}.profile-panel{padding:18px}.dashboard-search-popover{right:-90px}}
+
+/* Bloco 38 — arte aprovada pelo proprietario no cabecalho, sem degrade. */
+.content:has(.owner-overview) .owner-hero{position:relative;isolation:isolate;min-height:95px;padding:10px 0;overflow:hidden}
+.content:has(.owner-overview) .owner-hero::before{content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;background-image:url('/images/dashboard-planeta.png');background-size:cover;background-repeat:no-repeat;background-position:right 46%;opacity:1}
+.content:has(.owner-overview) .owner-hero>div{position:relative;z-index:1;max-width:70%}
+.content:has(.owner-overview) .owner-hero>.primary-button{position:relative;z-index:1}
+.content:has(.owner-overview) .owner-hero h1{color:#132446}
+.content:has(.owner-overview) .owner-hero p{color:#5c7092}
+.owner-kpi{min-height:74px}
+.owner-kpi strong{margin-bottom:0}
+@media(max-width:840px){
+ .content:has(.owner-overview) .owner-hero::before{background-size:auto 100%;background-position:right top;opacity:.65}
+ .content:has(.owner-overview) .owner-hero>div{max-width:75%}
+}
+@media(max-width:600px){
+ .content:has(.owner-overview) .owner-hero{min-height:106px}
+ .content:has(.owner-overview) .owner-hero::before{opacity:.3}
+ .content:has(.owner-overview) .owner-hero>div{max-width:100%}
+}
+
+/* Bloco 38B — saudacao com fundo destacado e planeta centralizado verticalmente. */
+.content:has(.owner-overview) .owner-hero{
+  min-height:112px;
+  padding:15px 19px;
+  margin-bottom:13px;
+  border:1px solid #d3e2fa;
+  border-radius:16px;
+  background-color:#e6efff;
+  align-items:center;
+}
+.content:has(.owner-overview) .owner-hero::before{
+  background-image:url('/images/dashboard-planeta.png');
+  background-size:80% auto;
+  background-position:right 34%;
+  background-repeat:no-repeat;
+  opacity:1;
+}
+.content:has(.owner-overview) .owner-hero>div{max-width:66%}
+.content:has(.owner-overview) .owner-hero .eyebrow{color:#4266a2}
+.content:has(.owner-overview) .owner-hero h1{color:#12284d}
+.content:has(.owner-overview) .owner-hero p{color:#405b86}
+.owner-kpis{grid-template-columns:repeat(4,minmax(0,1fr)) minmax(118px,.86fr);gap:9px}
+.owner-kpi{min-height:66px;padding:12px 9px;gap:8px}
+.owner-kpi strong{font-size:clamp(16px,1.2vw,22px)}
+.owner-kpi-budget{min-width:0;min-height:66px;border:0;border-radius:13px;background:linear-gradient(125deg,#214ed1,#3976f3);color:white;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;padding:10px;cursor:pointer;font-size:12px;font-weight:750;text-align:center;box-shadow:0 5px 15px #275be62b}
+.owner-kpi-budget:hover{background:linear-gradient(125deg,#1741b9,#2865e8)}
+.owner-kpi-budget:focus-visible{outline:3px solid #69aaf9;outline-offset:3px}
+@media(max-width:1050px){
+ .content:has(.owner-overview) .owner-hero::before{background-size:95% auto;background-position:right 29%;opacity:.9}
+ .owner-kpis{gap:7px}
+ .owner-kpi{padding:10px 8px}
+ .owner-kpi-icon{width:30px;height:30px}
+ .owner-kpi-budget{font-size:11px}
+}
+@media(max-width:800px){
+ .owner-kpis{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .owner-kpi-budget{grid-column:1/-1;min-height:43px;flex-direction:row}
+ .content:has(.owner-overview) .owner-hero{min-height:106px}
+ .content:has(.owner-overview) .owner-hero::before{background-size:auto 220%;background-position:right 34%;opacity:.6}
+ .content:has(.owner-overview) .owner-hero>div{max-width:78%}
+}
+@media(max-width:540px){
+ .content:has(.owner-overview) .owner-hero{padding:12px;min-height:100px}
+ .content:has(.owner-overview) .owner-hero::before{opacity:.28}
+ .content:has(.owner-overview) .owner-hero>div{max-width:100%}
+}
+
+/* Bloco 38C — refinamento aprovado: Saturno mais completo e cartoes azul-gelo.
+   Restrito ao Dashboard do proprietario; sem alterar outros modulos. */
+.content:has(.owner-overview) .owner-hero::before{
+  background-size:68% auto;
+  background-position:right 51%;
+}
+.content:has(.owner-overview) .owner-kpi,
+.content:has(.owner-overview) .owner-tile{
+  background-color:#edf4ff;
+  border-color:#d5e3fa;
+}
+.content:has(.owner-overview) .owner-event,
+.content:has(.owner-overview) .owner-quick-link{
+  background-color:#f8fbff;
+  border-color:#cadcf7;
+}
+.content:has(.owner-overview) .owner-insight,
+.content:has(.owner-overview) .owner-check,
+.content:has(.owner-overview) .owner-summary-row{
+  border-color:#d7e5fb;
+}
+.content:has(.owner-overview) .owner-kpi-budget{
+  background:linear-gradient(125deg,#214ed1,#3976f3);
+  color:#fff;
+}
+.content:has(.owner-overview) .owner-vitrine{
+  background:linear-gradient(105deg,#122862,#4b35aa 75%,#1166c3);
+}
+@media(max-width:1050px){
+  .content:has(.owner-overview) .owner-hero::before{
+    background-size:77% auto;
+    background-position:right 51%;
+  }
+}
+@media(max-width:800px){
+  .content:has(.owner-overview) .owner-hero::before{
+    background-size:auto 175%;
+    background-position:right 52%;
+    opacity:.55;
+  }
+}
+@media(max-width:540px){
+  .content:has(.owner-overview) .owner-hero::before{
+    background-size:auto 135%;
+    background-position:right 53%;
+    opacity:.26;
+  }
+}
+
+/* Bloco 40 — aviso de checklist temporario sem aumentar a altura do Dashboard. */
+.content:has(.owner-overview) .owner-check input:disabled{cursor:not-allowed;opacity:.5}
+.content:has(.owner-overview) .owner-check:has(input:disabled){color:#7386a5;cursor:default}
+.content:has(.owner-overview) .owner-check-note{margin:6px 0 0;font-size:10px;line-height:1.35;color:#627aa1}
+.content:has(.owner-overview) .owner-calendar-grid button:focus-visible{outline:2px solid #2458d3;outline-offset:1px}
+.content:has(.owner-overview) .owner-calendar-grid button.has-session::after{content:"";display:block;margin:0 auto;width:4px;height:4px;border-radius:50%;background:#2458d3}
+
+/* Navegacao padrao: acao curta para retornar a secao visitada. */
+.content .owner-back-button{display:inline-flex;align-items:center;gap:4px;background:transparent;border:1px solid #cbdcf6;border-radius:8px;color:#2255b8;font-size:11px;font-weight:700;padding:4px 9px;line-height:1.25;cursor:pointer;margin:0 0 5px}
+.content .owner-back-button:hover{background:#e9f1ff;border-color:#9cbaf2}
+.content .owner-back-button:focus-visible{outline:3px solid #85b6ff;outline-offset:2px}
+
+/* Bloco 42 — Agenda compacta: aplicacao exclusiva na aba de Agenda. */
+.content.agenda-compact-content{padding:14px 24px 9px;display:flex;flex-direction:column;gap:0}
+.agenda-compact-content .page-head{margin-bottom:11px;gap:10px;min-height:48px}
+.agenda-compact-content .page-head h1{font-size:25px;line-height:1.1;margin:0}
+.agenda-compact-content .page-head .primary-button{padding:10px 13px;border-radius:10px;font-size:12px;box-shadow:0 3px 10px #3457e91a}
+.agenda-compact-content .owner-back-button{margin:0 0 6px;padding:5px 10px;background:#dce9ff;color:#1d52ad;border:1px solid #9cbdf6;font-size:11px;border-radius:8px;font-weight:750}
+.agenda-compact-content .owner-back-button:hover{background:#c9ddff;border-color:#76a4ee}
+.agenda-compact-content .cal-page{gap:10px;min-height:0}
+.agenda-compact-content .cal-page .fullcal{padding:12px 14px 10px}
+.agenda-compact-content .cal-page .cal-toolbar{margin-bottom:8px;gap:10px}
+.agenda-compact-content .cal-toolbar h2{font-size:16px;margin:0;line-height:1.25}
+.agenda-compact-content .cal-controls{gap:5px}
+.agenda-compact-content .cal-controls strong{min-width:122px;font-size:11px}
+.agenda-compact-content .cal-controls button{padding:5px 9px;min-height:27px;border-radius:7px;font-size:11px}
+.agenda-compact-content .cal-page .cal-weeknames span{padding:6px 2px;font-size:10px}
+.agenda-compact-content .cal-page .cal-day{min-height:44px;height:44px;max-height:44px;padding:3px 5px;gap:1px}
+.agenda-compact-content .cal-page .cal-day>span{font-size:10px;line-height:13px}
+.agenda-compact-content .cal-page .cal-day small{font-size:9px;line-height:12px;padding:1px 3px;margin:0}
+.agenda-compact-content .cal-page .cal-grid{min-width:0}
+.agenda-compact-content .cal-events-panel{padding:11px 14px}
+.agenda-compact-content .cal-events-panel .panel-head{margin-bottom:7px}
+.agenda-compact-content .cal-events-panel .panel-head h2{font-size:15px;margin:0}
+.agenda-compact-content .cal-events-count{padding:4px 8px;font-size:10px}
+.agenda-compact-content .cal-events-table-wrap{max-height:145px;overflow:auto}
+.agenda-compact-content .cal-events-table{font-size:11px}
+.agenda-compact-content .cal-events-table th{padding:7px 9px;font-size:9px}
+.agenda-compact-content .cal-events-table td{padding:7px 9px}
+.agenda-compact-content .cal-empty{padding:12px!important}
+.agenda-compact-content .footer{margin-top:8px}
+@media(max-width:760px){
+ .content.agenda-compact-content{padding:12px 13px}
+ .agenda-compact-content .page-head{flex-wrap:wrap}
+ .agenda-compact-content .cal-page .fullcal,.agenda-compact-content .cal-events-panel{padding:11px}
+ .agenda-compact-content .cal-scroller{overflow-x:auto}
+ .agenda-compact-content .cal-grid{min-width:390px}
+ .agenda-compact-content .cal-page .cal-day{min-height:46px;height:46px}
+ .agenda-compact-content .cal-controls strong{min-width:105px}
+ .agenda-compact-content .cal-toolbar{align-items:flex-start}
+}
+@media(max-height:690px) and (min-width:761px){
+ .content.agenda-compact-content{padding-top:8px}
+ .agenda-compact-content .page-head{margin-bottom:7px}
+ .agenda-compact-content .cal-page .cal-day{height:37px;min-height:37px;max-height:37px}
+ .agenda-compact-content .cal-page{gap:7px}
+ .agenda-compact-content .cal-page .fullcal{padding-top:9px;padding-bottom:8px}
+ .agenda-compact-content .cal-events-panel{padding-top:8px;padding-bottom:8px}
+}
+
+/* Bloco 42B — Agenda com respiro visual e movimentos discretos. */
+.agenda-compact-content .cal-page{gap:14px}
+.agenda-compact-content .cal-page .fullcal{
+  background:#edf4ff;
+  border:1px solid #cddffc;
+  box-shadow:0 5px 22px #244b9b0c;
+  padding:15px 17px 14px;
+}
+.agenda-compact-content .cal-page .cal-weeknames span{background:#dfeaff;color:#234a87;padding:7px 2px;font-size:10px}
+.agenda-compact-content .cal-page .cal-day{
+  min-height:clamp(50px,6.8vh,66px);
+  height:clamp(50px,6.8vh,66px);
+  max-height:clamp(50px,6.8vh,66px);
+  background:#f7faff;
+  border-color:#dbe6f8;
+  padding:6px 8px;
+  transition:background-color 180ms ease,border-color 180ms ease,box-shadow 180ms ease;
+}
+.agenda-compact-content .cal-page .cal-day:hover{background:#e0ebff;border-color:#98b9f1;box-shadow:inset 0 0 0 1px #b1c9f8}
+.agenda-compact-content .cal-page .cal-day.chosen{background:#d8e7ff;border-color:#376be1;box-shadow:inset 0 0 0 2px #5584eb;outline:0}
+.agenda-compact-content .cal-page .cal-day.outside{background:#f0f4fc;opacity:.58}
+.agenda-compact-content .cal-page .cal-day>span{font-size:11px;line-height:15px}
+.agenda-compact-content .cal-page .cal-toolbar{margin-bottom:11px}
+.agenda-compact-content .cal-page .cal-toolbar h2{color:#16376e}
+.agenda-compact-content .cal-events-panel{
+  background:#edf4ff;
+  border:1px solid #cddffc;
+  box-shadow:0 5px 22px #244b9b0c;
+  padding:14px 17px;
+}
+.agenda-compact-content .cal-events-table th{background:#dfeaff;color:#395a91}
+.agenda-compact-content .cal-events-table td{background:#f7faff}
+.agenda-compact-content .cal-events-table tr.cal-row-selected td{background:#dbe9ff}
+.agenda-compact-content .cal-controls button{background:#f7faff;border-color:#bfd4f6;transition:background-color 180ms ease,border-color 180ms ease}
+.agenda-compact-content .cal-controls button:hover{background:#dbeaff;border-color:#8eb4ee}
+.agenda-compact-content .cal-page .panel{animation:agenda-card-enter 380ms ease-out both}
+.agenda-compact-content .cal-page .cal-events-panel{animation-delay:90ms}
+@keyframes agenda-card-enter{from{opacity:.75;transform:translateY(5px)}to{opacity:1;transform:translateY(0)}}
+@media(max-width:760px){
+  .agenda-compact-content .cal-page .fullcal,.agenda-compact-content .cal-events-panel{padding:12px}
+  .agenda-compact-content .cal-page .cal-day{min-height:50px;height:50px;max-height:50px;padding:4px}
+}
+@media(max-height:690px) and (min-width:761px){
+  .agenda-compact-content .cal-page{gap:9px}
+  .agenda-compact-content .cal-page .cal-day{height:clamp(41px,6.4vh,48px);min-height:clamp(41px,6.4vh,48px);max-height:clamp(41px,6.4vh,48px)}
+  .agenda-compact-content .cal-page .fullcal{padding:10px 13px}
+  .agenda-compact-content .cal-events-panel{padding:10px 13px}
+}
+@media(prefers-reduced-motion:reduce){
+  .agenda-compact-content .cal-page .panel{animation:none}
+  .agenda-compact-content .cal-page .cal-day,.agenda-compact-content .cal-controls button{transition:none}
+}
+
+/* Bloco 43 — Central Comercial: navegacao real, leve e compacta. */
+.content.commercial-compact-content{padding:20px 26px 12px}
+.commercial-compact-content .page-head{margin-bottom:14px}
+.commercial-compact-content .page-head h1{font-size:26px;margin:0}
+.commercial-compact-content .owner-back-button{background:#dce9ff;border-color:#9cbdf6;padding:5px 10px}
+.commercial-compact-content .owner-back-button:hover{background:#c9ddff}
+.commercial-compact-content .page-head .primary-button{font-size:12px;padding:10px 14px;box-shadow:0 3px 10px #3457e91a}
+.commercial-hub{border:1px solid #d3e2fa;background:#edf4ff;border-radius:16px;padding:18px 20px;box-shadow:0 8px 22px #204d950b}
+.commercial-hub-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:16px}
+.commercial-hub-head h2{font-size:18px;color:#173767;margin:0 0 4px}
+.commercial-hub-head p{font-size:12px;color:#55739c;margin:0}
+.commercial-hub-symbol,.commercial-hub-icon{display:grid;place-items:center;background:#dce9ff;color:#2459c5;border-radius:11px;flex-shrink:0}
+.commercial-hub-symbol{width:42px;height:42px}
+.commercial-hub-icon{width:43px;height:43px}
+.commercial-hub-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.commercial-hub-card{display:grid;grid-template-columns:43px minmax(0,1fr) 19px;grid-template-rows:auto auto;column-gap:12px;row-gap:2px;align-items:center;min-height:85px;padding:14px 16px;border-radius:13px;background:#f9fbff;border:1px solid #d1dff6;color:#193966;text-decoration:none;transition:background-color .18s ease,border-color .18s ease,transform .18s ease}
+.commercial-hub-card:hover{background:#e1edff;border-color:#91b5ef;transform:translateY(-2px)}
+.commercial-hub-card:focus-visible{outline:3px solid #75aafa;outline-offset:2px}
+.commercial-hub-card .commercial-hub-icon{grid-row:1/3;grid-column:1}
+.commercial-hub-card strong{font-size:13px;grid-row:1;grid-column:2;line-height:1.2}
+.commercial-hub-card>span:not(.commercial-hub-icon){font-size:11px;color:#637ba0;grid-row:2;grid-column:2;line-height:1.3}
+.commercial-hub-arrow{grid-column:3;grid-row:1/3;color:#4072cf}
+.commercial-hub-wide{grid-column:1/-1}
+@media(min-width:1100px){.commercial-hub{max-width:1000px;margin:auto}}
+@media(max-width:740px){
+ .content.commercial-compact-content{padding:13px}
+ .commercial-hub{padding:14px}
+ .commercial-hub-grid{grid-template-columns:1fr;gap:9px}
+ .commercial-hub-wide{grid-column:auto}
+ .commercial-hub-card{min-height:74px;padding:11px 12px}
+}
+@media(prefers-reduced-motion:reduce){.commercial-hub-card{transition:none}.commercial-hub-card:hover{transform:none}}
+
+/* Bloco 44 — ANTARES Intelligence: acabamento de relatorios do proprietario. */
+.intelligence-refined{max-width:1180px;margin:0 auto;padding:23px 24px 32px;color:#142e56}
+.intelligence-head{display:flex;align-items:center;justify-content:space-between;gap:14px;margin-bottom:17px}
+.intelligence-head h1{font-size:clamp(23px,2.2vw,30px);letter-spacing:-.7px;color:#102c59;margin:7px 0 5px;font-weight:800}
+.intelligence-head p{font-size:12px;color:#61779b;margin:0}
+.intelligence-back{display:inline-flex;align-items:center;gap:5px;background:#dce9ff;color:#1d52ad;border:1px solid #9cbdf6;border-radius:8px;padding:5px 10px;font-size:11px;font-weight:750;cursor:pointer}
+.intelligence-back:hover{background:#c9ddff}
+.intelligence-back:focus-visible,.intelligence-actions a:focus-visible{outline:3px solid #75aafa;outline-offset:2px}
+.intelligence-head-icon{width:48px;height:48px;border-radius:13px;display:grid;place-items:center;background:#dbe9ff;color:#2459c5}
+.intelligence-metrics{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.intelligence-metric{background:#edf4ff;border:1px solid #d2e0f9;border-radius:13px;padding:15px 16px;min-height:77px;display:flex;flex-direction:column;gap:8px}
+.intelligence-metric span{font-size:12px;color:#60789b}
+.intelligence-metric strong{color:#153766;font-size:clamp(17px,1.7vw,23px);line-height:1.15;font-weight:800;font-variant-numeric:tabular-nums}
+.intelligence-recommendations,.intelligence-actions{background:#edf4ff;border:1px solid #d2e0f9;border-radius:15px;padding:17px 19px;margin-top:13px}
+.intelligence-section-head{display:flex;align-items:center;gap:9px;margin-bottom:10px}
+.intelligence-section-icon{display:grid;place-items:center;background:#dbe9ff;color:#2459c5;border-radius:9px;width:35px;height:35px}
+.intelligence-recommendations h2,.intelligence-actions h2{font-size:17px;font-weight:750;margin:0;color:#193763}
+.intelligence-recommendations ul{list-style:none;margin:0;padding:0;display:grid;gap:7px}
+.intelligence-recommendations li{display:flex;align-items:flex-start;gap:9px;background:#f9fbff;border:1px solid #dbe6f7;border-radius:9px;padding:9px 11px;color:#38516f;font-size:12px;line-height:1.45}
+.intelligence-recommendations li svg{color:#316dd4;flex-shrink:0;margin-top:1px}
+.intelligence-recommendations>p:not(.intelligence-footnote){font-size:12px;color:#4c648a}
+.intelligence-footnote{font-size:10px;color:#687e9e;margin:10px 0 0}
+.intelligence-actions nav{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:9px;margin-top:13px}
+.intelligence-actions a{border:1px solid #cbdcf7;background:#f9fbff;color:#2352aa;text-decoration:none;border-radius:9px;padding:10px 9px;font-weight:700;font-size:11px;display:flex;align-items:center;justify-content:space-between;gap:5px}
+.intelligence-actions a:hover{background:#dfeaff;border-color:#99b9ed}
+.intelligence-error{border:1px solid #edd1a4;background:#fff2de;border-radius:10px;padding:13px;color:#8e4b10;font-size:12px}
+.intelligence-loading{padding:16px;color:#55739c}
+@media(max-width:800px){.intelligence-metrics{grid-template-columns:repeat(2,minmax(0,1fr))}.intelligence-actions nav{grid-template-columns:repeat(2,minmax(0,1fr))}.intelligence-refined{padding:15px}}
+@media(max-width:470px){.intelligence-metrics{grid-template-columns:1fr 1fr;gap:7px}.intelligence-metric{padding:11px;min-height:75px}.intelligence-actions nav{grid-template-columns:1fr}.intelligence-head-icon{display:none}}
+
+/* Bloco 45 — navegacao e superficies da Central de Operacoes. */
+.operations-refined .operations-back{display:inline-flex;align-items:center;gap:5px;background:#dce9ff;border:1px solid #9cbdf6;color:#1d52ad;padding:5px 10px;border-radius:8px;text-decoration:none;font-size:11px;font-weight:750}
+.operations-refined .operations-back:hover{background:#c9ddff}
+.operations-refined .operations-back:focus-visible{outline:3px solid #75aafa;outline-offset:2px}
+.operations-refined nav[aria-label="Áreas operacionais"]{margin:12px 0!important;gap:8px}
+.operations-refined nav[aria-label="Áreas operacionais"] button:hover{filter:brightness(.96)}
+.operations-refined [aria-label="Resumo gerencial"]{box-shadow:0 5px 22px #244b9b0c}
+.operations-refined section{scroll-margin-top:16px}
+@media(max-width:760px){.operations-refined{padding:13px!important}.operations-refined nav[aria-label="Áreas operacionais"] button{flex:1 1 125px}}
+
+/* Bloco 45B — Gestao Operacional: cúpulas sem excesso de indicadores gerais. */
+.operations-dome-panel{margin-top:12px}
+.operations-dome-head{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+.operations-dome-head p{margin:5px 0 0;font-size:12px;color:#60789b}
+.operations-dome-action{background:#2458d3;border:1px solid #2458d3;border-radius:9px;color:white;font-size:12px;font-weight:750;text-decoration:none;padding:10px 13px}
+.operations-dome-action:hover{background:#1849bd}
+.operations-dome-action:focus-visible{outline:3px solid #8cb5ff;outline-offset:3px}
+.operations-dome-kpis{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:15px}
+.operations-dome-kpis>div{border:1px solid #cbdcf7;background:#f9fbff;border-radius:10px;padding:14px;display:flex;flex-direction:column;gap:7px}
+.operations-dome-kpis span{font-size:11px;color:#577299}
+.operations-dome-kpis strong{font-size:23px;color:#17396e;font-variant-numeric:tabular-nums}
+.operations-dome-list{margin-top:16px;border-top:1px solid #cdddf4;padding-top:12px}
+.operations-dome-list h3,.operations-dome-table-title{font-size:15px;font-weight:750;margin:0 0 9px;color:#193763}
+.operations-dome-list p{font-size:12px;color:#60789b;margin:0}
+.operations-dome-chips{display:flex;flex-wrap:wrap;gap:7px}
+.operations-dome-chips span{font-size:11px;font-weight:650;color:#2853a0;background:#f9fbff;border:1px solid #c6d8f5;border-radius:9px;padding:8px 11px}
+.operations-dome-table-title{margin:17px 0 0;border-top:1px solid #cdddf4;padding-top:13px}
+.operations-readonly-note{font-size:11px;color:#647b9a;margin:10px 0 0;padding:8px 11px;background:#edf4ff;border-radius:9px}
+@media(max-width:680px){.operations-dome-kpis{grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}.operations-dome-kpis>div{padding:9px}.operations-dome-kpis strong{font-size:18px}.operations-dome-head{align-items:flex-start}}
+
+/* Bloco 45C — paginas exclusivas: cupulas e historico operacional. */
+.operation-detail{max-width:1180px;margin:0 auto;padding:22px 24px 32px;color:#173767}
+.operation-detail-back{display:inline-flex;align-items:center;padding:6px 12px;background:#dce9ff;border:1px solid #9cbdf6;border-radius:8px;color:#1d52ad;font-size:12px;font-weight:750;text-decoration:none}
+.operation-detail-back:hover{background:#c9ddff}
+.operation-detail-back:focus-visible,.operation-detail-action:focus-visible{outline:3px solid #8db8ff;outline-offset:2px}
+.operation-detail-head{display:flex;align-items:center;justify-content:space-between;gap:13px;flex-wrap:wrap;margin:12px 0 18px}
+.operation-detail-head h1{font-size:clamp(23px,2.4vw,30px);margin:0 0 5px;letter-spacing:-.5px}
+.operation-detail-head p{color:#627a9e;font-size:12px;margin:0}
+.operation-detail-action{display:inline-block;text-decoration:none;background:#2458d3;color:white;font-weight:750;font-size:12px;border-radius:10px;padding:11px 15px}
+.operation-detail-action:hover{background:#1b4ab8}
+.operation-detail-metrics{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:11px;margin-bottom:15px}
+.operation-detail-metrics>div{background:#edf4ff;border:1px solid #d2e0f9;padding:17px;border-radius:13px;display:flex;flex-direction:column;gap:8px}
+.operation-detail-metrics span{color:#5f789d;font-size:12px}
+.operation-detail-metrics strong{font-size:25px;line-height:1.1;font-variant-numeric:tabular-nums}
+.operation-detail-panel{background:#edf4ff;border:1px solid #d2e0f9;border-radius:15px;padding:18px}
+.operation-detail-panel h2{font-size:18px;margin:0 0 15px}
+.operation-detail-empty{background:#f9fbff;border:1px dashed #c7d9f5;border-radius:12px;padding:32px 15px;text-align:center}
+.operation-detail-empty p{font-size:13px;font-weight:700;margin:0 0 7px}
+.operation-detail-empty small{color:#627a9e}
+.operation-dome-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.operation-dome-card{background:#f9fbff;border:1px solid #cbdcf7;border-radius:12px;padding:17px}
+.operation-dome-top{display:flex;gap:8px;align-items:center;justify-content:space-between}
+.operation-dome-top h3{font-size:16px;margin:0}
+.operation-status-active,.operation-status-inactive{font-size:11px;font-weight:750;border-radius:50px;padding:5px 9px;white-space:nowrap}
+.operation-status-active{color:#14653c;background:#e1f5e9}
+.operation-status-inactive{color:#6c5367;background:#ece6ed}
+.operation-dome-card dl{margin:13px 0 0;display:grid;gap:8px}
+.operation-dome-card dl>div{display:flex;justify-content:space-between;gap:8px;border-top:1px solid #e0e9f9;padding-top:9px;font-size:12px}
+.operation-dome-card dt{color:#617a9e}
+.operation-dome-card dd{margin:0;font-weight:700;text-align:right}
+.operation-detail-warning{padding:13px;color:#845319;background:#fff0d7;border-radius:10px;font-size:12px}
+.operation-detail-table-scroll{max-height:430px;overflow:auto;border-radius:10px;border:1px solid #d2e0f9}
+.operation-detail-table-scroll table{width:100%;border-collapse:collapse;font-size:12px;text-align:left;background:#f9fbff}
+.operation-detail-table-scroll th{position:sticky;top:0;background:#dfeaff;color:#31558c;padding:12px 10px}
+.operation-detail-table-scroll td{padding:11px 10px;border-top:1px solid #dfe9f8}
+.operation-detail-id{font-family:ui-monospace,monospace;font-size:11px;color:#547198;word-break:break-all}
+@media(max-width:720px){.operation-detail{padding:14px}.operation-dome-grid{grid-template-columns:1fr}.operation-detail-metrics{gap:6px}.operation-detail-metrics>div{padding:12px}.operation-detail-metrics strong{font-size:20px}.operation-detail-panel{padding:12px}}
+
+/* Bloco 45D — reservas reais integradas abaixo das cupulas. */
+.operation-dome-unified{padding:17px 18px}
+.operation-reservations{margin-top:19px;border-top:1px solid #c9daf5;padding-top:17px}
+.operation-reservations-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px}
+.operation-reservations-head h2{margin:0;font-size:17px;color:#173767}
+.operation-reservations-badge{font-size:11px;white-space:nowrap;font-weight:700;padding:6px 10px;border-radius:9px;background:#dce9ff;color:#2859b6}
+.operation-reservations-metrics{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin:0 0 16px}
+.operation-reservations-metrics>div{border:1px solid #cbdcf7;background:#f9fbff;border-radius:10px;padding:12px;display:flex;justify-content:space-between;align-items:center;gap:9px}
+.operation-reservations-metrics span{font-size:11px;color:#58759e;line-height:1.4}
+.operation-reservations-metrics strong{font-size:20px;color:#183a70;font-variant-numeric:tabular-nums}
+.operation-reservations h3{font-size:14px;margin:0 0 9px;font-weight:750;color:#234674}
+.operation-reservations-empty{padding:19px 12px}
+.operation-reservations-items{display:grid;gap:7px}
+.operation-reservation-item{display:flex;justify-content:space-between;align-items:center;gap:12px;background:#f9fbff;border:1px solid #d2e0f9;border-radius:10px;padding:11px 13px}
+.operation-reservation-item>div{display:flex;flex-direction:column;gap:5px;min-width:0}
+.operation-reservation-item strong{font-size:12px;color:#173767;overflow-wrap:anywhere}
+.operation-reservation-item span{font-size:11px;color:#657c9c}
+.operation-reservation-item time{font-size:12px;font-weight:750;color:#2355b1;text-align:right}
+.operation-reservation-item>div:last-child span{text-align:right}
+.operation-reservations-more{font-size:11px;color:#687e9e;margin:11px 0 0}
+@media(max-width:700px){
+ .operation-reservations-metrics{grid-template-columns:1fr;gap:6px}
+ .operation-reservations-metrics>div{padding:9px 11px}
+ .operation-reservation-item{align-items:flex-start}
+ .operation-dome-unified{padding:13px}
+}
+
+/* Bloco 45E — nomes nos indicadores e formulario seguro de cupulas. */
+.operation-detail-metrics .operation-metric-names{margin:0;min-height:18px;font-size:11px;line-height:1.4;font-weight:650;color:#2a5aaf;overflow-wrap:anywhere}
+.operation-domes-heading{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;margin-bottom:14px;flex-wrap:wrap}
+.operation-domes-heading h2{margin:5px 0 0}
+.dome-create{max-width:100%;display:flex;flex-direction:column;align-items:flex-end;gap:9px}
+.dome-create-toggle{border:1px solid #2458d3;border-radius:9px;padding:9px 13px;background:#2458d3;color:#fff;font-size:12px;font-weight:750;cursor:pointer}
+.dome-create-toggle:hover{background:#1848b8}
+.dome-create-toggle:focus-visible,.dome-create-form input:focus-visible,.dome-create-actions button:focus-visible{outline:3px solid #87b1fc;outline-offset:2px}
+.dome-create-form{width:min(520px,calc(100vw - 58px));display:grid;grid-template-columns:1fr 1fr;gap:11px;padding:15px;background:#f9fbff;border:1px solid #cbdcf7;border-radius:12px}
+.dome-create-form label{display:grid;gap:5px;font-weight:700;font-size:11px;color:#31517b}
+.dome-create-form label:first-child{grid-column:1/-1}
+.dome-create-form input{background:white;border:1px solid #c5d7f3;border-radius:8px;padding:10px 11px;color:#173767;font-size:13px;width:100%;min-width:0}
+.dome-create-notice{grid-column:1/-1;font-size:11px;line-height:1.5;color:#835b1e;background:#fff3dc;padding:10px;border-radius:9px;margin:0}
+.dome-create-actions{display:flex;justify-content:flex-end;grid-column:1/-1;gap:8px}
+.dome-create-actions button{border:1px solid #c0d2ee;border-radius:8px;padding:9px 12px;background:#e9f1ff;color:#2555a9;font-size:12px;font-weight:700;cursor:pointer}
+.dome-create-actions button[type=submit]{background:#2458d3;color:#fff;border-color:#2458d3}
+.dome-create-actions button:disabled{opacity:.5;cursor:not-allowed}
+.dome-create-message{font-size:11px;color:#265998;margin:0}
+@media(max-width:600px){.dome-create{align-items:stretch;width:100%}.dome-create-form{width:100%}.operation-detail-metrics>div{padding:10px}}
+
+/* Bloco 45F — formulario flutuante e pagina compacta de cupulas. */
+.operation-detail{padding-top:14px;padding-bottom:16px}
+.operation-detail-head{margin:9px 0 12px}
+.operation-detail-head h1{font-size:25px}
+.operation-detail-metrics{margin-bottom:10px;gap:9px}
+.operation-detail-metrics>div{padding:11px 14px;gap:5px}
+.operation-detail-metrics strong{font-size:21px}
+.operation-detail-panel{padding:12px 15px}
+.operation-detail-panel h2{font-size:16px;margin-bottom:10px}
+.operation-domes-heading{align-items:center;margin-bottom:10px}
+.operation-domes-heading h2{margin:0}
+.operation-detail-empty{padding:15px 12px}
+.operation-detail-empty p{margin-bottom:4px}
+.operation-reservations{margin-top:12px;padding-top:11px}
+.operation-reservations-head{margin-bottom:8px}
+.operation-reservations-metrics{margin-bottom:11px}
+.operation-reservations-metrics>div{padding:9px 11px}
+.operation-reservations h3{margin-bottom:7px}
+.operation-reservations-empty{padding:12px}
+.dome-create-overlay{position:fixed;inset:0;z-index:1000;background:#081f4d82;display:grid;place-items:center;padding:14px}
+.dome-create .dome-create-form{width:min(485px,100%);max-height:calc(100dvh - 28px);overflow-y:auto;box-shadow:0 18px 60px #0a2b6070;grid-template-columns:repeat(2,minmax(0,1fr));padding:17px;gap:11px;background:#f6faff}
+.dome-create-title{grid-column:1/-1;display:flex;align-items:center;justify-content:space-between;gap:10px;color:#163767}
+.dome-create-title strong{font-size:17px}
+.dome-create-title button{font-size:21px;line-height:1;color:#2458d3;background:#e3eeff;border:1px solid #c7d9f4;border-radius:7px;width:30px;height:30px;cursor:pointer}
+.dome-create .dome-create-form label:first-of-type{grid-column:1/-1}
+.dome-create .dome-create-form input{padding:9px 10px}
+@media(max-width:600px){.dome-create .dome-create-form{width:100%;padding:13px}.operation-detail-metrics>div{padding:9px}.operation-detail-head{margin-bottom:10px}}
+@media(prefers-reduced-motion:reduce){.dome-create-overlay{animation:none}}
+
+/* Bloco 46 — Equipe, convites e permissoes. */
+.team-refined{max-width:1080px;margin:0 auto;padding:18px 23px 28px;color:#173767}
+.team-refined h1{font-size:26px;font-weight:800;margin:12px 0 3px}
+.team-intro{font-size:12px;color:#627a9e;margin:0 0 14px}
+.team-refined>.team-table{margin-bottom:12px}
+.team-table{border-collapse:separate;border-spacing:0;width:100%;text-align:left;background:#f9fbff;border:1px solid #cbdcf7;border-radius:12px;overflow:hidden;font-size:12px}
+.team-table thead{background:#dfeaff}
+.team-table th{padding:12px 11px;text-align:left;color:#32588d;font-size:11px}
+.team-table td{padding:11px;border-top:1px solid #deE8f8;color:#38516f}
+.team-refined .team-panel{margin:13px 0 0;background:#edf4ff;border:1px solid #d2e0f9;border-radius:14px;padding:17px}
+.team-refined .team-panel h2{font-size:17px;font-weight:750;margin:0 0 11px;color:#173767}
+.team-refined .team-panel p{font-size:12px;color:#5c7296}
+.team-invite-form{display:grid;gap:11px;max-width:560px;grid-template-columns:1fr 1fr}
+.team-invite-form label{font-size:12px;font-weight:650;color:#31517b}
+.team-invite-form label input{border:1px solid #bcd1f0;border-radius:9px;margin-top:6px;outline-offset:2px}
+.team-invite-form button{grid-column:1/-1;justify-self:start;border:0}
+.team-refined button{cursor:pointer;font-weight:700}
+.team-refined button:disabled{cursor:not-allowed;opacity:.55}
+.team-refined .team-help{font-size:11px;color:#647c9e;margin:14px 0 0}
+@media(max-width:700px){.team-refined{padding:13px}.team-refined .team-panel{padding:12px}.team-invite-form{grid-template-columns:1fr}.team-table{display:block;overflow-x:auto;white-space:nowrap}}
+
+/* Bloco 47 — histórico legível para o proprietário; detalhes técnicos sob demanda. */
+.operation-history .operation-detail-head{margin-bottom:13px}
+.operation-history .operation-detail-panel{padding:14px}
+.operation-history-heading{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:10px}
+.operation-history-heading h2{margin:0;font-size:16px}
+.operation-history-heading>span{font-size:11px;font-weight:750;color:#2759ad;background:#dce9ff;border-radius:8px;padding:6px 10px;white-space:nowrap}
+.operation-history .operation-detail-table-scroll{max-height:min(56dvh,520px);background:#f9fbff}
+.operation-history .operation-detail-table-scroll th{background:#dfeaff;font-size:11px}
+.operation-history .operation-detail-table-scroll td{font-size:12px;padding:10px 11px;vertical-align:middle}
+.operation-history-date{white-space:nowrap;font-variant-numeric:tabular-nums;color:#5b7195}
+.operation-history-action{font-weight:700;color:#173767}
+.operation-history-area{display:inline-flex;align-items:center;font-size:11px;background:#e5efff;color:#2555a3;padding:5px 8px;border-radius:7px;font-weight:650}
+.operation-history-details{position:relative;font-size:11px;color:#2858aa}
+.operation-history-details summary{cursor:pointer;font-weight:750;white-space:nowrap;padding:5px 8px;background:#e7f0ff;border:1px solid #c7daf8;border-radius:7px;list-style:none;display:inline-block}
+.operation-history-details summary::-webkit-details-marker{display:none}
+.operation-history-details summary:hover{background:#dce9ff}
+.operation-history-details summary:focus-visible{outline:3px solid #80b0fd;outline-offset:2px}
+.operation-history-details[open]{max-width:265px}
+.operation-history-details dl{margin:8px 0 0;padding:10px;background:#f0f5ff;border:1px solid #ccdcf6;border-radius:8px;min-width:190px}
+.operation-history-details dt{font-weight:750;color:#365c91;margin:5px 0 2px}
+.operation-history-details dd{margin:0;word-break:break-all;color:#536e96}
+.operation-history-note{font-size:11px;color:#60789b;margin:11px 2px 0}
+@media(max-width:650px){.operation-history .operation-detail-table-scroll{max-height:65dvh}.operation-history .operation-detail-table-scroll table{min-width:610px}}
+
+/* Bloco 47B — detalhes da auditoria em janela flutuante. */
+.operation-audit-open{font-size:11px;color:#2858aa;background:#e7f0ff;border:1px solid #c7daf8;border-radius:7px;padding:6px 10px;font-weight:750;cursor:pointer}
+.operation-audit-open:hover{background:#dce9ff}
+.operation-audit-open:focus-visible,.operation-audit-dialog button:focus-visible{outline:3px solid #80b0fd;outline-offset:2px}
+.operation-audit-dialog{position:fixed;margin:auto;width:min(420px,calc(100vw - 26px));max-height:calc(100dvh - 28px);overflow:auto;padding:20px;background:#f7fbff;color:#173767;border:1px solid #c1d6f6;border-radius:14px;box-shadow:0 18px 70px #081f4d55}
+.operation-audit-dialog::backdrop{background:#0b244e88}
+.operation-audit-dialog-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px}
+.operation-audit-dialog-head h3{margin:0;font-size:18px;font-weight:800;color:#173767}
+.operation-audit-dialog-head button{font-size:23px;line-height:1;background:#e5eeff;border:1px solid #c1d5f4;border-radius:8px;color:#2458d3;cursor:pointer;width:32px;height:32px}
+.operation-audit-dialog dl{display:grid;gap:5px;margin:0}
+.operation-audit-dialog dt{font-size:11px;color:#647c9e;font-weight:750;margin-top:8px}
+.operation-audit-dialog dd{font-size:13px;font-weight:600;margin:0;overflow-wrap:anywhere;color:#234574;padding:9px 11px;background:#eaf2ff;border:1px solid #d2e0f9;border-radius:8px}
+.operation-audit-dialog form{display:flex;justify-content:flex-end;margin-top:17px}
+.operation-audit-close{padding:9px 17px;border-radius:8px;border:0;background:#2458d3;color:#fff;font-size:12px;font-weight:750;cursor:pointer}
+
+/* Bloco 48 — tela de reservas pronta visualmente para configuracao operacional. */
+.booking-refined{max-width:1080px;margin:0 auto;padding:20px 23px 28px;color:#173767}
+.booking-heading{display:flex;justify-content:space-between;align-items:center;gap:10px;margin:13px 0 16px;flex-wrap:wrap}
+.booking-heading h1{font-size:26px;letter-spacing:-.4px;font-weight:800;margin:0 0 4px}
+.booking-heading p{font-size:12px;color:#5f789d;margin:0}
+.booking-calendar-link{background:#2458d3;border:1px solid #2458d3;color:#fff;font-size:12px;font-weight:700;border-radius:9px;padding:10px 13px;text-decoration:none}
+.booking-calendar-link:hover{background:#184bbb}
+.booking-panel{background:#edf4ff;border:1px solid #d2e0f9;border-radius:14px;padding:17px;margin:12px 0;display:grid;gap:12px}
+.booking-section-heading{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:9px}
+.booking-panel h2{font-size:17px;font-weight:750;margin:0;color:#173767}
+.booking-pill{background:#e0ebff;color:#2957a4;border-radius:30px;font-weight:750;font-size:11px;padding:6px 10px}
+.booking-metrics{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:9px}
+.booking-metrics>div{background:#f9fbff;border:1px solid #cbdcf7;border-radius:10px;padding:12px;display:flex;flex-direction:column;gap:7px}
+.booking-metrics span{font-size:11px;color:#5d789b}
+.booking-metrics strong{font-size:23px;color:#183c75;font-variant-numeric:tabular-nums}
+.booking-readiness-list{display:grid;gap:7px}
+.booking-readiness-row{display:flex;align-items:center;justify-content:space-between;gap:9px;background:#f9fbff;border:1px solid #cbdcf7;border-radius:10px;padding:11px 13px}
+.booking-readiness-row>div{display:grid;gap:4px}
+.booking-readiness-row strong{font-size:12px;color:#163767}
+.booking-readiness-row div span{font-size:11px;color:#687e9d}
+.booking-readiness-row>span{font-size:11px;border-radius:20px;padding:6px 9px;white-space:nowrap;font-weight:700}
+.booking-ready{background:#e2f4e8;color:#246a41}
+.booking-pending{background:#fff1d9;color:#895818}
+.booking-empty{font-size:12px;color:#647b99;margin:0}
+.booking-dome-names{font-size:11px;color:#5e789b;margin:0}
+.booking-readonly{margin:0;font-size:11px;color:#855b21;background:#fff4dd;border-radius:9px;padding:11px 12px}
+.booking-status{font-size:12px;background:#f2f7ff;border:1px solid #d2e0f9;padding:10px;border-radius:9px}
+.booking-operational-setup p{font-size:12px;color:#5e7695;margin:0}
+.booking-operational-setup label,.booking-form label{font-size:12px;font-weight:650;color:#365b8a;display:grid;gap:5px}
+.booking-operational-setup input,.booking-form input,.booking-form select{border:1px solid #bdd0ee;border-radius:9px;padding:10px;width:100%;background:#fff;color:#173767}
+.booking-operational-setup button,.booking-form button{border:0;background:#2458d3;color:#fff;font-weight:700;border-radius:9px;padding:10px 14px;cursor:pointer}
+.booking-operational-setup button:disabled,.booking-form button:disabled{opacity:.55;cursor:not-allowed}
+.booking-refined a:focus-visible,.booking-refined button:focus-visible,.booking-refined input:focus-visible,.booking-refined select:focus-visible{outline:3px solid #79a8fc;outline-offset:2px}
+@media(max-width:740px){.booking-refined{padding:14px}.booking-metrics{grid-template-columns:repeat(2,minmax(0,1fr))}.booking-panel{padding:12px}.booking-readiness-row{align-items:flex-start;flex-direction:column}}
+
+/* Bloco 49D: gerenciamento sem aumentar a altura da pagina. */
+.dome-manage{display:flex;align-items:center;gap:8px;margin-top:10px}
+.dome-manage-trigger{font-size:11px;padding:7px 12px;color:#2457b4;background:#e4eeff;border:1px solid #c5d8f7;border-radius:8px;font-weight:750;cursor:pointer}
+.dome-manage-trigger:hover{background:#dce9ff}
+.dome-manage-modal{background:#f7fbff;border:1px solid #c9dafa;border-radius:14px;padding:17px;box-shadow:0 18px 65px #071b4d64;width:min(490px,calc(100vw - 24px));max-height:calc(100dvh - 26px);overflow-y:auto;color:#18386b;display:grid;gap:12px}
+.dome-manage-hint{font-size:12px;color:#617ca1;margin:0}
+.dome-manage-fields{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.dome-manage-fields label:first-child{grid-column:1/-1}
+.dome-manage-modal label{display:grid;gap:5px;font-size:11px;font-weight:700;color:#375985}
+.dome-manage-modal input{width:100%;min-width:0;border:1px solid #c7d7f2;border-radius:8px;background:#fff;padding:9px;color:#18386b;font-size:12px}
+.dome-manage-actions{display:flex;flex-wrap:wrap;gap:8px}
+.dome-manage-actions button{background:#2458d3;color:#fff;border:0;border-radius:8px;padding:9px 13px;font-weight:750;font-size:12px;cursor:pointer}
+.dome-manage-actions button:nth-child(2){background:#e0eafe;color:#2656a4;border:1px solid #c0d3ef}
+.dome-manage-danger{border-top:1px solid #ccdbf4;padding-top:10px;display:grid;gap:9px}
+.dome-manage-danger strong{font-size:12px;color:#8b2e36}
+.dome-manage-danger p{font-size:11px;line-height:1.4;color:#7d5362;margin:0}
+.dome-manage-danger button{justify-self:start;font-size:11px;font-weight:750;border-radius:8px;padding:9px 12px;color:#fff;background:#a42e40;border:0;cursor:pointer}
+.dome-manage-modal button:disabled{opacity:.45;cursor:not-allowed}
+.dome-manage-modal button:focus-visible,.dome-manage-modal input:focus-visible,.dome-manage-trigger:focus-visible{outline:3px solid #7faaff;outline-offset:2px}
+@media(max-width:600px){.dome-manage-modal{padding:13px}.dome-manage-fields{grid-template-columns:1fr}.dome-manage-fields label:first-child{grid-column:auto}}
+
+/* Relationship routes reuse the dashboard navigation. */
+.relationship-content {padding:22px 26px;max-width:1320px;}
+.relationship-content>main {padding:0!important;max-width:none!important;min-height:0!important;}
+.sidebar .owner-nav-link.active {background:#283d65;color:#fff;box-shadow:inset 3px 0 #62d8f0;border-radius:10px;}
+@media(max-width:640px){.relationship-content{padding:18px 14px;}}
+
+/* ANTARES: calendário com maior área útil no desktop */
+@media (min-width: 741px) {
+ .cal-page .cal-day { min-height: 112px; max-height: none; padding: 10px; gap: 6px; }
+ .cal-page .cal-day > span { font-size: 13px; }
+ .cal-page .cal-day small { font-size: 11px; }
+}
+
+/* Agenda master: dias um pouco mais altos para facilitar a leitura */
+.cal-page .cal-days .cal-day{height:clamp(66px,9vh,82px);min-height:clamp(66px,9vh,82px);max-height:none;padding:8px;gap:5px}
+
+/* ANTARES V3: avatares discretamente maiores */
+.owner-profile-link .avatar{width:44px;height:44px;flex-shrink:0;object-fit:cover}
+.owner-header-profile .avatar.mini{width:38px;height:38px;object-fit:cover}
+
+/* Perfil — identidade visual azul e navegacao padronizada */
+.profile-page{background:radial-gradient(circle at 85% 12%,#dceafe 0,transparent 35%),linear-gradient(160deg,#edf4ff 0%,#f7faff 60%,#eaf1fd 100%);padding:28px 24px 60px}
+.profile-navigation{margin-bottom:16px}
+.profile-navigation .owner-back-button{display:inline-flex;align-items:center;gap:5px;background:#e8f1ff;border:1px solid #bfd3f6;color:#1e4fa7;border-radius:9px;padding:8px 13px;font-size:12px;font-weight:750;box-shadow:0 2px 6px #153d7a12}
+.profile-navigation .owner-back-button:hover{background:#d9e9ff;transform:translateY(-1px)}
+.profile-panel{padding:0;overflow:hidden;border:1px solid #c9dcfa;border-radius:19px;box-shadow:0 20px 55px #143c7b1c,0 4px 12px #143c7b0d}
+.profile-header{background:linear-gradient(115deg,#0c285b 0%,#1753b5 55%,#2d79ed 100%);padding:27px 32px 25px;color:#fff;position:relative;overflow:hidden}
+.profile-header::after{content:"";position:absolute;width:220px;height:220px;right:-48px;top:-140px;border:1px solid #ffffff35;border-radius:50%;box-shadow:0 0 0 36px #ffffff0a,0 0 0 78px #ffffff08;pointer-events:none}
+.profile-header .profile-eyebrow{color:#c2dcff;letter-spacing:2px;font-size:11px;margin:0 0 9px}
+.profile-header h1{color:#fff;font-size:29px;font-weight:800;margin:0;letter-spacing:-.4px}
+.profile-form-layout{margin:0;padding:32px;gap:35px;grid-template-columns:190px minmax(0,1fr);background:linear-gradient(180deg,#fff 0%,#f8fbff 100%)}
+.profile-photo-area{background:#edf5ff;border:1px solid #d4e3fb;border-radius:15px;padding:22px 12px;align-self:start;box-shadow:0 6px 14px #214d9c0b}
+.profile-photo-area>img,.profile-photo-area>span{border:4px solid white;box-shadow:0 7px 20px #143c7b30;width:126px;height:126px}
+.profile-photo-button{background:#fff;border:1px solid #a9c8fa;color:#164ea8;padding:11px 15px;box-shadow:0 3px 9px #1c58a01c}
+.profile-photo-button:hover{background:#dceaff;transform:translateY(-1px)}
+.profile-fields{gap:17px}
+.profile-fields label{color:#1d4077;font-size:12px;font-weight:750;gap:7px}
+.profile-fields input{height:45px;border-color:#bed3f1;border-radius:10px;background:#fff;font-size:14px;box-shadow:inset 0 1px 2px #123c6b08}
+.profile-fields input:focus{border-color:#3979e6;box-shadow:0 0 0 3px #3979e622;outline:none}
+.profile-fields input:disabled{background:#edf3fc;color:#59708f}
+.profile-fields .primary-button{background:linear-gradient(110deg,#1648c3,#3478f4);border:0;border-radius:10px;padding:13px 20px;color:#fff;font-weight:800;box-shadow:0 8px 18px #245fe43d}
+.profile-fields .primary-button:hover{background:linear-gradient(110deg,#103caa,#2266e3);transform:translateY(-2px);box-shadow:0 11px 22px #245fe44d}
+.profile-feedback{background:#e9f3ff;border:1px solid #bdd8fa;border-radius:9px;padding:10px 12px;color:#164c98;font-weight:650}
+@media(max-width:600px){.profile-page{padding:16px 12px 35px}.profile-header{padding:22px}.profile-form-layout{padding:20px;grid-template-columns:1fr;gap:20px}.profile-photo-area{max-width:230px;justify-self:center;width:100%}.profile-fields .primary-button{width:100%;justify-content:center}}
+
+/* Perfil aprovado: integrado ao shell, com destaque azul na foto e controles. */
+.content:has(.profile-page){padding:0!important;background:linear-gradient(135deg,#edf5ff 0%,#f7faff 72%,#e8f1ff 100%);min-height:calc(100vh - 82px)}
+.content:has(.profile-page) .profile-page{min-height:calc(100vh - 82px);padding:22px clamp(16px,3vw,42px) 55px;background:radial-gradient(circle at 93% 7%,#d9e9ff 0,transparent 40%),linear-gradient(140deg,#edf5ff,#f7faff)}
+.content:has(.profile-page) .profile-page>*{max-width:1000px}
+.content:has(.profile-page) .profile-photo-area{background:linear-gradient(150deg,#0c347b,#0865cb 80%,#00a2ef);border:2px solid #0aa6ff;box-shadow:0 10px 24px #064ba54a;padding:24px 15px}
+.content:has(.profile-page) .profile-photo-area>img,.content:has(.profile-page) .profile-photo-area>span{width:140px;height:140px;border:4px solid #e4f9ff;box-shadow:0 0 0 3px #2bc9ff,0 0 20px #0ce1ff90}
+.content:has(.profile-page) .profile-photo-button{background:linear-gradient(110deg,#0c55b9,#089fdf);color:#fff;border:1px solid #7de6ff;box-shadow:0 5px 14px #032b7480;font-size:13px}
+.content:has(.profile-page) .profile-photo-button:hover{background:linear-gradient(110deg,#1645a8,#07b6f0)}
+.content:has(.profile-page) .profile-fields .primary-button{background:linear-gradient(110deg,#1740c5 10%,#145de9 65%,#0cb7ed);box-shadow:0 8px 18px #125bd24d}
+.content:has(.profile-page) .profile-fields .primary-button:hover{background:linear-gradient(110deg,#1234ac,#0965e3 65%,#08a9dc)}
+@media(max-width:600px){.content:has(.profile-page) .profile-page{padding:15px 12px 32px}.content:has(.profile-page) .profile-photo-area{width:100%;max-width:250px}}

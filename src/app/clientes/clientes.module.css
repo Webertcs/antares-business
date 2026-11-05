@@ -1,0 +1,170 @@
+.page {color:#17345b;min-height:100vh;line-height:1.55;}
+.page button,.page a,.page input,.page select {transition:background .15s,box-shadow .15s;}
+.page button {cursor:pointer;min-height:42px;padding:9px 14px;border:1px solid #c6d7ee;border-radius:10px;background:#f3f7ff;color:#214d86;font-weight:600;font-size:14px;}
+.page button:disabled {cursor:wait;opacity:.55;}
+.page button:hover:not(:disabled) {box-shadow:0 3px 12px #163c7320;}
+.page :is(button,a,input,select):focus-visible {outline:3px solid #5495ed;outline-offset:3px;}
+.hero {padding:28px;border-radius:22px;background:linear-gradient(125deg,#102d59,#1555a2);color:white;box-shadow:0 12px 30px #14376818;}
+.hero h1 {letter-spacing:-1px;margin:8px 0;}
+.hero p {color:#dbeafe;max-width:510px;}
+.backButton {display:inline-flex;align-items:center;gap:8px;padding:8px 13px;min-height:38px;border:1px solid #cbdcf0;border-radius:9px;background:#fff;color:#234d80;text-decoration:none;font-size:13px;font-weight:600;}
+.backButton:hover {background:#edf4ff;}
+.headerActions {display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+.hero .headerButton {display:inline-flex;align-items:center;justify-content:center;min-height:36px;padding:7px 12px;border:1px solid #8db3e0;border-radius:8px;background:#204f89;color:#fff;text-decoration:none;font-size:13px;font-weight:600;line-height:20px;white-space:nowrap;}
+.hero .headerButton:hover:not(:disabled) {background:#2d609e;box-shadow:none;}
+.hero .access {color:#deecff;font-size:12px;}
+.metric {background:#fff;border:1px solid #dbe6f4;border-radius:12px;padding:14px 16px;}
+.metric div {font-size:13px;color:#55708e;}
+.metric strong {display:block;margin-top:8px;color:#163b6e;}
+.caption {font-size:13px;color:#5c728d;margin:8px 0 18px;}
+.directory,.history,.editor {background:white;border-color:#dbe6f4!important;box-shadow:0 6px 22px #173a6607;}
+.sectionHeading {display:flex;justify-content:space-between;gap:16px;align-items:center;margin-bottom:22px;}
+.sectionHeading h2 {font-size:20px;font-weight:700;margin:0;}
+.sectionHeading p {font-size:14px;color:#61758e;margin:3px 0;}
+.sectionHeading>span,.badge {background:#edf4ff;border:1px solid #d8e6fa;border-radius:99px;padding:5px 11px;font-size:12px;white-space:nowrap;}
+.page th {font-size:12px;text-transform:uppercase;letter-spacing:.5px;background:#f5f8fd;color:#5c7390;}
+.page td {padding:15px 10px!important;border-bottom:1px solid #e6edf6!important;font-size:14px;}
+.page tbody tr:hover {background:#f8fbff;}
+.badge[data-status='inactive'] {background:#f1f4f8;color:#64748b;border-color:#e2e8f0;}
+.badge[data-status='active'] {background:#e1efff;color:#144f95;}
+.actions {display:flex;gap:8px;align-items:center;flex-wrap:wrap;}
+.empty {padding:42px 20px;text-align:center;border:1px dashed #cbdcf1;border-radius:14px;background:#f8fbff;}
+.empty h3 {font-size:18px;font-weight:650;}
+.empty p {color:#61758e;margin-top:8px;}
+.history h2 {color:#174784;}
+.history h3 {display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;border-top:1px solid #e4ecf7;padding-top:18px;}
+.history li {padding:12px 14px;margin:8px 0;background:#f4f8fe;border-radius:10px;list-style:none;}
+.feedback {padding:14px 18px;background:#e9f2ff;border:1px solid #c5dbf7;border-radius:12px;margin-top:16px;}
+.editor h2 {font-weight:700;margin-bottom:20px;}
+.editor form {grid-template-columns:repeat(2,minmax(0,1fr));}
+.editor label {font-size:13px;font-weight:600;}
+.editor input,.editor select,.dialog select {border:1px solid #cbd9ea;border-radius:9px;margin-top:6px;background:white;color:#17345b;min-height:44px;}
+.editor form>div {grid-column:1/-1;padding-top:12px;}
+.editor button[type='submit'],.dialog button:first-child {background:#2563eb;color:white;border-color:#2563eb;}
+.overlay {position:fixed;inset:0;background:#0d244f80;display:grid;place-items:center;padding:20px;z-index:100;}
+.dialog::backdrop {background:#0d244f80;}
+.dialog {margin:auto;border:0;color:#17345b;background:white;padding:28px;border-radius:20px;max-width:480px;width:100%;box-shadow:0 20px 70px #102a5350;}
+.dialog h2 {font-size:23px;font-weight:700;margin-bottom:12px;}
+.dialog label {display:block;margin:20px 0 8px;}
+.dialog select {display:block;width:100%;padding:10px;}
+@media(max-width:640px) {.hero {padding:22px 18px;}.hero h1 {font-size:26px!important;}.editor form {grid-template-columns:1fr;}.sectionHeading {align-items:flex-start;}.page td {min-width:105px;}.actions {min-width:150px;}.dialog .actions {min-width:0;}}
+
+.formDialog {position:fixed;inset:0;margin:auto;width:min(720px,calc(100vw - 32px));max-height:calc(100dvh - 32px);overflow:auto;border:1px solid #cfdef1;border-radius:18px;padding:24px;color:#17345b;box-shadow:0 24px 80px #102a5340;}
+.formDialog::backdrop {background:#0e234b85;backdrop-filter:blur(2px);}
+.formHeading {display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:18px;}
+.formHeading h2 {margin:0;}
+.formHeading button {font-size:22px;min-width:38px;padding:2px 10px;}
+.formDialog form {display:block;}
+.formFields {display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;border:0;padding:0;margin:0;min-width:0;}
+.formFields label:last-child {grid-column:1/-1;}
+.formActions {display:flex;justify-content:flex-end;position:sticky;bottom:-24px;background:white;padding:16px 0;margin-top:16px;border-top:1px solid #e1eaf5;}
+.formError {padding:12px;background:#edf4ff;border-radius:8px;margin-top:14px;}
+@media(max-width:560px){.formDialog{padding:18px;width:calc(100vw - 20px);max-height:calc(100dvh - 20px);}.formFields{grid-template-columns:1fr;}.formActions{bottom:-18px;}}
+
+/* ANTARES — acabamento premium do modal de cadastro */
+.formDialog {padding:0;width:min(680px,calc(100vw - 32px));border:1px solid #9fc2ef;border-radius:20px;box-shadow:0 28px 90px #071c4370;overflow:auto;}
+.formHeading {margin:0;padding:22px 26px;background:linear-gradient(115deg,#102e63,#1556ae 65%,#2879e7);color:#fff;}
+.formHeading h2 {color:#fff;font-size:23px;font-weight:750;letter-spacing:-.35px;}
+.formHeading button {background:#ffffff24!important;color:#fff!important;border:1px solid #ffffff70!important;border-radius:10px;}
+.formHeading button:hover {background:#ffffff40!important;}
+.formDialog form {padding:22px 26px 0;}
+.formFields {grid-template-columns:repeat(2,minmax(0,1fr));column-gap:18px;row-gap:16px;}
+.formFields label {display:block;min-width:0;color:#234976;font-size:13px;font-weight:700;}
+.formFields label:first-child {grid-column:1/-1;}
+.formFields input,.formFields select {box-sizing:border-box;width:100%!important;min-height:46px;border:1px solid #bfd3ef;border-radius:10px;background:#f7faff;color:#17345b;padding:10px 12px;transition:border-color .2s,box-shadow .2s;}
+.formFields input:focus,.formFields select:focus {outline:none;border-color:#2879e7;box-shadow:0 0 0 3px #2879e726;background:#fff;}
+.formFields label:last-child {grid-column:1/-1;}
+.formActions {bottom:0;margin-top:22px;padding:16px 0 20px;gap:10px;background:#fff;}
+.formActions button {min-width:128px;border-radius:10px;font-weight:700;}
+.formActions button[type='submit'] {background:linear-gradient(110deg,#1453b8,#2879ee);color:#fff;border-color:#2169d8;box-shadow:0 5px 14px #1e62c52a;}
+.formActions button[type='submit']:hover:not(:disabled) {background:linear-gradient(110deg,#10459c,#1765d4);}
+.formActions button[type='button'] {margin-left:0!important;background:#e8f1ff;color:#174e9c;border:1px solid #b8d1f5;}
+.formActions button[type='button']:hover:not(:disabled) {background:#d8e8ff;}
+@media(max-width:560px) {.formDialog{width:calc(100vw - 20px);max-height:calc(100dvh - 20px);}.formHeading{padding:18px;}.formDialog form{padding:18px 18px 0;}.formFields{grid-template-columns:1fr;}.formActions{flex-wrap:wrap;}.formActions button{flex:1;min-width:0;}}
+
+/* Distribuição corrigida: formulário ocupa toda a largura do modal.
+   O grid pertence ao fieldset; cada campo é uma célula, não um grid aninhado. */
+.formDialog {width:min(740px,calc(100vw - 32px));}
+.formDialog .formFields {display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px 20px;width:100%;}
+.formDialog .formFields label {display:block;width:100%;min-width:0;grid-column:auto;}
+.formDialog .formFields label:first-child,
+.formDialog .formFields label:last-child {grid-column:1/-1;}
+.formDialog .formFields input,
+.formDialog .formFields select {display:block;width:100%!important;max-width:none!important;box-sizing:border-box;}
+.formDialog .formFields label:nth-child(6) {grid-column:auto;}
+@media(max-width:560px){
+ .formDialog .formFields {grid-template-columns:minmax(0,1fr);}
+ .formDialog .formFields label {grid-column:1/-1;}
+}
+
+/* Base de clientes — filtros visíveis e organizados */
+.directoryHeader {display:flex;justify-content:space-between;align-items:center;gap:16px;padding:18px 20px;margin:-18px -18px 18px;background:linear-gradient(110deg,#e9f2ff,#f3f8ff);border-bottom:1px solid #c9ddfa;border-radius:14px 14px 0 0;}
+.directoryHeader h2 {margin:0;color:#124785;font-size:21px;font-weight:750;}
+.directoryHeader p {margin:4px 0 0;color:#52739b;font-size:13px;}
+.resultCount {background:#1d60c3;color:#fff;border-radius:99px;padding:7px 13px;font-size:12px;font-weight:700;white-space:nowrap;}
+.filterPanel {display:grid;grid-template-columns:minmax(220px,1fr) minmax(175px,220px) auto;align-items:end;gap:12px;background:#f0f6ff;border:1px solid #c9defb;border-radius:14px;padding:15px;margin-bottom:18px;}
+.filterSearch,.filterKind {display:flex;flex-direction:column;gap:7px;min-width:0;color:#174a8c;font-size:13px;font-weight:700;}
+.filterKind small {color:#1d60c3;font-size:11px;margin-left:5px;}
+.filterSearch input,.filterKind select {box-sizing:border-box;width:100%;min-height:45px;padding:10px 12px;border:1px solid #aac8ef;border-radius:9px;background:#fff;color:#193c68;font-size:14px;}
+.filterSearch input:focus,.filterKind select:focus {outline:3px solid #9ac4ff;outline-offset:1px;}
+.filterKind select {cursor:pointer;font-weight:600;}
+.filterArchived {display:flex;align-items:center;justify-content:center;gap:9px;min-height:45px;padding:8px 13px;border:1px solid #b6d0f3;border-radius:9px;background:#e0edff;color:#174a8c;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap;}
+.filterArchived input {width:18px;height:18px;accent-color:#1c61c8;cursor:pointer;}
+.filterArchived:has(input:checked) {background:#c8e0ff;border-color:#3778d5;}
+@media(max-width:850px) {.filterPanel{grid-template-columns:minmax(0,1fr) minmax(160px,220px);}.filterArchived{grid-column:1/-1;justify-content:flex-start;}}
+@media(max-width:560px) {.directoryHeader{align-items:flex-start;flex-direction:column;}.filterPanel{grid-template-columns:1fr;}.filterArchived{grid-column:auto;}}
+
+/* Situação do cliente — destaque semântico e brilho discreto */
+.badge[data-status='active'] {background:linear-gradient(120deg,#d8eaff,#bcdcff);color:#104b9b;border:1px solid #8dbcf5;font-weight:750;box-shadow:0 0 0 2px #cde4ff55,0 3px 9px #2677d024;}
+.badge[data-status='inactive'] {background:#f1f3f6;color:#8995a5;border:1px solid #e0e5eb;font-weight:600;box-shadow:none;}
+.badge[data-status='prospect'] {background:#edf3ff;color:#466a9d;border:1px solid #d7e4f8;box-shadow:none;}
+
+/* Histórico do cliente em modal central protegido */
+.historyDialog {position:fixed;inset:0;margin:auto;padding:0;width:min(760px,calc(100vw - 28px));max-height:calc(100dvh - 28px);overflow:auto;border:1px solid #a5c6f0;border-radius:19px;background:#fff;color:#17345b;box-shadow:0 28px 90px #071c4370;}
+.historyDialog::backdrop {background:#0e234b85;backdrop-filter:blur(2px);}
+.historyHeading {position:sticky;top:0;z-index:1;display:flex;justify-content:space-between;align-items:center;gap:14px;padding:20px 24px;background:linear-gradient(115deg,#102e63,#1556ae 65%,#2879e7);color:#fff;}
+.historyHeading h2 {margin:0;font-size:23px;font-weight:750;color:#fff;}
+.historyHeading button {background:#ffffff24;color:#fff;border:1px solid #ffffff70;font-size:22px;min-width:40px;}
+.historyBody {padding:22px 26px;}
+.historyBody h2 {font-size:22px;color:#174784;font-weight:750;margin:0 0 8px;}
+.historyBody h3 {display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-top:22px;padding-top:18px;border-top:1px solid #dce8f8;font-size:17px;font-weight:750;color:#174784;}
+.historyBody p {margin:8px 0;color:#426184;}
+.historyBody ul {padding:0;margin:12px 0;}
+.historyBody li {padding:13px 15px;margin:8px 0;list-style:none;border:1px solid #d9e7fa;border-radius:10px;background:#f3f8ff;}
+.historyFooter {position:sticky;bottom:0;display:flex;justify-content:flex-end;padding:14px 24px;background:#f2f7ff;border-top:1px solid #d8e6f8;}
+.historyFooter button {background:#1d62ce;color:#fff;border:1px solid #1d62ce;}
+@media(max-width:560px){.historyHeading{padding:16px;}.historyBody{padding:18px;}.historyFooter{padding:12px 16px;}}
+
+/* Clientes: colunas estáveis mesmo com razões sociais extensas. */
+.clientsTable {table-layout:fixed;min-width:760px;}
+.clientsTable th:nth-child(1) {width:38%;}
+.clientsTable th:nth-child(2) {width:12%;}
+.clientsTable th:nth-child(3) {width:13%;}
+.clientsTable th:nth-child(4) {width:13%;}
+.clientsTable th:nth-child(5) {width:24%;}
+.clientsTable td {vertical-align:middle;overflow-wrap:anywhere;}
+.clientName {display:block;line-height:1.45;overflow-wrap:anywhere;word-break:normal;}
+.clientsTable .actions {display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px;min-width:0;align-items:stretch;}
+.clientsTable .actions button {min-width:0;width:100%;padding:8px 5px!important;line-height:1.3;white-space:normal;}
+.clientsTable .actions button:first-child {grid-column:1/-1;}
+@media(max-width:850px){.clientsTable {min-width:760px;}}
+
+/* Refinamento compacto da base de clientes — padrão visual ANTARES. */
+.clientsTable {min-width:720px;border-collapse:separate!important;border-spacing:0 4px!important;}
+.clientsTable th {background:#e0edff!important;color:#174b8d!important;padding:9px 10px!important;border-bottom:1px solid #a9c9f5!important;}
+.clientsTable tbody tr {background:#f0f6ff;}
+.clientsTable tbody tr:nth-child(even) {background:#e7f1ff;}
+.clientsTable tbody tr:hover {background:#dceaff;}
+.clientsTable td {padding:7px 9px!important;border-bottom:1px solid #cbdffa!important;font-size:12px!important;}
+.clientsTable td:first-child {border-radius:9px 0 0 9px;}
+.clientsTable td:last-child {border-radius:0 9px 9px 0;}
+.clientsTable .clientName {font-size:12px;line-height:1.35;font-weight:700;}
+.clientsTable .actions {display:flex;flex-wrap:nowrap;gap:5px;min-width:0;}
+.clientsTable .actions button {width:auto;min-height:30px!important;padding:5px 7px!important;border-radius:7px;font-size:11px!important;line-height:1.2;white-space:nowrap;}
+.clientsTable .actions button:first-child {grid-column:auto;flex:1;}
+.clientsTable th:nth-child(1) {width:41%;}
+.clientsTable th:nth-child(2) {width:11%;}
+.clientsTable th:nth-child(3) {width:11%;}
+.clientsTable th:nth-child(4) {width:12%;}
+.clientsTable th:nth-child(5) {width:25%;}
+@media(max-width:900px) {.clientsTable {min-width:800px;}}

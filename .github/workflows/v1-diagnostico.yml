@@ -1,0 +1,33 @@
+name: ANTARES V1 - diagnostico compilacao
+on:
+  push:
+    branches:
+      - feature/bloco-02d-seguranca
+    paths:
+      - 'package.json'
+      - 'package-lock.json'
+      - '.github/workflows/v1-diagnostico.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  diagnostico:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Conferir integridade do lockfile
+        run: npm ci --ignore-scripts --no-fund
+      - name: Conferir TypeScript
+        run: npx tsc --noEmit
+      - name: Compilar Next.js
+        run: npm run build
+      - name: Auditar dependencias de producao
+        run: npm audit --omit=dev --audit-level=high

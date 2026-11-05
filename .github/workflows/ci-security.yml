@@ -1,0 +1,27 @@
+name: ANTARES - segurança e build
+on:
+  push:
+    branches: [main, feature/bloco-02d-seguranca]
+  pull_request:
+    branches: [main]
+permissions:
+  contents: read
+jobs:
+  quality:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - name: Instalar dependências reproduzíveis
+        run: npm ci
+      - name: Verificar código e tipos
+        run: npm run build
+        env:
+          NEON_AUTH_BASE_URL: https://invalid.example
+          NEON_AUTH_COOKIE_SECRET: non-production-ci-secret-only-not-valid
+      - name: Auditar dependências de produção (bloqueante)
+        run: npm audit --omit=dev --audit-level=high
