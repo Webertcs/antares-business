@@ -1,6 +1,13 @@
 -- ANTARES: execute once as neondb_owner in Neon SQL Editor.
 -- Transactional reservation changes, isolated audit and conflict checks.
 BEGIN;
+CREATE EXTENSION IF NOT EXISTS btree_gist;
+-- Atomic exclusion across ALL presentation writers, including concurrent POST and PATCH.
+-- Existing overlaps will make this migration fail without modifying reservations.
+ALTER TABLE public.presentations ADD CONSTRAINT antares_presentations_no_dome_overlap
+ EXCLUDE USING gist (organization_id WITH =, dome_id WITH =,
+ tstzrange(starts_at,ends_at,'[)') WITH &&)
+ WHERE (status <> 'cancelled' AND dome_id IS NOT NULL);
 CREATE TABLE IF NOT EXISTS public.antares_reservation_audit (
  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
  organization_id uuid NOT NULL,
@@ -18,6 +25,7 @@ CREATE TABLE IF NOT EXISTS public.antares_reservation_audit (
  changed_at timestamptz NOT NULL DEFAULT now()
 );
 ALTER TABLE public.antares_reservation_audit ENABLE ROW LEVEL SECURITY;
+REVOKE ALL ON public.antares_reservation_audit FROM antares_team_runtime;
 REVOKE ALL ON public.antares_reservation_audit FROM PUBLIC;
 CREATE OR REPLACE FUNCTION public.antares_change_proposal_reservation(
  p_actor text,p_org uuid,p_presentation uuid,p_action text,p_dome uuid,p_start timestamptz,p_end timestamptz
