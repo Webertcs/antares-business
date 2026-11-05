@@ -16,7 +16,7 @@ export default async function Page({params}:{params:Promise<{id:string}>}){
  LEFT JOIN public.antares_domes d ON d.id=e.dome_id AND d.organization_id=e.organization_id
  WHERE e.id=${id} AND e.organization_id=${ctx.organizationId} LIMIT 1`;
  if(!rows.length)notFound();const e=rows[0];
- const assigned=await db`SELECT t.id,t.full_name FROM public.antares_event_team_assignments a JOIN public.team_members t ON t.id=a.member_id AND t.organization_id=a.organization_id AND t.active=true AND t.role='collaborator' WHERE a.organization_id=${ctx.organizationId}::uuid AND a.event_id=${id}::uuid ORDER BY t.full_name,t.id`;
+ const assigned=await db`SELECT t.id,COALESCE(NULLIF(p.display_name,''),t.full_name) AS full_name,p.photo_data FROM public.antares_event_team_assignments a JOIN public.team_members t ON t.id=a.member_id AND t.organization_id=a.organization_id AND t.active=true AND t.role='collaborator' LEFT JOIN public.antares_member_profiles p ON p.organization_id=t.organization_id AND p.member_id=t.id WHERE a.organization_id=${ctx.organizationId}::uuid AND a.event_id=${id}::uuid ORDER BY t.full_name,t.id`;
  const address=String(e.venue||'').trim();
  const maps='https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(address);
  const waze='https://waze.com/ul?q='+encodeURIComponent(address)+'&navigate=yes';
@@ -33,7 +33,7 @@ export default async function Page({params}:{params:Promise<{id:string}>}){
  {([['Instituição',String(e.client_name),'🏫'],['Cúpula',String(e.dome_name||'A definir'),'🪐'],['Público previsto',e.expected_attendees==null?'A definir':String(e.expected_attendees),'👥']] as const).map(([label,value,icon])=><div key={label} style={infoCard}><div style={{display:'flex',alignItems:'center',gap:10}}><span aria-hidden="true" style={{fontSize:23,background:'#d9eaff',borderRadius:12,padding:8}}>{icon}</span><div style={{minWidth:0}}><div style={{fontSize:14,fontWeight:750,color:'#28589b',lineHeight:1.3}}>{label}</div><div style={{fontSize:15,fontWeight:400,overflowWrap:'anywhere',lineHeight:1.35}}>{value}</div></div></div></div>)}
  </div>
 
- <EventTeamPanel eventId={id} profileKey={ctx.memberId} ownerName="Proprietário" isOwner={ctx.role==='owner'} initialAssigned={assigned.map(m=>({id:String(m.id),full_name:String(m.full_name)}))}/>
+ <EventTeamPanel eventId={id} profileKey={ctx.memberId} ownerName="Proprietário" isOwner={ctx.role==='owner'} initialAssigned={assigned.map(m=>({id:String(m.id),full_name:String(m.full_name),photo_data:typeof m.photo_data==='string'?m.photo_data:null}))}/>
  <EventOperations eventId={id}/>
 
  <EventNotes eventId={id} initialNotes={String(e.notes||'')} canEdit={ctx.role==='owner' && process.env.ANTARES_EVENT_OPERATIONS_WRITES_ENABLED==='true'}/>
