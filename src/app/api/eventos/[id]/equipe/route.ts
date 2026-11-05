@@ -13,7 +13,7 @@ export async function GET(_req:Request,{params}:{params:Promise<{id:string}>}){
   const events=await db`SELECT id FROM public.crm_events WHERE id=${id}::uuid AND organization_id=${ctx.organizationId}::uuid LIMIT 1`;
   if(!events.length)return NextResponse.json({error:'Evento não encontrado'},{status:404});
   const assignments=await db`SELECT member_id FROM public.antares_event_team_assignments WHERE organization_id=${ctx.organizationId}::uuid AND event_id=${id}::uuid ORDER BY member_id`;
-  const members=await db`SELECT id,full_name,email FROM public.team_members WHERE organization_id=${ctx.organizationId}::uuid AND role='collaborator' AND active=true ORDER BY full_name,id`;
+  const members=await db`SELECT t.id,COALESCE(NULLIF(p.display_name,''),t.full_name) AS full_name,t.email,p.photo_data FROM public.team_members t LEFT JOIN public.antares_member_profiles p ON p.organization_id=t.organization_id AND p.member_id=t.id WHERE t.organization_id=${ctx.organizationId}::uuid AND t.role='collaborator' AND t.active=true ORDER BY t.full_name,t.id`;
   return NextResponse.json({members,selectedIds:assignments.map(a=>String(a.member_id))},{headers:{'Cache-Control':'private, no-store'}});
  }catch{return NextResponse.json({error:'Equipe indisponível'},{status:503})}
 }
