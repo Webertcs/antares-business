@@ -30,7 +30,7 @@ BEGIN
  IF p_action NOT IN ('edit','cancel') THEN RAISE EXCEPTION 'invalid action'; END IF;
  -- Membership is checked again inside the transaction, not only by the API.
  SELECT EXISTS(SELECT 1 FROM public.team_members t WHERE t.organization_id=p_org
-   AND t.user_id=p_actor AND t.role='owner' AND t.active=true) INTO v_actor_ok;
+   AND t.auth_subject=p_actor AND t.role='owner' AND t.active=true) INTO v_actor_ok;
  IF NOT v_actor_ok THEN RAISE EXCEPTION 'unauthorized actor'; END IF;
  -- Lock all reservation changes in this organization, including other domes.
  PERFORM pg_advisory_xact_lock(hashtextextended(p_org::text,0));
