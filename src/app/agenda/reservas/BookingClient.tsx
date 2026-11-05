@@ -1,6 +1,7 @@
 'use client';
 import {useEffect,useState} from 'react';
 import Link from 'next/link';
+import BackButton from '../../BackButton';
 type Proposal={id:string;title:string;client_name:string;mapped:boolean};
 type Dome={id:string;name:string;capacity:number|null;mapped:boolean};
 type Booking={proposal_id:string;presentation_id:string};
@@ -27,7 +28,7 @@ export default function BookingClient({enabled}:{enabled:boolean}){
  try{const r=await fetch('/api/agenda/reservas',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({proposalId,domeId,start:new Date(start).toISOString(),end:new Date(end).toISOString()})});const v=await r.json();if(!r.ok)throw Error(v.error||'Reserva não registrada');await load();setStatus('Reserva registrada. Consulte a Agenda.');setProposalId('');setDomeId('');}
  catch(e){setStatus(e instanceof Error?e.message:'Erro');}finally{setBusy(false)}}
  return <main className="booking-refined">
- <Link href="/?section=operacao" className="operation-detail-back">← Voltar</Link>
+ <BackButton/>
  <div className="booking-heading"><div><h1>Reservas</h1><p>Agende apresentações com cúpulas e instituições vinculadas.</p></div><Link className="booking-calendar-link" href="/?section=agenda">Ver calendário ↗</Link></div>
  {status&&<p role="status" className="booking-status">{status}</p>}
  <section className="booking-panel" aria-labelledby="booking-readiness-heading">
@@ -42,7 +43,7 @@ export default function BookingClient({enabled}:{enabled:boolean}){
   {data?.domes.length?<p className="booking-dome-names">Cúpulas: {data.domes.map(d=>d.name+(d.mapped?' ✓':' — vínculo pendente')).join(' · ')}</p>:data&&<p className="booking-empty">Ainda não há cúpulas cadastradas. Utilize a página Cúpulas para consultar a estrutura.</p>}
   {!enabled&&<p className="booking-readonly">Os agendamentos ainda não estão liberados para gravação. A configuração será validada antes da entrega.</p>}
  </section>
- {enabled&&data&&<section style={{border:'1px solid #bdcce4',padding:18,borderRadius:12,marginTop:20,display:'grid',gap:12}}>
+ {enabled&&data&&data.proposals.some(p=>!p.mapped)&&<section style={{border:'1px solid #bdcce4',padding:18,borderRadius:12,marginTop:20,display:'grid',gap:12}}>
  <h2>Preparar cadastros para a primeira reserva</h2>
  <p>Vincule a instituição da proposta aceita. Cadastre a cúpula na área Cúpulas.</p>
  {data.proposals.filter(p=>!p.mapped).map(p=><button disabled={busy} key={p.id} onClick={()=>prepare({action:'link-client',proposalId:p.id})} style={{padding:12}}>Vincular cliente: {p.client_name}</button>)}
