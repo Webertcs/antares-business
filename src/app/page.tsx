@@ -10,6 +10,7 @@ export default async function Home() {
   if (!session?.user?.id) redirect('/auth/sign-in');
   const context = await requireMember();
   if (!context) redirect('/sem-acesso');
+  if (context.role === 'collaborator') redirect('/?section=agenda');
   const isDeveloper = context.role === 'owner' && Boolean(process.env.ANTARES_DEVELOPER_SUBJECT) && process.env.ANTARES_DEVELOPER_SUBJECT === context.user.id;
   return <DashboardClient profileKey={context.memberId} accountLabel={isDeveloper ? 'Proprietário / Desenvolvedor' : context.role === 'owner' ? 'Proprietário' : 'Colaborador'} />;
 }
