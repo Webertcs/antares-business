@@ -36,8 +36,13 @@ export async function POST(req:Request){
  if(process.env.ANTARES_FINANCE_WRITES_ENABLED!=='true')
   return NextResponse.json({error:'Gravações financeiras desabilitadas.'},{status:503});
  const origin=req.headers.get('origin');
- const expected=process.env.ANTARES_APP_ORIGIN;
- if(!origin||!expected||origin!==new URL(expected).origin)
+ const host=req.headers.get('host');
+ let sameOrigin=false;
+ try{
+  const parsed=origin?new URL(origin):null;
+  sameOrigin=Boolean(parsed&&host&&parsed.host===host&&['http:','https:'].includes(parsed.protocol));
+ }catch{sameOrigin=false;}
+ if(!sameOrigin)
   return NextResponse.json({error:'Origem não autorizada.'},{status:403});
  if(req.headers.get('content-type')?.split(';')[0]?.trim().toLowerCase()!=='application/json')
   return NextResponse.json({error:'Conteúdo inválido.'},{status:415});
