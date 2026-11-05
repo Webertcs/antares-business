@@ -9,7 +9,7 @@ export default function ProfileClient({email,name,role,profileKey}:Props){
  const [photo,setPhoto]=useState('');
  const [message,setMessage]=useState('');
  useEffect(()=>{try{const raw=localStorage.getItem(storageKey);if(raw){const d=JSON.parse(raw);if(typeof d.alias==='string')setAlias(d.alias);if(typeof d.photo==='string')setPhoto(d.photo)}}catch{}},[storageKey]);
- function save(){if(!alias.trim()||alias.length>120){setMessage('Informe um nome de até 120 caracteres.');return}try{localStorage.setItem(storageKey,JSON.stringify({alias:alias.trim(),photo}));setMessage('Preferências visuais salvas neste dispositivo.');}catch{setMessage('Não foi possível salvar neste navegador. Tente uma foto menor.');}}
+ function save(){if(!alias.trim()||alias.length>120){setMessage('Informe um nome de até 120 caracteres.');return}try{localStorage.setItem(storageKey,JSON.stringify({alias:alias.trim(),photo}));window.dispatchEvent(new CustomEvent('antares:profile-updated',{detail:{profileKey,alias:alias.trim(),photo}}));setMessage('Preferências visuais salvas neste dispositivo.');}catch{setMessage('Não foi possível salvar neste navegador. Tente uma foto menor.');}}
  async function handleFile(file?:File){if(!file)return; if(!['image/jpeg','image/png','image/webp'].includes(file.type)){setMessage('Use JPEG, PNG ou WebP.');return}if(file.size>2*1024*1024){setMessage('Escolha uma imagem de até 2 MB.');return}
  try{
  const bitmap=await createImageBitmap(file);
