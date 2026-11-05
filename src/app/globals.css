@@ -794,3 +794,15 @@
 .profile-fields .primary-button:hover{background:linear-gradient(110deg,#103caa,#2266e3);transform:translateY(-2px);box-shadow:0 11px 22px #245fe44d}
 .profile-feedback{background:#e9f3ff;border:1px solid #bdd8fa;border-radius:9px;padding:10px 12px;color:#164c98;font-weight:650}
 @media(max-width:600px){.profile-page{padding:16px 12px 35px}.profile-header{padding:22px}.profile-form-layout{padding:20px;grid-template-columns:1fr;gap:20px}.profile-photo-area{max-width:230px;justify-self:center;width:100%}.profile-fields .primary-button{width:100%;justify-content:center}}
+
+/* Perfil aprovado: integrado ao shell, com destaque azul na foto e controles. */
+.content:has(.profile-page){padding:0!important;background:linear-gradient(135deg,#edf5ff 0%,#f7faff 72%,#e8f1ff 100%);min-height:calc(100vh - 82px)}
+.content:has(.profile-page) .profile-page{min-height:calc(100vh - 82px);padding:22px clamp(16px,3vw,42px) 55px;background:radial-gradient(circle at 93% 7%,#d9e9ff 0,transparent 40%),linear-gradient(140deg,#edf5ff,#f7faff)}
+.content:has(.profile-page) .profile-page>*{max-width:1000px}
+.content:has(.profile-page) .profile-photo-area{background:linear-gradient(150deg,#0c347b,#0865cb 80%,#00a2ef);border:2px solid #0aa6ff;box-shadow:0 10px 24px #064ba54a;padding:24px 15px}
+.content:has(.profile-page) .profile-photo-area>img,.content:has(.profile-page) .profile-photo-area>span{width:140px;height:140px;border:4px solid #e4f9ff;box-shadow:0 0 0 3px #2bc9ff,0 0 20px #0ce1ff90}
+.content:has(.profile-page) .profile-photo-button{background:linear-gradient(110deg,#0c55b9,#089fdf);color:#fff;border:1px solid #7de6ff;box-shadow:0 5px 14px #032b7480;font-size:13px}
+.content:has(.profile-page) .profile-photo-button:hover{background:linear-gradient(110deg,#1645a8,#07b6f0)}
+.content:has(.profile-page) .profile-fields .primary-button{background:linear-gradient(110deg,#1740c5 10%,#145de9 65%,#0cb7ed);box-shadow:0 8px 18px #125bd24d}
+.content:has(.profile-page) .profile-fields .primary-button:hover{background:linear-gradient(110deg,#1234ac,#0965e3 65%,#08a9dc)}
+@media(max-width:600px){.content:has(.profile-page) .profile-page{padding:15px 12px 32px}.content:has(.profile-page) .profile-photo-area{width:100%;max-width:250px}}
