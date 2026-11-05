@@ -12,6 +12,18 @@ export default function EquipeClient({ writesEnabled }: { writesEnabled: boolean
   const [link, setLink] = useState('');
   const [sending, setSending] = useState(false);
   const [feedback, setFeedback] = useState('');
+  const [securityReady, setSecurityReady] = useState(false);
+  const [checkingSecurity, setCheckingSecurity] = useState(true);
+  const canWrite = writesEnabled && securityReady;
+  useEffect(() => {
+    let alive = true;
+    fetch('/api/equipe/preflight', {cache:'no-store'})
+      .then(async r => {const data=await r.json();if(!r.ok)throw Error(data.error||'Verificação indisponível');return data;})
+      .then(data => {if(alive)setSecurityReady(data.readyForControlledTest===true);})
+      .catch(()=>{if(alive)setSecurityReady(false);})
+      .finally(()=>{if(alive)setCheckingSecurity(false);});
+    return ()=>{alive=false};
+  }, []);
   useEffect(() => {
     let alive = true;
     fetch('/api/equipe', { cache: 'no-store' })
@@ -31,7 +43,7 @@ export default function EquipeClient({ writesEnabled }: { writesEnabled: boolean
   }
   useEffect(() => { void refreshInvitations(); }, []);
   async function revoke(invitation: Invitation) {
-    if (!writesEnabled || !window.confirm('Revogar o convite para ' + invitation.invited_email + '?')) return;
+    if (!canWrite || !window.confirm('Revogar o convite para ' + invitation.invited_email + '?')) return;
     setFeedback('');
     try {
       const response = await fetch('/api/equipe/convites/revogar', {
@@ -45,7 +57,7 @@ export default function EquipeClient({ writesEnabled }: { writesEnabled: boolean
     } catch (e) { setFeedback(e instanceof Error ? e.message : 'Erro ao revogar convite'); }
   }
   async function suspend(member: Member) {
-    if (!writesEnabled || member.role !== 'collaborator' || !member.active || !window.confirm('Suspender acesso de ' + member.full_name + '?')) return;
+    if (!canWrite || member.role !== 'collaborator' || !member.active || !window.confirm('Suspender acesso de ' + member.full_name + '?')) return;
     try {
       const response = await fetch('/api/equipe/suspender', {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
@@ -59,7 +71,7 @@ export default function EquipeClient({ writesEnabled }: { writesEnabled: boolean
   }
   async function invite(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    if (!writesEnabled) return;
+    if (!canWrite) return;
     setSending(true); setFeedback(''); setLink('');
     try {
       const response = await fetch('/api/equipe/convites', {
@@ -75,35 +87,36 @@ export default function EquipeClient({ writesEnabled }: { writesEnabled: boolean
     } catch (e) { setFeedback(e instanceof Error ? e.message : 'Falha ao gerar convite'); }
     finally { setSending(false); }
   }
-  return <main className="team-refined">
-
-    <h1>Equipe e permissões</h1>
-    <p className="team-intro">Colaboradores e acessos do planetário.</p>
+  return <main className="team-refined team-premium">
+    <header className="team-premium-header"><span className="team-premium-eyebrow">GESTÃO DE ACESSOS</span><h1>Equipe e permissões</h1><p>Gerencie os acessos do planetário em um só lugar.</p></header>
+    <div className="team-premium-body">
+    <div className="team-premium-summary"><div><strong>{members.length}</strong><span>Integrantes</span></div><div><strong>{members.filter(m=>m.active).length}</strong><span>Ativos</span></div><div><strong>{invitations.length}</strong><span>Convites pendentes</span></div></div>
+    <h2 className="team-section-title">Pessoas com acesso</h2>
     {loading ? <p>Carregando...</p> : error ? <p role="alert">{error}</p> : <table className="team-table">
       <thead><tr><th>Nome</th><th>E-mail</th><th>Perfil</th><th>Situação</th><th>Ações</th></tr></thead>
       <tbody>{members.map(m => <tr key={m.id}><td>{m.full_name}</td><td>{m.email||'—'}</td>
-        <td>{m.role==='owner'?'Proprietário':'Colaborador'}</td><td>{m.active?'Ativo':'Inativo'}</td><td>{writesEnabled && m.role==='collaborator' && m.active ? <button onClick={()=>suspend(m)} style={{padding:8,borderRadius:8,color:'#fff',background:'#9f1239'}}>Suspender</button> : '—'}</td></tr>)}</tbody>
+        <td>{m.role==='owner'?'Proprietário':'Colaborador'}</td><td>{m.active?'Ativo':'Inativo'}</td><td>{canWrite && m.role==='collaborator' && m.active ? <button onClick={()=>suspend(m)} style={{padding:8,borderRadius:8,color:'#fff',background:'#9f1239'}}>Suspender</button> : '—'}</td></tr>)}</tbody>
     </table>}
-    <section className="team-panel">
+    <section className="team-panel team-premium-panel">
       <h2>Convidar colaborador</h2>
-      {!writesEnabled && <p role="status" style={{color:'#92400e',fontWeight:700}}>Convites temporariamente indisponíveis: configuração de segurança em andamento.</p>}
+      {!canWrite && <p role="status" style={{color:'#92400e',fontWeight:700}}>{checkingSecurity ? 'Verificando permissões de segurança...' : 'Convites aguardam ativação segura no servidor.'}</p>}
       <p>O convidado precisa entrar com o mesmo e-mail e confirmar a conta. Não é possível convidar outro proprietário.</p>
       <form onSubmit={invite} className="team-invite-form">
-        <label>Nome completo<input disabled={!writesEnabled} required minLength={2} maxLength={160} value={name} onChange={e=>setName(e.target.value)} style={{display:'block',width:'100%',padding:10,color:'#111',background:'#fff'}}/></label>
-        <label>E-mail do colaborador<input disabled={!writesEnabled} required type="email" maxLength={254} value={email} onChange={e=>setEmail(e.target.value)} style={{display:'block',width:'100%',padding:10,color:'#111',background:'#fff'}}/></label>
-        <button type="submit" disabled={!writesEnabled || sending} style={{padding:12,borderRadius:10,color:'#fff',background:'#2563eb'}}>{sending?'Gerando convite...':'Gerar convite de 48 horas'}</button>
+        <label>Nome completo<input disabled={!canWrite} required minLength={2} maxLength={160} value={name} onChange={e=>setName(e.target.value)} style={{display:'block',width:'100%',padding:10,color:'#111',background:'#fff'}}/></label>
+        <label>E-mail do colaborador<input disabled={!canWrite} required type="email" maxLength={254} value={email} onChange={e=>setEmail(e.target.value)} style={{display:'block',width:'100%',padding:10,color:'#111',background:'#fff'}}/></label>
+        <button type="submit" disabled={!canWrite || sending} style={{padding:12,borderRadius:10,color:'#fff',background:'#2563eb'}}>{sending?'Gerando convite...':'Gerar convite de 48 horas'}</button>
       </form>
       {feedback && <p role="status">{feedback}</p>}
       {link && <div><input readOnly aria-label="Link do convite" value={link} style={{width:'100%',padding:10,color:'#111',background:'#fff'}}/>
         <button onClick={async()=>{try{await navigator.clipboard.writeText(link);setFeedback('Link copiado.')}catch{setFeedback('Selecione e copie o link acima.')}}} style={{padding:10,marginTop:8,borderRadius:8,background:'#334155',color:'#fff'}}>Copiar link</button></div>}
     </section>
-    <section className="team-panel">
+    <section className="team-panel team-premium-panel">
       <h2>Convites pendentes</h2>
       {invitations.length === 0 ? <p>Nenhum convite pendente.</p> :
         <ul style={{display:'grid',gap:12}}>{invitations.map(inv => <li key={inv.id}>
           <strong>{inv.invited_name}</strong> — {inv.invited_email} (até {new Date(inv.expires_at).toLocaleDateString('pt-BR')})
-          {writesEnabled && <button onClick={()=>revoke(inv)} style={{marginLeft:12,padding:8,borderRadius:8,color:'#fff',background:'#9f1239'}}>Revogar</button>}
+          {canWrite && <button onClick={()=>revoke(inv)} style={{marginLeft:12,padding:8,borderRadius:8,color:'#fff',background:'#9f1239'}}>Revogar</button>}
         </li>)}</ul>}
-    </section>
+    </section></div>
   </main>;
 }
