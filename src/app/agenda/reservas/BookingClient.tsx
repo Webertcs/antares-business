@@ -8,6 +8,7 @@ export default function BookingClient({enabled}:{enabled:boolean}){
  const [data,setData]=useState<{proposals:Proposal[];domes:Dome[];links:Booking[]}|null>(null);
  const [status,setStatus]=useState('Carregando...'),[busy,setBusy]=useState(false);
  const [detailId,setDetailId]=useState<string|null>(null);
+ const [modalError,setModalError]=useState('');
  const [editMode,setEditMode]=useState(false),[editDome,setEditDome]=useState(''),[editStart,setEditStart]=useState(''),[editEnd,setEditEnd]=useState('');
  const [query,setQuery]=useState(''),[year,setYear]=useState('all'),[month,setMonth]=useState('all'),[stateFilter,setStateFilter]=useState('all'),[sort,setSort]=useState('desc'),[page,setPage]=useState(1);
  const [proposalId,setProposalId]=useState(''),[domeId,setDomeId]=useState(''),[start,setStart]=useState(''),[end,setEnd]=useState('');
@@ -21,21 +22,21 @@ export default function BookingClient({enabled}:{enabled:boolean}){
  const years=Array.from(new Set((data?.links||[]).map(b=>String(new Date(b.starts_at).getFullYear())))).sort((a,b)=>b.localeCompare(a));
  const pageCount=Math.max(1,Math.ceil(bookings.length/10));const currentPage=Math.min(page,pageCount);
  const localInput=(value:string)=>{const d=new Date(value);const p=(n:number)=>String(n).padStart(2,'0');return `${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())}T${p(d.getHours())}:${p(d.getMinutes())}`;};
- function openDetails(id:string){setDetailId(id);setEditMode(false);const b=data?.links.find(x=>x.presentation_id===id);if(b){setEditStart(localInput(b.starts_at));setEditEnd(localInput(b.ends_at));setEditDome(data?.domes.find(d=>d.name===b.dome_name)?.id||'');}}
+ function openDetails(id:string){setDetailId(id);setEditMode(false);setModalError('');const b=data?.links.find(x=>x.presentation_id===id);if(b){setEditStart(localInput(b.starts_at));setEditEnd(localInput(b.ends_at));setEditDome(data?.domes.find(d=>d.name===b.dome_name)?.id||'');}}
  async function changeBooking(action:'edit'|'cancel'){
   if(!selectedBooking||busy||!enabled)return;
   const body:Record<string,string>={action,presentationId:selectedBooking.presentation_id};
   if(action==='edit'){
-   if(!editDome||!editStart||!editEnd||new Date(editEnd)<=new Date(editStart)){setStatus('Confira a cúpula e os horários da edição.');return;}
+   if(!editDome||!editStart||!editEnd||new Date(editEnd)<=new Date(editStart)){setModalError('Confira a cúpula e os horários da edição.');return;}
    body.domeId=editDome;body.start=new Date(editStart).toISOString();body.end=new Date(editEnd).toISOString();
    if(!window.confirm('Confirmar alteração desta reserva? A Agenda será atualizada e a mudança deverá ficar registrada no histórico.'))return;
   }else{
    if(!window.confirm('Cancelar esta reserva? A operação deverá preservar o histórico e não poderá ser desfeita por este botão.'))return;
    body.confirm='CANCELAR';
   }
-  setBusy(true);setStatus('');
+  setBusy(true);setStatus('');setModalError('');
   try{const r=await fetch('/api/agenda/reservas',{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});const v=await r.json();if(!r.ok)throw Error(v.error||'Operação recusada');await load();setDetailId(null);setEditMode(false);setStatus(action==='edit'?'Reserva atualizada.':'Reserva cancelada e preservada no histórico.');}
-  catch(e){setStatus(e instanceof Error?e.message:'Não foi possível alterar a reserva.');}
+  catch(e){setModalError(e instanceof Error?e.message:'Não foi possível alterar a reserva.');}
   finally{setBusy(false);}
  }
  const formatDate=(value:string)=>new Intl.DateTimeFormat('pt-BR',{dateStyle:'short',timeStyle:'short',timeZone:'America/Sao_Paulo'}).format(new Date(value));
@@ -92,6 +93,7 @@ export default function BookingClient({enabled}:{enabled:boolean}){
  <button disabled={busy||!proposalId||!domeId||!start||!end||new Date(end)<=new Date(start)} style={{padding:12,color:'white',background:'#1d4ed8',border:0,borderRadius:8}}>{busy?'Salvando...':'Registrar reserva'}</button>
  </form>}
  {selectedBooking&&<div role="presentation" onMouseDown={e=>{if(e.target===e.currentTarget)setDetailId(null)}} style={{position:'fixed',inset:0,zIndex:1000,background:'rgba(10,27,57,.55)',display:'grid',placeItems:'center',padding:16}}><section role="dialog" aria-modal="true" aria-labelledby="booking-detail-title" style={{background:'#fff',color:'#19345f',borderRadius:14,padding:24,width:'min(100%,480px)',boxShadow:'0 18px 50px rgba(0,0,0,.2)'}}><h2 id="booking-detail-title" style={{marginTop:0}}>Detalhes da reserva</h2><p><strong>Instituição:</strong> {selectedProposal?.client_name||'Não identificada'}</p><p><strong>Proposta:</strong> {selectedProposal?.title||'Não identificada'}</p><p><strong>Cúpula:</strong> {selectedBooking.dome_name||'Não informada'}</p><p><strong>Início:</strong> {formatDate(selectedBooking.starts_at)}</p><p><strong>Término:</strong> {formatDate(selectedBooking.ends_at)}</p><p><strong>Situação:</strong> {selectedBooking.status==='reserved'?'Reservada':selectedBooking.status==='cancelled'?'Cancelada':selectedBooking.status}</p>
+ {modalError&&<p role="alert" style={{padding:10,borderRadius:8,background:'#fff1f2',color:'#9f1239'}}>{modalError}</p>}
  {editMode&&<div style={{display:'grid',gap:10,margin:'14px 0'}}><label>Cúpula<select value={editDome} onChange={e=>setEditDome(e.target.value)} style={{display:'block',width:'100%',padding:10}}>{!editDome&&<option value="">Selecione a cúpula</option>}{domes.map(d=><option key={d.id} value={d.id}>{d.name}</option>)}</select></label><label>Início<input type="datetime-local" value={editStart} onChange={e=>setEditStart(e.target.value)} style={{display:'block',width:'100%',padding:10}}/></label><label>Término<input type="datetime-local" value={editEnd} onChange={e=>setEditEnd(e.target.value)} style={{display:'block',width:'100%',padding:10}}/></label></div>}
  <div style={{display:'flex',gap:8,flexWrap:'wrap',marginTop:18}}>
  {enabled&&selectedBooking.status!=='cancelled'&&<><button type="button" disabled={busy} onClick={()=>editMode?void changeBooking('edit'):setEditMode(true)} style={{background:'#1d4ed8',color:'#fff',border:0,borderRadius:8,padding:'10px 16px',cursor:'pointer'}}>{busy?'Aguarde...':editMode?'Salvar alteração':'Editar reserva'}</button>{!editMode&&<button type="button" disabled={busy} onClick={()=>void changeBooking('cancel')} style={{background:'#fff',color:'#b91c1c',border:'1px solid #fecaca',borderRadius:8,padding:'10px 16px',cursor:'pointer'}}>Cancelar reserva</button>}</>}
