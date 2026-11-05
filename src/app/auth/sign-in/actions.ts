@@ -9,5 +9,7 @@ export async function signInAction(_previous: { error: string } | null, form: Fo
     const { error } = await auth.signIn.email({ email, password });
     if (error) return { error: 'Não foi possível entrar. Confira seus dados e a verificação do e-mail.' };
   } catch { return { error: 'Falha no serviço de autenticação.' }; }
+  const token=String(form.get('inviteToken')||'');
+  if(/^[a-f0-9]{64}$/.test(token))redirect('/convite?token='+encodeURIComponent(token));
   redirect('/');
 }
