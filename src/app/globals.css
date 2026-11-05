@@ -806,3 +806,23 @@
 .content:has(.profile-page) .profile-fields .primary-button{background:linear-gradient(110deg,#1740c5 10%,#145de9 65%,#0cb7ed);box-shadow:0 8px 18px #125bd24d}
 .content:has(.profile-page) .profile-fields .primary-button:hover{background:linear-gradient(110deg,#1234ac,#0965e3 65%,#08a9dc)}
 @media(max-width:600px){.content:has(.profile-page) .profile-page{padding:15px 12px 32px}.content:has(.profile-page) .profile-photo-area{width:100%;max-width:250px}}
+
+/* Equipe — visual ANTARES */
+.team-premium{padding:0!important;border:1px solid #c7daf6;border-radius:17px;overflow:hidden;background:#fff;box-shadow:0 14px 34px #163d7d16}
+.team-premium-header{padding:27px 30px;background:linear-gradient(110deg,#10306c,#1d5cc0 65%,#3186ef);color:#fff}
+.team-premium-header h1{color:#fff!important;font-size:27px!important;margin:8px 0!important}
+.team-premium-header p{color:#d8e8ff!important;margin:0!important}
+.team-premium-eyebrow{color:#bdd9ff;font-size:11px;letter-spacing:2px;font-weight:800}
+.team-premium-body{padding:25px 28px;background:linear-gradient(#fff,#f6faff)}
+.team-premium-summary{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:22px}
+.team-premium-summary>div{display:flex;flex-direction:column;gap:5px;padding:17px;border:1px solid #c8daf6;border-radius:12px;background:#ebf3ff;box-shadow:0 4px 10px #174ea311}
+.team-premium-summary strong{color:#1251af;font-size:26px}
+.team-premium-summary span{color:#456392;font-size:12px;font-weight:700}
+.team-section-title{font-size:17px;color:#163f82;margin:12px 0}
+.team-premium .team-table{border:1px solid #c9dbf7;border-radius:10px;overflow:hidden;margin-bottom:20px}
+.team-premium-panel{padding:21px!important;background:linear-gradient(135deg,#eaf3ff,#f8fbff)!important;border:1px solid #c7dbf9!important;border-radius:13px!important;box-shadow:0 5px 13px #1b4e950e;margin-top:16px}
+.team-premium-panel h2{color:#174782}
+.team-premium-panel input{border:1px solid #bad0f1!important;border-radius:9px!important;min-height:42px}
+.team-premium-panel button:not(:disabled){background:linear-gradient(110deg,#1646b6,#3178ef)!important;color:white!important;box-shadow:0 5px 12px #235bc333;font-weight:750}
+.team-premium-panel button:disabled{background:#a2bceb!important;cursor:not-allowed}
+@media(max-width:680px){.team-premium-body{padding:16px}.team-premium-summary{grid-template-columns:1fr}.team-premium .team-table{display:block;overflow-x:auto}}
