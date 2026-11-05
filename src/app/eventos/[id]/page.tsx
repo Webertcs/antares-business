@@ -32,7 +32,7 @@ export default async function Page({params}:{params:Promise<{id:string}>}){
  {([['Instituição',String(e.client_name),'🏫'],['Cúpula',String(e.dome_name||'A definir'),'🪐'],['Público previsto',e.expected_attendees==null?'A definir':String(e.expected_attendees),'👥']] as const).map(([label,value,icon])=><div key={label} style={infoCard}><div style={{display:'flex',alignItems:'center',gap:10}}><span aria-hidden="true" style={{fontSize:23,background:'#d9eaff',borderRadius:12,padding:8}}>{icon}</span><div style={{minWidth:0}}><div style={{fontSize:14,fontWeight:750,color:'#28589b',lineHeight:1.3}}>{label}</div><div style={{fontSize:15,fontWeight:400,overflowWrap:'anywhere',lineHeight:1.35}}>{value}</div></div></div></div>)}
  </div>
 
- <EventTeamPanel profileKey={ctx.memberId} ownerName="Proprietário"/>
+ <EventTeamPanel eventId={id} profileKey={ctx.memberId} ownerName="Proprietário" isOwner={ctx.role==='owner'}/>
  <EventOperations eventId={id}/>
 
  <EventNotes eventId={id} initialNotes={String(e.notes||'')} canEdit={ctx.role==='owner' && process.env.ANTARES_EVENT_OPERATIONS_WRITES_ENABLED==='true'}/>
