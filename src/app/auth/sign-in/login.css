@@ -21,4 +21,4 @@
 @media(max-width:760px){.antares-login-scene{padding:16px;background-size:cover;background-position:center}.antares-login-card{width:min(100%,370px);padding:22px 20px 24px}}
 
 /* Respiro visual entre o lettering BUSINESS da arte e o formulario real. */
-@media(min-width:761px){.antares-login-card{transform:translateY(42px)}}
+@media(min-width:761px){.antares-login-card{transform:translateY(92px)}}
