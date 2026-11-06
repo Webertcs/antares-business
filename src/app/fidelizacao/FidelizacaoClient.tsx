@@ -96,7 +96,14 @@ export default function FidelizacaoClient(){
  .fidelizacao-kpi-compact:nth-child(5){background:#eaf0fb!important}
  .fidelizacao-kpi-compact small{font-size:11px!important;color:#305c98!important}
  .fidelizacao-kpi-compact>div{line-height:1.2!important;margin-top:3px!important}
- .fidelizacao-attention-table{font-size:12px;line-height:1.25}\n .fidelizacao-attention-table td{padding:7px 10px;border-bottom:1px solid #e1e8f1}\n .fidelizacao-attention-table th{font-size:12px}\n .fidelizacao-radar-kpi{padding:8px 10px!important;min-height:0!important}\n .fidelizacao-radar-kpi small{font-size:11px!important}\n .fidelizacao-radar-kpi>div{font-size:20px!important;line-height:1.2!important}\n .fidelizacao-pagination{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;margin-top:14px;font-size:13px}
+ .fidelizacao-attention-table{font-size:12px;line-height:1.25}
+ .fidelizacao-attention-table thead{background:#dceafd;color:#17467f}
+ .fidelizacao-attention-table tbody tr:nth-child(odd){background:#f0f6ff}
+ .fidelizacao-attention-table tbody tr:nth-child(even){background:#fff}
+ .fidelizacao-attention-table tbody tr:hover{background:#e1eeff}
+ .fidelizacao-attention-table tbody td:first-child strong{color:#1554a0}
+ .fidelizacao-attention-table tbody td:last-child{color:#245b9b;font-weight:600}
+ .fidelizacao-attention-table + *{margin-top:0}\n .fidelizacao-attention-table td{padding:7px 10px;border-bottom:1px solid #e1e8f1}\n .fidelizacao-attention-table th{font-size:12px}\n .fidelizacao-radar-kpi{padding:8px 10px!important;min-height:0!important}\n .fidelizacao-radar-kpi small{font-size:11px!important}\n .fidelizacao-radar-kpi>div{font-size:20px!important;line-height:1.2!important}\n .fidelizacao-pagination{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;margin-top:14px;font-size:13px}
  .fidelizacao-pagination>div{display:flex;gap:8px}
  .fidelizacao-pagination button{padding:8px 12px;border:1px solid #a9c2e4;border-radius:8px;background:#eaf2ff;color:#154783;font-weight:650;cursor:pointer}
  .fidelizacao-pagination button:disabled{opacity:.45;cursor:not-allowed}
@@ -120,7 +127,7 @@ export default function FidelizacaoClient(){
  </section>
  <section style={{border:'1px solid #b6c7de',borderRadius:14,padding:19,marginTop:20}}>
  <h2 className="fidelizacao-section-heading">Central de atenção aos clientes</h2>
- <p style={{fontSize:13}}>Classificação por apresentações concluídas no ano atual: Bronze (1), Prata (2–3), Ouro (4+). Eventos cancelados, reservados ou apenas orçados não contam.</p>
+ 
  <div style={{display:'flex',flexWrap:'wrap',gap:12,margin:'15px 0'}}>
  <label>Mostrar <select value={filter} onChange={e=>setFilter(e.target.value)} style={{marginLeft:8,padding:8,border:'1px solid #9db1cd',borderRadius:8,background:'white',color:'#142b4f'}}>
  <option value="all">Todas</option><option value="attention">Precisam de atenção</option><option value="Ouro">Ouro</option><option value="Prata">Prata</option><option value="Bronze">Bronze</option></select></label>
