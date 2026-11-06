@@ -144,6 +144,17 @@ export default function FidelizacaoClient(){
 
  </section>
  <section style={{border:'1px solid #b6c7de',borderRadius:14,padding:19,marginTop:20}}>
+ <h2 className="fidelizacao-section-heading">Programa de Fidelização</h2>
+ <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(210px,1fr))',gap:12,marginTop:14}}>
+ {[
+ {name:'Ouro',count:'4 ou mais visitas concluídas',ideas:'Parceiros especiais: fortalecer a parceria, antecipar o planejamento anual e propor experiências exclusivas.'},
+ {name:'Prata',count:'2 ou 3 visitas concluídas',ideas:'Parcerias em crescimento: apresentar novos temas e incentivar uma programação recorrente.'},
+ {name:'Bronze',count:'1 visita concluída',ideas:'Novas parcerias: agradecer a primeira experiência, acompanhar a satisfação e incentivar uma segunda visita.'}
+ ].map(t=><div key={t.name} className={'fidelizacao-tier fidelizacao-tier-'+t.name.toLowerCase()}>
+ <strong>✦ {t.name}</strong><div style={{fontSize:13,margin:'6px 0'}}>{t.count}</div><p style={{fontSize:13}}>{t.ideas}</p></div>)}
+ </div>
+ </section>
+ <section style={{border:'1px solid #b6c7de',borderRadius:14,padding:19,marginTop:20}}>
  <h2 className="fidelizacao-section-heading">Central de atenção aos clientes</h2>
  
  <div style={{display:'flex',flexWrap:'wrap',gap:12,margin:'15px 0'}}>
@@ -158,17 +169,7 @@ export default function FidelizacaoClient(){
  <td>{i.tier==='Sem categoria'?'—':i.tier}</td><td>{i.completed}</td><td>{dateLabel(i.last)}</td><td>{shortAlert(i)}</td></tr>)}</tbody>
  </table></div>}
  </section>
- <section style={{border:'1px solid #b6c7de',borderRadius:14,padding:19,marginTop:20}}>
- <h2 className="fidelizacao-section-heading">Programa de relacionamento por instituição</h2>
- <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(210px,1fr))',gap:12,marginTop:14}}>
- {[
- {name:'Bronze',count:'1 visita concluída',ideas:'Agradecimento, material de apoio e convite para nova sessão.'},
- {name:'Prata',count:'2 ou 3 visitas concluídas',ideas:'Avaliar pacote anual, indicação e prioridade de negociação.'},
- {name:'Ouro',count:'4 ou mais visitas concluídas',ideas:'Planejar agenda anual, sessões temáticas e prioridade de planejamento.'}
- ].map(t=><div key={t.name} className={'fidelizacao-tier fidelizacao-tier-'+t.name.toLowerCase()}>
- <strong>✦ {t.name}</strong><div style={{fontSize:13,margin:'6px 0'}}>{t.count}</div><p style={{fontSize:13}}>{t.ideas}</p></div>)}
- </div>
- </section>
+
  <section style={{border:'1px solid #b6c7de',borderRadius:14,padding:19,marginTop:20}}>
  <h2 id="agenda-relacionamento" className="fidelizacao-section-heading">Agenda interna de relacionamento</h2>
  <div className="fidelizacao-form-grid">
