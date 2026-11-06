@@ -1,7 +1,8 @@
 'use client';
 import {useEffect,useMemo,useState} from 'react';
 
-type Client={id:string;name:string;kind:string;status:string;city:string|null};
+type Client={id:string;name:string;kind:string;status:string;city:string|null;phone?:string|null};
+type Contact={client_id:string;phone:string|null;whatsapp:boolean;is_primary:boolean};
 type Event={id:string;client_id:string;status:string;event_date:string|null;title:string};
 type Action={id:string;client_id:string;client_name:string;action_kind:string;due_date:string|null;priority:string;status:string;note:string};
 type Item={client:Client;completed:number;last:Date|null;days:number|null;tier:string;alert:string;priority:number};
@@ -14,6 +15,7 @@ function parseDate(value:string|null):Date|null{
 export default function FidelizacaoClient(){
  const [clients,setClients]=useState<Client[]>([]);
  const [events,setEvents]=useState<Event[]>([]);
+ const [contacts,setContacts]=useState<Contact[]>([]);
  const [loading,setLoading]=useState(true);
  const [error,setError]=useState('');
  const [filter,setFilter]=useState('all');
@@ -50,7 +52,7 @@ export default function FidelizacaoClient(){
   const ctrl=new AbortController();
   fetch('/api/crm/clientes',{cache:'no-store',signal:ctrl.signal}).then(async r=>{
    const d=await r.json();if(!r.ok)throw Error(d.error||'Falha ao carregar dados.');
-   setClients(d.clients||[]);setEvents(d.events||[]);
+   setClients(d.clients||[]);setEvents(d.events||[]);setContacts(d.contacts||[]);
   }).catch(e=>{if(e.name!=='AbortError')setError(e.message||'Erro ao carregar');}).finally(()=>setLoading(false));
   return ()=>ctrl.abort();
  },[]);
@@ -86,6 +88,15 @@ export default function FidelizacaoClient(){
   return {withoutVisit:withoutVisit.length,inactive:inactive.length,attention:attention.length,recurring:recurring.length,overdue:overdue.length,suggestions};
  },[items,actions,threshold]);
  const openByClient=useMemo(()=>{const m=new Map<string,Action[]>();for(const a of actions){if(a.status!=='open')continue;const list=m.get(a.client_id)||[];list.push(a);m.set(a.client_id,list);}for(const list of m.values())list.sort((a,b)=>String(a.due_date||'9999').localeCompare(String(b.due_date||'9999')));return m;},[actions]);
+ const whatsappFor=(clientId:string)=>{
+  const client=clients.find(c=>c.id===clientId);
+  const preferred=contacts.find(c=>c.client_id===clientId&&c.whatsapp&&c.phone)||contacts.find(c=>c.client_id===clientId&&c.is_primary&&c.phone);
+  const raw=preferred?.phone||client?.phone||'';
+  const digits=raw.replace(/\D/g,'');
+  if(!digits||digits.length<10||digits.length>13)return null;
+  const international=digits.startsWith('55')?digits:'55'+digits;
+  return 'https://wa.me/'+international+'?text='+encodeURIComponent(messageFor(clientId));
+ };
  const radarPages=Math.max(1,Math.ceil(radar.suggestions.length/10));
  const currentRadarPage=Math.min(radarPage,radarPages-1);
  const displayed=items.filter(i=>filter==='all'||(filter==='attention'?i.priority<=2:i.tier===filter));
@@ -141,7 +152,7 @@ export default function FidelizacaoClient(){
  .fidelizacao-tier-card:nth-child(1){background:#fff5e9!important;border-color:#d4a06a!important}
  .fidelizacao-tier-card:nth-child(2){background:#eff3fa!important;border-color:#9eafc6!important}
  .fidelizacao-tier-card:nth-child(3){background:#fff9e5!important;border-color:#d6b45b!important}
- .fidelizacao-reminder{background:#eef5ff;border:1px solid #c3d8f5;border-radius:10px;padding:12px}
+ .fidelizacao-history-button{padding:10px 16px;border:1px solid #9dbce6;border-radius:9px;background:#dceaff;color:#173f7c;font-weight:750;cursor:pointer}\n .fidelizacao-history-button:hover{background:#c9dfff}\n .fidelizacao-reminder{background:#eef5ff;border:1px solid #c3d8f5;border-radius:10px;padding:12px}
  .fidelizacao-page select,.fidelizacao-page input,.fidelizacao-page textarea{background:#f1f7ff!important;border-color:#a9c9ef!important}
  .fidelizacao-page button:not(:disabled){transition:background .15s,border-color .15s}
  .fidelizacao-pagination button{padding:8px 12px;border:1px solid #a9c2e4;border-radius:8px;background:#eaf2ff;color:#154783;font-weight:650;cursor:pointer}
@@ -195,15 +206,15 @@ export default function FidelizacaoClient(){
 
  <section style={{border:'1px solid #b6c7de',borderRadius:14,padding:19,marginTop:20}}>
  <h2 id="agenda-relacionamento" className="fidelizacao-section-heading">Agenda interna de relacionamento</h2>
- <button type="button" className="fidelizacao-button" onClick={()=>openReminder()}>+ Criar lembrete interno</button>
+ <p style={{fontSize:13,color:'#31527e',margin:'4px 0 12px'}}>Os contatos são programados no Radar Comercial. Acompanhe e finalize as ações aqui.</p>
  {feedback&&<p role="status" style={{marginTop:10}}>{feedback}</p>}
  <h3 style={{marginTop:22,fontWeight:700}}>Lembretes registrados ({actions.filter(a=>a.status==='open').length} em aberto)</h3>
  <div style={{display:'grid',gap:10,marginTop:10}}>
  {actions.filter(a=>a.status==='open').length===0?<p>Nenhum lembrete cadastrado.</p>:actions.filter(a=>a.status==='open').map(a=><div key={a.id} className={'fidelizacao-reminder '+(a.status==='open'?'fidelizacao-reminder-open':'fidelizacao-reminder-closed')}>
  <div><strong>{a.client_name}</strong> <span className={'fidelizacao-status '+(a.status==='open'?'is-open':'is-closed')}>{a.status==='open'?'Em aberto':a.status==='done'?'Concluído':'Dispensado'}</span><div style={{fontSize:13}}>Tipo: {a.action_kind} · Prioridade: {a.priority} · {a.status==='open'?'Em aberto':a.status==='done'?'Concluído':'Dispensado'}</div><div style={{fontSize:13}}>Prazo: {a.due_date?String(a.due_date).slice(0,10).split('-').reverse().join('/'):'Sem data'}</div><div>{a.note}</div></div>
- {a.status==='open'&&<div style={{display:'flex',alignItems:'center',gap:8}}><button disabled={saving} onClick={()=>saveAction('complete',a.id)}>Concluir</button><button disabled={saving} onClick={()=>saveAction('dismiss',a.id)}>Dispensar</button></div>}</div>)}
+ {a.status==='open'&&<div style={{display:'flex',alignItems:'center',gap:8,flexWrap:'wrap'}}>{whatsappFor(a.client_id)?<a href={whatsappFor(a.client_id)!} target="_blank" rel="noopener noreferrer" className="fidelizacao-button" style={{textDecoration:'none',background:'#16794c'}}>WhatsApp</a>:<span style={{fontSize:12,color:'#6b7280'}} title="Cadastre um telefone válido em Clientes">Sem telefone cadastrado</span>}<button disabled={saving} onClick={()=>saveAction('complete',a.id)}>Concluir</button><button disabled={saving} onClick={()=>saveAction('dismiss',a.id)}>Dispensar</button></div>}</div>)}
  </div>
- {actions.some(a=>a.status!=='open')&&<div style={{marginTop:14}}><button type="button" onClick={()=>setShowHistory(v=>!v)} aria-expanded={showHistory}>{showHistory?'Ocultar':'Mostrar'} histórico ({actions.filter(a=>a.status!=='open').length})</button>{showHistory&&<div style={{display:'grid',gap:8,marginTop:10}}>{actions.filter(a=>a.status!=='open').map(a=><div key={a.id} className="fidelizacao-reminder fidelizacao-reminder-closed"><strong>{a.client_name}</strong><span> · {a.status==='done'?'Concluído':'Dispensado'}</span><div>{a.note}</div></div>)}</div>}</div>}
+ {actions.some(a=>a.status!=='open')&&<div style={{marginTop:14}}><button type="button" className="fidelizacao-history-button" onClick={()=>setShowHistory(v=>!v)} aria-expanded={showHistory}>{showHistory?'Ocultar histórico':'Ver histórico de contatos'} ({actions.filter(a=>a.status!=='open').length})</button>{showHistory&&<div style={{display:'grid',gap:8,marginTop:10}}>{actions.filter(a=>a.status!=='open').map(a=><div key={a.id} className="fidelizacao-reminder fidelizacao-reminder-closed"><strong>{a.client_name}</strong><span> · {a.status==='done'?'Concluído':'Dispensado'}</span><div>{a.note}</div></div>)}</div>}</div>}
  </section>
  </main>
  {modalOpen&&<div className="fidelizacao-modal-backdrop" role="presentation">
