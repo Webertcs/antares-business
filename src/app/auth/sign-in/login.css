@@ -16,3 +16,12 @@
 .antares-login-card{width:min(100%,390px);max-width:390px;padding:20px 26px 18px;gap:10px;border-radius:23px;background:linear-gradient(160deg,rgba(3,24,63,.98),rgba(1,12,42,.99));box-shadow:0 0 0 1px #04a8ff55,0 0 23px #009dff65,0 16px 38px #0009}
 .antares-login-brand{margin-bottom:0}.antares-login-mark{font-size:37px}.antares-login-mark span{font-size:40px}.antares-login-wordmark{font-size:32px}.antares-login-business{font-size:10px;letter-spacing:4px}.antares-login-subtitle{font-size:9px;letter-spacing:1.3px;margin-top:5px}.antares-login-card h1{font-size:22px;margin:6px 0}.antares-login-field{height:43px;border-radius:10px}.antares-login-field input{font-size:14px}.antares-login-submit{height:46px;font-size:16px;margin-top:6px}.antares-login-forgot{font-size:13px;margin-top:3px}
 @media(max-width:760px){.antares-login-scene{background-size:contain;background-position:center center}.antares-login-card{width:min(100%,350px);padding:18px 19px;gap:9px}}
+
+/* 06/11 — fundo sem faixas, logo unica da arte e controles reais sobre a ilustracao. */
+@media(min-width:761px){
+ .antares-login-scene{background-size:100% 100%;background-position:center;}
+ .antares-login-card{background:transparent;border-color:transparent;box-shadow:none;backdrop-filter:none;}
+ .antares-login-brand{visibility:hidden;}
+ .antares-login-card h1{visibility:hidden;}
+ .antares-login-forgot{margin-top:17px;}
+}
