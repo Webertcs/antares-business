@@ -23,6 +23,7 @@ export default function FidelizacaoClient(){
  const [actions,setActions]=useState<Action[]>([]);
  const [selected,setSelected]=useState('');
  const [modalOpen,setModalOpen]=useState(false);
+ const [modalFromRadar,setModalFromRadar]=useState(false);
  const [modalTouched,setModalTouched]=useState(false);
  const [due,setDue]=useState('');
  const [kind,setKind]=useState('follow_up');
@@ -53,7 +54,7 @@ export default function FidelizacaoClient(){
   }).catch(e=>{if(e.name!=='AbortError')setError(e.message||'Erro ao carregar');}).finally(()=>setLoading(false));
   return ()=>ctrl.abort();
  },[]);
- function openReminder(clientId=''){setSelected(clientId);setDue('');setKind('follow_up');setPriority('normal');setNote('');setFeedback('');setModalTouched(false);setModalOpen(true);}
+ function openReminder(clientId=''){setModalFromRadar(Boolean(clientId));setSelected(clientId);setDue('');setKind('follow_up');setPriority('normal');setNote('');setFeedback('');setModalTouched(false);setModalOpen(true);}
  function closeReminder(){if(saving)return;if(modalTouched&&!window.confirm('Descartar as alterações do lembrete?'))return;setModalOpen(false);setModalTouched(false);}
  useEffect(()=>{if(!modalOpen)return;const onKey=(e:KeyboardEvent)=>{if(e.key==='Escape'){e.preventDefault();if(!saving&&(!modalTouched||window.confirm('Descartar as alterações do lembrete?'))){setModalOpen(false);setModalTouched(false);}}};window.addEventListener('keydown',onKey);return()=>window.removeEventListener('keydown',onKey);},[modalOpen,modalTouched,saving]);
  const items=useMemo<Item[]>(()=>{
@@ -84,6 +85,7 @@ export default function FidelizacaoClient(){
   ].sort((a,b)=>a.rank-b.rank);
   return {withoutVisit:withoutVisit.length,inactive:inactive.length,attention:attention.length,recurring:recurring.length,overdue:overdue.length,suggestions};
  },[items,actions,threshold]);
+ const openByClient=useMemo(()=>{const m=new Map<string,Action[]>();for(const a of actions){if(a.status!=='open')continue;const list=m.get(a.client_id)||[];list.push(a);m.set(a.client_id,list);}for(const list of m.values())list.sort((a,b)=>String(a.due_date||'9999').localeCompare(String(b.due_date||'9999')));return m;},[actions]);
  const radarPages=Math.max(1,Math.ceil(radar.suggestions.length/10));
  const currentRadarPage=Math.min(radarPage,radarPages-1);
  const displayed=items.filter(i=>filter==='all'||(filter==='attention'?i.priority<=2:i.tier===filter));
@@ -91,6 +93,8 @@ export default function FidelizacaoClient(){
  const dateLabel=(d:Date|null)=>d?d.toLocaleDateString('pt-BR',{timeZone:'UTC'}):'—';
  const shortAlert=(i:Item)=>i.last===null?'Primeira visita':i.alert==='Novo / sem visita realizada'?'Primeira visita':i.alert;
  return <><style>{`
+ .fidelizacao-programmed{display:inline-block;margin-left:10px;padding:2px 7px;border:1px solid #b3d5be;border-radius:6px;background:#e4f5e9;color:#176039;font-size:11px;font-weight:700;white-space:nowrap}
+ .fidelizacao-modal-description strong{color:#173f7c;font-size:17px}
  .fidelizacao-modal-backdrop{position:fixed;inset:0;background:rgba(8,22,48,.72);z-index:9999;display:flex;align-items:center;justify-content:center;padding:18px}
  .fidelizacao-modal{width:min(680px,100%);max-height:90vh;overflow-y:auto;background:#f5f9ff;color:#142b4f;border:1px solid #b9d4f8;border-radius:16px;padding:22px;box-shadow:0 24px 80px #08163070}
  .fidelizacao-modal-header{display:flex;justify-content:space-between;align-items:center;gap:12px;background:linear-gradient(105deg,#173f7c,#2477d8);color:white;border-radius:10px;padding:12px 16px}
@@ -165,7 +169,7 @@ export default function FidelizacaoClient(){
  {([['Primeira visita pendente',radar.withoutVisit],['Retorno em atenção',radar.inactive],['Acompanhar',radar.attention],['Recorrentes no ano',radar.recurring],['Lembretes vencidos',radar.overdue]] as [string,number][]).map(([label,total])=><div key={label} className="fidelizacao-radar-kpi" style={{flex:'1 1 140px'}}><small>{label}</small><div style={{fontSize:25,fontWeight:800}}>{total}</div></div>)}
  </div>
  <h3 className="fidelizacao-radar-subtitle">Radar de Fidelização</h3>
- {loading?<p>Carregando...</p>:error?<p role="alert">{error}</p>:radar.suggestions.length===0?<p>Sem oportunidades identificadas.</p>:<div className="fidelizacao-radar-list" style={{display:'grid',gap:3}}>{radar.suggestions.slice(currentRadarPage*10,(currentRadarPage+1)*10).map(o=><div key={o.id+o.rank} className="fidelizacao-opportunity fidelizacao-opportunity-compact"><div><strong>{o.name}</strong></div><button type="button" className="fidelizacao-button" onClick={()=>openReminder(o.id)}>Programar contato</button></div>)}</div>}
+ {loading?<p>Carregando...</p>:error?<p role="alert">{error}</p>:radar.suggestions.length===0?<p>Sem oportunidades identificadas.</p>:<div className="fidelizacao-radar-list" style={{display:'grid',gap:3}}>{radar.suggestions.slice(currentRadarPage*10,(currentRadarPage+1)*10).map(o=><div key={o.id+o.rank} className="fidelizacao-opportunity fidelizacao-opportunity-compact"><div><strong>{o.name}</strong>{openByClient.get(o.id)?.length?<span className="fidelizacao-programmed" title="Contato programado, ainda não concluído">✓ Programado: {String(openByClient.get(o.id)![0].due_date||"Sem data").slice(0,10).split("-").reverse().join("/")} {openByClient.get(o.id)!.length>1?`· ${openByClient.get(o.id)!.length} lembretes`:""}</span>:null}</div><button type="button" className="fidelizacao-button" onClick={()=>openReminder(o.id)}>Programar contato</button></div>)}</div>}
  {radar.suggestions.length>10&&<nav aria-label="Páginas do radar comercial" className="fidelizacao-pagination"><span>Exibindo {currentRadarPage*10+1}–{Math.min((currentRadarPage+1)*10,radar.suggestions.length)} de {radar.suggestions.length} escolas · Página {currentRadarPage+1} de {radarPages}</span><div><button type="button" disabled={currentRadarPage===0} onClick={()=>setRadarPage(p=>Math.max(0,p-1))}>Anterior</button><button type="button" disabled={currentRadarPage>=radarPages-1} onClick={()=>setRadarPage(p=>Math.min(radarPages-1,p+1))}>Próxima</button></div></nav>}
 
  </section>
@@ -202,9 +206,9 @@ export default function FidelizacaoClient(){
  {modalOpen&&<div className="fidelizacao-modal-backdrop" role="presentation">
  <div className="fidelizacao-modal" role="dialog" aria-modal="true" aria-labelledby="fidelizacao-modal-title">
  <div className="fidelizacao-modal-header"><h2 id="fidelizacao-modal-title">Programar contato</h2><button type="button" onClick={closeReminder} disabled={saving} aria-label="Fechar janela">✕</button></div>
- <p className="fidelizacao-modal-description">Organize o próximo contato com a instituição.</p>
+ <p className="fidelizacao-modal-description"><strong>{clients.find(c=>c.id===selected)?.name||"Selecione a instituição"}</strong></p>
   <div className="fidelizacao-form-grid">
- <label>Instituição<select value={selected} onChange={e=>{setSelected(e.target.value);setModalTouched(true);}} style={{display:'block',padding:9,maxWidth:230}}><option value="">Selecione</option>{items.map(i=><option key={i.client.id} value={i.client.id}>{i.client.name}</option>)}</select></label>
+ {!modalFromRadar&&<label>Instituição<select value={selected} onChange={e=>{setSelected(e.target.value);setModalTouched(true);}} style={{display:'block',padding:9,maxWidth:230}}><option value="">Selecione</option>{items.map(i=><option key={i.client.id} value={i.client.id}>{i.client.name}</option>)}</select></label>}
  <label>Ação<select value={kind} onChange={e=>{setKind(e.target.value);setModalTouched(true);}} style={{display:'block',padding:9}}><option value="follow_up">Retomar contato</option><option value="renewal">Renovação</option><option value="feedback">Pedir avaliação</option><option value="offer">Nova experiência</option><option value="other">Outra</option></select></label>
  <label>Data prevista<input type="date" value={due} onChange={e=>{setDue(e.target.value);setModalTouched(true);}} style={{display:'block',padding:8}}/></label>
  <label>Prioridade<select value={priority} onChange={e=>{setPriority(e.target.value);setModalTouched(true);}} style={{display:'block',padding:9}}><option value="normal">Normal</option><option value="high">Alta</option><option value="low">Baixa</option></select></label>
