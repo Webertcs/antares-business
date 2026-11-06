@@ -159,7 +159,7 @@ export default function FidelizacaoClient(){
  .fidelizacao-pagination button:disabled{opacity:.45;cursor:not-allowed}
  /* Hierarquia visual dos painéis e histórico compacto */
  .fidelizacao-page .fidelizacao-radar-panel{padding:22px!important}
- .fidelizacao-page .fidelizacao-radar-kpi{min-height:76px!important;padding:12px 14px!important}
+ .fidelizacao-page .fidelizacao-radar-kpi{min-height:84px!important;padding:12px 14px!important}
  .fidelizacao-page .fidelizacao-radar-kpi small{font-size:13px!important;color:#24548d!important}
  .fidelizacao-page .fidelizacao-radar-kpi>div{font-size:23px!important;color:#17467f!important}
  .fidelizacao-page .fidelizacao-attention-panel{padding:22px!important}
