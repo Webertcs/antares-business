@@ -176,7 +176,26 @@ export default function FidelizacaoClient(){
  .fidelizacao-page .fidelizacao-history-row .fidelizacao-history-status{margin-left:0;justify-self:end}
  @media(max-width:760px){.fidelizacao-page .fidelizacao-history-row{grid-template-columns:minmax(0,1fr) auto}.fidelizacao-page .fidelizacao-history-note{grid-column:1/-1;grid-row:2}.fidelizacao-page .fidelizacao-history-row .fidelizacao-history-status{grid-column:2;grid-row:1}}
 
- `}</style><main className="fidelizacao-page" style={{maxWidth:1180,margin:'0 auto',padding:'16px 18px 32px',fontFamily:'system-ui',color:'#142b4f'}}>
+ 
+  /* Auditoria final: padrao visual de Fidelizacao */
+ .fidelizacao-page{--fidelizacao-text:#17467f;--fidelizacao-muted:#315b90;--fidelizacao-border:#c7dcf7;--fidelizacao-radius:10px;color:var(--fidelizacao-text)}
+ .fidelizacao-page .fidelizacao-panel{border-color:var(--fidelizacao-border);border-radius:12px}
+ .fidelizacao-page .fidelizacao-section-heading{color:var(--fidelizacao-text)!important;border-radius:var(--fidelizacao-radius);font-size:19px;line-height:1.3}
+ .fidelizacao-page .fidelizacao-agenda-panel .fidelizacao-section-heading{font-size:18px}
+ .fidelizacao-page .fidelizacao-kpi-compact small,.fidelizacao-page .fidelizacao-radar-kpi small{color:var(--fidelizacao-muted)!important;font-size:12px!important;line-height:1.35}
+ .fidelizacao-page .fidelizacao-kpi-compact>div{font-size:20px;line-height:1.2}
+ .fidelizacao-page .fidelizacao-radar-kpi{min-height:84px!important}
+ .fidelizacao-page .fidelizacao-attention-table{color:var(--fidelizacao-text);font-size:13px}
+ .fidelizacao-page .fidelizacao-attention-table th{font-size:12px;line-height:1.35}
+ .fidelizacao-page .fidelizacao-history-note{font-size:13px;line-height:1.45;color:var(--fidelizacao-muted);overflow-wrap:anywhere;min-width:0}
+ .fidelizacao-page .fidelizacao-history-row{border-radius:var(--fidelizacao-radius);gap:12px}
+ .fidelizacao-page .fidelizacao-history-row strong{color:var(--fidelizacao-text)}
+ .fidelizacao-page .fidelizacao-button,.fidelizacao-page .fidelizacao-history-button,.fidelizacao-page .fidelizacao-pagination button,.fidelizacao-page .fidelizacao-modal-cancel{border-radius:8px;font-weight:700;line-height:1.3}
+ .fidelizacao-page .fidelizacao-history-button,.fidelizacao-page .fidelizacao-pagination button{min-height:36px}
+ .fidelizacao-page .fidelizacao-agenda-panel h3,.fidelizacao-page .fidelizacao-agenda-panel p{color:var(--fidelizacao-text)}
+ .fidelizacao-page button:focus-visible,.fidelizacao-page input:focus-visible,.fidelizacao-page select:focus-visible,.fidelizacao-page textarea:focus-visible{outline:2px solid #2477d8;outline-offset:2px}
+ @media(max-width:760px){.fidelizacao-page .fidelizacao-history-row{gap:8px}.fidelizacao-page .fidelizacao-history-note{font-size:13px}}
+`}</style><main className="fidelizacao-page" style={{maxWidth:1180,margin:'0 auto',padding:'16px 18px 32px',fontFamily:'system-ui',color:'#142b4f'}}>
 
  <header className="fidelizacao-hero"><div className="fidelizacao-eyebrow">ANTARES BUSINESS · RELACIONAMENTO</div><h1>Fidelização e Relacionamento</h1></header>
  <div className="fidelizacao-kpi-grid">
