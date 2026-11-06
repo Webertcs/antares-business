@@ -103,7 +103,15 @@ export default function FidelizacaoClient(){
  .fidelizacao-attention-table tbody tr:hover{background:#e1eeff}
  .fidelizacao-attention-table tbody td:first-child strong{color:#1554a0}
  .fidelizacao-attention-table tbody td:last-child{color:#245b9b;font-weight:600}
- .fidelizacao-attention-table + *{margin-top:0}\n .fidelizacao-attention-table td{padding:7px 10px;border-bottom:1px solid #e1e8f1}\n .fidelizacao-attention-table th{font-size:12px}\n .fidelizacao-radar-kpi{padding:8px 10px!important;min-height:0!important}\n .fidelizacao-radar-kpi small{font-size:11px!important}\n .fidelizacao-radar-kpi>div{font-size:20px!important;line-height:1.2!important}\n .fidelizacao-pagination{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;margin-top:14px;font-size:13px}
+ .fidelizacao-attention-table + *{margin-top:0}\n .fidelizacao-attention-table td{padding:7px 10px;border-bottom:1px solid #e1e8f1}\n .fidelizacao-attention-table th{font-size:12px}\n .fidelizacao-radar-kpi{padding:8px 10px!important;min-height:0!important}\n .fidelizacao-radar-kpi small{font-size:11px!important}\n .fidelizacao-radar-kpi>div{font-size:20px!important;line-height:1.2!important}\n .fidelizacao-radar-kpi{background:#eaf3ff!important;border:1px solid #c9dcf7!important;border-radius:8px;color:#17467f!important}
+ .fidelizacao-radar-kpi small{font-size:12px!important;font-weight:600!important;color:#305c98!important}
+ .fidelizacao-radar-kpi>div{font-size:18px!important;font-weight:800!important;color:#17467f!important}
+ .fidelizacao-radar-subtitle{font-size:12px;font-weight:750;color:#17467f;margin-bottom:10px}
+ .fidelizacao-opportunity-compact{background:#f0f6ff!important;border:1px solid #d4e3f8!important;border-radius:7px!important}
+ .fidelizacao-opportunity-compact:nth-child(even){background:#fff!important}
+ .fidelizacao-opportunity-compact:hover{background:#e1eeff!important}
+ .fidelizacao-opportunity-compact strong{font-size:12px!important;font-weight:750!important;color:#1554a0!important}
+ .fidelizacao-pagination{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;margin-top:14px;font-size:13px}
  .fidelizacao-pagination>div{display:flex;gap:8px}
  .fidelizacao-tier-card:nth-child(1){background:#fff5e9!important;border-color:#d4a06a!important}
  .fidelizacao-tier-card:nth-child(2){background:#eff3fa!important;border-color:#9eafc6!important}
@@ -126,7 +134,7 @@ export default function FidelizacaoClient(){
  <div style={{display:'flex',gap:10,flexWrap:'wrap',marginBottom:18}}>
  {([['Primeira visita pendente',radar.withoutVisit],['Retorno em atenção',radar.inactive],['Acompanhar',radar.attention],['Recorrentes no ano',radar.recurring],['Lembretes vencidos',radar.overdue]] as [string,number][]).map(([label,total])=><div key={label} className="fidelizacao-radar-kpi" style={{flex:'1 1 140px'}}><small>{label}</small><div style={{fontSize:25,fontWeight:800}}>{total}</div></div>)}
  </div>
- <h3 style={{fontWeight:700,marginBottom:10}}>Radar de Fidelização</h3>
+ <h3 className="fidelizacao-radar-subtitle">Radar de Fidelização</h3>
  {loading?<p>Carregando...</p>:error?<p role="alert">{error}</p>:radar.suggestions.length===0?<p>Sem oportunidades identificadas.</p>:<div style={{display:'grid',gap:9}}>{radar.suggestions.slice(currentRadarPage*10,(currentRadarPage+1)*10).map(o=><div key={o.id+o.rank} className="fidelizacao-opportunity fidelizacao-opportunity-compact"><div><strong>{o.name}</strong></div><button type="button" className="fidelizacao-button" onClick={()=>{setSelected(o.id);document.getElementById('agenda-relacionamento')?.scrollIntoView({behavior:'smooth'});}}>Programar contato</button></div>)}</div>}
  {radar.suggestions.length>10&&<nav aria-label="Páginas do radar comercial" className="fidelizacao-pagination"><span>Exibindo {currentRadarPage*10+1}–{Math.min((currentRadarPage+1)*10,radar.suggestions.length)} de {radar.suggestions.length} escolas · Página {currentRadarPage+1} de {radarPages}</span><div><button type="button" disabled={currentRadarPage===0} onClick={()=>setRadarPage(p=>Math.max(0,p-1))}>Anterior</button><button type="button" disabled={currentRadarPage>=radarPages-1} onClick={()=>setRadarPage(p=>Math.min(radarPages-1,p+1))}>Próxima</button></div></nav>}
 
