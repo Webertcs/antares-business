@@ -132,17 +132,6 @@ export default function FidelizacaoClient(){
  {([['Instituições',items.length],['Ouro',count('Ouro')],['Prata',count('Prata')],['Bronze',count('Bronze')],['Precisam de atenção',items.filter(i=>i.priority<=2).length]] as [string,number][]).map(([k,v])=>
  <div key={k} className="fidelizacao-kpi fidelizacao-kpi-compact"><small>{k}</small><div style={{fontSize:22,fontWeight:800}}>{v}</div></div>)}
  </div>
- <section className="fidelizacao-panel">
- <h2 className="fidelizacao-section-heading">ANTARES Intelligence · Radar comercial</h2>
- 
- <div style={{display:'flex',gap:10,flexWrap:'wrap',marginBottom:18}}>
- {([['Primeira visita pendente',radar.withoutVisit],['Retorno em atenção',radar.inactive],['Acompanhar',radar.attention],['Recorrentes no ano',radar.recurring],['Lembretes vencidos',radar.overdue]] as [string,number][]).map(([label,total])=><div key={label} className="fidelizacao-radar-kpi" style={{flex:'1 1 140px'}}><small>{label}</small><div style={{fontSize:25,fontWeight:800}}>{total}</div></div>)}
- </div>
- <h3 className="fidelizacao-radar-subtitle">Radar de Fidelização</h3>
- {loading?<p>Carregando...</p>:error?<p role="alert">{error}</p>:radar.suggestions.length===0?<p>Sem oportunidades identificadas.</p>:<div className="fidelizacao-radar-list" style={{display:'grid',gap:3}}>{radar.suggestions.slice(currentRadarPage*10,(currentRadarPage+1)*10).map(o=><div key={o.id+o.rank} className="fidelizacao-opportunity fidelizacao-opportunity-compact"><div><strong>{o.name}</strong></div><button type="button" className="fidelizacao-button" onClick={()=>{setSelected(o.id);document.getElementById('agenda-relacionamento')?.scrollIntoView({behavior:'smooth'});}}>Programar contato</button></div>)}</div>}
- {radar.suggestions.length>10&&<nav aria-label="Páginas do radar comercial" className="fidelizacao-pagination"><span>Exibindo {currentRadarPage*10+1}–{Math.min((currentRadarPage+1)*10,radar.suggestions.length)} de {radar.suggestions.length} escolas · Página {currentRadarPage+1} de {radarPages}</span><div><button type="button" disabled={currentRadarPage===0} onClick={()=>setRadarPage(p=>Math.max(0,p-1))}>Anterior</button><button type="button" disabled={currentRadarPage>=radarPages-1} onClick={()=>setRadarPage(p=>Math.min(radarPages-1,p+1))}>Próxima</button></div></nav>}
-
- </section>
  <section style={{border:'1px solid #b6c7de',borderRadius:14,padding:19,marginTop:20}}>
  <h2 className="fidelizacao-section-heading">Programa de Fidelização</h2>
  <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(210px,1fr))',gap:12,marginTop:14}}>
@@ -154,6 +143,18 @@ export default function FidelizacaoClient(){
  <strong>✦ {t.name}</strong><div style={{fontSize:13,margin:'6px 0'}}>{t.count}</div><p style={{fontSize:13}}>{t.ideas}</p></div>)}
  </div>
  </section>
+ <section className="fidelizacao-panel">
+ <h2 className="fidelizacao-section-heading">ANTARES Intelligence · Radar comercial</h2>
+ 
+ <div style={{display:'flex',gap:10,flexWrap:'wrap',marginBottom:18}}>
+ {([['Primeira visita pendente',radar.withoutVisit],['Retorno em atenção',radar.inactive],['Acompanhar',radar.attention],['Recorrentes no ano',radar.recurring],['Lembretes vencidos',radar.overdue]] as [string,number][]).map(([label,total])=><div key={label} className="fidelizacao-radar-kpi" style={{flex:'1 1 140px'}}><small>{label}</small><div style={{fontSize:25,fontWeight:800}}>{total}</div></div>)}
+ </div>
+ <h3 className="fidelizacao-radar-subtitle">Radar de Fidelização</h3>
+ {loading?<p>Carregando...</p>:error?<p role="alert">{error}</p>:radar.suggestions.length===0?<p>Sem oportunidades identificadas.</p>:<div className="fidelizacao-radar-list" style={{display:'grid',gap:3}}>{radar.suggestions.slice(currentRadarPage*10,(currentRadarPage+1)*10).map(o=><div key={o.id+o.rank} className="fidelizacao-opportunity fidelizacao-opportunity-compact"><div><strong>{o.name}</strong></div><button type="button" className="fidelizacao-button" onClick={()=>{setSelected(o.id);document.getElementById('agenda-relacionamento')?.scrollIntoView({behavior:'smooth'});}}>Programar contato</button></div>)}</div>}
+ {radar.suggestions.length>10&&<nav aria-label="Páginas do radar comercial" className="fidelizacao-pagination"><span>Exibindo {currentRadarPage*10+1}–{Math.min((currentRadarPage+1)*10,radar.suggestions.length)} de {radar.suggestions.length} escolas · Página {currentRadarPage+1} de {radarPages}</span><div><button type="button" disabled={currentRadarPage===0} onClick={()=>setRadarPage(p=>Math.max(0,p-1))}>Anterior</button><button type="button" disabled={currentRadarPage>=radarPages-1} onClick={()=>setRadarPage(p=>Math.min(radarPages-1,p+1))}>Próxima</button></div></nav>}
+
+ </section>
+
  <section style={{border:'1px solid #b6c7de',borderRadius:14,padding:19,marginTop:20}}>
  <h2 className="fidelizacao-section-heading">Central de atenção aos clientes</h2>
  
