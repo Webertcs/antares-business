@@ -88,16 +88,23 @@ export default function FidelizacaoClient(){
  .fidelizacao-opportunity-compact{padding:5px 10px!important;min-height:0!important;gap:8px!important;align-items:center!important}
  .fidelizacao-opportunity-compact strong{font-size:13px}
  .fidelizacao-opportunity-compact .fidelizacao-button{padding:6px 10px!important;font-size:12px;white-space:nowrap}
+ .fidelizacao-kpi-compact{padding:9px 13px!important;min-height:0!important;background:#eaf3ff!important;border-color:#c9dcf7!important}
+ .fidelizacao-kpi-compact:nth-child(2){background:#e5f1ff!important}
+ .fidelizacao-kpi-compact:nth-child(3){background:#edf0ff!important}
+ .fidelizacao-kpi-compact:nth-child(4){background:#e5f6fb!important}
+ .fidelizacao-kpi-compact:nth-child(5){background:#eaf0fb!important}
+ .fidelizacao-kpi-compact small{font-size:11px!important;color:#305c98!important}
+ .fidelizacao-kpi-compact>div{line-height:1.2!important;margin-top:3px!important}
  .fidelizacao-radar-kpi{padding:8px 10px!important;min-height:0!important}\n .fidelizacao-radar-kpi small{font-size:11px!important}\n .fidelizacao-radar-kpi>div{font-size:20px!important;line-height:1.2!important}\n .fidelizacao-pagination{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;margin-top:14px;font-size:13px}
  .fidelizacao-pagination>div{display:flex;gap:8px}
  .fidelizacao-pagination button{padding:8px 12px;border:1px solid #a9c2e4;border-radius:8px;background:#eaf2ff;color:#154783;font-weight:650;cursor:pointer}
  .fidelizacao-pagination button:disabled{opacity:.45;cursor:not-allowed}
  `}</style><main className="fidelizacao-page" style={{maxWidth:1180,margin:'0 auto',padding:'16px 18px 32px',fontFamily:'system-ui',color:'#142b4f'}}>
 
- <header className="fidelizacao-hero"><div className="fidelizacao-eyebrow">ANTARES BUSINESS · RELACIONAMENTO</div><h1>Fidelização e Relacionamento</h1><p>Acompanhe instituições, oportunidades e próximos contatos. Nenhuma mensagem é enviada automaticamente.</p></header>
+ <header className="fidelizacao-hero"><div className="fidelizacao-eyebrow">ANTARES BUSINESS · RELACIONAMENTO</div><h1>Fidelização e Relacionamento</h1></header>
  <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(170px,1fr))',gap:12}}>
  {([['Instituições',items.length],['Ouro',count('Ouro')],['Prata',count('Prata')],['Bronze',count('Bronze')],['Precisam de atenção',items.filter(i=>i.priority<=2).length]] as [string,number][]).map(([k,v])=>
- <div key={k} className="fidelizacao-kpi"><small>{k}</small><div style={{fontSize:27,fontWeight:800}}>{v}</div></div>)}
+ <div key={k} className="fidelizacao-kpi fidelizacao-kpi-compact"><small>{k}</small><div style={{fontSize:22,fontWeight:800}}>{v}</div></div>)}
  </div>
  <section className="fidelizacao-panel">
  <h2 className="fidelizacao-section-heading">ANTARES Intelligence · Radar comercial</h2>
