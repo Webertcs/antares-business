@@ -105,11 +105,11 @@ export default function FidelizacaoClient(){
  .fidelizacao-modal .fidelizacao-form-grid{margin-bottom:16px}
  .fidelizacao-modal input,.fidelizacao-modal select{max-width:100%!important;width:100%;border:1px solid #a9c6eb;border-radius:8px;background:#fff;color:#142b4f}
  .fidelizacao-modal-cancel{margin-left:12px;border:1px solid #9ab5d9;border-radius:8px;padding:9px 15px;background:#e8f0fb;color:#173f7c;cursor:pointer}
- .fidelizacao-section-heading{color:#fff!important;font-size:20px;font-weight:750;background:linear-gradient(105deg,#173f7c,#2477d8);color:white;padding:13px 16px;border-radius:10px;margin:-3px -3px 15px}
+ .fidelizacao-section-heading{color:#173f7c!important;font-size:20px;font-weight:750;background:#dceaff!important;padding:13px 16px;border:1px solid #c7dcf7;border-radius:10px;margin:-3px -3px 15px}
  .fidelizacao-opportunity-compact{padding:5px 10px!important;min-height:0!important;gap:8px!important;align-items:center!important}
  .fidelizacao-opportunity-compact strong{font-size:13px}
  .fidelizacao-opportunity-compact .fidelizacao-button{padding:6px 10px!important;font-size:12px;white-space:nowrap}
- .fidelizacao-kpi-compact{padding:9px 13px!important;min-height:0!important;background:#eaf3ff!important;border-color:#c9dcf7!important}
+ .fidelizacao-kpi-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}\n @media(max-width:650px){.fidelizacao-kpi-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}\n .fidelizacao-kpi-compact{padding:9px 13px!important;min-height:0!important;background:#eaf3ff!important;border-color:#c9dcf7!important}
  .fidelizacao-kpi-compact:nth-child(2){background:#e5f1ff!important}
  .fidelizacao-kpi-compact:nth-child(3){background:#edf0ff!important}
  .fidelizacao-kpi-compact:nth-child(4){background:#e5f6fb!important}
@@ -149,7 +149,7 @@ export default function FidelizacaoClient(){
  `}</style><main className="fidelizacao-page" style={{maxWidth:1180,margin:'0 auto',padding:'16px 18px 32px',fontFamily:'system-ui',color:'#142b4f'}}>
 
  <header className="fidelizacao-hero"><div className="fidelizacao-eyebrow">ANTARES BUSINESS · RELACIONAMENTO</div><h1>Fidelização e Relacionamento</h1></header>
- <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(170px,1fr))',gap:12}}>
+ <div className="fidelizacao-kpi-grid">
  {([['Instituições',items.length],['Diamante',count('Diamante')],['Ouro',count('Ouro')],['Prata',count('Prata')],['Bronze',count('Bronze')],['Precisam de atenção',items.filter(i=>i.priority<=2).length]] as [string,number][]).map(([k,v])=>
  <div key={k} className="fidelizacao-kpi fidelizacao-kpi-compact"><small>{k}</small><div style={{fontSize:22,fontWeight:800}}>{v}</div></div>)}
  </div>
