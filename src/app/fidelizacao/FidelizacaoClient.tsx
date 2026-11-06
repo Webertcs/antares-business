@@ -20,6 +20,7 @@ export default function FidelizacaoClient(){
  const [error,setError]=useState('');
  const [filter,setFilter]=useState('all');
  const [radarPage,setRadarPage]=useState(0);
+ const [attentionPage,setAttentionPage]=useState(0);
  const [showHistory,setShowHistory]=useState(false);
  const [threshold,setThreshold]=useState(90);
  const [actions,setActions]=useState<Action[]>([]);
@@ -99,7 +100,9 @@ export default function FidelizacaoClient(){
  };
  const radarPages=Math.max(1,Math.ceil(radar.suggestions.length/10));
  const currentRadarPage=Math.min(radarPage,radarPages-1);
- const displayed=items.filter(i=>filter==='all'||(filter==='attention'?i.priority<=2:i.tier===filter));
+ const displayed=items.filter(i=>filter==='all'||(filter==='attention'?i.priority<=2:i.tier===filter)).sort((a,b)=>a.client.name.localeCompare(b.client.name,'pt-BR',{sensitivity:'base'}));
+ const attentionPages=Math.max(1,Math.ceil(displayed.length/10));
+ const currentAttentionPage=Math.min(attentionPage,attentionPages-1);
  const count=(tier:string)=>items.filter(i=>i.tier===tier).length;
  const messageFor=(clientId:string)=>{const client=items.find(i=>i.client.id===clientId);const name=client?.client.name||'sua instituição';const tier=client?.tier||'Sem categoria';const proposal=tier==='Diamante'?'uma parceria anual e experiências especiais':tier==='Ouro'?'novas experiências e condições para a continuidade da parceria':tier==='Prata'?'novos temas e opções de programação recorrente':'uma nova visita do Planetário ANTARES';return 'Olá! Agradecemos a parceria com '+name+'. Gostaríamos de conversar sobre '+proposal+'. Podemos apresentar uma proposta personalizada?';};
  const dateLabel=(d:Date|null)=>d?d.toLocaleDateString('pt-BR',{timeZone:'UTC'}):'—';
@@ -227,19 +230,20 @@ export default function FidelizacaoClient(){
  </section>
 
  <section className="fidelizacao-attention-panel" style={{border:'1px solid #b6c7de',borderRadius:14,padding:19,marginTop:20}}>
- <h2 className="fidelizacao-section-heading">Central de atenção aos clientes</h2>
+ <h2 className="fidelizacao-section-heading">Central de Alertas</h2>
  
  <div style={{display:'flex',flexWrap:'wrap',gap:12,margin:'15px 0'}}>
- <label>Mostrar <select value={filter} onChange={e=>setFilter(e.target.value)} style={{marginLeft:8,padding:8,border:'1px solid #9db1cd',borderRadius:8,background:'white',color:'#142b4f'}}>
+ <label>Mostrar <select value={filter} onChange={e=>(setFilter(e.target.value),setAttentionPage(0))} style={{marginLeft:8,padding:8,border:'1px solid #9db1cd',borderRadius:8,background:'white',color:'#142b4f'}}>
  <option value="all">Todas</option><option value="attention">Precisam de atenção</option><option value="Diamante">Diamante</option><option value="Ouro">Ouro</option><option value="Prata">Prata</option><option value="Bronze">Bronze</option></select></label>
  <label>Alerta após <select value={threshold} onChange={e=>setThreshold(Number(e.target.value))} style={{marginLeft:8,padding:8,border:'1px solid #9db1cd',borderRadius:8,background:'white',color:'#142b4f'}}><option value={90}>90 dias</option><option value={120}>120 dias</option><option value={180}>180 dias</option></select></label>
  </div>
  {loading?<p>Carregando dados da organização...</p>:error?<p role="alert">{error}</p>:displayed.length===0?<p>Nenhuma instituição nesta categoria.</p>:
  <div style={{overflowX:'auto'}}><table className="fidelizacao-attention-table" style={{width:'100%',borderCollapse:'collapse',textAlign:'left',minWidth:680}}>
  <thead><tr>{['Instituição','Categoria','Visitas','Última visita','Atenção'].map(c=><th key={c} style={{padding:'8px 10px',borderBottom:'1px solid #c3d1e6'}}>{c}</th>)}</tr></thead>
- <tbody>{displayed.map(i=><tr key={i.client.id}><td style={{padding:'7px 10px',borderBottom:'1px solid #e1e8f1'}}><strong>{i.client.name}</strong></td>
+ <tbody>{displayed.slice(currentAttentionPage*10,(currentAttentionPage+1)*10).map(i=><tr key={i.client.id}><td style={{padding:'7px 10px',borderBottom:'1px solid #e1e8f1'}}><strong>{i.client.name}</strong></td>
  <td>{i.tier==='Sem categoria'?'—':i.tier}</td><td>{i.completed}</td><td>{dateLabel(i.last)}</td><td>{shortAlert(i)}</td></tr>)}</tbody>
  </table></div>}
+ {displayed.length>10&&<nav aria-label="Páginas da Central de Alertas" className="fidelizacao-pagination"><span>Exibindo {currentAttentionPage*10+1}–{Math.min((currentAttentionPage+1)*10,displayed.length)} de {displayed.length} instituições · Página {currentAttentionPage+1} de {attentionPages}</span><div><button type="button" disabled={currentAttentionPage===0} onClick={()=>setAttentionPage(p=>Math.max(0,p-1))}>Anterior</button><button type="button" disabled={currentAttentionPage>=attentionPages-1} onClick={()=>setAttentionPage(p=>Math.min(attentionPages-1,p+1))}>Próxima</button></div></nav>}
  </section>
 
  <section className="fidelizacao-agenda-panel" style={{border:'1px solid #b6c7de',borderRadius:14,padding:19,marginTop:20}}>
