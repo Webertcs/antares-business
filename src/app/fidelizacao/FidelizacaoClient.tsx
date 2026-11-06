@@ -105,6 +105,12 @@ export default function FidelizacaoClient(){
  .fidelizacao-attention-table tbody td:last-child{color:#245b9b;font-weight:600}
  .fidelizacao-attention-table + *{margin-top:0}\n .fidelizacao-attention-table td{padding:7px 10px;border-bottom:1px solid #e1e8f1}\n .fidelizacao-attention-table th{font-size:12px}\n .fidelizacao-radar-kpi{padding:8px 10px!important;min-height:0!important}\n .fidelizacao-radar-kpi small{font-size:11px!important}\n .fidelizacao-radar-kpi>div{font-size:20px!important;line-height:1.2!important}\n .fidelizacao-pagination{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;margin-top:14px;font-size:13px}
  .fidelizacao-pagination>div{display:flex;gap:8px}
+ .fidelizacao-tier-card:nth-child(1){background:#fff5e9!important;border-color:#d4a06a!important}
+ .fidelizacao-tier-card:nth-child(2){background:#eff3fa!important;border-color:#9eafc6!important}
+ .fidelizacao-tier-card:nth-child(3){background:#fff9e5!important;border-color:#d6b45b!important}
+ .fidelizacao-reminder{background:#eef5ff;border:1px solid #c3d8f5;border-radius:10px;padding:12px}
+ .fidelizacao-page select,.fidelizacao-page input,.fidelizacao-page textarea{background:#f1f7ff!important;border-color:#a9c9ef!important}
+ .fidelizacao-page button:not(:disabled){transition:background .15s,border-color .15s}
  .fidelizacao-pagination button{padding:8px 12px;border:1px solid #a9c2e4;border-radius:8px;background:#eaf2ff;color:#154783;font-weight:650;cursor:pointer}
  .fidelizacao-pagination button:disabled{opacity:.45;cursor:not-allowed}
  `}</style><main className="fidelizacao-page" style={{maxWidth:1180,margin:'0 auto',padding:'16px 18px 32px',fontFamily:'system-ui',color:'#142b4f'}}>
@@ -142,7 +148,6 @@ export default function FidelizacaoClient(){
  </section>
  <section style={{border:'1px solid #b6c7de',borderRadius:14,padding:19,marginTop:20}}>
  <h2 className="fidelizacao-section-heading">Programa de relacionamento por instituição</h2>
- <p>As categorias representam visitas concluídas no ano, não descontos ou benefícios concedidos automaticamente.</p>
  <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(210px,1fr))',gap:12,marginTop:14}}>
  {[
  {name:'Bronze',count:'1 visita concluída',ideas:'Agradecimento, material de apoio e convite para nova sessão.'},
@@ -151,11 +156,9 @@ export default function FidelizacaoClient(){
  ].map(t=><div key={t.name} className={'fidelizacao-tier fidelizacao-tier-'+t.name.toLowerCase()}>
  <strong>✦ {t.name}</strong><div style={{fontSize:13,margin:'6px 0'}}>{t.count}</div><p style={{fontSize:13}}>{t.ideas}</p></div>)}
  </div>
- <p style={{fontSize:12,marginTop:12}}>Pacotes anuais, prioridade de agenda e indicações premiadas são possibilidades comerciais sujeitas à aprovação do proprietário, disponibilidade e condições definidas em proposta. Nenhuma vantagem é concedida por este painel.</p>
  </section>
  <section style={{border:'1px solid #b6c7de',borderRadius:14,padding:19,marginTop:20}}>
  <h2 id="agenda-relacionamento" className="fidelizacao-section-heading">Agenda interna de relacionamento</h2>
- <p style={{fontSize:13}}>Registre contatos e programe retornos. O ANTARES não envia mensagens automaticamente.</p>
  <div className="fidelizacao-form-grid">
  <label>Instituição<select value={selected} onChange={e=>setSelected(e.target.value)} style={{display:'block',padding:9,maxWidth:230}}><option value="">Selecione</option>{items.map(i=><option key={i.client.id} value={i.client.id}>{i.client.name}</option>)}</select></label>
  <label>Ação<select value={kind} onChange={e=>setKind(e.target.value)} style={{display:'block',padding:9}}><option value="follow_up">Retomar contato</option><option value="renewal">Renovação</option><option value="feedback">Pedir avaliação</option><option value="offer">Nova experiência</option><option value="other">Outra</option></select></label>
@@ -173,6 +176,5 @@ export default function FidelizacaoClient(){
  </div>
  {actions.some(a=>a.status!=='open')&&<div style={{marginTop:14}}><button type="button" onClick={()=>setShowHistory(v=>!v)} aria-expanded={showHistory}>{showHistory?'Ocultar':'Mostrar'} histórico ({actions.filter(a=>a.status!=='open').length})</button>{showHistory&&<div style={{display:'grid',gap:8,marginTop:10}}>{actions.filter(a=>a.status!=='open').map(a=><div key={a.id} className="fidelizacao-reminder fidelizacao-reminder-closed"><strong>{a.client_name}</strong><span> · {a.status==='done'?'Concluído':'Dispensado'}</span><div>{a.note}</div></div>)}</div>}</div>}
  </section>
- <p style={{fontSize:12,opacity:.8,marginTop:16}}>As recomendações são somente orientativas. A agenda permite cadastrar e concluir lembretes internos; não envia mensagens. A disponibilidade das cúpulas é gerenciada na Agenda.</p>
  </main></>;
 }
