@@ -228,7 +228,7 @@ export default function FidelizacaoClient(){
  <label>Prioridade<select value={priority} onChange={e=>{setPriority(e.target.value);setModalTouched(true);}} style={{display:'block',padding:9}}><option value="normal">Normal</option><option value="high">Alta</option><option value="low">Baixa</option></select></label>
  </div>
  <label>Observação<input value={note} onChange={e=>{setNote(e.target.value);setModalTouched(true);}} maxLength={2000} placeholder="Ex.: oferecer sessão de galáxias no próximo bimestre" style={{display:'block',padding:10,width:'100%',margin:'6px 0 12px'}}/></label>
- <div style={{margin:'12px 0',padding:12,border:'1px solid #b9d4f8',borderRadius:10,background:'#eaf3ff'}}><strong>Sugestão de mensagem comercial</strong><p style={{fontSize:13,margin:'8px 0'}}>{messageFor(selected)}</p><button type="button" disabled={!selected} onClick={()=>navigator.clipboard.writeText(messageFor(selected)).then(()=>setFeedback('Mensagem copiada. Revise antes de enviar.')).catch(()=>setFeedback('Não foi possível copiar a mensagem.'))} className="fidelizacao-button">Copiar mensagem para editar</button><p style={{fontSize:11,marginTop:7}}>Sugestão opcional. Nenhum benefício ou mensagem é enviado automaticamente.</p></div>
+
  <button type="button" disabled={saving||!selected||!due} onClick={()=>saveAction('create')} className="fidelizacao-button">{saving?'Salvando...':'Criar lembrete interno'}</button>
 
 
