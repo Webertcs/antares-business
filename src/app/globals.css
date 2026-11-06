@@ -826,3 +826,39 @@
 .team-premium-panel button:not(:disabled){background:linear-gradient(110deg,#1646b6,#3178ef)!important;color:white!important;box-shadow:0 5px 12px #235bc333;font-weight:750}
 .team-premium-panel button:disabled{background:#a2bceb!important;cursor:not-allowed}
 @media(max-width:680px){.team-premium-body{padding:16px}.team-premium-summary{grid-template-columns:1fr}.team-premium .team-table{display:block;overflow-x:auto}}
+
+
+/* Fidelizacao — identidade visual ANTARES, somente apresentacao */
+.fidelizacao-page .fidelizacao-hero{background:linear-gradient(110deg,#142f62,#1c55a5 65%,#2d83ee);color:white;border-radius:17px;padding:26px 28px;margin:6px 0 16px;box-shadow:0 9px 25px #153c7b17}
+.fidelizacao-eyebrow{font-size:10px;letter-spacing:2px;font-weight:800;color:#c6dafa;margin-bottom:10px}
+.fidelizacao-hero h1{font-size:clamp(23px,2.4vw,31px);font-weight:850;margin:0 0 8px;color:#fff}
+.fidelizacao-hero p{font-size:13px;color:#e6f0ff;margin:0;line-height:1.55}
+.fidelizacao-kpi{border:1px solid #d6e3f7;border-radius:12px;padding:17px;background:#fff;box-shadow:0 4px 14px #174b8b0b}
+.fidelizacao-kpi small{display:block;color:#60789c;font-size:12px;font-weight:650}
+.fidelizacao-kpi>div{color:#164785}
+.fidelizacao-page .fidelizacao-panel{background:#fff;border:1px solid #d6e3f7;border-radius:15px;padding:22px;margin-top:17px;box-shadow:0 5px 19px #173a740b}
+.fidelizacao-panel>h2{color:#183c75;margin-top:0;margin-bottom:8px}
+.fidelizacao-panel>p{color:#536b8c;line-height:1.55}
+.fidelizacao-radar-kpi{background:#edf4ff;border:1px solid #e0eafd;padding:14px;border-radius:11px;min-width:130px}
+.fidelizacao-radar-kpi small{color:#536b8c}
+.fidelizacao-radar-kpi>div{color:#143e7b}
+.fidelizacao-opportunity{padding:14px;border:1px solid #d5e2f6;border-radius:11px;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;background:#f8fbff}
+.fidelizacao-button{display:inline-flex;align-items:center;justify-content:center;padding:10px 16px;border:1px solid #2371d7;border-radius:9px;background:linear-gradient(120deg,#164db5,#198fe5);color:#fff;font-size:13px;font-weight:750;box-shadow:0 4px 12px #1e66bf20}
+.fidelizacao-button:hover:not(:disabled){filter:brightness(1.09)}
+.fidelizacao-button:disabled{opacity:.5;cursor:not-allowed}
+.fidelizacao-tier{border:1px solid #d4e1f3;background:#f8fbff;border-radius:12px;padding:18px;min-height:140px}
+.fidelizacao-tier strong{display:block;font-size:17px;color:#17467e}
+.fidelizacao-tier-bronze{border-top:4px solid #b97c48}.fidelizacao-tier-prata{border-top:4px solid #94a6bc}.fidelizacao-tier-ouro{border-top:4px solid #d5aa43}
+.fidelizacao-form-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;align-items:end;margin:18px 0}
+.fidelizacao-form-grid label{display:block;min-width:0;font-size:12px;font-weight:700;color:#315580}
+.fidelizacao-form-grid select,.fidelizacao-form-grid input,.fidelizacao-panel>label input{width:100%;max-width:none!important;min-height:40px;border:1px solid #cbdcf4;border-radius:9px;background:#f8fbff;color:#17365e;padding:9px;margin-top:6px}
+.fidelizacao-reminder{border:1px solid #d4e1f4;padding:15px;border-radius:11px;display:flex;align-items:center;gap:12px;justify-content:space-between;flex-wrap:wrap;background:#f8fbff}
+.fidelizacao-reminder-closed{background:#f4f7fb}
+.fidelizacao-status{display:inline-block;font-size:11px;font-weight:700;border-radius:20px;padding:4px 9px;margin-left:6px}
+.fidelizacao-status.is-open{background:#e2f0ff;color:#1559a6}.fidelizacao-status.is-closed{background:#e5f5eb;color:#247246}
+.fidelizacao-reminder button{border:1px solid #b6ccee;border-radius:8px;padding:8px 12px;color:#174c9a;background:#e9f2ff;font-weight:700}
+.fidelizacao-reminder button:disabled{opacity:.5}
+.fidelizacao-page table thead{background:#edf4ff;color:#214e88}
+.fidelizacao-page table tbody tr:nth-child(even){background:#f8fbff}
+@media(max-width:900px){.fidelizacao-form-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:580px){.fidelizacao-page{padding:12px!important}.fidelizacao-page .fidelizacao-hero{padding:20px}.fidelizacao-page .fidelizacao-panel{padding:15px}.fidelizacao-form-grid{grid-template-columns:1fr}.fidelizacao-opportunity .fidelizacao-button{width:100%}}
