@@ -63,10 +63,13 @@ export default function FidelizacaoClient(){
  const items=useMemo<Item[]>(()=>{
   const now=new Date();const year=now.getUTCFullYear();
   return clients.filter(c=>c.kind==='school'||c.kind==='company'||c.kind==='association').map(client=>{
-   const completed=events.filter(e=>e.client_id===client.id&&e.status==='completed');
+   // A confirmação verde na Agenda habilita o ciclo; a visita só entra na contagem após sua data.
+   // Eventos cancelados, reservados e futuros não contam como visitas realizadas.
+   const today=parseDate(new Date().toLocaleDateString('en-CA',{timeZone:'America/Sao_Paulo'}))!;
+   const completed=events.filter(e=>e.client_id===client.id&&(e.status==='confirmed'||e.status==='completed')&&parseDate(e.event_date)!==null&&parseDate(e.event_date)!.getTime()<=today.getTime());
    const dated=completed.map(e=>parseDate(e.event_date)).filter((d):d is Date=>d!==null).sort((a,b)=>b.getTime()-a.getTime());
    const last=dated[0]||null;
-   const days=last?Math.max(0,Math.floor((now.getTime()-last.getTime())/DAY)):null;
+   const days=last?Math.max(0,Math.floor((today.getTime()-last.getTime())/DAY)):null;
    const yearly=dated.filter(d=>d.getUTCFullYear()===year).length;
    const tier=yearly>=8?'Diamante':yearly>=4?'Ouro':yearly>=2?'Prata':yearly===1?'Bronze':'Sem categoria';
    const alert=days!==null&&days>=threshold?'Retomar contato':completed.length===0?'Novo / sem visita realizada':days!==null&&days>=60?'Acompanhar':'Relacionamento recente';
@@ -81,10 +84,10 @@ export default function FidelizacaoClient(){
   const today=new Date().toLocaleDateString('en-CA',{timeZone:'America/Sao_Paulo'});
   const overdue=actions.filter(a=>a.status==='open'&&a.due_date&&String(a.due_date).slice(0,10)<today);
   const suggestions=[
-   ...inactive.map(i=>({id:i.client.id,name:i.client.name,reason:'Sem visita concluída há '+i.days+' dias',tip:'Avaliar oferta de nova apresentação',rank:0})),
+   ...inactive.map(i=>({id:i.client.id,name:i.client.name,reason:'Sem visita confirmada há '+i.days+' dias',tip:'Avaliar oferta de nova apresentação',rank:0})),
    ...attention.map(i=>({id:i.client.id,name:i.client.name,reason:'Última visita há '+i.days+' dias',tip:'Programar acompanhamento',rank:1})),
    ...recurring.filter(i=>i.priority!==0).map(i=>({id:i.client.id,name:i.client.name,reason:i.completed+' apresentações neste ano',tip:'Avaliar pacote de renovação',rank:2})),
-   ...withoutVisit.map(i=>({id:i.client.id,name:i.client.name,reason:'Nenhuma visita concluída',tip:'Verificar negociação da primeira visita',rank:3}))
+   ...withoutVisit.map(i=>({id:i.client.id,name:i.client.name,reason:'Nenhuma visita confirmada até hoje',tip:'Verificar negociação da primeira visita',rank:3}))
   ].sort((a,b)=>a.rank-b.rank);
   return {withoutVisit:withoutVisit.length,inactive:inactive.length,attention:attention.length,recurring:recurring.length,overdue:overdue.length,suggestions};
  },[items,actions,threshold]);
