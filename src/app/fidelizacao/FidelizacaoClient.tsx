@@ -157,6 +157,25 @@ export default function FidelizacaoClient(){
  .fidelizacao-page button:not(:disabled){transition:background .15s,border-color .15s}
  .fidelizacao-pagination button{padding:8px 12px;border:1px solid #a9c2e4;border-radius:8px;background:#eaf2ff;color:#154783;font-weight:650;cursor:pointer}
  .fidelizacao-pagination button:disabled{opacity:.45;cursor:not-allowed}
+ /* Hierarquia visual dos painéis e histórico compacto */
+ .fidelizacao-page .fidelizacao-radar-panel{padding:22px!important}
+ .fidelizacao-page .fidelizacao-radar-kpi{min-height:76px!important;padding:12px 14px!important}
+ .fidelizacao-page .fidelizacao-radar-kpi small{font-size:13px!important;color:#24548d!important}
+ .fidelizacao-page .fidelizacao-radar-kpi>div{font-size:23px!important;color:#17467f!important}
+ .fidelizacao-page .fidelizacao-attention-panel{padding:22px!important}
+ .fidelizacao-page .fidelizacao-attention-table{font-size:13px}
+ .fidelizacao-page .fidelizacao-attention-table td{padding:9px 10px}
+ .fidelizacao-page .fidelizacao-agenda-panel{padding:15px!important;color:#17467f}
+ .fidelizacao-page .fidelizacao-agenda-panel .fidelizacao-section-heading{margin-bottom:10px;padding:11px 14px;font-size:18px}
+ .fidelizacao-page .fidelizacao-agenda-panel h3{margin-top:12px!important;color:#17467f;font-size:14px}
+ .fidelizacao-page .fidelizacao-agenda-panel p,.fidelizacao-page .fidelizacao-agenda-panel strong,.fidelizacao-page .fidelizacao-agenda-panel .fidelizacao-reminder{color:#17467f}
+ .fidelizacao-page .fidelizacao-agenda-panel .fidelizacao-reminder-open{padding:10px!important}
+ .fidelizacao-page .fidelizacao-history-row{display:grid!important;grid-template-columns:minmax(145px,1.1fr) minmax(160px,2fr) auto;align-items:center;gap:12px;padding:9px 12px!important;min-height:42px}
+ .fidelizacao-page .fidelizacao-history-row strong{font-size:13px;line-height:1.3}
+ .fidelizacao-page .fidelizacao-history-note{font-size:12px;color:#31527e;line-height:1.35;overflow-wrap:anywhere}
+ .fidelizacao-page .fidelizacao-history-row .fidelizacao-history-status{margin-left:0;justify-self:end}
+ @media(max-width:760px){.fidelizacao-page .fidelizacao-history-row{grid-template-columns:minmax(0,1fr) auto}.fidelizacao-page .fidelizacao-history-note{grid-column:1/-1;grid-row:2}.fidelizacao-page .fidelizacao-history-row .fidelizacao-history-status{grid-column:2;grid-row:1}}
+
  `}</style><main className="fidelizacao-page" style={{maxWidth:1180,margin:'0 auto',padding:'16px 18px 32px',fontFamily:'system-ui',color:'#142b4f'}}>
 
  <header className="fidelizacao-hero"><div className="fidelizacao-eyebrow">ANTARES BUSINESS · RELACIONAMENTO</div><h1>Fidelização e Relacionamento</h1></header>
@@ -176,7 +195,7 @@ export default function FidelizacaoClient(){
  <strong>✦ {t.name}</strong><div style={{fontSize:13,margin:'6px 0'}}>{t.count}</div><p style={{fontSize:13}}>{t.ideas}</p></div>)}
  </div>
  </section>
- <section className="fidelizacao-panel">
+ <section className="fidelizacao-panel fidelizacao-radar-panel">
  <h2 className="fidelizacao-section-heading">ANTARES Intelligence · Radar comercial</h2>
  
  <div className="fidelizacao-radar-kpi-grid" style={{marginBottom:18}}>
@@ -188,7 +207,7 @@ export default function FidelizacaoClient(){
 
  </section>
 
- <section style={{border:'1px solid #b6c7de',borderRadius:14,padding:19,marginTop:20}}>
+ <section className="fidelizacao-attention-panel" style={{border:'1px solid #b6c7de',borderRadius:14,padding:19,marginTop:20}}>
  <h2 className="fidelizacao-section-heading">Central de atenção aos clientes</h2>
  
  <div style={{display:'flex',flexWrap:'wrap',gap:12,margin:'15px 0'}}>
@@ -204,7 +223,7 @@ export default function FidelizacaoClient(){
  </table></div>}
  </section>
 
- <section style={{border:'1px solid #b6c7de',borderRadius:14,padding:19,marginTop:20}}>
+ <section className="fidelizacao-agenda-panel" style={{border:'1px solid #b6c7de',borderRadius:14,padding:19,marginTop:20}}>
  <h2 id="agenda-relacionamento" className="fidelizacao-section-heading">Agenda interna de relacionamento</h2>
  <p style={{fontSize:13,color:'#31527e',margin:'4px 0 12px'}}>Os contatos são programados no Radar Comercial. Acompanhe e finalize as ações aqui.</p>
  {feedback&&<p role="status" style={{marginTop:10}}>{feedback}</p>}
@@ -214,7 +233,7 @@ export default function FidelizacaoClient(){
  <div><strong>{a.client_name}</strong> <span className={'fidelizacao-status '+(a.status==='open'?'is-open':'is-closed')}>{a.status==='open'?'Em aberto':a.status==='done'?'Concluído':'Dispensado'}</span><div style={{fontSize:13}}>Tipo: {a.action_kind} · Prioridade: {a.priority} · {a.status==='open'?'Em aberto':a.status==='done'?'Concluído':'Dispensado'}</div><div style={{fontSize:13}}>Prazo: {a.due_date?String(a.due_date).slice(0,10).split('-').reverse().join('/'):'Sem data'}</div><div>{a.note}</div></div>
  {a.status==='open'&&<div style={{display:'flex',alignItems:'center',gap:8,flexWrap:'wrap'}}>{whatsappFor(a.client_id)?<a href={whatsappFor(a.client_id)!} target="_blank" rel="noopener noreferrer" className="fidelizacao-button" style={{textDecoration:'none',background:'#16794c'}}>WhatsApp</a>:<span style={{fontSize:12,color:'#6b7280'}} title="Cadastre um telefone válido em Clientes">Sem telefone cadastrado</span>}<button disabled={saving} onClick={()=>saveAction('complete',a.id)}>Concluir</button><button disabled={saving} onClick={()=>saveAction('dismiss',a.id)}>Dispensar</button></div>}</div>)}
  </div>
- {actions.some(a=>a.status!=='open')&&<div style={{marginTop:14}}><button type="button" className="fidelizacao-history-button" onClick={()=>setShowHistory(v=>!v)} aria-expanded={showHistory}>{showHistory?'Ocultar histórico':'Ver histórico de contatos'} ({actions.filter(a=>a.status!=='open').length})</button>{showHistory&&<div style={{display:'grid',gap:8,marginTop:10}}>{actions.filter(a=>a.status!=='open').map(a=><div key={a.id} className="fidelizacao-reminder fidelizacao-reminder-closed"><strong>{a.client_name}</strong><span className={'fidelizacao-history-status '+(a.status==='done'?'is-done':'is-dismissed')}>{a.status==='done'?'✓ Concluído':'Dispensado'}</span><div>{a.note}</div></div>)}</div>}</div>}
+ {actions.some(a=>a.status!=='open')&&<div style={{marginTop:14}}><button type="button" className="fidelizacao-history-button" onClick={()=>setShowHistory(v=>!v)} aria-expanded={showHistory}>{showHistory?'Ocultar histórico':'Ver histórico de contatos'} ({actions.filter(a=>a.status!=='open').length})</button>{showHistory&&<div style={{display:'grid',gap:8,marginTop:10}}>{actions.filter(a=>a.status!=='open').map(a=><div key={a.id} className="fidelizacao-reminder fidelizacao-reminder-closed fidelizacao-history-row"><strong>{a.client_name}</strong><div className="fidelizacao-history-note">{a.note}</div><span className={'fidelizacao-history-status '+(a.status==='done'?'is-done':'is-dismissed')}>{a.status==='done'?'✓ Concluído':'Dispensado'}</span></div>)}</div>}</div>}
  </section>
  </main>
  {modalOpen&&<div className="fidelizacao-modal-backdrop" role="presentation">
