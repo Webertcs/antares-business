@@ -1,25 +1,35 @@
 'use client';
-import { Suspense, useActionState, useState } from 'react';
+import {Suspense,useActionState,useState} from 'react';
 import {useSearchParams} from 'next/navigation';
 import Link from 'next/link';
-import { signInAction } from './actions';
-function LoginFormContent(){
- const search=useSearchParams();const token=search.get('token')||'';const valid=/^[a-f0-9]{64}$/.test(token);const query=valid?'?token='+encodeURIComponent(token):'';
- const [state, action, pending] = useActionState(signInAction, null);
- const [showPassword,setShowPassword] = useState(false);
- return <form action={action} style={{display:'grid',gap:14,maxWidth:380,margin:'12vh auto',padding:28,border:'1px solid #334155',borderRadius:16}}>
-  <h1 style={{fontSize:25,fontWeight:750}}>ANTARES BUSINESS</h1>
-  {valid&&<input type="hidden" name="inviteToken" value={token}/>}
-  <p>Entre com uma conta autorizada do planetário.</p>
-  <label>E-mail<input name="email" type="email" required autoComplete="username" style={{width:'100%',padding:12,color:'#111',background:'white'}}/></label>
-  <label>Senha<span style={{display:'flex',alignItems:'stretch',gap:4}}><input name="password" type={showPassword?'text':'password'} required autoComplete="current-password" style={{width:'100%',minWidth:0,padding:12,color:'#111',background:'white'}}/><button type="button" onClick={()=>setShowPassword(p=>!p)} aria-label={showPassword?'Ocultar senha':'Mostrar senha'} aria-pressed={showPassword} title={showPassword?'Ocultar senha':'Mostrar senha'} style={{border:'1px solid #94a3b8',borderRadius:8,padding:'0 11px',background:'#fff',color:'#111',cursor:'pointer'}}>{showPassword?'🙈':'👁️'}</button></span></label>
-  {state?.error && <p role="alert" style={{color:'#ef4444'}}>{state.error}</p>}
-  <button disabled={pending} style={{padding:12,background:'#2563eb',borderRadius:10,color:'white'}}>{pending?'Entrando…':'Entrar'}</button>
-  {valid&&<Link href={"/auth/primeiro-acesso"+query}>Primeiro acesso · Criar conta</Link>}
-  <Link href="/auth/esqueci-senha">Esqueci minha senha</Link>
-  <Link href={"/auth/verificar-email"+query}>Confirmar meu e-mail</Link>
-  <Link href="/vitrine">Ver vitrine pública</Link>
- </form>;
-}
+import {Eye,EyeOff,LockKeyhole,Mail,LogIn,KeyRound} from 'lucide-react';
+import {signInAction} from './actions';
+import './login.css';
 
-export default function LoginForm(){return <Suspense fallback={<p>Carregando login...</p>}><LoginFormContent/></Suspense>}
+function LoginFormContent(){
+ const search=useSearchParams();
+ const token=search.get('token')||'';
+ const valid=/^[a-f0-9]{64}$/.test(token);
+ const query=valid?'?token='+encodeURIComponent(token):'';
+ const [state,action,pending]=useActionState(signInAction,null);
+ const [showPassword,setShowPassword]=useState(false);
+ return <main className="antares-login-scene">
+  <form action={action} className="antares-login-card">
+   <div className="antares-login-brand" aria-label="ANTARES BUSINESS — Planetário Móvel Digital">
+    <div className="antares-login-mark" aria-hidden="true">✦<span>◌</span></div>
+    <div className="antares-login-wordmark">ANTARES</div>
+    <div className="antares-login-business">B U S I N E S S</div>
+    <div className="antares-login-subtitle">PLANETÁRIO MÓVEL DIGITAL</div>
+   </div>
+   <h1>Acesse sua conta</h1>
+   {valid&&<input type="hidden" name="inviteToken" value={token}/>}
+   <label className="antares-login-field"><Mail aria-hidden="true" size={21}/><span className="sr-only">E-mail</span><input name="email" type="email" placeholder="E-mail" required autoComplete="username"/></label>
+   <label className="antares-login-field"><LockKeyhole aria-hidden="true" size={21}/><span className="sr-only">Senha</span><input name="password" type={showPassword?'text':'password'} placeholder="Senha" required autoComplete="current-password"/><button type="button" className="antares-login-eye" onClick={()=>setShowPassword(p=>!p)} aria-label={showPassword?'Ocultar senha':'Mostrar senha'} aria-pressed={showPassword}>{showPassword?<EyeOff size={22}/>:<Eye size={22}/>}</button></label>
+   {state?.error&&<p role="alert" className="antares-login-error">{state.error}</p>}
+   <button className="antares-login-submit" disabled={pending} type="submit"><LogIn size={23}/>{pending?'Entrando…':'ENTRAR'}</button>
+   <Link className="antares-login-forgot" href="/auth/esqueci-senha"><KeyRound size={18}/> Esqueceu a senha?</Link>
+   {valid&&<div className="antares-login-invite"><Link href={'/auth/primeiro-acesso'+query}>Ativar meu convite</Link><Link href={'/auth/verificar-email'+query}>Confirmar e-mail</Link></div>}
+  </form>
+ </main>;
+}
+export default function LoginForm(){return <Suspense fallback={<main className="antares-login-scene"/>}><LoginFormContent/></Suspense>}
