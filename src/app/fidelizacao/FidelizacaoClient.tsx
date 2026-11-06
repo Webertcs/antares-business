@@ -84,11 +84,11 @@ export default function FidelizacaoClient(){
  const count=(tier:string)=>items.filter(i=>i.tier===tier).length;
  const dateLabel=(d:Date|null)=>d?d.toLocaleDateString('pt-BR',{timeZone:'UTC'}):'Nenhuma visita concluída';
  return <><style>{`
- .fidelizacao-section-heading{font-size:20px;font-weight:750;background:linear-gradient(105deg,#173f7c,#2477d8);color:white;padding:13px 16px;border-radius:10px;margin:-3px -3px 15px}
- .fidelizacao-opportunity-compact{padding:8px 12px!important;min-height:0!important;gap:12px!important}
+ .fidelizacao-section-heading{color:#fff!important;font-size:20px;font-weight:750;background:linear-gradient(105deg,#173f7c,#2477d8);color:white;padding:13px 16px;border-radius:10px;margin:-3px -3px 15px}
+ .fidelizacao-opportunity-compact{padding:5px 10px!important;min-height:0!important;gap:8px!important;align-items:center!important}
  .fidelizacao-opportunity-compact strong{font-size:13px}
- .fidelizacao-opportunity-compact .fidelizacao-button{padding:8px 11px;font-size:12px;white-space:nowrap}
- .fidelizacao-pagination{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;margin-top:14px;font-size:13px}
+ .fidelizacao-opportunity-compact .fidelizacao-button{padding:6px 10px!important;font-size:12px;white-space:nowrap}
+ .fidelizacao-radar-kpi{padding:8px 10px!important;min-height:0!important}\n .fidelizacao-radar-kpi small{font-size:11px!important}\n .fidelizacao-radar-kpi>div{font-size:20px!important;line-height:1.2!important}\n .fidelizacao-pagination{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;margin-top:14px;font-size:13px}
  .fidelizacao-pagination>div{display:flex;gap:8px}
  .fidelizacao-pagination button{padding:8px 12px;border:1px solid #a9c2e4;border-radius:8px;background:#eaf2ff;color:#154783;font-weight:650;cursor:pointer}
  .fidelizacao-pagination button:disabled{opacity:.45;cursor:not-allowed}
@@ -101,12 +101,12 @@ export default function FidelizacaoClient(){
  </div>
  <section className="fidelizacao-panel">
  <h2 className="fidelizacao-section-heading">ANTARES Intelligence · Radar comercial</h2>
- <p>Oportunidades calculadas a partir de apresentações concluídas, sem enviar mensagens nem conceder descontos.</p>
+ 
  <div style={{display:'flex',gap:10,flexWrap:'wrap',marginBottom:18}}>
  {([['Primeira visita pendente',radar.withoutVisit],['Retorno em atenção',radar.inactive],['Acompanhar',radar.attention],['Recorrentes no ano',radar.recurring],['Lembretes vencidos',radar.overdue]] as [string,number][]).map(([label,total])=><div key={label} className="fidelizacao-radar-kpi" style={{flex:'1 1 140px'}}><small>{label}</small><div style={{fontSize:25,fontWeight:800}}>{total}</div></div>)}
  </div>
- <h3 style={{fontWeight:700,marginBottom:10}}>Oportunidades sugeridas</h3>
- {loading?<p>Carregando...</p>:error?<p role="alert">{error}</p>:radar.suggestions.length===0?<p>Sem oportunidades identificadas.</p>:<div style={{display:'grid',gap:9}}>{radar.suggestions.slice(currentRadarPage*10,(currentRadarPage+1)*10).map(o=><div key={o.id+o.rank} className="fidelizacao-opportunity fidelizacao-opportunity-compact"><div><strong>{o.name}</strong><div style={{fontSize:13}}>{o.reason}</div><div style={{fontSize:13,color:'#315a96'}}>{o.tip}</div></div><button type="button" className="fidelizacao-button" onClick={()=>{setSelected(o.id);document.getElementById('agenda-relacionamento')?.scrollIntoView({behavior:'smooth'});}}>Programar contato</button></div>)}</div>}
+ <h3 style={{fontWeight:700,marginBottom:10}}>Radar de Fidelização</h3>
+ {loading?<p>Carregando...</p>:error?<p role="alert">{error}</p>:radar.suggestions.length===0?<p>Sem oportunidades identificadas.</p>:<div style={{display:'grid',gap:9}}>{radar.suggestions.slice(currentRadarPage*10,(currentRadarPage+1)*10).map(o=><div key={o.id+o.rank} className="fidelizacao-opportunity fidelizacao-opportunity-compact"><div><strong>{o.name}</strong></div><button type="button" className="fidelizacao-button" onClick={()=>{setSelected(o.id);document.getElementById('agenda-relacionamento')?.scrollIntoView({behavior:'smooth'});}}>Programar contato</button></div>)}</div>}
  {radar.suggestions.length>10&&<nav aria-label="Páginas do radar comercial" className="fidelizacao-pagination"><span>Exibindo {currentRadarPage*10+1}–{Math.min((currentRadarPage+1)*10,radar.suggestions.length)} de {radar.suggestions.length} escolas · Página {currentRadarPage+1} de {radarPages}</span><div><button type="button" disabled={currentRadarPage===0} onClick={()=>setRadarPage(p=>Math.max(0,p-1))}>Anterior</button><button type="button" disabled={currentRadarPage>=radarPages-1} onClick={()=>setRadarPage(p=>Math.min(radarPages-1,p+1))}>Próxima</button></div></nav>}
  <p style={{fontSize:12,opacity:.75,marginTop:12}}>Indicadores de relacionamento são estimativas para auxiliar o acompanhamento das instituições, não conclusões definitivas.</p>
  </section>
