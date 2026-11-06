@@ -5,38 +5,17 @@
 .antares-login-field input,.antares-login-field input:-webkit-autofill,.antares-login-field input:-webkit-autofill:hover,.antares-login-field input:-webkit-autofill:focus{-webkit-text-fill-color:#fff!important;box-shadow:0 0 0 1000px #0b3169 inset!important;caret-color:white!important;border-radius:4px}
 @media(max-width:720px){.antares-login-scene{background-position:50% center}.antares-login-card{width:min(100%,440px);padding:27px 22px 26px;background:linear-gradient(160deg,#031b4af5,#010f30f8)}}
 
-/* 06/11 — PNG local, enquadramento panorâmico e formulário funcional. */
-.antares-login-scene{background-image:url('/antares-login-cinematic.png');background-size:cover;background-position:center center;background-attachment:scroll;min-height:100dvh}
-.antares-login-card{background:linear-gradient(160deg,#03183ff7,#010e2ff9);max-width:520px;box-shadow:0 0 0 2px #04a8ff44,0 0 32px #009dff85,0 24px 60px #000b}
-@media(min-width:1100px){.antares-login-scene{background-size:cover;background-position:center 52%}}
-@media(max-width:760px){.antares-login-scene{background-position:center center;padding:24px 14px}.antares-login-card{max-width:440px}}
 
-/* 06/11 — enquadrar toda a arte, sem cortar telescópio, lua ou cúpula. */
-.antares-login-scene{background-color:#020b24;background-image:url('/antares-login-cinematic.png');background-repeat:no-repeat;background-size:contain;background-position:center center;padding:18px 14px}
-.antares-login-card{width:min(100%,390px);max-width:390px;padding:20px 26px 18px;gap:10px;border-radius:23px;background:linear-gradient(160deg,rgba(3,24,63,.98),rgba(1,12,42,.99));box-shadow:0 0 0 1px #04a8ff55,0 0 23px #009dff65,0 16px 38px #0009}
-.antares-login-brand{margin-bottom:0}.antares-login-mark{font-size:37px}.antares-login-mark span{font-size:40px}.antares-login-wordmark{font-size:32px}.antares-login-business{font-size:10px;letter-spacing:4px}.antares-login-subtitle{font-size:9px;letter-spacing:1.3px;margin-top:5px}.antares-login-card h1{font-size:22px;margin:6px 0}.antares-login-field{height:43px;border-radius:10px}.antares-login-field input{font-size:14px}.antares-login-submit{height:46px;font-size:16px;margin-top:6px}.antares-login-forgot{font-size:13px;margin-top:3px}
-@media(max-width:760px){.antares-login-scene{background-size:contain;background-position:center center}.antares-login-card{width:min(100%,350px);padding:18px 19px;gap:9px}}
-
-/* 06/11 — fundo sem faixas, logo unica da arte e controles reais sobre a ilustracao. */
-@media(min-width:761px){
- .antares-login-scene{background-size:100% 100%;background-position:center;}
- .antares-login-card{background:transparent;border-color:transparent;box-shadow:none;backdrop-filter:none;}
- .antares-login-brand{visibility:hidden;}
- .antares-login-card h1{visibility:hidden;}
- .antares-login-forgot{margin-top:17px;}
-}
-
-/* Alinhamento dos controles reais sobre o painel impresso na arte (desktop). */
-@media(min-width:761px){
- .antares-login-scene{position:relative;display:block;padding:0;overflow:hidden;}
- .antares-login-card{position:absolute;inset:0;display:block;width:100%;max-width:none;height:100%;padding:0;margin:0;border:0;border-radius:0;background:transparent;box-shadow:none;backdrop-filter:none;}
- .antares-login-brand,.antares-login-card h1{display:none;}
- .antares-login-field{position:absolute;left:36.8%;width:26.4%;height:6.1%;min-height:35px;max-height:54px;padding:0 12px;gap:9px;border-radius:10px;background:#082b60;box-shadow:inset 0 1px 4px #001638;border-color:#36a7fa;}
- .antares-login-field:nth-of-type(2){top:48.3%;}
- .antares-login-field:nth-of-type(3){top:55.4%;}
- .antares-login-field input{font-size:clamp(12px,1vw,16px);}
- .antares-login-submit{position:absolute;left:36.8%;top:65.6%;width:26.4%;height:7%;min-height:40px;max-height:62px;margin:0;border-radius:12px;font-size:clamp(14px,1.2vw,19px);}
- .antares-login-forgot{position:absolute;left:36.8%;top:76%;width:26.4%;height:5%;margin:0;color:white;}
- .antares-login-error{position:absolute;left:36.8%;top:60.8%;width:26.4%;z-index:2;padding:5px;font-size:11px;}
- .antares-login-invite{position:absolute;left:36.8%;top:82%;width:26.4%;}
-}
+/* Arte sem formulario: controles HTML independentes e responsivos. */
+.antares-login-scene{min-height:100dvh;background:#020b24 url('/antares-login-background.png') center center/cover no-repeat;padding:20px;display:flex;align-items:center;justify-content:center}
+.antares-login-card{position:relative;width:min(100%,390px);max-width:390px;min-height:0;margin:0;padding:25px 27px 27px;display:flex;flex-direction:column;gap:12px;background:linear-gradient(155deg,rgba(2,20,57,.94),rgba(1,13,39,.96));border:1px solid #3bbcff;border-radius:24px;box-shadow:0 0 28px #009dff7a,0 18px 55px #000b;backdrop-filter:blur(9px)}
+.antares-login-brand{display:none}
+.antares-login-card h1{visibility:visible;display:block;margin:0 0 6px;font-size:24px}
+.antares-login-field{position:static;width:auto;height:48px;min-height:48px;max-height:none;display:flex;padding:0 12px;gap:10px;background:#0c326a;border:1px solid #479dff;border-radius:11px;box-shadow:inset 0 1px 4px #001535}
+.antares-login-field input{background:transparent!important;box-shadow:none!important;color:white!important;font-size:15px}
+.antares-login-field input:-webkit-autofill{-webkit-text-fill-color:white!important;box-shadow:0 0 0 1000px #0c326a inset!important}
+.antares-login-submit{position:static;width:100%;height:51px;min-height:51px;max-height:none;margin:4px 0 0;border-radius:12px;font-size:17px}
+.antares-login-forgot{position:static;width:auto;height:auto;margin:3px 0 0;font-size:14px}
+.antares-login-error,.antares-login-invite{position:static;width:auto}
+@media(min-width:1100px){.antares-login-scene{background-size:100% 100%;}}
+@media(max-width:760px){.antares-login-scene{padding:16px;background-size:cover;background-position:center}.antares-login-card{width:min(100%,370px);padding:22px 20px 24px}}
