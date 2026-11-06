@@ -65,7 +65,7 @@ export default function FidelizacaoClient(){
    const last=dated[0]||null;
    const days=last?Math.max(0,Math.floor((now.getTime()-last.getTime())/DAY)):null;
    const yearly=dated.filter(d=>d.getUTCFullYear()===year).length;
-   const tier=yearly>=4?'Ouro':yearly>=2?'Prata':yearly===1?'Bronze':'Sem categoria';
+   const tier=yearly>=8?'Diamante':yearly>=4?'Ouro':yearly>=2?'Prata':yearly===1?'Bronze':'Sem categoria';
    const alert=days!==null&&days>=threshold?'Retomar contato':completed.length===0?'Novo / sem visita realizada':days!==null&&days>=60?'Acompanhar':'Relacionamento recente';
    return {client,completed:yearly,last,days,tier,alert,priority:days!==null&&days>=threshold?0:days!==null&&days>=60?2:3};
   }).sort((a,b)=>a.priority-b.priority||((b.days||0)-(a.days||0)));
@@ -90,6 +90,7 @@ export default function FidelizacaoClient(){
  const currentRadarPage=Math.min(radarPage,radarPages-1);
  const displayed=items.filter(i=>filter==='all'||(filter==='attention'?i.priority<=2:i.tier===filter));
  const count=(tier:string)=>items.filter(i=>i.tier===tier).length;
+ const messageFor=(clientId:string)=>{const client=items.find(i=>i.client.id===clientId);const name=client?.client.name||'sua instituição';const tier=client?.tier||'Sem categoria';const proposal=tier==='Diamante'?'uma parceria anual e experiências especiais':tier==='Ouro'?'novas experiências e condições para a continuidade da parceria':tier==='Prata'?'novos temas e opções de programação recorrente':'uma nova visita do Planetário ANTARES';return 'Olá! Agradecemos a parceria com '+name+'. Gostaríamos de conversar sobre '+proposal+'. Podemos apresentar uma proposta personalizada?';};
  const dateLabel=(d:Date|null)=>d?d.toLocaleDateString('pt-BR',{timeZone:'UTC'}):'—';
  const shortAlert=(i:Item)=>i.last===null?'Primeira visita':i.alert==='Novo / sem visita realizada'?'Primeira visita':i.alert;
  return <><style>{`
@@ -136,6 +137,7 @@ export default function FidelizacaoClient(){
  .fidelizacao-radar-list{gap:3px!important}
  .fidelizacao-pagination{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;margin-top:14px;font-size:13px}
  .fidelizacao-pagination>div{display:flex;gap:8px}
+ .fidelizacao-tier-diamante{background:#e6f5ff!important;border-top:3px solid #4ca6d8!important}
  .fidelizacao-tier-card:nth-child(1){background:#fff5e9!important;border-color:#d4a06a!important}
  .fidelizacao-tier-card:nth-child(2){background:#eff3fa!important;border-color:#9eafc6!important}
  .fidelizacao-tier-card:nth-child(3){background:#fff9e5!important;border-color:#d6b45b!important}
@@ -148,16 +150,17 @@ export default function FidelizacaoClient(){
 
  <header className="fidelizacao-hero"><div className="fidelizacao-eyebrow">ANTARES BUSINESS · RELACIONAMENTO</div><h1>Fidelização e Relacionamento</h1></header>
  <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(170px,1fr))',gap:12}}>
- {([['Instituições',items.length],['Ouro',count('Ouro')],['Prata',count('Prata')],['Bronze',count('Bronze')],['Precisam de atenção',items.filter(i=>i.priority<=2).length]] as [string,number][]).map(([k,v])=>
+ {([['Instituições',items.length],['Diamante',count('Diamante')],['Ouro',count('Ouro')],['Prata',count('Prata')],['Bronze',count('Bronze')],['Precisam de atenção',items.filter(i=>i.priority<=2).length]] as [string,number][]).map(([k,v])=>
  <div key={k} className="fidelizacao-kpi fidelizacao-kpi-compact"><small>{k}</small><div style={{fontSize:22,fontWeight:800}}>{v}</div></div>)}
  </div>
  <section style={{border:'1px solid #b6c7de',borderRadius:14,padding:19,marginTop:20}}>
  <h2 className="fidelizacao-section-heading">Programa de Fidelização</h2>
  <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(210px,1fr))',gap:12,marginTop:14}}>
  {[
- {name:'Ouro',count:'4 ou mais visitas concluídas',ideas:'Parceiros especiais: fortalecer a parceria, antecipar o planejamento anual e propor experiências exclusivas.'},
- {name:'Prata',count:'2 ou 3 visitas concluídas',ideas:'Parcerias em crescimento: apresentar novos temas e incentivar uma programação recorrente.'},
- {name:'Bronze',count:'1 visita concluída',ideas:'Novas parcerias: agradecer a primeira experiência, acompanhar a satisfação e incentivar uma segunda visita.'}
+ {name:'Diamante',count:'8 ou mais visitas concluídas',ideas:'Sugestões para negociação: até 20% de desconto, sessão gratuita anual e selo Escola Parceira, conforme aprovação do proprietário.'},
+ {name:'Ouro',count:'4 a 7 visitas concluídas',ideas:'Sugestões para negociação: até 15% de desconto, sessão extra a cada cinco visitas e materiais exclusivos.'},
+ {name:'Prata',count:'2 ou 3 visitas concluídas',ideas:'Sugestões para negociação: até 10% de desconto, prioridade de agenda e novos temas.'},
+ {name:'Bronze',count:'1 visita concluída',ideas:'Sugestões para negociação: agradecimento, até 5% na segunda visita e acompanhamento.'}
  ].map(t=><div key={t.name} className={'fidelizacao-tier fidelizacao-tier-'+t.name.toLowerCase()}>
  <strong>✦ {t.name}</strong><div style={{fontSize:13,margin:'6px 0'}}>{t.count}</div><p style={{fontSize:13}}>{t.ideas}</p></div>)}
  </div>
@@ -179,7 +182,7 @@ export default function FidelizacaoClient(){
  
  <div style={{display:'flex',flexWrap:'wrap',gap:12,margin:'15px 0'}}>
  <label>Mostrar <select value={filter} onChange={e=>setFilter(e.target.value)} style={{marginLeft:8,padding:8,border:'1px solid #9db1cd',borderRadius:8,background:'white',color:'#142b4f'}}>
- <option value="all">Todas</option><option value="attention">Precisam de atenção</option><option value="Ouro">Ouro</option><option value="Prata">Prata</option><option value="Bronze">Bronze</option></select></label>
+ <option value="all">Todas</option><option value="attention">Precisam de atenção</option><option value="Diamante">Diamante</option><option value="Ouro">Ouro</option><option value="Prata">Prata</option><option value="Bronze">Bronze</option></select></label>
  <label>Alerta após <select value={threshold} onChange={e=>setThreshold(Number(e.target.value))} style={{marginLeft:8,padding:8,border:'1px solid #9db1cd',borderRadius:8,background:'white',color:'#142b4f'}}><option value={90}>90 dias</option><option value={120}>120 dias</option><option value={180}>180 dias</option></select></label>
  </div>
  {loading?<p>Carregando dados da organização...</p>:error?<p role="alert">{error}</p>:displayed.length===0?<p>Nenhuma instituição nesta categoria.</p>:
@@ -214,6 +217,7 @@ export default function FidelizacaoClient(){
  <label>Prioridade<select value={priority} onChange={e=>{setPriority(e.target.value);setModalTouched(true);}} style={{display:'block',padding:9}}><option value="normal">Normal</option><option value="high">Alta</option><option value="low">Baixa</option></select></label>
  </div>
  <label>Observação<input value={note} onChange={e=>{setNote(e.target.value);setModalTouched(true);}} maxLength={2000} placeholder="Ex.: oferecer sessão de galáxias no próximo bimestre" style={{display:'block',padding:10,width:'100%',margin:'6px 0 12px'}}/></label>
+ <div style={{margin:'12px 0',padding:12,border:'1px solid #b9d4f8',borderRadius:10,background:'#eaf3ff'}}><strong>Sugestão de mensagem comercial</strong><p style={{fontSize:13,margin:'8px 0'}}>{messageFor(selected)}</p><button type="button" disabled={!selected} onClick={()=>navigator.clipboard.writeText(messageFor(selected)).then(()=>setFeedback('Mensagem copiada. Revise antes de enviar.')).catch(()=>setFeedback('Não foi possível copiar a mensagem.'))} className="fidelizacao-button">Copiar mensagem para editar</button><p style={{fontSize:11,marginTop:7}}>Sugestão opcional. Nenhum benefício ou mensagem é enviado automaticamente.</p></div>
  <button type="button" disabled={saving||!selected||!due} onClick={()=>saveAction('create')} className="fidelizacao-button">{saving?'Salvando...':'Criar lembrete interno'}</button>
 
 
