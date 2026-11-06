@@ -22,6 +22,8 @@ export default function FidelizacaoClient(){
  const [threshold,setThreshold]=useState(90);
  const [actions,setActions]=useState<Action[]>([]);
  const [selected,setSelected]=useState('');
+ const [modalOpen,setModalOpen]=useState(false);
+ const [modalTouched,setModalTouched]=useState(false);
  const [due,setDue]=useState('');
  const [kind,setKind]=useState('follow_up');
  const [priority,setPriority]=useState('normal');
@@ -39,6 +41,7 @@ export default function FidelizacaoClient(){
    const r=await fetch('/api/fidelizacao/acoes',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({command,id,clientId:selected,date:due||null,kind,priority,note})});
    const d=await r.json();if(!r.ok)throw Error(d.error||'Não foi possível salvar');
    await refreshActions();setNote('');setDue('');setFeedback('Lembrete atualizado com sucesso.');
+   if(command==='create'){setModalOpen(false);setModalTouched(false);}
   }catch(e){setFeedback(e instanceof Error?e.message:'Erro inesperado');}
   finally{setSaving(false);}
  }
@@ -50,6 +53,9 @@ export default function FidelizacaoClient(){
   }).catch(e=>{if(e.name!=='AbortError')setError(e.message||'Erro ao carregar');}).finally(()=>setLoading(false));
   return ()=>ctrl.abort();
  },[]);
+ function openReminder(clientId=''){setSelected(clientId);setDue('');setKind('follow_up');setPriority('normal');setNote('');setFeedback('');setModalTouched(false);setModalOpen(true);}
+ function closeReminder(){if(saving)return;if(modalTouched&&!window.confirm('Descartar as alterações do lembrete?'))return;setModalOpen(false);setModalTouched(false);}
+ useEffect(()=>{if(!modalOpen)return;const onKey=(e:KeyboardEvent)=>{if(e.key==='Escape'){e.preventDefault();if(!saving&&(!modalTouched||window.confirm('Descartar as alterações do lembrete?'))){setModalOpen(false);setModalTouched(false);}}};window.addEventListener('keydown',onKey);return()=>window.removeEventListener('keydown',onKey);},[modalOpen,modalTouched,saving]);
  const items=useMemo<Item[]>(()=>{
   const now=new Date();const year=now.getUTCFullYear();
   return clients.filter(c=>c.kind==='school'||c.kind==='company'||c.kind==='association').map(client=>{
@@ -85,6 +91,15 @@ export default function FidelizacaoClient(){
  const dateLabel=(d:Date|null)=>d?d.toLocaleDateString('pt-BR',{timeZone:'UTC'}):'—';
  const shortAlert=(i:Item)=>i.last===null?'Primeira visita':i.alert==='Novo / sem visita realizada'?'Primeira visita':i.alert;
  return <><style>{`
+ .fidelizacao-modal-backdrop{position:fixed;inset:0;background:rgba(8,22,48,.72);z-index:9999;display:flex;align-items:center;justify-content:center;padding:18px}
+ .fidelizacao-modal{width:min(680px,100%);max-height:90vh;overflow-y:auto;background:#f5f9ff;color:#142b4f;border:1px solid #b9d4f8;border-radius:16px;padding:22px;box-shadow:0 24px 80px #08163070}
+ .fidelizacao-modal-header{display:flex;justify-content:space-between;align-items:center;gap:12px;background:linear-gradient(105deg,#173f7c,#2477d8);color:white;border-radius:10px;padding:12px 16px}
+ .fidelizacao-modal-header h2{font-size:20px;margin:0;font-weight:750}
+ .fidelizacao-modal-header button{background:#ffffff25;color:white;border:1px solid #ffffff66;border-radius:8px;padding:5px 12px;cursor:pointer}
+ .fidelizacao-modal-description{margin:14px 0;color:#31527e}
+ .fidelizacao-modal .fidelizacao-form-grid{margin-bottom:16px}
+ .fidelizacao-modal input,.fidelizacao-modal select{max-width:100%!important;width:100%;border:1px solid #a9c6eb;border-radius:8px;background:#fff;color:#142b4f}
+ .fidelizacao-modal-cancel{margin-left:12px;border:1px solid #9ab5d9;border-radius:8px;padding:9px 15px;background:#e8f0fb;color:#173f7c;cursor:pointer}
  .fidelizacao-section-heading{color:#fff!important;font-size:20px;font-weight:750;background:linear-gradient(105deg,#173f7c,#2477d8);color:white;padding:13px 16px;border-radius:10px;margin:-3px -3px 15px}
  .fidelizacao-opportunity-compact{padding:5px 10px!important;min-height:0!important;gap:8px!important;align-items:center!important}
  .fidelizacao-opportunity-compact strong{font-size:13px}
@@ -150,7 +165,7 @@ export default function FidelizacaoClient(){
  {([['Primeira visita pendente',radar.withoutVisit],['Retorno em atenção',radar.inactive],['Acompanhar',radar.attention],['Recorrentes no ano',radar.recurring],['Lembretes vencidos',radar.overdue]] as [string,number][]).map(([label,total])=><div key={label} className="fidelizacao-radar-kpi" style={{flex:'1 1 140px'}}><small>{label}</small><div style={{fontSize:25,fontWeight:800}}>{total}</div></div>)}
  </div>
  <h3 className="fidelizacao-radar-subtitle">Radar de Fidelização</h3>
- {loading?<p>Carregando...</p>:error?<p role="alert">{error}</p>:radar.suggestions.length===0?<p>Sem oportunidades identificadas.</p>:<div className="fidelizacao-radar-list" style={{display:'grid',gap:3}}>{radar.suggestions.slice(currentRadarPage*10,(currentRadarPage+1)*10).map(o=><div key={o.id+o.rank} className="fidelizacao-opportunity fidelizacao-opportunity-compact"><div><strong>{o.name}</strong></div><button type="button" className="fidelizacao-button" onClick={()=>{setSelected(o.id);document.getElementById('agenda-relacionamento')?.scrollIntoView({behavior:'smooth'});}}>Programar contato</button></div>)}</div>}
+ {loading?<p>Carregando...</p>:error?<p role="alert">{error}</p>:radar.suggestions.length===0?<p>Sem oportunidades identificadas.</p>:<div className="fidelizacao-radar-list" style={{display:'grid',gap:3}}>{radar.suggestions.slice(currentRadarPage*10,(currentRadarPage+1)*10).map(o=><div key={o.id+o.rank} className="fidelizacao-opportunity fidelizacao-opportunity-compact"><div><strong>{o.name}</strong></div><button type="button" className="fidelizacao-button" onClick={()=>openReminder(o.id)}>Programar contato</button></div>)}</div>}
  {radar.suggestions.length>10&&<nav aria-label="Páginas do radar comercial" className="fidelizacao-pagination"><span>Exibindo {currentRadarPage*10+1}–{Math.min((currentRadarPage+1)*10,radar.suggestions.length)} de {radar.suggestions.length} escolas · Página {currentRadarPage+1} de {radarPages}</span><div><button type="button" disabled={currentRadarPage===0} onClick={()=>setRadarPage(p=>Math.max(0,p-1))}>Anterior</button><button type="button" disabled={currentRadarPage>=radarPages-1} onClick={()=>setRadarPage(p=>Math.min(radarPages-1,p+1))}>Próxima</button></div></nav>}
 
  </section>
@@ -173,14 +188,7 @@ export default function FidelizacaoClient(){
 
  <section style={{border:'1px solid #b6c7de',borderRadius:14,padding:19,marginTop:20}}>
  <h2 id="agenda-relacionamento" className="fidelizacao-section-heading">Agenda interna de relacionamento</h2>
- <div className="fidelizacao-form-grid">
- <label>Instituição<select value={selected} onChange={e=>setSelected(e.target.value)} style={{display:'block',padding:9,maxWidth:230}}><option value="">Selecione</option>{items.map(i=><option key={i.client.id} value={i.client.id}>{i.client.name}</option>)}</select></label>
- <label>Ação<select value={kind} onChange={e=>setKind(e.target.value)} style={{display:'block',padding:9}}><option value="follow_up">Retomar contato</option><option value="renewal">Renovação</option><option value="feedback">Pedir avaliação</option><option value="offer">Nova experiência</option><option value="other">Outra</option></select></label>
- <label>Data prevista<input type="date" value={due} onChange={e=>setDue(e.target.value)} style={{display:'block',padding:8}}/></label>
- <label>Prioridade<select value={priority} onChange={e=>setPriority(e.target.value)} style={{display:'block',padding:9}}><option value="normal">Normal</option><option value="high">Alta</option><option value="low">Baixa</option></select></label>
- </div>
- <label>Observação<input value={note} onChange={e=>setNote(e.target.value)} maxLength={2000} placeholder="Ex.: oferecer sessão de galáxias no próximo bimestre" style={{display:'block',padding:10,width:'100%',margin:'6px 0 12px'}}/></label>
- <button disabled={saving||!selected} onClick={()=>saveAction('create')} className="fidelizacao-button">{saving?'Salvando...':'Criar lembrete interno'}</button>
+ <button type="button" className="fidelizacao-button" onClick={()=>openReminder()}>+ Criar lembrete interno</button>
  {feedback&&<p role="status" style={{marginTop:10}}>{feedback}</p>}
  <h3 style={{marginTop:22,fontWeight:700}}>Lembretes registrados ({actions.filter(a=>a.status==='open').length} em aberto)</h3>
  <div style={{display:'grid',gap:10,marginTop:10}}>
@@ -190,5 +198,22 @@ export default function FidelizacaoClient(){
  </div>
  {actions.some(a=>a.status!=='open')&&<div style={{marginTop:14}}><button type="button" onClick={()=>setShowHistory(v=>!v)} aria-expanded={showHistory}>{showHistory?'Ocultar':'Mostrar'} histórico ({actions.filter(a=>a.status!=='open').length})</button>{showHistory&&<div style={{display:'grid',gap:8,marginTop:10}}>{actions.filter(a=>a.status!=='open').map(a=><div key={a.id} className="fidelizacao-reminder fidelizacao-reminder-closed"><strong>{a.client_name}</strong><span> · {a.status==='done'?'Concluído':'Dispensado'}</span><div>{a.note}</div></div>)}</div>}</div>}
  </section>
- </main></>;
+ </main>
+ {modalOpen&&<div className="fidelizacao-modal-backdrop" role="presentation">
+ <div className="fidelizacao-modal" role="dialog" aria-modal="true" aria-labelledby="fidelizacao-modal-title">
+ <div className="fidelizacao-modal-header"><h2 id="fidelizacao-modal-title">Programar contato</h2><button type="button" onClick={closeReminder} disabled={saving} aria-label="Fechar janela">✕</button></div>
+ <p className="fidelizacao-modal-description">Organize o próximo contato com a instituição.</p>
+  <div className="fidelizacao-form-grid">
+ <label>Instituição<select value={selected} onChange={e=>{setSelected(e.target.value);setModalTouched(true);}} style={{display:'block',padding:9,maxWidth:230}}><option value="">Selecione</option>{items.map(i=><option key={i.client.id} value={i.client.id}>{i.client.name}</option>)}</select></label>
+ <label>Ação<select value={kind} onChange={e=>{setKind(e.target.value);setModalTouched(true);}} style={{display:'block',padding:9}}><option value="follow_up">Retomar contato</option><option value="renewal">Renovação</option><option value="feedback">Pedir avaliação</option><option value="offer">Nova experiência</option><option value="other">Outra</option></select></label>
+ <label>Data prevista<input type="date" value={due} onChange={e=>{setDue(e.target.value);setModalTouched(true);}} style={{display:'block',padding:8}}/></label>
+ <label>Prioridade<select value={priority} onChange={e=>{setPriority(e.target.value);setModalTouched(true);}} style={{display:'block',padding:9}}><option value="normal">Normal</option><option value="high">Alta</option><option value="low">Baixa</option></select></label>
+ </div>
+ <label>Observação<input value={note} onChange={e=>{setNote(e.target.value);setModalTouched(true);}} maxLength={2000} placeholder="Ex.: oferecer sessão de galáxias no próximo bimestre" style={{display:'block',padding:10,width:'100%',margin:'6px 0 12px'}}/></label>
+ <button type="button" disabled={saving||!selected||!due} onClick={()=>saveAction('create')} className="fidelizacao-button">{saving?'Salvando...':'Criar lembrete interno'}</button>
+
+
+ <button type="button" onClick={closeReminder} disabled={saving} className="fidelizacao-modal-cancel">Cancelar</button>
+ </div></div>}
+ </>;
 }
