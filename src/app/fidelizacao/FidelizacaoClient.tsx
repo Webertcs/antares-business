@@ -137,7 +137,7 @@ export default function FidelizacaoClient(){
    ...attention.map(i=>({id:i.client.id,name:i.client.name,reason:'Última visita há '+i.days+' dias',tip:'Programar acompanhamento',rank:1})),
    ...recurring.filter(i=>i.priority!==0).map(i=>({id:i.client.id,name:i.client.name,reason:i.completed+' apresentações neste ano',tip:'Avaliar pacote de renovação',rank:2})),
    ...withoutVisit.map(i=>({id:i.client.id,name:i.client.name,reason:'Nenhuma visita confirmada até hoje',tip:'Verificar negociação da primeira visita',rank:3}))
-  ].sort((a,b)=>a.rank-b.rank);
+  ].sort((a,b)=>a.name.localeCompare(b.name,'pt-BR',{sensitivity:'base'}));
   return {withoutVisit:withoutVisit.length,inactive:inactive.length,attention:attention.length,recurring:recurring.length,overdue:overdue.length,suggestions};
  },[items,actions,threshold]);
  const openByClient=useMemo(()=>{const m=new Map<string,Action[]>();for(const a of actions){if(a.status!=='open')continue;const list=m.get(a.client_id)||[];list.push(a);m.set(a.client_id,list);}for(const list of m.values())list.sort((a,b)=>String(a.due_date||'9999').localeCompare(String(b.due_date||'9999')));return m;},[actions]);
