@@ -14,7 +14,21 @@ export async function GET(_req:NextRequest,{params}:{params:Promise<{id:string}>
   const present=await db`SELECT to_regclass('public.antares_event_attendance') IS NOT NULL AS ready`;
   if(!present[0]?.ready)return NextResponse.json({status:event[0].status,attendance:null,canClose:false},{headers:{'Cache-Control':'private, no-store'}});
   const rows=await db`SELECT actual_students,closed_at FROM public.antares_event_attendance WHERE organization_id=${ctx.organizationId}::uuid AND event_id=${id}::uuid LIMIT 1`;
-  return NextResponse.json({status:event[0].status,attendance:rows[0]||null,canClose:ctx.role==='owner'&&event[0].status==='confirmed'&&!!event[0].event_date&&String(event[0].event_date).slice(0,10)<=new Date().toLocaleDateString('en-CA',{timeZone:'America/Sao_Paulo'})&&process.env.ANTARES_EVENT_CLOSING_WRITES_ENABLED==='true'},{headers:{'Cache-Control':'private, no-store'}});
+  const eventDate = String(event[0].event_date ?? '').slice(0,10);
+  const today = new Intl.DateTimeFormat('en-CA',{timeZone:'America/Sao_Paulo',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date());
+  const checks = {
+   owner:ctx.role==='owner',
+   confirmed:event[0].status==='confirmed',
+   datePresent:!!eventDate,
+   dateEligible:!!eventDate && eventDate<=today,
+   featureEnabled:process.env.ANTARES_EVENT_CLOSING_WRITES_ENABLED==='true'
+  };
+  return NextResponse.json({
+   status:event[0].status,
+   attendance:rows[0]||null,
+   canClose:Object.values(checks).every(Boolean),
+   diagnostics:process.env.NODE_ENV==='development'?{checks,eventDate,today}:undefined
+  },{headers:{'Cache-Control':'private, no-store'}});
  }catch{return unavailable();}
 }
 export async function POST(req:NextRequest,{params}:{params:Promise<{id:string}>}){
