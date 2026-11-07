@@ -36,16 +36,21 @@ export default function EventClosing({eventId}:{eventId:string}){
   {data?.status==='completed'&&!data.attendance&&<p style={{fontSize:13}}>Evento já marcado como realizado. O registro de presença requer conferência antes de qualquer atualização.</p>}
   {!data?.canClose&&!data?.attendance&&<p style={{fontSize:12,color:'#526888',marginBottom:0}}>Encerramento protegido: disponível após implantação e homologação da função segura no Neon.</p>}
   {error&&<p role="status" style={{fontSize:12}}>{error}</p>}{message&&<p role="status">{message}</p>}
-  {editing&&<div role="presentation" style={{position:'fixed',inset:0,zIndex:1000,display:'grid',placeItems:'center',background:'rgba(5,22,54,.65)',padding:20}}>
-   <div role="dialog" aria-modal="true" aria-labelledby="correct-title" style={{background:'#fff',padding:24,borderRadius:16,width:'min(100%,460px)',boxShadow:'0 20px 60px #0005'}}>
-    <h2 id="correct-title" style={{margin:'0 0 8px',fontSize:21}}>Corrigir alunos atendidos</h2>
-    <p>Quantidade anterior: <strong>{data?.attendance?.actual_students}</strong>. A correção ficará registrada na auditoria e não criará outro encerramento.</p>
-    <label style={{display:'grid',gap:6,fontWeight:700}}>Quantidade correta<input autoFocus type="number" min="0" max="100000" step="1" value={students} onChange={e=>setStudents(e.target.value)} style={{padding:12,border:'1px solid #94add5',borderRadius:8}}/></label>
-    <label style={{display:'grid',gap:6,fontWeight:700,marginTop:12}}>Motivo da correção<textarea maxLength={500} rows={3} value={reason} onChange={e=>setReason(e.target.value)} placeholder="Ex.: erro de digitação no encerramento" style={{padding:12,border:'1px solid #94add5',borderRadius:8}}/></label>
-    {message&&<p role="alert">{message}</p>}
-    <div style={{display:'flex',justifyContent:'flex-end',gap:10,marginTop:18}}>
-     <button type="button" disabled={busy} onClick={()=>{setEditing(false);setMessage('')}}>Cancelar</button>
-     <button type="button" disabled={busy||!/^\d+$/.test(students)||Number(students)>100000||Number(students)===data?.attendance?.actual_students||reason.trim().length<5} onClick={()=>void correctAttendance()} style={{background:'#1554b0',color:'#fff',padding:'10px 14px',border:0,borderRadius:9,fontWeight:700}}>{busy?'Salvando…':'Confirmar'}</button>
+  {editing&&<div role="presentation" style={{position:'fixed',inset:0,zIndex:1000,display:'grid',placeItems:'center',background:'rgba(5,22,54,.72)',padding:20}}>
+   <div role="dialog" aria-modal="true" aria-labelledby="correct-title" style={{background:'linear-gradient(160deg,#eef5ff 0%,#f8fbff 65%,#e9f2ff 100%)',color:'#163968',border:'1px solid #8fb6ed',borderRadius:18,width:'min(100%,470px)',boxShadow:'0 24px 70px #041e4c70',overflow:'hidden'}}>
+    <div style={{background:'linear-gradient(110deg,#103c85,#1764c3)',color:'#fff',padding:'19px 24px',borderBottom:'3px solid #74b4ff'}}>
+     <h2 id="correct-title" style={{margin:0,fontSize:21,fontWeight:800}}>Corrigir alunos atendidos</h2>
+     <p style={{margin:'6px 0 0',fontSize:13,color:'#e0efff'}}>Ajuste o total registrado com segurança.</p>
+    </div>
+    <div style={{padding:'20px 24px 22px'}}>
+     <div style={{background:'#dceaff',border:'1px solid #b6d1f5',borderRadius:11,padding:'11px 13px',fontSize:13,lineHeight:1.5,marginBottom:18}}>Quantidade anterior: <strong>{data?.attendance?.actual_students}</strong>. A correção ficará registrada na auditoria e não criará outro encerramento.</div>
+     <label style={{display:'grid',gap:7,fontWeight:750,fontSize:14}}>Quantidade correta<input autoFocus type="number" min="0" max="100000" step="1" value={students} onChange={e=>setStudents(e.target.value)} style={{padding:'12px 13px',background:'#fff',color:'#173668',border:'1.5px solid #8fb6e8',borderRadius:10,fontSize:17,fontWeight:700,outlineOffset:2}}/></label>
+     <label style={{display:'grid',gap:7,fontWeight:750,fontSize:14,marginTop:16}}>Motivo da correção<textarea maxLength={500} rows={3} value={reason} onChange={e=>setReason(e.target.value)} placeholder="Ex.: erro de digitação no encerramento" style={{padding:12,background:'#fff',color:'#173668',border:'1.5px solid #8fb6e8',borderRadius:10,resize:'vertical',fontFamily:'inherit',fontSize:14,outlineOffset:2}}/></label>
+     {message&&<p role="alert" style={{color:'#a52a37',fontWeight:650}}>{message}</p>}
+     <div style={{display:'flex',justifyContent:'flex-end',alignItems:'center',gap:10,marginTop:22,paddingTop:16,borderTop:'1px solid #c4d9f4'}}>
+      <button type="button" disabled={busy} onClick={()=>{setEditing(false);setMessage('')}} style={{padding:'10px 14px',border:'1px solid #a5c4ec',borderRadius:9,background:'#fff',color:'#1a4d90',fontWeight:700}}>Cancelar</button>
+      <button type="button" disabled={busy||!/^\\d+$/.test(students)||Number(students)>100000||Number(students)===data?.attendance?.actual_students||reason.trim().length<5} onClick={()=>void correctAttendance()} style={{background:'linear-gradient(110deg,#1252ac,#2075d4)',color:'#fff',padding:'11px 19px',border:'1px solid #1554b0',borderRadius:9,fontWeight:800,boxShadow:'0 3px 9px #1458ac30',opacity:busy||!/^\\d+$/.test(students)||Number(students)>100000||Number(students)===data?.attendance?.actual_students||reason.trim().length<5?.6:1}}>{busy?'Salvando…':'Confirmar'}</button>
+     </div>
     </div>
    </div>
   </div>}
