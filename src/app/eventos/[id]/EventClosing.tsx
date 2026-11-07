@@ -49,7 +49,7 @@ export default function EventClosing({eventId}:{eventId:string}){
      {message&&<p role="alert" style={{color:'#a52a37',fontWeight:650}}>{message}</p>}
      <div style={{display:'flex',justifyContent:'flex-end',alignItems:'center',gap:10,marginTop:22,paddingTop:16,borderTop:'1px solid #c4d9f4'}}>
       <button type="button" disabled={busy} onClick={()=>{setEditing(false);setMessage('')}} style={{padding:'10px 14px',border:'1px solid #a5c4ec',borderRadius:9,background:'#fff',color:'#1a4d90',fontWeight:700}}>Cancelar</button>
-      <button type="button" disabled={busy||!/^\\d+$/.test(students)||Number(students)>100000||Number(students)===data?.attendance?.actual_students||reason.trim().length<5} onClick={()=>void correctAttendance()} style={{background:'linear-gradient(110deg,#1252ac,#2075d4)',color:'#fff',padding:'11px 19px',border:'1px solid #1554b0',borderRadius:9,fontWeight:800,boxShadow:'0 3px 9px #1458ac30',opacity:busy||!/^\\d+$/.test(students)||Number(students)>100000||Number(students)===data?.attendance?.actual_students||reason.trim().length<5?0.6:1}}>{busy?'Salvando…':'Confirmar'}</button>
+      <button type="button" disabled={busy||!/^\d+$/.test(students)||Number(students)>100000||Number(students)===data?.attendance?.actual_students||reason.trim().length<5} onClick={()=>void correctAttendance()} style={{background:'linear-gradient(110deg,#1252ac,#2075d4)',color:'#fff',padding:'11px 19px',border:'1px solid #1554b0',borderRadius:9,fontWeight:800,boxShadow:'0 3px 9px #1458ac30',opacity:busy||!/^\d+$/.test(students)||Number(students)>100000||Number(students)===data?.attendance?.actual_students||reason.trim().length<5?0.6:1}}>{busy?'Salvando…':'Confirmar'}</button>
      </div>
     </div>
    </div>
