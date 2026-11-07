@@ -1,5 +1,5 @@
 /** Regras únicas para contagem de visitas e avisos do ANTARES.
- * Datas são dias civis de Brasília; a confirmação da Agenda não antecipa visitas.
+ * Datas são dias civis de Brasília; somente o encerramento confirma uma visita realizada.
  */
 export type VisitStatus='confirmed'|'completed'|string;
 export type VisitInput={status:VisitStatus;event_date:string|null};
@@ -13,7 +13,7 @@ export function visitDays(value:string|null):number|null{
 export function relationshipCycle(events:VisitInput[],today:string){
  const now=visitDays(today);
  if(now===null)throw Error('Data atual inválida');
- const dates=events.filter(e=>e.status==='confirmed'||e.status==='completed')
+ const dates=events.filter(e=>e.status==='completed')
   .map(e=>visitDays(e.event_date)).filter((d):d is number=>d!==null&&d<=now)
   .sort((a,b)=>b-a);
  const last=dates[0]??null;
