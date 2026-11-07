@@ -250,6 +250,7 @@ export default function FidelizacaoClient(){
 
  <section className="fidelizacao-attention-panel" style={{border:'1px solid #b6c7de',borderRadius:14,padding:19,marginTop:20}}>
  <h2 className="fidelizacao-section-heading">Central de Alertas</h2>
+  {feedback&&<p role="status" style={{padding:"8px 12px",background:"#eaf3ff",borderRadius:8,color:"#17467f"}}>{feedback}</p>}
  
  <div style={{display:'flex',flexWrap:'wrap',gap:12,margin:'15px 0'}}>
  <label>Mostrar <select value={filter} onChange={e=>(setFilter(e.target.value),setAttentionPage(0))} style={{marginLeft:8,padding:8,border:'1px solid #9db1cd',borderRadius:8,background:'white',color:'#142b4f'}}>
