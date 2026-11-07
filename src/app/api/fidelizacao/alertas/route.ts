@@ -31,7 +31,7 @@ export async function GET(){
    if(days===null||days<60||snoozes[String(r.id)]>=today)return [];
    return [{client_id:String(r.id),client_name:String(r.name),last_visit:date,days,severity:days>=90?'critical':'warning'}];
   });
-  return NextResponse.json({alerts,count:alerts.length,critical:alerts.filter(a=>a.severity==='critical').length},{headers:{'Cache-Control':'private, no-store'}});
+  return NextResponse.json({alerts,snoozes,count:alerts.length,critical:alerts.filter(a=>a.severity==='critical').length},{headers:{'Cache-Control':'private, no-store'}});
  }catch{
   return NextResponse.json({error:'Alertas temporariamente indisponíveis'},{status:503,headers:{'Cache-Control':'no-store'}});
  }
