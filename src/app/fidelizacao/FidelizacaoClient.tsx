@@ -111,10 +111,10 @@ export default function FidelizacaoClient(){
  const items=useMemo<Item[]>(()=>{
   const year=Number(new Intl.DateTimeFormat('en-US',{year:'numeric',timeZone:'America/Sao_Paulo'}).format(new Date()));
   return clients.filter(c=>c.kind==='school'||c.kind==='company'||c.kind==='association').map(client=>{
-   // A confirmação verde na Agenda habilita o ciclo; a visita só entra na contagem após sua data.
+   // A visita só entra na contagem após o encerramento efetivo do evento.
    // Eventos cancelados, reservados e futuros não contam como visitas realizadas.
    const today=parseDate(new Date().toLocaleDateString('en-CA',{timeZone:'America/Sao_Paulo'}))!;
-   const completed=events.filter(e=>e.client_id===client.id&&(e.status==='confirmed'||e.status==='completed')&&parseDate(e.event_date)!==null&&parseDate(e.event_date)!.getTime()<=today.getTime());
+   const completed=events.filter(e=>e.client_id===client.id&&e.status==='completed'&&parseDate(e.event_date)!==null&&parseDate(e.event_date)!.getTime()<=today.getTime());
    const cycle=relationshipCycle(events.filter(e=>e.client_id===client.id),today.toISOString().slice(0,10));
    const dated=completed.map(e=>parseDate(e.event_date)).filter((d):d is Date=>d!==null).sort((a,b)=>b.getTime()-a.getTime());
    const last=dated[0]||null;
