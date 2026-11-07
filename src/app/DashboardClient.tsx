@@ -6,7 +6,6 @@ import BackButton from './BackButton';
 import Image from 'next/image';
 import InstallAntares from './InstallAntares';
 import DashboardOverview from './DashboardOverview';
-import DashboardSearch from './DashboardSearch';
 import {Orbit,GraduationCap,LayoutDashboard,CalendarDays,CalendarCheck2,BriefcaseBusiness,ClipboardCheck,Wallet,Settings2,Bell,Plus,ChevronLeft,ArrowUpRight,Search,CheckCircle2,Clock3,Users,ChevronRight,Menu,X,FileText,ShieldCheck,Sparkles,Rocket,ExternalLink} from 'lucide-react';
 const pages=[{id:'inicio',name:'Início',icon:LayoutDashboard},{id:'agenda',name:'Agenda',icon:CalendarDays},{id:'comercial',name:'Comercial',icon:BriefcaseBusiness},{id:'operacao',name:'Operação',icon:ClipboardCheck},{id:'financeiro',name:'Financeiro',icon:Wallet}];
 type Reminder={id:string;client_name:string;due_date:string|null;priority:string;status:string;note:string};
