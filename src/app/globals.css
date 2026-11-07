@@ -888,3 +888,13 @@
  .topbar .breadcrumb,.topbar .top-left>svg,.topbar .top-left>strong,.topbar .owner-header-profile{display:none}
  .topbar{height:44px;background:transparent;border-bottom:0;justify-content:flex-start}
 }
+
+/* Ajuste final solicitado: perfil seguido de sino, sem mensagens por enquanto. */
+.sidebar-bottom .owner-profile-link{margin-top:10px;padding-top:14px}
+.sidebar-bottom .owner-profile-link small{font-size:12px;line-height:1.4}
+.sidebar-bottom .sidebar-notifications{border-top:0;margin:2px 0 0;padding:0 0 6px 45px}
+.sidebar-bottom .sidebar-notifications>.icon-button{width:38px;min-height:34px;justify-content:flex-start}
+.content:has(.owner-overview) .owner-hero{
+ background-image:linear-gradient(90deg,rgba(7,23,54,.45),rgba(7,23,54,0)),url('/images/antares-cabecalho-espacial.png');
+ background-position:center;background-size:cover;
+}
