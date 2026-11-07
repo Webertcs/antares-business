@@ -40,7 +40,31 @@ export default function FidelizacaoClient(){
   const r=await fetch('/api/fidelizacao/acoes',{cache:'no-store'});const d=await r.json();
   if(!r.ok)throw Error(d.error||'Falha ao carregar lembretes');setActions(d.actions||[]);
  }
- useEffect(()=>{refreshActions().catch(e=>setFeedback(e.message));fetch('/api/fidelizacao/alertas',{cache:'no-store'}).then(r=>r.json()).then(d=>{if(d.snoozes)setSnoozes(d.snoozes);}).catch(()=>{});},[]);
+ const [todayKey,setTodayKey]=useState(()=>new Date().toLocaleDateString('en-CA',{timeZone:'America/Sao_Paulo'}));
+ useEffect(()=>{
+  let active=true;let pending=false;
+  const sync=async()=>{
+   if(pending||document.visibilityState==='hidden')return;
+   pending=true;
+   try{
+    const [actionsResult,alertsResult,clientsResult]=await Promise.allSettled([
+     fetch('/api/fidelizacao/acoes',{cache:'no-store'}).then(async r=>{const d=await r.json();if(!r.ok)throw Error(d.error||'Falha ao atualizar lembretes');return d;}),
+     fetch('/api/fidelizacao/alertas',{cache:'no-store'}).then(async r=>{if(!r.ok)throw Error('Falha ao atualizar alertas');return r.json();}),
+     fetch('/api/crm/clientes',{cache:'no-store'}).then(async r=>{const d=await r.json();if(!r.ok)throw Error(d.error||'Falha ao atualizar clientes');return d;})
+    ]);
+    if(!active)return;
+    if(actionsResult.status==='fulfilled')setActions(actionsResult.value.actions||[]);
+    if(alertsResult.status==='fulfilled')setSnoozes(alertsResult.value.snoozes||{});
+    if(clientsResult.status==='fulfilled'){const d=clientsResult.value;setClients(d.clients||[]);setEvents(d.events||[]);setContacts(d.contacts||[]);setError('');}
+    setTodayKey(new Date().toLocaleDateString('en-CA',{timeZone:'America/Sao_Paulo'}));
+   }finally{pending=false;}
+  };
+  const onResume=()=>{if(document.visibilityState==='visible')void sync();};
+  const interval=window.setInterval(onResume,60*1000);
+  window.addEventListener('focus',onResume);
+  document.addEventListener('visibilitychange',onResume);
+  return()=>{active=false;window.clearInterval(interval);window.removeEventListener('focus',onResume);document.removeEventListener('visibilitychange',onResume);};
+ },[]);
  async function snooze(clientId:string){
   const today=new Date().toLocaleDateString('en-CA',{timeZone:'America/Sao_Paulo'});
   const date=new Date(today+'T12:00:00Z');date.setUTCDate(date.getUTCDate()+14);
@@ -97,7 +121,7 @@ export default function FidelizacaoClient(){
    const alert=days!==null&&days>=threshold?'Retomar contato':completed.length===0?'Novo / sem visita realizada':days!==null&&days>=60?'Acompanhar':'Relacionamento recente';
    return {client,completed:yearly,last,days,tier,alert,priority:days!==null&&days>=threshold?0:days!==null&&days>=60?2:3};
   }).sort((a,b)=>a.priority-b.priority||((b.days||0)-(a.days||0)));
- },[clients,events]);
+ },[clients,events,todayKey]);
  const radar=useMemo(()=>{
   const withoutVisit=items.filter(i=>i.last===null);
   const inactive=items.filter(i=>i.days!==null&&i.days>=threshold);
