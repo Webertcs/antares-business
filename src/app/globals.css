@@ -863,9 +863,9 @@
 @media(max-width:900px){.fidelizacao-form-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:580px){.fidelizacao-page{padding:12px!important}.fidelizacao-page .fidelizacao-hero{padding:20px}.fidelizacao-page .fidelizacao-panel{padding:15px}.fidelizacao-form-grid{grid-template-columns:1fr}.fidelizacao-opportunity .fidelizacao-button{width:100%}}
 
-/* Bloco final Dashboard: faixa superior removida no desktop; controles no menu. */
+/* Faixa superior removida de todos os modulos no desktop; menu movel preservado. */
 @media(min-width:761px){
- .shell:has(.owner-overview)>.main>.topbar{display:none}
+ .shell>.main>.topbar{display:none}
 }
 .sidebar-notifications{position:relative;margin:8px 0 10px;padding:8px 4px;border-top:1px solid #31405d}
 .sidebar-notifications>.icon-button{display:flex;align-items:center;justify-content:center;gap:9px;width:100%;min-height:34px;color:#d7e5ff}
