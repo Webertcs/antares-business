@@ -862,3 +862,29 @@
 .fidelizacao-page table tbody tr:nth-child(even){background:#f8fbff}
 @media(max-width:900px){.fidelizacao-form-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:580px){.fidelizacao-page{padding:12px!important}.fidelizacao-page .fidelizacao-hero{padding:20px}.fidelizacao-page .fidelizacao-panel{padding:15px}.fidelizacao-form-grid{grid-template-columns:1fr}.fidelizacao-opportunity .fidelizacao-button{width:100%}}
+
+/* Bloco final Dashboard: faixa superior removida no desktop; controles no menu. */
+@media(min-width:761px){
+ .shell:has(.owner-overview)>.main>.topbar{display:none}
+}
+.sidebar-notifications{position:relative;margin:8px 0 10px;padding:8px 4px;border-top:1px solid #31405d}
+.sidebar-notifications>.icon-button{display:flex;align-items:center;justify-content:center;gap:9px;width:100%;min-height:34px;color:#d7e5ff}
+.sidebar-notifications>.icon-button:hover{color:white;background:#263858;border-radius:9px}
+.sidebar-notifications #antares-notification-panel{right:auto!important;left:calc(100% + 8px);top:auto!important;bottom:0}
+.owner-profile-link strong{max-width:190px;text-overflow:clip;white-space:normal;overflow-wrap:anywhere}
+.content:has(.owner-overview) .owner-hero{
+ min-height:158px;padding:24px 27px;
+ background:linear-gradient(90deg,rgba(8,27,65,.95) 0%,rgba(10,39,86,.83) 47%,rgba(10,39,86,.06) 100%),url('/images/antares-cabecalho-realista.png') center / cover no-repeat,#102a58;
+ border-color:#234f89;
+}
+.content:has(.owner-overview) .owner-hero::before{display:none!important}
+.content:has(.owner-overview) .owner-hero .eyebrow{color:#c8e0ff}
+.content:has(.owner-overview) .owner-hero h1{color:#fff;font-size:clamp(25px,2.5vw,35px)}
+.content:has(.owner-overview) .owner-hero p{color:#e0ecff}
+@media(max-width:760px){
+ .sidebar-notifications #antares-notification-panel{position:fixed!important;left:12px!important;right:12px!important;top:20%!important;bottom:auto!important;width:auto!important}
+ .content:has(.owner-overview) .owner-hero{min-height:138px;padding:19px}
+ .content:has(.owner-overview) .owner-hero>div{max-width:100%}
+ .topbar .breadcrumb,.topbar .top-left>svg,.topbar .top-left>strong,.topbar .owner-header-profile{display:none}
+ .topbar{height:44px;background:transparent;border-bottom:0;justify-content:flex-start}
+}
