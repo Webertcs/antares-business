@@ -3,6 +3,7 @@ import {requireMember,getDb} from '@/lib/equipe/auth';
 import EventOperations from './EventOperations';
 import EventTeamPanel from './EventTeamPanel';
 import EventNotes from './EventNotes';
+import EventClosing from './EventClosing';
 export const dynamic='force-dynamic';
 const uuid=/^[0-9a-f]{8}(-[0-9a-f]{4}){3}-[0-9a-f]{12}$/i;
 const infoCard:React.CSSProperties={background:'linear-gradient(145deg,#fff 0%,#e9f1ff 100%)',border:'1px solid #c4d8ff',borderRadius:12,padding:'10px 12px',boxShadow:'0 6px 20px rgba(25,67,140,.07)',minWidth:0};
@@ -39,6 +40,7 @@ export default async function Page({params}:{params:Promise<{id:string}>}){
 
  <EventTeamPanel eventId={id} ownerName={String(eventOwner?.full_name||'Proprietário')} ownerPhoto={typeof eventOwner?.photo_data==='string'?eventOwner.photo_data:null} isOwner={ctx.role==='owner'} initialAssigned={assigned.map(m=>({id:String(m.id),full_name:String(m.full_name),photo_data:typeof m.photo_data==='string'?m.photo_data:null}))}/>
  <EventOperations eventId={id}/>
+ <EventClosing eventId={id}/>
 
  <EventNotes eventId={id} initialNotes={String(e.notes||'')} canEdit={ctx.role==='owner' && process.env.ANTARES_EVENT_OPERATIONS_WRITES_ENABLED==='true'}/>
  </div>;
