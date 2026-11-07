@@ -11,7 +11,7 @@ export default function EventClosing({eventId}:{eventId:string}){
  useEffect(()=>{const ctrl=new AbortController();load(ctrl.signal).then(d=>{if(!ctrl.signal.aborted)setData(d)}).catch(e=>{if(!ctrl.signal.aborted)setError(e instanceof Error?e.message:'Consulta indisponível')});return()=>ctrl.abort()},[load]);
  async function correctAttendance(){
   const n=Number(students);
-  if(!/^\\d+$/.test(students)||!Number.isSafeInteger(n)||n>100000||n===data?.attendance?.actual_students||reason.trim().length<5||reason.trim().length>500)return;
+  if(!/^\d+$/.test(students)||!Number.isSafeInteger(n)||n>100000||n===data?.attendance?.actual_students||reason.trim().length<5||reason.trim().length>500)return;
   setBusy(true);setMessage('');
   try{
    const r=await fetch('/api/eventos/'+encodeURIComponent(eventId)+'/encerramento/corrigir',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({students:n,reason:reason.trim()})});
@@ -45,7 +45,7 @@ export default function EventClosing({eventId}:{eventId:string}){
     {message&&<p role="alert">{message}</p>}
     <div style={{display:'flex',justifyContent:'flex-end',gap:10,marginTop:18}}>
      <button type="button" disabled={busy} onClick={()=>{setEditing(false);setMessage('')}}>Cancelar</button>
-     <button type="button" disabled={busy||!/^\\d+$/.test(students)||Number(students)>100000||Number(students)===data?.attendance?.actual_students||reason.trim().length<5} onClick={()=>void correctAttendance()} style={{background:'#1554b0',color:'#fff',padding:'10px 14px',border:0,borderRadius:9,fontWeight:700}}>{busy?'Salvando…':'Confirmar correção'}</button>
+     <button type="button" disabled={busy||!/^\d+$/.test(students)||Number(students)>100000||Number(students)===data?.attendance?.actual_students||reason.trim().length<5} onClick={()=>void correctAttendance()} style={{background:'#1554b0',color:'#fff',padding:'10px 14px',border:0,borderRadius:9,fontWeight:700}}>{busy?'Salvando…':'Confirmar correção'}</button>
     </div>
    </div>
   </div>}
