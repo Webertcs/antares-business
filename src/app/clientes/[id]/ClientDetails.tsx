@@ -54,16 +54,19 @@ export default function ClientDetails({id,writesEnabled}:{id:string;writesEnable
  const proposalIds=new Set(proposals.map(p=>String(p.id)));
  const contracts=commercial?.contracts.filter(c=>proposalIds.has(String(c.proposal_id)))||[];
  const money=(value:unknown)=>new Intl.NumberFormat('pt-BR',{style:'currency',currency:'BRL'}).format(Number(value)||0);
- const panel:React.CSSProperties={background:'linear-gradient(125deg,#f3f8ff 0%,#ffffff 60%,#edf5ff 100%)',border:'1px solid #c6d9f4',borderLeft:'4px solid #4d8de2',borderRadius:14,padding:13,marginBottom:12,boxShadow:'0 9px 23px rgba(18,62,132,.12),0 2px 5px rgba(18,62,132,.06)'};
- const heading:React.CSSProperties={fontSize:17,fontWeight:700,lineHeight:1.35,color:'#174987',margin:'0 0 12px'};
+ const action:React.CSSProperties={display:'inline-flex',alignItems:'center',justifyContent:'center',minHeight:36,padding:'8px 14px',background:'linear-gradient(110deg,#1454a7,#2379df)',color:'#fff',borderRadius:9,textDecoration:'none',fontWeight:750,fontSize:13,boxShadow:'0 3px 9px rgba(20,80,170,.18)'};
+ const secondary:React.CSSProperties={...action,background:'#e7f1ff',color:'#174e98',border:'1px solid #b8d2f5',boxShadow:'none'};
+ const panel:React.CSSProperties={background:'linear-gradient(125deg,#f3f8ff 0%,#ffffff 60%,#edf5ff 100%)',border:'1px solid #c6d9f4',borderLeft:'4px solid #4d8de2',borderRadius:14,padding:'17px 19px',marginBottom:13,boxShadow:'0 9px 23px rgba(18,62,132,.12),0 2px 5px rgba(18,62,132,.06)'};
+ const heading:React.CSSProperties={fontSize:17,fontWeight:800,lineHeight:1.35,color:'#174987',margin:'0 0 13px'};
  const row:React.CSSProperties={padding:'11px 13px',background:'linear-gradient(100deg,#e1efff,#f4f9ff)',border:'1px solid #c5dcfa',borderLeft:'4px solid #4b8ce5',borderRadius:9,marginBottom:8,overflowWrap:'anywhere',fontSize:13,lineHeight:1.5};
  return <main style={{maxWidth:1180,margin:'0 auto',padding:'16px 20px 36px',fontFamily:'system-ui',color:'#16325b'}}>
  {loading?<p>Carregando ficha...</p>:error?<p role="alert">{error}</p>:client&&<>
  <header style={{background:'linear-gradient(110deg,#102c63,#1162ba)',color:'#fff',borderRadius:14,padding:'14px 20px',marginBottom:12,boxShadow:'0 8px 22px rgba(14,62,130,.18)'}}>
  <div style={{fontSize:11,fontWeight:700,letterSpacing:2,color:'#b8dcff'}}>ANTARES · CLIENTES</div>
- <h1 style={{fontSize:23,lineHeight:1.25,margin:'7px 0 0'}}>{client.name}</h1>
+ <h1 style={{fontSize:24,lineHeight:1.25,margin:'7px 0 0'}}>{client.name}</h1><p style={{fontSize:12,color:'#d8eaff',margin:'7px 0 0'}}>Ficha da instituição · Histórico, contatos e relacionamento comercial</p>
  
  </header>
+ <nav aria-label="Ações da instituição" style={{display:'flex',gap:9,flexWrap:'wrap',marginBottom:14}}><Link href="/clientes" style={secondary}>← Clientes</Link><Link href="/operacoes?area=comercial" style={action}>Ver propostas</Link><Link href="/operacoes?area=contratos" style={secondary}>Ver contratos</Link><Link href="/eventos" style={secondary}>Ver eventos</Link></nav>
  <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(170px,1fr))',gap:10,marginBottom:14}}>
  {([['Contatos',contacts.length],['Apresentações',events.length],...([['Propostas',proposals.length],['Contratos',contracts.length]] as [string,number][])] as [string,number][]).map(([label,value])=>
  <div key={label} style={{background:'linear-gradient(135deg,#e0eeff 0%,#f4f8ff 65%,#ffffff 100%)',border:'1px solid #bdd3f3',borderTop:`4px solid ${label==='Contatos'?'#397fda':label==='Apresentações'?'#d69b3a':label==='Turmas'?'#169caa':'#6c73d9'}`,borderRadius:12,padding:'12px 15px',boxShadow:'0 8px 18px rgba(25,76,150,.13),0 2px 4px rgba(25,76,150,.06)'}}><div style={{fontSize:12,fontWeight:600,color:'#42628b'}}>{label}</div><strong style={{fontSize:23,color:'#143e82'}}>{value}</strong></div>)}
@@ -74,16 +77,16 @@ export default function ClientDetails({id,writesEnabled}:{id:string;writesEnable
  </div>{client.notes&&<p style={{fontSize:13,marginBottom:0}}><strong>Observações:</strong> {client.notes}</p>}</section>
  <section style={{...panel,borderLeftColor:'#169caa'}}><h2 style={heading}>Propostas e orçamentos ({proposals.length})</h2>
  {commercialError?<p role="alert">{commercialError}</p>:!commercial?<p>Carregando informações comerciais…</p>:commercial.unavailable.includes('proposals')?<p>Propostas temporariamente indisponíveis.</p>:proposals.length===0?<p>Nenhuma proposta vinculada a esta instituição.</p>:proposals.map(p=><div key={String(p.id)} style={row}><strong>{String(p.title||'Proposta')}</strong> · {money(p.total)} · {String(p.status||'Sem situação')}<div style={{fontSize:12}}>Criada em {dateBR(p.created_at?String(p.created_at):null)}</div></div>)}
- <Link href="/operacoes?area=comercial" style={{fontSize:13,color:'#1556ae',fontWeight:700}}>Consultar todas as propostas</Link></section>
+ <div style={{marginTop:12}}><Link href="/operacoes?area=comercial" style={action}>Consultar propostas</Link></div></section>
  <section style={{...panel,borderLeftColor:'#3c7ad4'}}><h2 style={heading}>Contratos ({contracts.length})</h2>
  {commercialError?<p role="alert">{commercialError}</p>:!commercial?<p>Carregando contratos…</p>:commercial.unavailable.includes('contracts')||commercial.unavailable.includes('proposals')?<p>Contratos temporariamente indisponíveis.</p>:contracts.length===0?<p>Nenhum contrato vinculado a esta instituição.</p>:contracts.map(c=><div key={String(c.id)} style={row}><strong>{String(c.proposal_title||'Contrato')}</strong> · {String(c.status||'Sem situação')}<div style={{fontSize:12}}>Confirmado em {dateBR(c.confirmed_at?String(c.confirmed_at):null)}</div></div>)}
- <Link href="/operacoes?area=contratos" style={{fontSize:13,color:'#1556ae',fontWeight:700}}>Consultar todos os contratos</Link></section>
- <section style={{...panel,borderLeftColor:'#169caa'}}><h2 style={heading}>Participação de alunos</h2><p style={{fontSize:13}}>O público previsto é informado antes da apresentação. O total real de alunos será registrado uma única vez, no encerramento do evento, após a implantação segura do controle. Esse registro também servirá de referência para o ciclo de fidelização, sem duplicar lembretes.</p></section>
+ <div style={{marginTop:12}}><Link href="/operacoes?area=contratos" style={action}>Consultar contratos</Link></div></section>
+ <section style={{...panel,borderLeftColor:'#169caa'}}><h2 style={heading}>Participação de alunos</h2><p style={{fontSize:13}}>O público previsto é informado no planejamento. O total real de alunos é registrado no encerramento do evento e pode ser corrigido com auditoria. A visita concluída conta para a Fidelização.</p><Link href="/eventos" style={secondary}>Consultar eventos e presenças</Link></section>
  <section style={{...panel,borderLeftColor:'#6c73d9',background:'linear-gradient(125deg,#f3f3ff 0%,#ffffff 60%,#eef5ff 100%)'}}><h2 style={heading}>Contatos ({contacts.length})</h2>
  {contacts.length===0?<p>Sem contatos cadastrados.</p>:contacts.map(c=><div key={c.id} style={row}><strong>{c.full_name}</strong>{c.position?' · '+c.position:''}{c.is_primary?' · Principal':''}<div style={{fontSize:12,marginTop:3}}>{c.phone||c.email||'Sem contato informado'}</div></div>)}
  </section>
  <section style={{...panel,borderLeftColor:'#d69b3a',background:'linear-gradient(125deg,#fff8ec 0%,#ffffff 60%,#edf5ff 100%)'}}><h2 style={heading}>Histórico de apresentações e oportunidades ({events.length})</h2>
- {events.length===0?<p>Sem eventos registrados.</p>:events.map(e=><div key={e.id} style={row}><strong>{e.title}</strong> · {dateBR(e.event_date)} · {eventStatuses[e.status]||e.status}{e.expected_attendees!=null?' · '+e.expected_attendees+' participantes':''}</div>)}
+ {events.length===0?<p>Sem eventos registrados.</p>:events.map(e=><div key={e.id} style={row}><strong>{e.title}</strong> · {dateBR(e.event_date)} · {eventStatuses[e.status]||e.status}{e.expected_attendees!=null?' · '+e.expected_attendees+' previstos':''}<div style={{marginTop:9}}><Link href={'/eventos/'+e.id} style={secondary}>Abrir operação</Link></div></div>)}
  </section>
  
  </>}
