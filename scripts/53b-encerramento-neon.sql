@@ -62,7 +62,6 @@ END;
 $$;
 
 REVOKE ALL ON FUNCTION public.antares_close_event(text,uuid,integer) FROM PUBLIC;
-REVOKE ALL ON FUNCTION public.antares_close_event(text,uuid,integer) FROM PUBLIC, neondb_owner;
 GRANT EXECUTE ON FUNCTION public.antares_close_event(text,uuid,integer) TO antares_team_runtime;
 COMMIT;
 
