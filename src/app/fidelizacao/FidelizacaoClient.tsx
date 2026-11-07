@@ -5,7 +5,7 @@ import {relationshipCycle} from '@/lib/fidelizacao/relationship-cycle';
 type Client={id:string;name:string;kind:string;status:string;city:string|null;phone?:string|null};
 type Contact={client_id:string;phone:string|null;whatsapp:boolean;is_primary:boolean};
 type Event={id:string;client_id:string;status:string;event_date:string|null;title:string};
-type Action={id:string;client_id:string;client_name:string;action_kind:string;due_date:string|null;priority:string;status:string;note:string};
+type Action={archived?:boolean;id:string;client_id:string;client_name:string;action_kind:string;due_date:string|null;priority:string;status:string;note:string};
 type Item={client:Client;completed:number;last:Date|null;days:number|null;tier:string;alert:string;priority:number};
 function parseDate(value:string|null):Date|null{
  if(!value)return null;
@@ -22,6 +22,7 @@ export default function FidelizacaoClient(){
  const [radarPage,setRadarPage]=useState(0);
  const [attentionPage,setAttentionPage]=useState(0);
  const [showHistory,setShowHistory]=useState(false);
+ const [showArchived,setShowArchived]=useState(false);
  const threshold=90;
  const [actions,setActions]=useState<Action[]>([]);
  const [selected,setSelected]=useState('');
@@ -48,6 +49,16 @@ export default function FidelizacaoClient(){
   setSaving(true);setFeedback('');
   try{const r=await fetch('/api/fidelizacao/adiar',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({clientId,until})});const d=await r.json();if(!r.ok)throw Error(d.error||'Não foi possível adiar');setSnoozes(p=>({...p,[clientId]:until}));setFeedback('Alerta adiado até '+until.split('-').reverse().join('/')+'.');}
   catch(e){setFeedback(e instanceof Error?e.message:'Erro ao adiar');}finally{setSaving(false);}
+ }
+ async function manageHistory(id:string,command:'archive'|'restore'){
+  if(command==='archive'&&!window.confirm('Arquivar este contato? Ele sairá do histórico principal, mas será preservado para auditoria e poderá ser restaurado.'))return;
+  setSaving(true);setFeedback('');
+  try{
+   const r=await fetch('/api/fidelizacao/historico',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({id,command})});
+   const d=await r.json();if(!r.ok)throw Error(d.error||'Não foi possível atualizar o histórico');
+   await refreshActions();setFeedback(command==='archive'?'Contato arquivado com sucesso.':'Contato restaurado com sucesso.');
+  }catch(e){setFeedback(e instanceof Error?e.message:'Erro ao atualizar histórico');}
+  finally{setSaving(false);}
  }
  async function saveAction(command:'create'|'complete'|'dismiss',id?:string){
   setSaving(true);setFeedback('');
@@ -283,7 +294,8 @@ export default function FidelizacaoClient(){
  <div><strong>{a.client_name}</strong> <span className={'fidelizacao-status '+(a.status==='open'?'is-open':'is-closed')}>{a.status==='open'?'Em aberto':a.status==='done'?'Concluído':'Dispensado'}</span><div style={{fontSize:13}}>Prazo: {a.due_date?String(a.due_date).slice(0,10).split('-').reverse().join('/'):'Sem data'}</div><div>{a.note}</div></div>
  {a.status==='open'&&<div style={{display:'flex',alignItems:'center',gap:8,flexWrap:'wrap'}}>{whatsappFor(a.client_id)?<a href={whatsappFor(a.client_id)!} target="_blank" rel="noopener noreferrer" className="fidelizacao-button" style={{textDecoration:'none',background:'#16794c'}}>WhatsApp</a>:<span style={{fontSize:12,color:'#6b7280'}} title="Cadastre um telefone válido em Clientes">Sem telefone cadastrado</span>}<button disabled={saving} onClick={()=>saveAction('complete',a.id)}>Concluir</button><button disabled={saving} onClick={()=>saveAction('dismiss',a.id)}>Dispensar</button></div>}</div>)}
  </div>
- {actions.some(a=>a.status!=='open')&&<div style={{marginTop:14}}><button type="button" className="fidelizacao-history-button" onClick={()=>setShowHistory(v=>!v)} aria-expanded={showHistory}>{showHistory?'Ocultar histórico':'Ver histórico de contatos'} ({actions.filter(a=>a.status!=='open').length})</button>{showHistory&&<div style={{display:'grid',gap:8,marginTop:10}}>{actions.filter(a=>a.status!=='open').map(a=><div key={a.id} className="fidelizacao-reminder fidelizacao-reminder-closed fidelizacao-history-row"><strong>{a.client_name}</strong><div className="fidelizacao-history-note">{a.note}</div><span className={'fidelizacao-history-status '+(a.status==='done'?'is-done':'is-dismissed')}>{a.status==='done'?'✓ Concluído':'Dispensado'}</span></div>)}</div>}</div>}
+ {actions.some(a=>a.status!=='open'&&!a.archived)&&<div style={{marginTop:14}}><button type="button" className="fidelizacao-history-button" onClick={()=>setShowHistory(v=>!v)} aria-expanded={showHistory}>{showHistory?'Ocultar histórico':'Ver histórico de contatos'} ({actions.filter(a=>a.status!=='open'&&!a.archived).length})</button>{showHistory&&<div style={{display:'grid',gap:8,marginTop:10}}>{actions.filter(a=>a.status!=='open'&&!a.archived).map(a=><div key={a.id} className="fidelizacao-reminder fidelizacao-reminder-closed fidelizacao-history-row"><strong>{a.client_name}</strong><div className="fidelizacao-history-note">{a.note}</div><span className={'fidelizacao-history-status '+(a.status==='done'?'is-done':'is-dismissed')}>{a.status==='done'?'✓ Concluído':'Dispensado'}</span><button type="button" disabled={saving} className="fidelizacao-history-button" onClick={()=>manageHistory(a.id,'archive')}>Arquivar</button></div>)}</div>}</div>}
+ {actions.some(a=>a.archived)&&<div style={{marginTop:12}}><button type="button" className="fidelizacao-history-button" onClick={()=>setShowArchived(v=>!v)} aria-expanded={showArchived}>{showArchived?'Ocultar arquivados':'Ver arquivados'} ({actions.filter(a=>a.archived).length})</button>{showArchived&&<div style={{display:'grid',gap:8,marginTop:10}}>{actions.filter(a=>a.archived).map(a=><div key={a.id} className="fidelizacao-reminder fidelizacao-reminder-closed fidelizacao-history-row"><strong>{a.client_name}</strong><div className="fidelizacao-history-note">{a.note}</div><span className="fidelizacao-history-status">Arquivado</span><button type="button" disabled={saving} className="fidelizacao-history-button" onClick={()=>manageHistory(a.id,'restore')}>Restaurar</button></div>)}</div>}</div>}
  </section>
  </main>
  {modalOpen&&<div className="fidelizacao-modal-backdrop" role="presentation">
