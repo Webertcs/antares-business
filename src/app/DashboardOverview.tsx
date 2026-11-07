@@ -12,7 +12,7 @@ const formatTime=(date:Date)=>new Intl.DateTimeFormat('pt-BR',{timeZone:TZ,hour:
 const quickLinks=[
  {title:'Cúpulas',href:'/agenda/reservas',icon:Orbit},
  {title:'Propostas',href:'/operacoes?area=comercial',icon:FileText},
- {title:'Contratos',href:'/operacoes?area=comercial',icon:BriefcaseBusiness},
+ {title:'Contratos',href:'/operacoes?area=contratos',icon:BriefcaseBusiness},
  {title:'Recebimentos',href:'/financeiro/receber',icon:HandCoins},
  {title:'Relatórios',href:'/financeiro',icon:BarChart3},
  {title:'Leads da vitrine',href:'/vitrine/inbox',icon:ContactRound},
