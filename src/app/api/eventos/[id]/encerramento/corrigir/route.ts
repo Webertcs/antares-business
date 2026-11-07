@@ -14,8 +14,9 @@ export async function POST(req:NextRequest,{params}:{params:Promise<{id:string}>
  if(Number(req.headers.get('content-length')||'0')>2000)return NextResponse.json({error:'Requisição excessiva'},{status:413});
  let body:unknown;try{body=await req.json()}catch{return NextResponse.json({error:'JSON inválido'},{status:400})}
  const input=body as {students?:unknown;reason?:unknown}|null;
- const students=input?.students,reason=input?.reason;
- if(typeof students!=='number'||!Number.isInteger(students)||students<0||students>100000||typeof reason!=='string'||reason.trim().length<5||reason.trim().length>500)
+ const students=input?.students;
+ const reason='Correção de quantidade pelo proprietário';
+ if(typeof students!=='number'||!Number.isInteger(students)||students<0||students>100000)
   return NextResponse.json({error:'Informe quantidade válida e motivo com 5 a 500 caracteres'},{status:400});
  try{
   const sql=getTeamWriteDb();
