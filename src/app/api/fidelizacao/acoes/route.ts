@@ -6,8 +6,9 @@ export async function GET(){
  const ctx=await requireOwner();if(!ctx)return NextResponse.json({error:'Somente proprietário.'},{status:403});
  try{
   const db=getDb();
-  const actions=await db`SELECT a.id,a.client_id,a.action_kind,a.due_date,a.priority,a.status,a.note,a.created_at,a.completed_at,c.name AS client_name
+  const actions=await db`SELECT a.id,a.client_id,a.action_kind,a.due_date,a.priority,a.status,a.note,a.created_at,a.completed_at, (h.action_id IS NOT NULL) AS archived,c.name AS client_name
   FROM public.antares_relationship_actions a
+  LEFT JOIN public.antares_relationship_history_archive h ON h.action_id=a.id AND h.organization_id=a.organization_id
   JOIN public.crm_clients c ON c.id=a.client_id AND c.organization_id=a.organization_id
   WHERE a.organization_id=${ctx.organizationId}
   ORDER BY CASE WHEN a.status='open' THEN 0 ELSE 1 END,a.due_date ASC NULLS LAST,a.created_at DESC LIMIT 300`;
