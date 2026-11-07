@@ -210,7 +210,10 @@ export default function FidelizacaoClient(){
  .fidelizacao-page .fidelizacao-agenda-panel h3{margin-top:12px!important;color:#17467f;font-size:14px}
  .fidelizacao-page .fidelizacao-agenda-panel p,.fidelizacao-page .fidelizacao-agenda-panel strong,.fidelizacao-page .fidelizacao-agenda-panel .fidelizacao-reminder{color:#17467f}
  .fidelizacao-page .fidelizacao-agenda-panel .fidelizacao-reminder-open{padding:10px!important}
- .fidelizacao-page .fidelizacao-history-row{display:grid!important;grid-template-columns:minmax(145px,1.1fr) minmax(160px,2fr) auto;align-items:center;gap:12px;padding:9px 12px!important;min-height:42px}
+ .fidelizacao-page .fidelizacao-history-row{display:grid!important;grid-template-columns:minmax(140px,1.15fr) minmax(160px,2fr) auto auto;align-items:center;gap:10px;padding:8px 11px!important;min-height:40px}
+ .fidelizacao-page .fidelizacao-history-row>.fidelizacao-history-button{width:auto!important;min-width:88px;max-width:max-content;justify-self:end;grid-column:auto!important;grid-row:auto!important;padding:6px 12px!important;font-size:12px!important;line-height:1.3;white-space:nowrap}
+ .fidelizacao-page .fidelizacao-history-row>.fidelizacao-history-status{margin-left:0!important;justify-self:end}
+ @media(max-width:760px){.fidelizacao-page .fidelizacao-history-row{grid-template-columns:minmax(0,1fr) auto auto!important;gap:8px}.fidelizacao-page .fidelizacao-history-row>.fidelizacao-history-note{grid-column:1/-1;grid-row:2}.fidelizacao-page .fidelizacao-history-row>.fidelizacao-history-status{grid-column:2;grid-row:1}.fidelizacao-page .fidelizacao-history-row>.fidelizacao-history-button{grid-column:3!important;grid-row:1!important}}
  .fidelizacao-page .fidelizacao-history-row strong{font-size:13px;line-height:1.3}
  .fidelizacao-page .fidelizacao-history-note{font-size:12px;color:#31527e;line-height:1.35;overflow-wrap:anywhere}
  .fidelizacao-page .fidelizacao-history-row .fidelizacao-history-status{margin-left:0;justify-self:end}
