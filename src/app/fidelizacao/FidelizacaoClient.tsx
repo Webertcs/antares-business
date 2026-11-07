@@ -25,6 +25,8 @@ export default function FidelizacaoClient(){
  const [showArchived,setShowArchived]=useState(false);
  const threshold=90;
  const [actions,setActions]=useState<Action[]>([]);
+ const [actionsError,setActionsError]=useState('');
+ const [actionsLoaded,setActionsLoaded]=useState(false);
  const [selected,setSelected]=useState('');
  const [modalOpen,setModalOpen]=useState(false);
  const [modalFromRadar,setModalFromRadar]=useState(false);
@@ -38,7 +40,7 @@ export default function FidelizacaoClient(){
  const [snoozes,setSnoozes]=useState<Record<string,string>>({});
  async function refreshActions(){
   const r=await fetch('/api/fidelizacao/acoes',{cache:'no-store'});const d=await r.json();
-  if(!r.ok)throw Error(d.error||'Falha ao carregar lembretes');setActions(d.actions||[]);
+  if(!r.ok)throw Error(d.error||'Falha ao carregar lembretes');if(!Array.isArray(d.actions))throw Error('Resposta inválida da agenda');setActions(d.actions);setActionsError('');setActionsLoaded(true);
  }
  const [todayKey,setTodayKey]=useState(()=>new Date().toLocaleDateString('en-CA',{timeZone:'America/Sao_Paulo'}));
  useEffect(()=>{
@@ -53,12 +55,13 @@ export default function FidelizacaoClient(){
      fetch('/api/crm/clientes',{cache:'no-store'}).then(async r=>{const d=await r.json();if(!r.ok)throw Error(d.error||'Falha ao atualizar clientes');return d;})
     ]);
     if(!active)return;
-    if(actionsResult.status==='fulfilled')setActions(actionsResult.value.actions||[]);
+    if(actionsResult.status==='fulfilled'&&Array.isArray(actionsResult.value.actions)){setActions(actionsResult.value.actions);setActionsError('');setActionsLoaded(true);}else{setActionsError(actionsResult.status==='rejected'?(actionsResult.reason instanceof Error?actionsResult.reason.message:'Falha na consulta de lembretes'):'Resposta inválida da agenda');}
     if(alertsResult.status==='fulfilled')setSnoozes(alertsResult.value.snoozes||{});
     if(clientsResult.status==='fulfilled'){const d=clientsResult.value;setClients(d.clients||[]);setEvents(d.events||[]);setContacts(d.contacts||[]);setError('');}
     setTodayKey(new Date().toLocaleDateString('en-CA',{timeZone:'America/Sao_Paulo'}));
    }finally{pending=false;}
   };
+  void sync();
   const onResume=()=>{if(document.visibilityState==='visible')void sync();};
   const interval=window.setInterval(onResume,60*1000);
   window.addEventListener('focus',onResume);
