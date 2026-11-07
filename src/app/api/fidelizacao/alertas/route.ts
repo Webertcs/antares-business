@@ -14,7 +14,7 @@ export async function GET(){
    SELECT c.id,c.name,MAX(e.event_date) AS last_visit
    FROM public.crm_clients c
    LEFT JOIN public.crm_events e ON e.organization_id=c.organization_id
-    AND e.client_id=c.id AND e.status IN ('confirmed','completed')
+    AND e.client_id=c.id AND e.status='completed'
     AND e.event_date<=${today}::date
    WHERE c.organization_id=${owner.organizationId}
     AND COALESCE(c.status,'active') NOT IN ('archived','inactive')
@@ -27,7 +27,7 @@ export async function GET(){
   const alerts=rows.flatMap(r=>{
    if(!r.last_visit)return [];
    const date=r.last_visit instanceof Date?r.last_visit.toISOString().slice(0,10):String(r.last_visit).slice(0,10);
-   const {days}=relationshipCycle([{status:'confirmed',event_date:date}],today);
+   const {days}=relationshipCycle([{status:'completed',event_date:date}],today);
    if(days===null||days<60||snoozes[String(r.id)]>=today)return [];
    return [{client_id:String(r.id),client_name:String(r.name),last_visit:date,days,severity:days>=90?'critical':'warning'}];
   });
