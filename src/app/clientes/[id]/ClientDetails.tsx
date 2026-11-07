@@ -10,6 +10,8 @@ const statuses:Record<string,string>={prospect:'Prospecto',active:'Ativo',inacti
 const eventStatuses:Record<string,string>={lead:'Oportunidade',quoted:'Orçado',reserved:'Reservado',confirmed:'Confirmado',completed:'Realizado',cancelled:'Cancelado'};
 const dateBR=(value:string|null)=>value?new Intl.DateTimeFormat('pt-BR',{timeZone:'UTC'}).format(new Date(value)):'Sem data';
 export default function ClientDetails({id,writesEnabled}:{id:string;writesEnabled:boolean}){
+ const [commercial,setCommercial]=useState<{proposals:Record<string,unknown>[];contracts:Record<string,unknown>[];unavailable:string[]}|null>(null);
+ const [commercialError,setCommercialError]=useState('');
  const [client,setClient]=useState<Client|null>(null),[contacts,setContacts]=useState<Contact[]>([]),[events,setEvents]=useState<Event[]>([]),[groups,setGroups]=useState<Group[]>([]);
  const [loading,setLoading]=useState(true),[error,setError]=useState(''),[educationError,setEducationError]=useState('');
  const [newGroup,setNewGroup]=useState(false),[saving,setSaving]=useState(false),[groupError,setGroupError]=useState('');
@@ -47,6 +49,11 @@ export default function ClientDetails({id,writesEnabled}:{id:string;writesEnable
  }catch(e){if(!ctrl.signal.aborted)setError(e instanceof Error?e.message:'Erro de consulta');}
  finally{if(!ctrl.signal.aborted)setLoading(false);}
  })();return()=>ctrl.abort();},[id]);
+ useEffect(()=>{const ctrl=new AbortController();fetch('/api/business',{cache:'no-store',signal:ctrl.signal}).then(async r=>{const data=await r.json();if(!r.ok)throw Error(data.error||'Consulta comercial indisponível');if(!ctrl.signal.aborted)setCommercial({proposals:Array.isArray(data.proposals)?data.proposals:[],contracts:Array.isArray(data.contracts)?data.contracts:[],unavailable:Array.isArray(data.unavailable)?data.unavailable:[]});}).catch(e=>{if(!ctrl.signal.aborted&&e?.name!=='AbortError')setCommercialError('Consulta comercial indisponível no momento.')});return()=>ctrl.abort()},[]);
+ const proposals=commercial?.proposals.filter(p=>String(p.client_id)===id)||[];
+ const proposalIds=new Set(proposals.map(p=>String(p.id)));
+ const contracts=commercial?.contracts.filter(c=>proposalIds.has(String(c.proposal_id)))||[];
+ const money=(value:unknown)=>new Intl.NumberFormat('pt-BR',{style:'currency',currency:'BRL'}).format(Number(value)||0);
  const panel:React.CSSProperties={background:'linear-gradient(125deg,#f3f8ff 0%,#ffffff 60%,#edf5ff 100%)',border:'1px solid #c6d9f4',borderLeft:'4px solid #4d8de2',borderRadius:14,padding:18,marginBottom:16,boxShadow:'0 9px 23px rgba(18,62,132,.12),0 2px 5px rgba(18,62,132,.06)'};
  const heading:React.CSSProperties={fontSize:17,fontWeight:700,lineHeight:1.35,color:'#174987',margin:'0 0 12px'};
  const row:React.CSSProperties={padding:'11px 13px',background:'linear-gradient(100deg,#e1efff,#f4f9ff)',border:'1px solid #c5dcfa',borderLeft:'4px solid #4b8ce5',borderRadius:9,marginBottom:8,overflowWrap:'anywhere',fontSize:13,lineHeight:1.5};
@@ -58,35 +65,26 @@ export default function ClientDetails({id,writesEnabled}:{id:string;writesEnable
  
  </header>
  <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(170px,1fr))',gap:10,marginBottom:14}}>
- {([['Contatos',contacts.length],['Apresentações',events.length],...(client.kind==='school'?[['Turmas',groups.length],['Alunos previstos',groups.reduce((a,g)=>a+Number(g.student_count||0),0)]]:[])] as [string,number][]).map(([label,value])=>
+ {([['Contatos',contacts.length],['Apresentações',events.length],...([['Propostas',proposals.length],['Contratos',contracts.length]] as [string,number][])] as [string,number][]).map(([label,value])=>
  <div key={label} style={{background:'linear-gradient(135deg,#e0eeff 0%,#f4f8ff 65%,#ffffff 100%)',border:'1px solid #bdd3f3',borderTop:`4px solid ${label==='Contatos'?'#397fda':label==='Apresentações'?'#d69b3a':label==='Turmas'?'#169caa':'#6c73d9'}`,borderRadius:12,padding:'12px 15px',boxShadow:'0 8px 18px rgba(25,76,150,.13),0 2px 4px rgba(25,76,150,.06)'}}><div style={{fontSize:12,fontWeight:600,color:'#42628b'}}>{label}</div><strong style={{fontSize:23,color:'#143e82'}}>{value}</strong></div>)}
  </div>
  <section style={{...panel,borderLeftColor:'#397fda'}}><h2 style={heading}>Dados da instituição</h2>
  <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(210px,1fr))',gap:12,fontSize:13}}>
  {([['Tipo',kinds[client.kind]||client.kind],['Situação',statuses[client.status]||client.status],['Cidade',client.city||'—'],['E-mail',client.email||'—'],['Telefone',client.phone||'—']] as [string,string][]).map(([label,value])=><div key={label}><strong style={{color:'#315e94'}}>{label}</strong><div style={{marginTop:4,overflowWrap:'anywhere'}}>{value}</div></div>)}
  </div>{client.notes&&<p style={{fontSize:13,marginBottom:0}}><strong>Observações:</strong> {client.notes}</p>}</section>
- {client.kind==='school'&&<section style={{...panel,borderLeftColor:'#169caa',background:'linear-gradient(125deg,#effafb 0%,#ffffff 60%,#edf6ff 100%)'}}><div style={{display:'flex',alignItems:'center',justifyContent:'space-between',gap:12,flexWrap:'wrap',marginBottom:12}}><h2 style={{...heading,margin:0}}>Turmas e Professores</h2>{writesEnabled&&<button type="button" onClick={()=>{setGroupForm(emptyGroup);setNewGroup(true);}} style={{border:'1px solid #2b62b7',borderRadius:8,background:'linear-gradient(135deg,#367bdc,#174fa8)',color:'#fff',padding:'6px 11px',fontSize:12,fontWeight:700,lineHeight:1.4,boxShadow:'0 3px 8px rgba(28,80,160,.22)',cursor:'pointer'}}>+ Nova turma</button>}</div>
- {educationError?<p role="alert">{educationError}</p>:groups.length===0?<p style={{fontSize:13}}>Nenhuma turma vinculada a esta escola.</p>:<div style={{overflowX:'auto'}}><table style={{width:'100%',borderCollapse:'collapse',fontSize:13,textAlign:'left'}}>
- <thead><tr>{['Turma','Série / ano','Alunos','Professor responsável','Contato institucional'].map(t=><th key={t} style={{padding:10,background:'#dceaff',color:'#174987'}}>{t}</th>)}</tr></thead>
- <tbody>{groups.map(g=><tr key={g.id}>{[g.label,g.grade_level,g.student_count,g.teacher_name,g.teacher_contact].map((v,i)=><td key={i} style={{padding:10,borderBottom:'1px solid #d5e5fa'}}>{v??'—'}</td>)}</tr>)}</tbody></table></div>}
- {!writesEnabled&&<p style={{fontSize:12,color:'#60799c',marginBottom:0}}>Cadastro de turmas permanece bloqueado até a validação de segurança.</p>}
- </section>}
+ <section style={{...panel,borderLeftColor:'#169caa'}}><h2 style={heading}>Propostas e orçamentos ({proposals.length})</h2>
+ {commercialError?<p role="alert">{commercialError}</p>:!commercial?<p>Carregando informações comerciais…</p>:commercial.unavailable.includes('proposals')?<p>Propostas temporariamente indisponíveis.</p>:proposals.length===0?<p>Nenhuma proposta vinculada a esta instituição.</p>:proposals.map(p=><div key={String(p.id)} style={row}><strong>{String(p.title||'Proposta')}</strong> · {money(p.total)} · {String(p.status||'Sem situação')}<div style={{fontSize:12}}>Criada em {dateBR(p.created_at?String(p.created_at):null)}</div></div>)}
+ <Link href="/operacoes?area=comercial" style={{fontSize:13,color:'#1556ae',fontWeight:700}}>Consultar todas as propostas</Link></section>
+ <section style={{...panel,borderLeftColor:'#3c7ad4'}}><h2 style={heading}>Contratos ({contracts.length})</h2>
+ {commercialError?<p role="alert">{commercialError}</p>:!commercial?<p>Carregando contratos…</p>:commercial.unavailable.includes('contracts')||commercial.unavailable.includes('proposals')?<p>Contratos temporariamente indisponíveis.</p>:contracts.length===0?<p>Nenhum contrato vinculado a esta instituição.</p>:contracts.map(c=><div key={String(c.id)} style={row}><strong>{String(c.proposal_title||'Contrato')}</strong> · {String(c.status||'Sem situação')}<div style={{fontSize:12}}>Confirmado em {dateBR(c.confirmed_at?String(c.confirmed_at):null)}</div></div>)}
+ <Link href="/operacoes?area=contratos" style={{fontSize:13,color:'#1556ae',fontWeight:700}}>Consultar todos os contratos</Link></section>
+ <section style={{...panel,borderLeftColor:'#169caa'}}><h2 style={heading}>Participação de alunos</h2><p style={{fontSize:13}}>O público previsto é informado nos eventos. O controle de alunos efetivamente atendidos será registrado por sessão, após a implantação segura do campo específico, sem confundir previsão com presença real.</p></section>
  <section style={{...panel,borderLeftColor:'#6c73d9',background:'linear-gradient(125deg,#f3f3ff 0%,#ffffff 60%,#eef5ff 100%)'}}><h2 style={heading}>Contatos ({contacts.length})</h2>
  {contacts.length===0?<p>Sem contatos cadastrados.</p>:contacts.map(c=><div key={c.id} style={row}><strong>{c.full_name}</strong>{c.position?' · '+c.position:''}{c.is_primary?' · Principal':''}<div style={{fontSize:12,marginTop:3}}>{c.phone||c.email||'Sem contato informado'}</div></div>)}
  </section>
  <section style={{...panel,borderLeftColor:'#d69b3a',background:'linear-gradient(125deg,#fff8ec 0%,#ffffff 60%,#edf5ff 100%)'}}><h2 style={heading}>Histórico de apresentações e oportunidades ({events.length})</h2>
  {events.length===0?<p>Sem eventos registrados.</p>:events.map(e=><div key={e.id} style={row}><strong>{e.title}</strong> · {dateBR(e.event_date)} · {eventStatuses[e.status]||e.status}{e.expected_attendees!=null?' · '+e.expected_attendees+' participantes':''}</div>)}
  </section>
- {newGroup&&<dialog ref={groupDialog} aria-modal="true" aria-labelledby="new-group-title" onCancel={e=>{e.preventDefault();closeGroup();}} style={{width:'min(560px,calc(100vw - 32px))',maxHeight:'88vh',overflowY:'auto',border:'1px solid #b7cfee',borderRadius:14,padding:0,boxShadow:'0 20px 70px #001a4466',color:'#173966'}}>
- <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',background:'linear-gradient(110deg,#102c63,#1162ba)',color:'#fff',padding:'15px 20px'}}>
- <h2 id="new-group-title" style={{margin:0,fontSize:20}}>Nova turma</h2><button type="button" onClick={closeGroup} disabled={saving} aria-label="Fechar formulário" style={{background:'#ffffff25',border:'1px solid #ffffff60',borderRadius:8,color:'#fff',padding:'6px 12px'}}>×</button></div>
- <form onSubmit={saveGroup} style={{padding:20,display:'grid',gap:12}}>
- <div style={{background:'#eaf3ff',padding:12,borderRadius:8,fontSize:13}}><strong>Escola vinculada:</strong> {client.name}</div>
- {([['label','Turma'],['grade','Série / ano'],['teacher','Professor responsável'],['contact','Contato institucional'],['notes','Observações']] as const).map(([key,label])=><label key={key} style={{display:'grid',gap:5,fontSize:13,fontWeight:600}}>{label}<input value={groupForm[key]} required={key==='label'} maxLength={key==='notes'?1000:160} onChange={e=>setGroupForm(v=>({...v,[key]:e.target.value}))} style={{width:'100%',padding:10,border:'1px solid #b6cfee',borderRadius:7,color:'#173966',background:'#fff'}}/></label>)}
- <label style={{display:'grid',gap:5,fontSize:13,fontWeight:600}}>Quantidade de alunos<input type="number" min={0} max={1000} required value={groupForm.studentCount} onChange={e=>setGroupForm(v=>({...v,studentCount:Number(e.target.value)}))} style={{padding:10,border:'1px solid #b6cfee',borderRadius:7,color:'#173966'}}/></label>
- {groupError&&<p role="alert" style={{color:'#b91c1c'}}>{groupError}</p>}
- <div style={{display:'flex',justifyContent:'flex-end',gap:9}}><button type="button" disabled={saving} onClick={closeGroup}>Cancelar</button><button type="submit" disabled={saving||!writesEnabled} style={{background:'#2058c5',color:'#fff',border:0,borderRadius:8,padding:'10px 15px'}}>{saving?'Salvando...':'Cadastrar turma'}</button></div>
- </form></dialog>}
  
  </>}
  </main>;
