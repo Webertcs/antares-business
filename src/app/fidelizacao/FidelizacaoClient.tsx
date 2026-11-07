@@ -34,11 +34,21 @@ export default function FidelizacaoClient(){
  const [note,setNote]=useState('');
  const [saving,setSaving]=useState(false);
  const [feedback,setFeedback]=useState('');
+ const [snoozes,setSnoozes]=useState<Record<string,string>>({});
  async function refreshActions(){
   const r=await fetch('/api/fidelizacao/acoes',{cache:'no-store'});const d=await r.json();
   if(!r.ok)throw Error(d.error||'Falha ao carregar lembretes');setActions(d.actions||[]);
  }
- useEffect(()=>{refreshActions().catch(e=>setFeedback(e.message));},[]);
+ useEffect(()=>{refreshActions().catch(e=>setFeedback(e.message));fetch('/api/fidelizacao/alertas',{cache:'no-store'}).then(r=>r.json()).then(d=>{if(d.snoozes)setSnoozes(d.snoozes);}).catch(()=>{});},[]);
+ async function snooze(clientId:string){
+  const today=new Date().toLocaleDateString('en-CA',{timeZone:'America/Sao_Paulo'});
+  const date=new Date(today+'T12:00:00Z');date.setUTCDate(date.getUTCDate()+14);
+  const until=date.toISOString().slice(0,10);
+  if(!window.confirm('Adiar o alerta por 14 dias? A contagem desde a última visita continuará normalmente.'))return;
+  setSaving(true);setFeedback('');
+  try{const r=await fetch('/api/fidelizacao/adiar',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({clientId,until})});const d=await r.json();if(!r.ok)throw Error(d.error||'Não foi possível adiar');setSnoozes(p=>({...p,[clientId]:until}));setFeedback('Alerta adiado até '+until.split('-').reverse().join('/')+'.');}
+  catch(e){setFeedback(e instanceof Error?e.message:'Erro ao adiar');}finally{setSaving(false);}
+ }
  async function saveAction(command:'create'|'complete'|'dismiss',id?:string){
   setSaving(true);setFeedback('');
   try{
@@ -250,7 +260,7 @@ export default function FidelizacaoClient(){
  <div style={{overflowX:'auto'}}><table className="fidelizacao-attention-table" style={{width:'100%',borderCollapse:'collapse',textAlign:'left',minWidth:680}}>
  <thead><tr>{['Instituição','Categoria','Visitas','Última visita','Atenção'].map(c=><th key={c} style={{padding:'8px 10px',borderBottom:'1px solid #c3d1e6'}}>{c}</th>)}</tr></thead>
  <tbody>{displayed.slice(currentAttentionPage*10,(currentAttentionPage+1)*10).map(i=><tr key={i.client.id}><td style={{padding:'7px 10px',borderBottom:'1px solid #e1e8f1'}}><strong>{i.client.name}</strong></td>
- <td>{i.tier==='Sem categoria'?'—':i.tier}</td><td>{i.completed}</td><td>{dateLabel(i.last)}</td><td><span>{shortAlert(i)}</span>{i.days!==null&&i.days>=60&&<div style={{marginTop:5}}>{openByClient.get(i.client.id)?.length?<small style={{color:'#176039'}}>Contato já programado</small>:<button type="button" className="fidelizacao-button" onClick={()=>openReminder(i.client.id)}>Programar contato</button>}</div>}</td></tr>)}</tbody>
+ <td>{i.tier==='Sem categoria'?'—':i.tier}</td><td>{i.completed}</td><td>{dateLabel(i.last)}</td><td><span>{snoozes[i.client.id]&&snoozes[i.client.id]>=new Date().toLocaleDateString('en-CA',{timeZone:'America/Sao_Paulo'})?'Adiado até '+snoozes[i.client.id].split('-').reverse().join('/'):shortAlert(i)}</span>{i.days!==null&&i.days>=60&&<div style={{marginTop:5}}>{openByClient.get(i.client.id)?.length?<small style={{color:'#176039'}}>Contato já programado</small>:<button type="button" className="fidelizacao-button" onClick={()=>openReminder(i.client.id)}>Programar contato</button>}{!(snoozes[i.client.id]&&snoozes[i.client.id]>=new Date().toLocaleDateString('en-CA',{timeZone:'America/Sao_Paulo'}))&&<button type="button" disabled={saving} className="fidelizacao-button" style={{marginLeft:6}} onClick={()=>snooze(i.client.id)}>Adiar 14 dias</button>}</div>}</td></tr>)}</tbody>
  </table></div>}
  {displayed.length>10&&<nav aria-label="Páginas da Central de Alertas" className="fidelizacao-pagination"><span>Exibindo {currentAttentionPage*10+1}–{Math.min((currentAttentionPage+1)*10,displayed.length)} de {displayed.length} instituições · Página {currentAttentionPage+1} de {attentionPages}</span><div><button type="button" disabled={currentAttentionPage===0} onClick={()=>setAttentionPage(p=>Math.max(0,p-1))}>Anterior</button><button type="button" disabled={currentAttentionPage>=attentionPages-1} onClick={()=>setAttentionPage(p=>Math.min(attentionPages-1,p+1))}>Próxima</button></div></nav>}
  </section>
