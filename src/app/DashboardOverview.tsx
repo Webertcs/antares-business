@@ -11,9 +11,8 @@ const formatDate=(date:Date)=>new Intl.DateTimeFormat('pt-BR',{timeZone:TZ,day:'
 const formatTime=(date:Date)=>new Intl.DateTimeFormat('pt-BR',{timeZone:TZ,hour:'2-digit',minute:'2-digit'}).format(date);
 const quickLinks=[
  {title:'Cúpulas',href:'/agenda/reservas',icon:Orbit},
- {title:'Contratos',href:'/operacoes',icon:FileText},
- {title:'Professores',href:'/educacional',icon:GraduationCap},
- {title:'Alunos e turmas',href:'/educacional',icon:Users},
+ {title:'Propostas',href:'/operacoes?area=comercial',icon:FileText},
+ {title:'Contratos',href:'/operacoes?area=comercial',icon:BriefcaseBusiness},
  {title:'Recebimentos',href:'/financeiro/receber',icon:HandCoins},
  {title:'Relatórios',href:'/financeiro',icon:BarChart3},
  {title:'Leads da vitrine',href:'/vitrine/inbox',icon:ContactRound},
@@ -44,7 +43,7 @@ export default function DashboardOverview({cash,receivable,proposals,upcoming,ca
    {label:'A receber',value:receivable,icon:ArrowUpRight},
    {label:'Propostas abertas',value:proposals,icon:FileText},
    {label:'Próximas sessões',value:agendaAvailable?String(upcoming.length):'—',icon:CalendarDays}].map(k=><article className="owner-kpi" key={k.label}><span className="owner-kpi-icon"><k.icon size={20}/></span><div><span>{k.label}</span><strong>{k.value}</strong></div></article>)}
-   <button type="button" className="owner-kpi-budget" onClick={()=>onNavigate('comercial')}><Plus size={19}/><span>Novo orçamento</span></button>
+   <button type="button" className="owner-kpi-budget" onClick={()=>window.location.assign('/operacoes?area=comercial')}><Plus size={19}/><span>Novo orçamento</span></button>
   </div>
   <div className="owner-main-grid">
    <section className="owner-tile owner-relationship"><div className="owner-tile-head"><span className="owner-tile-icon"><Users size={20}/></span><div><h2>Inteligência de relacionamento</h2><p>Alertas e lembretes comerciais</p></div></div>
