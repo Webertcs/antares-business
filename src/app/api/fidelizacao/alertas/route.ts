@@ -19,11 +19,16 @@ export async function GET(){
    WHERE c.organization_id=${owner.organizationId}
     AND COALESCE(c.status,'active') NOT IN ('archived','inactive')
    GROUP BY c.id,c.name ORDER BY c.name ASC LIMIT 500`;
+  let snoozes:Record<string,string>={};
+  try{
+   const saved=await db`SELECT client_id,snoozed_until FROM public.antares_relationship_snoozes WHERE organization_id=${owner.organizationId} AND snoozed_until>=${today}::date`;
+   snoozes=Object.fromEntries(saved.map(r=>[String(r.client_id),r.snoozed_until instanceof Date?r.snoozed_until.toISOString().slice(0,10):String(r.snoozed_until).slice(0,10)]));
+  }catch{/* A migração 06D pode estar pendente: alertas originais continuam disponíveis. */}
   const alerts=rows.flatMap(r=>{
    if(!r.last_visit)return [];
    const date=r.last_visit instanceof Date?r.last_visit.toISOString().slice(0,10):String(r.last_visit).slice(0,10);
    const {days}=relationshipCycle([{status:'confirmed',event_date:date}],today);
-   if(days===null||days<60)return [];
+   if(days===null||days<60||snoozes[String(r.id)]>=today)return [];
    return [{client_id:String(r.id),client_name:String(r.name),last_visit:date,days,severity:days>=90?'critical':'warning'}];
   });
   return NextResponse.json({alerts,count:alerts.length,critical:alerts.filter(a=>a.severity==='critical').length},{headers:{'Cache-Control':'private, no-store'}});
