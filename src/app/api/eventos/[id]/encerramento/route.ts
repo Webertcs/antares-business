@@ -32,6 +32,7 @@ export async function GET(_req:NextRequest,{params}:{params:Promise<{id:string}>
    status:event[0].status,
    attendance:rows[0]||null,
    canClose:Object.values(checks).every(Boolean),
+   canCorrect:ctx.role==='owner' && event[0].status==='completed' && !!rows[0] && process.env.ANTARES_EVENT_ATTENDANCE_CORRECTIONS_ENABLED==='true',
    diagnostics:process.env.NODE_ENV==='development'?{checks,eventDate,today}:undefined
   },{headers:{'Cache-Control':'private, no-store'}});
  }catch{return unavailable();}
