@@ -20,7 +20,7 @@ export async function GET(){
    GROUP BY c.id,c.name ORDER BY c.name ASC LIMIT 500`;
   const alerts=rows.flatMap(r=>{
    if(!r.last_visit)return [];
-   const date=String(r.last_visit).slice(0,10);
+   const date=r.last_visit instanceof Date?r.last_visit.toISOString().slice(0,10):String(r.last_visit).slice(0,10);
    const days=Math.floor((Date.parse(today+'T12:00:00Z')-Date.parse(date+'T12:00:00Z'))/86400000);
    if(!Number.isFinite(days)||days<60)return [];
    return [{client_id:String(r.id),client_name:String(r.name),last_visit:date,days,severity:days>=90?'critical':'warning'}];
