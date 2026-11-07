@@ -1,12 +1,12 @@
 'use client';
 import {useEffect,useMemo,useState} from 'react';
+import {relationshipCycle} from '@/lib/fidelizacao/relationship-cycle';
 
 type Client={id:string;name:string;kind:string;status:string;city:string|null;phone?:string|null};
 type Contact={client_id:string;phone:string|null;whatsapp:boolean;is_primary:boolean};
 type Event={id:string;client_id:string;status:string;event_date:string|null;title:string};
 type Action={id:string;client_id:string;client_name:string;action_kind:string;due_date:string|null;priority:string;status:string;note:string};
 type Item={client:Client;completed:number;last:Date|null;days:number|null;tier:string;alert:string;priority:number};
-const DAY=86400000;
 function parseDate(value:string|null):Date|null{
  if(!value)return null;
  const date=new Date(value.slice(0,10)+'T12:00:00Z');
@@ -67,9 +67,10 @@ export default function FidelizacaoClient(){
    // Eventos cancelados, reservados e futuros não contam como visitas realizadas.
    const today=parseDate(new Date().toLocaleDateString('en-CA',{timeZone:'America/Sao_Paulo'}))!;
    const completed=events.filter(e=>e.client_id===client.id&&(e.status==='confirmed'||e.status==='completed')&&parseDate(e.event_date)!==null&&parseDate(e.event_date)!.getTime()<=today.getTime());
+   const cycle=relationshipCycle(events.filter(e=>e.client_id===client.id),today.toISOString().slice(0,10));
    const dated=completed.map(e=>parseDate(e.event_date)).filter((d):d is Date=>d!==null).sort((a,b)=>b.getTime()-a.getTime());
    const last=dated[0]||null;
-   const days=last?Math.max(0,Math.floor((today.getTime()-last.getTime())/DAY)):null;
+   const days=cycle.days;
    const yearly=dated.filter(d=>d.getUTCFullYear()===year).length;
    const tier=yearly>=8?'Diamante':yearly>=4?'Ouro':yearly>=2?'Prata':yearly===1?'Bronze':'Sem categoria';
    const alert=days!==null&&days>=threshold?'Retomar contato':completed.length===0?'Novo / sem visita realizada':days!==null&&days>=60?'Acompanhar':'Relacionamento recente';
