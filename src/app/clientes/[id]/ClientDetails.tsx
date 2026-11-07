@@ -10,6 +10,7 @@ const statuses:Record<string,string>={prospect:'Prospecto',active:'Ativo',inacti
 const eventStatuses:Record<string,string>={lead:'Oportunidade',quoted:'Orçado',reserved:'Reservado',confirmed:'Confirmado',completed:'Realizado',cancelled:'Cancelado'};
 const dateBR=(value:string|null)=>value?new Intl.DateTimeFormat('pt-BR',{timeZone:'UTC'}).format(new Date(value)):'Sem data';
 export default function ClientDetails({id,writesEnabled}:{id:string;writesEnabled:boolean}){
+ const [activeTab,setActiveTab]=useState<'apresentacoes'|'propostas'|'contratos'|'alunos'|'eventos'|'contatos'|'historico'|'observacoes'>('apresentacoes');
  const [commercial,setCommercial]=useState<{proposals:Record<string,unknown>[];contracts:Record<string,unknown>[];unavailable:string[]}|null>(null);
  const [commercialError,setCommercialError]=useState('');
  const [client,setClient]=useState<Client|null>(null),[contacts,setContacts]=useState<Contact[]>([]),[events,setEvents]=useState<Event[]>([]),[groups,setGroups]=useState<Group[]>([]);
@@ -72,20 +73,23 @@ export default function ClientDetails({id,writesEnabled}:{id:string;writesEnable
  <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(165px,1fr))',gap:8,fontSize:12}}>
  {([['Tipo',kinds[client.kind]||client.kind],['Situação',statuses[client.status]||client.status],['Cidade',client.city||'—'],['E-mail',client.email||'—'],['Telefone',client.phone||'—']] as [string,string][]).map(([label,value])=><div key={label}><strong style={{color:'#315e94'}}>{label}</strong><div style={{marginTop:4,overflowWrap:'anywhere'}}>{value}</div></div>)}
  </div>{client.notes&&<p style={{fontSize:13,marginBottom:0}}><strong>Observações:</strong> {client.notes}</p>}</section>
- <section style={{...panel,borderLeftColor:'#169caa'}}><h2 style={heading}>Propostas e orçamentos ({proposals.length})</h2>
+ <nav aria-label="Seções do cliente" style={{display:'flex',flexWrap:'wrap',gap:8,margin:'14px 0'}}>{([['apresentacoes','Apresentações'],['propostas','Propostas'],['contratos','Contratos'],['alunos','Alunos'],['eventos','Eventos'],['contatos','Contatos'],['historico','Histórico'],['observacoes','Observações']] as const).map(([key,label])=><button key={key} type="button" aria-current={activeTab===key?'page':undefined} onClick={()=>setActiveTab(key)} style={{cursor:'pointer',border:'1px solid #a9c7ee',borderRadius:10,padding:'10px 15px',fontWeight:700,background:activeTab===key?'linear-gradient(110deg,#0862cf,#16458e)':'#eaf3ff',color:activeTab===key?'#fff':'#174987'}}>{label}</button>)}</nav>
+ {activeTab==='apresentacoes'&&<section style={{...panel,borderLeftColor:'#d69b3a'}}><h2 style={heading}>Apresentações ({events.length})</h2>{events.length===0?<p>Nenhuma apresentação registrada.</p>:events.map(e=><div key={e.id} style={row}><strong>{e.title}</strong> · {dateBR(e.event_date)} · {eventStatuses[e.status]||e.status}<div><Link href={`/eventos/${e.id}`} style={{fontWeight:700,color:'#1556ae'}}>Abrir operação do evento</Link></div></div>)}</section>}
+ {activeTab==='propostas'&&<section style={{...panel,borderLeftColor:'#169caa'}}><h2 style={heading}>Propostas e orçamentos ({proposals.length})</h2>
  {commercialError?<p role="alert">{commercialError}</p>:!commercial?<p>Carregando informações comerciais…</p>:commercial.unavailable.includes('proposals')?<p>Propostas temporariamente indisponíveis.</p>:proposals.length===0?<p>Nenhuma proposta vinculada a esta instituição.</p>:proposals.map(p=><div key={String(p.id)} style={row}><strong>{String(p.title||'Proposta')}</strong> · {money(p.total)} · {String(p.status||'Sem situação')}<div style={{fontSize:12}}>Criada em {dateBR(p.created_at?String(p.created_at):null)}</div></div>)}
- <Link href="/operacoes?area=comercial" style={{fontSize:13,color:'#1556ae',fontWeight:700}}>Consultar todas as propostas</Link></section>
- <section style={{...panel,borderLeftColor:'#3c7ad4'}}><h2 style={heading}>Contratos ({contracts.length})</h2>
+ <Link href="/operacoes?area=comercial" style={{fontSize:13,color:'#1556ae',fontWeight:700}}>Consultar todas as propostas</Link></section>}
+ {activeTab==='contratos'&&<section style={{...panel,borderLeftColor:'#3c7ad4'}}><h2 style={heading}>Contratos ({contracts.length})</h2>
  {commercialError?<p role="alert">{commercialError}</p>:!commercial?<p>Carregando contratos…</p>:commercial.unavailable.includes('contracts')||commercial.unavailable.includes('proposals')?<p>Contratos temporariamente indisponíveis.</p>:contracts.length===0?<p>Nenhum contrato vinculado a esta instituição.</p>:contracts.map(c=><div key={String(c.id)} style={row}><strong>{String(c.proposal_title||'Contrato')}</strong> · {String(c.status||'Sem situação')}<div style={{fontSize:12}}>Confirmado em {dateBR(c.confirmed_at?String(c.confirmed_at):null)}</div></div>)}
- <Link href="/operacoes?area=contratos" style={{fontSize:13,color:'#1556ae',fontWeight:700}}>Consultar todos os contratos</Link></section>
- <section style={{...panel,borderLeftColor:'#169caa'}}><h2 style={heading}>Participação de alunos</h2><p style={{fontSize:13}}>O público previsto é informado antes da apresentação. O total real de alunos será registrado uma única vez, no encerramento do evento, após a implantação segura do controle. Esse registro também servirá de referência para o ciclo de fidelização, sem duplicar lembretes.</p></section>
- <section style={{...panel,borderLeftColor:'#6c73d9',background:'linear-gradient(125deg,#f3f3ff 0%,#ffffff 60%,#eef5ff 100%)'}}><h2 style={heading}>Contatos ({contacts.length})</h2>
+ <Link href="/operacoes?area=contratos" style={{fontSize:13,color:'#1556ae',fontWeight:700}}>Consultar todos os contratos</Link></section>}
+ {activeTab==='alunos'&&<section style={{...panel,borderLeftColor:'#169caa'}}><h2 style={heading}>Participação de alunos</h2><p style={{fontSize:13}}>O público previsto é informado antes da apresentação. O total real de alunos será registrado uma única vez, no encerramento do evento, após a implantação segura do controle. Esse registro também servirá de referência para o ciclo de fidelização, sem duplicar lembretes.</p></section>}
+ {activeTab==='contatos'&&<section style={{...panel,borderLeftColor:'#6c73d9',background:'linear-gradient(125deg,#f3f3ff 0%,#ffffff 60%,#eef5ff 100%)'}}><h2 style={heading}>Contatos ({contacts.length})</h2>
  {contacts.length===0?<p>Sem contatos cadastrados.</p>:contacts.map(c=><div key={c.id} style={row}><strong>{c.full_name}</strong>{c.position?' · '+c.position:''}{c.is_primary?' · Principal':''}<div style={{fontSize:12,marginTop:3}}>{c.phone||c.email||'Sem contato informado'}</div></div>)}
- </section>
- <section style={{...panel,borderLeftColor:'#d69b3a',background:'linear-gradient(125deg,#fff8ec 0%,#ffffff 60%,#edf5ff 100%)'}}><h2 style={heading}>Histórico de apresentações e oportunidades ({events.length})</h2>
+ </section>}
+ {activeTab==='eventos'&&<section style={{...panel,borderLeftColor:'#d69b3a',background:'linear-gradient(125deg,#fff8ec 0%,#ffffff 60%,#edf5ff 100%)'}}><h2 style={heading}>Histórico de apresentações e oportunidades ({events.length})</h2>
  {events.length===0?<p>Sem eventos registrados.</p>:events.map(e=><div key={e.id} style={row}><strong>{e.title}</strong> · {dateBR(e.event_date)} · {eventStatuses[e.status]||e.status}{e.expected_attendees!=null?' · '+e.expected_attendees+' participantes':''}</div>)}
- </section>
- 
+ </section>}
+ {activeTab==='historico'&&<section style={panel}><h2 style={heading}>Histórico do cliente</h2><p>Consulte as apresentações na aba Eventos e os registros comerciais nas abas Propostas e Contratos. O histórico de contatos será integrado sem duplicar dados.</p></section>}
+ {activeTab==='observacoes'&&<section style={panel}><h2 style={heading}>Observações da instituição</h2><p>{client.notes||'Nenhuma observação cadastrada.'}</p></section>}
  </>}
  </main>;
 }
