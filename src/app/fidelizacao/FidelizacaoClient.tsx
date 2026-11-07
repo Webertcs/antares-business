@@ -109,7 +109,12 @@ export default function FidelizacaoClient(){
  const count=(tier:string)=>items.filter(i=>i.tier===tier).length;
  const messageFor=(clientId:string)=>{const client=items.find(i=>i.client.id===clientId);const name=client?.client.name||'sua instituição';const tier=client?.tier||'Sem categoria';const proposal=tier==='Diamante'?'uma parceria anual e experiências especiais':tier==='Ouro'?'novas experiências e condições para a continuidade da parceria':tier==='Prata'?'novos temas e opções de programação recorrente':'uma nova visita do Planetário ANTARES';return 'Olá! Agradecemos a parceria com '+name+'. Gostaríamos de conversar sobre '+proposal+'. Podemos apresentar uma proposta personalizada?';};
  const dateLabel=(d:Date|null)=>d?d.toLocaleDateString('pt-BR',{timeZone:'UTC'}):'—';
- const shortAlert=(i:Item)=>i.last===null?'Primeira visita':i.alert==='Novo / sem visita realizada'?'Primeira visita':i.alert;
+ const shortAlert=(i:Item)=>{
+  if(i.last!==null)return i.alert;
+  const today=parseDate(new Date().toLocaleDateString('en-CA',{timeZone:'America/Sao_Paulo'}))!;
+  const upcoming=events.filter(e=>e.client_id===i.client.id&&e.status==='confirmed'&&parseDate(e.event_date)!==null&&parseDate(e.event_date)!.getTime()>today.getTime()).map(e=>parseDate(e.event_date)!).sort((a,b)=>a.getTime()-b.getTime());
+  return upcoming.length?'Visita confirmada para '+dateLabel(upcoming[0]):'Primeira visita';
+ };
  return <><style>{`
  .fidelizacao-programmed{display:inline-block;margin-left:10px;padding:2px 7px;border:1px solid #b3d5be;border-radius:6px;background:#e4f5e9;color:#176039;font-size:11px;font-weight:700;white-space:nowrap}
  .fidelizacao-modal-description strong{color:#173f7c;font-size:17px}
