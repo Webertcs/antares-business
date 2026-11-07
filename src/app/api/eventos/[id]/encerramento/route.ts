@@ -14,7 +14,12 @@ export async function GET(_req:NextRequest,{params}:{params:Promise<{id:string}>
   const present=await db`SELECT to_regclass('public.antares_event_attendance') IS NOT NULL AS ready`;
   if(!present[0]?.ready)return NextResponse.json({status:event[0].status,attendance:null,canClose:false},{headers:{'Cache-Control':'private, no-store'}});
   const rows=await db`SELECT actual_students,closed_at FROM public.antares_event_attendance WHERE organization_id=${ctx.organizationId}::uuid AND event_id=${id}::uuid LIMIT 1`;
-  const eventDate = String(event[0].event_date ?? '').slice(0,10);
+  const rawDate = event[0].event_date;
+  const eventDate = rawDate instanceof Date
+   ? new Intl.DateTimeFormat('en-CA',{timeZone:'UTC',year:'numeric',month:'2-digit',day:'2-digit'}).format(rawDate)
+   : /^\\d{4}-\\d{2}-\\d{2}$/.test(String(rawDate ?? '').slice(0,10))
+    ? String(rawDate).slice(0,10)
+    : '';
   const today = new Intl.DateTimeFormat('en-CA',{timeZone:'America/Sao_Paulo',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date());
   const checks = {
    owner:ctx.role==='owner',
