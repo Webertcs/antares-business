@@ -22,7 +22,7 @@ export default function FidelizacaoClient(){
  const [radarPage,setRadarPage]=useState(0);
  const [attentionPage,setAttentionPage]=useState(0);
  const [showHistory,setShowHistory]=useState(false);
- const [threshold,setThreshold]=useState(90);
+ const threshold=90;
  const [actions,setActions]=useState<Action[]>([]);
  const [selected,setSelected]=useState('');
  const [modalOpen,setModalOpen]=useState(false);
@@ -57,11 +57,11 @@ export default function FidelizacaoClient(){
   }).catch(e=>{if(e.name!=='AbortError')setError(e.message||'Erro ao carregar');}).finally(()=>setLoading(false));
   return ()=>ctrl.abort();
  },[]);
- function openReminder(clientId=''){setModalFromRadar(Boolean(clientId));setSelected(clientId);setDue('');setKind('follow_up');setPriority('normal');setNote('');setFeedback('');setModalTouched(false);setModalOpen(true);}
+ function openReminder(clientId=''){if(clientId&&actions.some(a=>a.client_id===clientId&&a.status==='open')){setFeedback('Já existe um contato em aberto para esta instituição. Consulte a Agenda Interna.');document.getElementById('agenda-relacionamento')?.scrollIntoView({behavior:'smooth',block:'start'});return;}setModalFromRadar(Boolean(clientId));setSelected(clientId);setDue('');setKind('follow_up');setPriority('normal');setNote('');setFeedback('');setModalTouched(false);setModalOpen(true);}
  function closeReminder(){if(saving)return;if(modalTouched&&!window.confirm('Descartar as alterações do lembrete?'))return;setModalOpen(false);setModalTouched(false);}
  useEffect(()=>{if(!modalOpen)return;const onKey=(e:KeyboardEvent)=>{if(e.key==='Escape'){e.preventDefault();if(!saving&&(!modalTouched||window.confirm('Descartar as alterações do lembrete?'))){setModalOpen(false);setModalTouched(false);}}};window.addEventListener('keydown',onKey);return()=>window.removeEventListener('keydown',onKey);},[modalOpen,modalTouched,saving]);
  const items=useMemo<Item[]>(()=>{
-  const now=new Date();const year=now.getUTCFullYear();
+  const year=Number(new Intl.DateTimeFormat('en-US',{year:'numeric',timeZone:'America/Sao_Paulo'}).format(new Date()));
   return clients.filter(c=>c.kind==='school'||c.kind==='company'||c.kind==='association').map(client=>{
    // A confirmação verde na Agenda habilita o ciclo; a visita só entra na contagem após sua data.
    // Eventos cancelados, reservados e futuros não contam como visitas realizadas.
@@ -75,7 +75,7 @@ export default function FidelizacaoClient(){
    const alert=days!==null&&days>=threshold?'Retomar contato':completed.length===0?'Novo / sem visita realizada':days!==null&&days>=60?'Acompanhar':'Relacionamento recente';
    return {client,completed:yearly,last,days,tier,alert,priority:days!==null&&days>=threshold?0:days!==null&&days>=60?2:3};
   }).sort((a,b)=>a.priority-b.priority||((b.days||0)-(a.days||0)));
- },[clients,events,threshold]);
+ },[clients,events]);
  const radar=useMemo(()=>{
   const withoutVisit=items.filter(i=>i.last===null);
   const inactive=items.filter(i=>i.days!==null&&i.days>=threshold);
@@ -243,13 +243,13 @@ export default function FidelizacaoClient(){
  <div style={{display:'flex',flexWrap:'wrap',gap:12,margin:'15px 0'}}>
  <label>Mostrar <select value={filter} onChange={e=>(setFilter(e.target.value),setAttentionPage(0))} style={{marginLeft:8,padding:8,border:'1px solid #9db1cd',borderRadius:8,background:'white',color:'#142b4f'}}>
  <option value="all">Todas</option><option value="attention">Precisam de atenção</option><option value="Diamante">Diamante</option><option value="Ouro">Ouro</option><option value="Prata">Prata</option><option value="Bronze">Bronze</option></select></label>
- <label>Alerta após <select value={threshold} onChange={e=>setThreshold(Number(e.target.value))} style={{marginLeft:8,padding:8,border:'1px solid #9db1cd',borderRadius:8,background:'white',color:'#142b4f'}}><option value={90}>90 dias</option><option value={120}>120 dias</option><option value={180}>180 dias</option></select></label>
+ <span style={{alignSelf:'center',fontSize:13,color:'#315b90'}}>Aviso preventivo: 60 dias · Prioritário: 90 dias</span>
  </div>
  {loading?<p>Carregando dados da organização...</p>:error?<p role="alert">{error}</p>:displayed.length===0?<p>Nenhuma instituição nesta categoria.</p>:
  <div style={{overflowX:'auto'}}><table className="fidelizacao-attention-table" style={{width:'100%',borderCollapse:'collapse',textAlign:'left',minWidth:680}}>
  <thead><tr>{['Instituição','Categoria','Visitas','Última visita','Atenção'].map(c=><th key={c} style={{padding:'8px 10px',borderBottom:'1px solid #c3d1e6'}}>{c}</th>)}</tr></thead>
  <tbody>{displayed.slice(currentAttentionPage*10,(currentAttentionPage+1)*10).map(i=><tr key={i.client.id}><td style={{padding:'7px 10px',borderBottom:'1px solid #e1e8f1'}}><strong>{i.client.name}</strong></td>
- <td>{i.tier==='Sem categoria'?'—':i.tier}</td><td>{i.completed}</td><td>{dateLabel(i.last)}</td><td>{shortAlert(i)}</td></tr>)}</tbody>
+ <td>{i.tier==='Sem categoria'?'—':i.tier}</td><td>{i.completed}</td><td>{dateLabel(i.last)}</td><td><span>{shortAlert(i)}</span>{i.days!==null&&i.days>=60&&<div style={{marginTop:5}}>{openByClient.get(i.client.id)?.length?<small style={{color:'#176039'}}>Contato já programado</small>:<button type="button" className="fidelizacao-button" onClick={()=>openReminder(i.client.id)}>Programar contato</button>}</div>}</td></tr>)}</tbody>
  </table></div>}
  {displayed.length>10&&<nav aria-label="Páginas da Central de Alertas" className="fidelizacao-pagination"><span>Exibindo {currentAttentionPage*10+1}–{Math.min((currentAttentionPage+1)*10,displayed.length)} de {displayed.length} instituições · Página {currentAttentionPage+1} de {attentionPages}</span><div><button type="button" disabled={currentAttentionPage===0} onClick={()=>setAttentionPage(p=>Math.max(0,p-1))}>Anterior</button><button type="button" disabled={currentAttentionPage>=attentionPages-1} onClick={()=>setAttentionPage(p=>Math.min(attentionPages-1,p+1))}>Próxima</button></div></nav>}
  </section>
