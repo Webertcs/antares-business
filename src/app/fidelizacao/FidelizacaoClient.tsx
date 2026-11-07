@@ -318,6 +318,8 @@ export default function FidelizacaoClient(){
  <h2 id="agenda-relacionamento" className="fidelizacao-section-heading">Agenda interna de relacionamento</h2>
  
  {feedback&&<p role="status" style={{marginTop:10}}>{feedback}</p>}
+ {actionsError&&<p role="alert" style={{marginTop:10,color:'#a83232',fontWeight:700}}>Não foi possível atualizar a agenda: {actionsError}. Os registros não foram apagados.</p>}
+ {!actionsLoaded&&!actionsError&&<p role="status">Carregando histórico e lembretes...</p>}
  <h3 style={{marginTop:22,fontWeight:700}}>Lembretes registrados ({actions.filter(a=>a.status==='open').length} em aberto)</h3>
  <div style={{display:'grid',gap:10,marginTop:10}}>
  {actions.filter(a=>a.status==='open').length===0?<p>Nenhum lembrete cadastrado.</p>:actions.filter(a=>a.status==='open').map(a=><div key={a.id} className={'fidelizacao-reminder '+(a.status==='open'?'fidelizacao-reminder-open':'fidelizacao-reminder-closed')}>
