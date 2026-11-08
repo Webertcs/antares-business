@@ -40,5 +40,5 @@ export async function POST(req:NextRequest){
     ${body.unitPrice},${body.fixedPrice},${body.discount},${body.deposit},
     ${date||null}::date,${notes}) AS id`;
   return NextResponse.json({id:result[0]?.id},{status:201,headers:{'Cache-Control':'no-store'}});
- }catch{return fail('Não foi possível cadastrar a proposta. Verifique as informações.',409);}
+ }catch(error){console.error('[ANTARES][propostas] Falha de gravação:',error instanceof Error?error.message:'Erro desconhecido');return fail('Não foi possível cadastrar a proposta. Verifique as informações.',409);}
 }
