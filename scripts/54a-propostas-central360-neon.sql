@@ -30,9 +30,9 @@ BEGIN
     RAISE EXCEPTION 'Desconto ou sinal excede o total'; END IF;
  INSERT INTO public.business_proposals(
  organization_id,client_id,title,pricing_model,expected_attendees,
- unit_price,fixed_price,discount,deposit,total,status,valid_until,notes)
+ unit_price,fixed_price,discount,deposit,status,valid_until,notes)
  VALUES(v_org,p_client,btrim(p_title),p_model,p_attendees,
- p_unit,p_fixed,p_discount,p_deposit,v_total,'draft',p_valid_until,
+ p_unit,p_fixed,p_discount,p_deposit,'draft',p_valid_until,
  nullif(btrim(coalesce(p_notes,'')),''))
  RETURNING id INTO v_id;
  INSERT INTO public.business_audit(organization_id,actor_subject,action,entity_type,entity_id)
