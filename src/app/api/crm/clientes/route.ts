@@ -8,7 +8,7 @@ export async function GET() {
     if (!ctx) return NextResponse.json({ error: 'Acesso não autorizado.' }, {status:403});
     const db = getDb();
     const [clients, contacts, events] = await Promise.all([
-      db`SELECT id, kind, name, email, phone, city, status, notes, created_at
+      db`SELECT id, kind, name, email, phone, phone_secondary, city, status, notes, created_at
         FROM public.crm_clients WHERE organization_id=${ctx.organizationId}
         ORDER BY created_at DESC LIMIT 500`,
       db`SELECT id,client_id,full_name,position,email,phone,whatsapp,is_primary
@@ -55,9 +55,9 @@ export async function POST(request: import('next/server').NextRequest) {
           AND NOT has_table_privilege(current_user,c.oid,'INSERT')
           AND NOT has_table_privilege(current_user,c.oid,'UPDATE')
           AND NOT has_table_privilege(current_user,c.oid,'DELETE')) AS safe_tables,
-      (SELECT count(*) = 3 FROM pg_proc p
+      (SELECT count(*) = 4 FROM pg_proc p
         WHERE p.pronamespace='public'::regnamespace
-          AND p.proname IN ('crm_save_client','crm_save_contact','crm_save_event')
+          AND p.proname IN ('crm_save_client','crm_save_contact','crm_save_event','crm_save_client_with_secondary')
           AND p.prosecdef
           AND pg_get_userbyid(p.proowner)='neondb_owner'
           AND has_function_privilege(current_user,p.oid,'EXECUTE')
@@ -72,10 +72,10 @@ export async function POST(request: import('next/server').NextRequest) {
     const str=(v:unknown,max=4000)=>typeof v==='string'?v.trim().slice(0,max):'';
     const uuid=(v:unknown)=>typeof v==='string' && /^[a-f0-9]{8}(-[a-f0-9]{4}){3}-[a-f0-9]{12}$/i.test(v)?v:null;
     if (body.action==='client') {
-      const rows=await sql`SELECT public.crm_save_client(
+      const rows=await sql`SELECT public.crm_save_client_with_secondary(
         ${ctx.user.id},${uuid(body.id)}::uuid,${str(body.kind,30)},${str(body.name,180)},
         ${str(body.email,254)},${str(body.phone,40)},${str(body.city,120)},
-        ${str(body.notes)},${str(body.status,30)}) AS id`;
+        ${str(body.notes)},${str(body.status,30)},${str(body.phoneSecondary,40)}) AS id`;
       return NextResponse.json({id:rows[0]?.id},{status:201});
     }
     if(body.action==='contact' && uuid(body.clientId)){
