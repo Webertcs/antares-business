@@ -9,10 +9,44 @@ const kinds:Record<string,string>={school:'Escola',company:'Empresa',association
 const statuses:Record<string,string>={prospect:'Prospecto',active:'Ativo',inactive:'Arquivado'};
 const eventStatuses:Record<string,string>={lead:'Oportunidade',quoted:'Orçado',reserved:'Reservado',confirmed:'Confirmado',completed:'Realizado',cancelled:'Cancelado'};
 const dateBR=(value:string|null)=>value?new Intl.DateTimeFormat('pt-BR',{timeZone:'UTC'}).format(new Date(value)):'Sem data';
-export default function ClientDetails({id,writesEnabled}:{id:string;writesEnabled:boolean}){
+export default function ClientDetails({id,writesEnabled,proposalWritesEnabled,contractWritesEnabled}:{id:string;writesEnabled:boolean;proposalWritesEnabled:boolean;contractWritesEnabled:boolean}){
  const [activeTab,setActiveTab]=useState<'propostas'|'contratos'|'alunos'|'eventos'|'financeiro'|'fidelizacao'|'historico'|'observacoes'>('eventos');
  const [commercial,setCommercial]=useState<{proposals:Record<string,unknown>[];contracts:Record<string,unknown>[];unavailable:string[]}|null>(null);
  const [commercialError,setCommercialError]=useState('');
+ const [commercialForm,setCommercialForm]=useState<'proposal'|'contract'|null>(null);
+ const [commercialBusy,setCommercialBusy]=useState(false);
+ const [commercialFeedback,setCommercialFeedback]=useState('');
+ const [proposalDraft,setProposalDraft]=useState({title:'',model:'per_student',attendees:'30',unitPrice:'10',fixedPrice:'0',discount:'0',deposit:'0',validUntil:'',notes:''});
+ const [contractDraft,setContractDraft]=useState({proposalId:'',mode:'written',terms:''});
+ const commercialDialog=useRef<HTMLDialogElement>(null);
+ useEffect(()=>{if(commercialForm)commercialDialog.current?.showModal();else commercialDialog.current?.close()},[commercialForm]);
+ async function refreshCommercial(){
+  const response=await fetch('/api/business',{cache:'no-store'});
+  const data=await response.json();
+  if(!response.ok)throw Error(data.error||'Não foi possível atualizar propostas e contratos');
+  setCommercial({proposals:Array.isArray(data.proposals)?data.proposals:[],contracts:Array.isArray(data.contracts)?data.contracts:[],unavailable:Array.isArray(data.unavailable)?data.unavailable:[]});
+ }
+ async function saveCommercial(e:React.FormEvent<HTMLFormElement>){
+  e.preventDefault();if(!commercialForm||commercialBusy)return;
+  if(commercialForm==='proposal'&&!proposalWritesEnabled)return;
+  if(commercialForm==='contract'&&!contractWritesEnabled)return;
+  setCommercialBusy(true);setCommercialFeedback('');
+  try{
+   const body=commercialForm==='proposal'?{action:'proposal',clientId:id,...proposalDraft,
+    attendees:Number(proposalDraft.attendees),unitPrice:Number(proposalDraft.unitPrice),fixedPrice:Number(proposalDraft.fixedPrice),
+    discount:Number(proposalDraft.discount),deposit:Number(proposalDraft.deposit)}:
+    {action:'contract',...contractDraft};
+   const response=await fetch('/api/business/gravar',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+   const result=await response.json();
+   if(!response.ok)throw Error(result.error||'Não foi possível salvar');
+   setCommercialForm(null);await refreshCommercial();
+   setCommercialFeedback(commercialForm==='proposal'?'Proposta cadastrada com sucesso.':'Contrato cadastrado com sucesso.');
+  }catch(err){setCommercialFeedback(err instanceof Error?err.message:'Operação não concluída');}
+  finally{setCommercialBusy(false);}
+ }
+ const formInput:React.CSSProperties={display:'block',width:'100%',padding:10,border:'1px solid #abc7ed',borderRadius:9,marginTop:5,color:'#16325b',background:'#fff'};
+ const formLabel:React.CSSProperties={fontSize:13,fontWeight:650,color:'#174987'};
+
  const [finance,setFinance]=useState<{entries:Record<string,unknown>[];income:number;expenses:number}|null>(null);
  const [financeError,setFinanceError]=useState('');
  const [client,setClient]=useState<Client|null>(null),[contacts,setContacts]=useState<Contact[]>([]),[events,setEvents]=useState<Event[]>([]),[groups,setGroups]=useState<Group[]>([]);
@@ -78,12 +112,37 @@ export default function ClientDetails({id,writesEnabled}:{id:string;writesEnable
  {([['Tipo',kinds[client.kind]||client.kind],['Situação',statuses[client.status]||client.status],['Cidade',client.city||'—'],['E-mail',client.email||'—'],['Telefone',client.phone||'—'],...(client.phone_secondary?[['Telefone secundário',client.phone_secondary]]:[])] as [string,string][]).map(([label,value])=><div key={label}><strong style={{color:'#315e94'}}>{label}</strong><div style={{marginTop:4,overflowWrap:'anywhere'}}>{value}</div></div>)}
  </div></section>
  <nav aria-label="Seções do cliente" style={{display:'flex',flexWrap:'wrap',gap:8,margin:'14px 0'}}>{([['eventos','Eventos'],['propostas','Propostas'],['contratos','Contratos'],['alunos','Alunos'],['fidelizacao','Fidelização'],['financeiro','Financeiro'],['historico','Histórico'],['observacoes','Observações']] as const).map(([key,label])=><button key={key} type="button" aria-current={activeTab===key?'page':undefined} onClick={()=>setActiveTab(key)} style={{cursor:'pointer',border:'1px solid #a9c7ee',borderRadius:10,padding:'10px 15px',fontWeight:700,background:activeTab===key?'linear-gradient(110deg,#0862cf,#16458e)':'#eaf3ff',color:activeTab===key?'#fff':'#174987'}}>{label}</button>)}</nav>
- {activeTab==='propostas'&&<section style={{...panel,borderLeftColor:'#169caa'}}><h2 style={heading}>Propostas e orçamentos ({proposals.length})</h2><p style={{fontSize:13}}>As propostas são vinculadas a esta instituição no módulo Comercial.</p>
+ {activeTab==='propostas'&&<section style={{...panel,borderLeftColor:'#169caa'}}><h2 style={heading}>Propostas e orçamentos ({proposals.length})</h2><p style={{fontSize:13}}>Propostas comerciais vinculadas a {client.name}.</p>{proposalWritesEnabled&&<button type="button" onClick={()=>{setCommercialFeedback('');setCommercialForm('proposal')}} style={actionLink}>+ Nova proposta</button>}
  {commercialError?<p role="alert">{commercialError}</p>:!commercial?<p>Carregando informações comerciais…</p>:commercial.unavailable.includes('proposals')?<p>Propostas temporariamente indisponíveis.</p>:proposals.length===0?<p>Nenhuma proposta vinculada a esta instituição.</p>:proposals.map(p=><div key={String(p.id)} style={row}><strong>{String(p.title||'Proposta')}</strong> · {money(p.total)} · {String(p.status||'Sem situação')}<div style={{fontSize:12}}>Criada em {dateBR(p.created_at?String(p.created_at):null)}</div></div>)}
 </section>}
- {activeTab==='contratos'&&<section style={{...panel,borderLeftColor:'#3c7ad4'}}><h2 style={heading}>Contratos ({contracts.length})</h2>
+ {activeTab==='contratos'&&<section style={{...panel,borderLeftColor:'#3c7ad4'}}><h2 style={heading}>Contratos ({contracts.length})</h2>{contractWritesEnabled&&<button type="button" onClick={()=>{setCommercialFeedback('');setCommercialForm('contract')}} style={actionLink}>+ Novo contrato</button>}<p style={{fontSize:13}}>Contratos são vinculados a propostas aceitas desta instituição.</p>
  {commercialError?<p role="alert">{commercialError}</p>:!commercial?<p>Carregando contratos…</p>:commercial.unavailable.includes('contracts')||commercial.unavailable.includes('proposals')?<p>Contratos temporariamente indisponíveis.</p>:contracts.length===0?<p>Nenhum contrato vinculado a esta instituição.</p>:contracts.map(c=><div key={String(c.id)} style={row}><strong>{String(c.proposal_title||'Contrato')}</strong> · {String(c.status||'Sem situação')}<div style={{fontSize:12}}>Confirmado em {dateBR(c.confirmed_at?String(c.confirmed_at):null)}</div></div>)}
 </section>}
+ {commercialFeedback&&<p role="status" style={{...panel,borderLeftColor:'#169caa'}}>{commercialFeedback}</p>}
+ <dialog ref={commercialDialog} onCancel={e=>{if(commercialBusy){e.preventDefault();return}setCommercialForm(null)}} style={{border:'1px solid #a8c6f0',borderRadius:16,padding:0,width:'min(590px,94vw)',maxHeight:'85vh',overflowY:'auto',boxShadow:'0 18px 60px #12356766'}}>
+ {commercialForm&&<><div style={{background:'linear-gradient(110deg,#12386f,#1769c7)',padding:'17px 22px',color:'white',display:'flex',justifyContent:'space-between',alignItems:'center'}}><strong>{commercialForm==='proposal'?'Nova proposta':'Novo contrato'}</strong><button type="button" disabled={commercialBusy} onClick={()=>setCommercialForm(null)} aria-label="Fechar" style={{color:'white',fontSize:22}}>×</button></div>
+ <form onSubmit={saveCommercial} style={{padding:22,display:'grid',gap:12}}>
+ <p style={{margin:0,fontSize:13}}>Instituição: <strong>{client.name}</strong> (vínculo fixo)</p>
+ {commercialForm==='proposal'?<>
+ <label style={formLabel}>Título<input required maxLength={180} style={formInput} value={proposalDraft.title} onChange={e=>setProposalDraft(v=>({...v,title:e.target.value}))}/></label>
+ <label style={formLabel}>Cobrança<select style={formInput} value={proposalDraft.model} onChange={e=>setProposalDraft(v=>({...v,model:e.target.value}))}><option value="per_student">Por aluno</option><option value="fixed">Valor fechado</option><option value="complimentary">Gratuito</option></select></label>
+ <label style={formLabel}>Participantes previstos<input required type="number" min={0} step={1} style={formInput} value={proposalDraft.attendees} onChange={e=>setProposalDraft(v=>({...v,attendees:e.target.value}))}/></label>
+ {proposalDraft.model==='per_student'&&<label style={formLabel}>Preço por aluno (R$)<input required type="number" min={0} step="0.01" style={formInput} value={proposalDraft.unitPrice} onChange={e=>setProposalDraft(v=>({...v,unitPrice:e.target.value}))}/></label>}
+ {proposalDraft.model==='fixed'&&<label style={formLabel}>Valor fechado (R$)<input required type="number" min={0} step="0.01" style={formInput} value={proposalDraft.fixedPrice} onChange={e=>setProposalDraft(v=>({...v,fixedPrice:e.target.value}))}/></label>}
+ <label style={formLabel}>Desconto (R$)<input type="number" min={0} step="0.01" style={formInput} value={proposalDraft.discount} onChange={e=>setProposalDraft(v=>({...v,discount:e.target.value}))}/></label>
+ <label style={formLabel}>Sinal (R$)<input type="number" min={0} step="0.01" style={formInput} value={proposalDraft.deposit} onChange={e=>setProposalDraft(v=>({...v,deposit:e.target.value}))}/></label>
+ <label style={formLabel}>Validade<input type="date" style={formInput} value={proposalDraft.validUntil} onChange={e=>setProposalDraft(v=>({...v,validUntil:e.target.value}))}/></label>
+ <label style={formLabel}>Observações<textarea maxLength={4000} rows={3} style={formInput} value={proposalDraft.notes} onChange={e=>setProposalDraft(v=>({...v,notes:e.target.value}))}/></label>
+ <p style={{margin:0}}>Total estimado: <strong>{money(Math.max(0,(proposalDraft.model==='per_student'?Number(proposalDraft.attendees)*Number(proposalDraft.unitPrice):proposalDraft.model==='fixed'?Number(proposalDraft.fixedPrice):0)-Number(proposalDraft.discount)))}</strong></p>
+ </>:<>
+ <label style={formLabel}>Proposta aceita<select required style={formInput} value={contractDraft.proposalId} onChange={e=>setContractDraft(v=>({...v,proposalId:e.target.value}))}><option value="">Selecione uma proposta aceita</option>{proposals.filter(p=>p.status==='accepted'&&!contracts.some(c=>String(c.proposal_id)===String(p.id))).map(p=><option key={String(p.id)} value={String(p.id)}>{String(p.title)}</option>)}</select></label>
+ <label style={formLabel}>Modalidade<select style={formInput} value={contractDraft.mode} onChange={e=>setContractDraft(v=>({...v,mode:e.target.value}))}><option value="written">Formal por escrito</option><option value="verbal">Acordo verbal</option><option value="whatsapp">WhatsApp</option></select></label>
+ <label style={formLabel}>Condições acordadas<textarea required minLength={8} maxLength={8000} rows={4} style={formInput} value={contractDraft.terms} onChange={e=>setContractDraft(v=>({...v,terms:e.target.value}))}/></label>
+ <p style={{fontSize:12}}>Registre apenas acordos efetivamente autorizados pelo cliente.</p>
+ </>}
+ <div style={{display:'flex',justifyContent:'flex-end',gap:10}}><button type="button" disabled={commercialBusy} onClick={()=>setCommercialForm(null)} style={{...actionLink,background:'#eaf3ff',color:'#174987'}}>Cancelar</button><button type="submit" disabled={commercialBusy||commercialForm==='contract'&&!proposals.some(p=>p.status==='accepted'&&!contracts.some(c=>String(c.proposal_id)===String(p.id)))} style={actionLink}>{commercialBusy?'Salvando…':'Salvar'}</button></div>
+ </form></>}
+ </dialog>
  {activeTab==='alunos'&&<section style={{...panel,borderLeftColor:'#169caa'}}><h2 style={heading}>Participação de alunos</h2><p style={{fontSize:13}}>O público previsto é informado antes da apresentação. O total real de alunos é registrado uma única vez no encerramento de cada evento.</p>{educationError?<p role="alert">{educationError}</p>:<p style={{fontSize:13}}>Turmas cadastradas: <strong>{groups.length}</strong></p>}{events.map(e=><div key={e.id} style={row}>{e.title} · Previsão: {e.expected_attendees??'não informada'} · <Link href={`/eventos/${e.id}`} style={{color:'#1556ae',fontWeight:700}}>Consultar atendimento</Link></div>)}<Link href="/educacional" style={actionLink}>Abrir Educacional</Link></section>}
  {activeTab==='eventos'&&<section style={panel}><h2 style={heading}>Eventos ({events.length})</h2><div style={{marginBottom:12,display:'flex',gap:8,flexWrap:'wrap'}}><Link href={`/clientes?newEventFor=${encodeURIComponent(id)}`} style={actionLink}>+ Novo evento para este cliente</Link><Link href="/eventos" style={{...actionLink,background:'#eaf3ff',color:'#174987',border:'1px solid #a9c7ee'}}>Consultar agenda</Link></div>{events.length===0?<p>Nenhum evento registrado para esta instituição.</p>:events.map(e=><div key={e.id} style={row}><strong>{e.title}</strong> · {dateBR(e.event_date)} · {eventStatuses[e.status]||e.status}<div><Link href={`/eventos/${e.id}`} style={{fontWeight:700,color:'#1556ae'}}>Abrir evento e operação</Link></div></div>)}</section>}
  {activeTab==='fidelizacao'&&<section style={panel}><h2 style={heading}>Fidelização</h2><p>Os níveis e os alertas são calculados a partir das visitas encerradas; consulte a Central de Fidelização para acompanhar este cliente.</p><Link href="/fidelizacao" style={actionLink}>Abrir Central de Fidelização</Link></section>}
