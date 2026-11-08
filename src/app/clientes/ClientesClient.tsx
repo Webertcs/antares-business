@@ -37,7 +37,7 @@ export default function ClientsPage({ writesEnabled }: { writesEnabled: boolean 
  return()=>ctrl.abort();
  },[selected,clients]);
  const historyDialog=useRef<HTMLDialogElement>(null);
- useEffect(()=>{if(selected)historyDialog.current?.showModal();},[selected]);
+ useEffect(()=>{if(selected&&!form)historyDialog.current?.showModal();else if(form&&historyDialog.current?.open)historyDialog.current.close();},[selected,form]);
  const [form,setForm]=useState<'client'|'contact'|'event'|null>(null);
  const formDialog=useRef<HTMLDialogElement>(null);
  const initialFields=useRef<Record<string,string>>({});
@@ -75,6 +75,19 @@ export default function ClientsPage({ writesEnabled }: { writesEnabled: boolean 
       status:'lead',venue:'',notes:''};
    initialFields.current=nextFields;setFields(nextFields);
  }
+ useEffect(()=>{
+  if(loading||clients.length===0)return;
+  const params=new URLSearchParams(window.location.search);
+  const editId=params.get('editId');const newEventFor=params.get('newEventFor');
+  const target=clients.find(c=>c.id===(editId||newEventFor));
+  if(!target)return;
+  if(!writesEnabled){setFeedback('Edição indisponível: a gravação de clientes está desabilitada.');return;}
+  if(editId)openForm('client',target);
+  else if(newEventFor){setSelected(target.id);openForm('event');}
+  window.history.replaceState(null,'',window.location.pathname);
+ // Executar uma única vez por navegação; não reabrir após salvar.
+ // eslint-disable-next-line react-hooks/exhaustive-deps
+ },[loading,clients.length,writesEnabled]);
  const setField=(key:string,value:string)=>setFields(f=>({...f,[key]:value}));
  async function submit(e:React.FormEvent<HTMLFormElement>){
    e.preventDefault();if(!writesEnabled || !form || saving)return;
