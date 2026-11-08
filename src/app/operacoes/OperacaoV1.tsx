@@ -13,8 +13,9 @@ export default function OperacaoV1({writesEnabled,contractWritesEnabled}:{writes
  const [data,setData]=useState<State>(empty),[error,setError]=useState(''),[loading,setLoading]=useState(true);
  const [unavailable,setUnavailable]=useState<string[]>([]);
  const [tab,setTab]=useState<'comercial'|'contratos'|'agenda'|'financeiro'|'balanco'|'auditoria'>('comercial');
- useEffect(()=>{const area=new URLSearchParams(window.location.search).get('area');if(area==='comercial'||area==='contratos'||area==='agenda'||area==='financeiro'||area==='balanco'||area==='auditoria')setTab(area)},[]);
+ useEffect(()=>{const area=new URLSearchParams(window.location.search).get('area');if(area==='comercial'||area==='contratos'||area==='agenda'||area==='financeiro'||area==='balanco'||area==='auditoria')setTab(area);setSelectedClientId(new URLSearchParams(window.location.search).get('clientId')||'')},[]);
  const [term,setTerm]=useState('');
+ const [selectedClientId,setSelectedClientId]=useState('');
  const [balance,setBalance]=useState<Balance|null>(null);
  const [dataEvents,setDataEvents]=useState<RecordRow[]>([]);
  const [eventError,setEventError]=useState('');
@@ -41,7 +42,7 @@ export default function OperacaoV1({writesEnabled,contractWritesEnabled}:{writes
  }
  function openForm(type:'proposal'|'contract'|'dome'|'booking'|'ledger'){
   setForm(type);setFeedback('');
-  setFields(type==='proposal'?{clientId:'',title:'',model:'per_student',attendees:'30',
+  setFields(type==='proposal'?{clientId:selectedClientId,title:'',model:'per_student',attendees:'30',
     unitPrice:'10',fixedPrice:'0',discount:'0',deposit:'0',validUntil:'',notes:''}:
     type==='contract'?{proposalId:'',mode:'written',terms:''}:type==='dome'?{name:''}:type==='booking'?{eventId:'',domeId:'',start:'',end:''}:{description:'',amount:'',date:localDay(),category:'income',status:'planned'});
  }
@@ -87,7 +88,9 @@ export default function OperacaoV1({writesEnabled,contractWritesEnabled}:{writes
    .catch(e=>{if(e?.name!=='AbortError')setBalanceError('Balanço indisponível até implantação da V1.');});
   return()=>controller.abort();
  },[revision]);
- const filtered=useMemo(()=>data.proposals.filter(x=>String(x.title||'').toLowerCase().includes(term.toLowerCase())||String(x.client_name||'').toLowerCase().includes(term.toLowerCase())),[data.proposals,term]);
+ const filtered=useMemo(()=>data.proposals.filter(x=>(!selectedClientId||String(x.client_id)===selectedClientId)&&(String(x.title||'').toLowerCase().includes(term.toLowerCase())||String(x.client_name||'').toLowerCase().includes(term.toLowerCase()))),[data.proposals,term,selectedClientId]);
+ const visibleProposalIds=new Set(data.proposals.filter(p=>String(p.client_id)===selectedClientId).map(p=>String(p.id)));
+ const visibleContracts=selectedClientId?data.contracts.filter(c=>visibleProposalIds.has(String(c.proposal_id))):data.contracts;
  const forecast=data.proposals.filter(p=>['accepted','sent','negotiating'].includes(String(p.status))).reduce((sum,p)=>sum+Number(p.total||0),0);
  const cash=data.ledger.filter(x=>x.status==='settled').reduce((sum,x)=>sum+(x.category==='income'?1:-1)*Number(x.amount||0),0);
  const pending=data.ledger.filter(x=>x.status==='planned').reduce((sum,x)=>sum+(x.category==='income'?1:-1)*Number(x.amount||0),0);
@@ -137,6 +140,7 @@ export default function OperacaoV1({writesEnabled,contractWritesEnabled}:{writes
  {([['comercial','Propostas'],['contratos','Contratos'],['agenda','Agenda e cúpulas'],['financeiro','Financeiro'],['balanco','Balanço mensal'],['auditoria','Auditoria']] as const).map(([k,l])=>
  <button key={k} onClick={()=>setTab(k)} aria-current={tab===k?'page':undefined}
  style={{padding:'9px 13px',borderRadius:9,border:'1px solid '+(tab===k?'#2558d7':'#c2d7f6'),background:tab===k?'#2458d3':'#f8fbff',color:tab===k?'#fff':'#2352a0',fontWeight:700,fontSize:12,cursor:'pointer'}}>{l}</button>)}</nav>
+ {selectedClientId&&<p style={{marginTop:12}}>Cliente selecionado: <strong>{String(data.clients.find(c=>String(c.id)===selectedClientId)?.name||'Não encontrado')}</strong> · <Link href={`/clientes/${encodeURIComponent(selectedClientId)}`}>Voltar à ficha</Link></p>}
  {tab==='comercial'&&<section style={base}><h2 style={{fontSize:21,fontWeight:650}}>Propostas e orçamentos</h2>{writesEnabled&&<button onClick={()=>openForm('proposal')} style={{padding:10,background:'#2563eb',color:'#fff',borderRadius:8}}>+ Nova proposta</button>}<p>Valores previstos, negociação e condições comerciais por cliente.</p>
   <input aria-label="Pesquisar proposta" placeholder="Pesquisar proposta ou cliente" value={term} onChange={e=>setTerm(e.target.value)} style={{padding:11,border:'1px solid #94a3b8',borderRadius:8,width:'100%',margin:'10px 0'}}/>
   <Rows heads={['Proposta','Cliente','Total','Situação','Validade']}
@@ -150,11 +154,11 @@ export default function OperacaoV1({writesEnabled,contractWritesEnabled}:{writes
  <p>Documentos não assinados podem ser consultados na aba Propostas. Uma confirmação registrada exige acordo real com o cliente.</p>
  {!contractWritesEnabled&&<p role="status" style={{padding:12,background:'#fff4df',borderRadius:8}}>Registro de contratos desabilitado durante a homologação. Consultas liberadas.</p>}
  <Rows heads={['Proposta','Modalidade','Situação','Confirmação']}
- rows={data.contracts.map(c=>[c.proposal_title,c.confirmation_mode,c.status,dateTime(c.confirmed_at)])}/>
+ rows={visibleContracts.map(c=>[c.proposal_title,c.confirmation_mode,c.status,dateTime(c.confirmed_at)])}/>
  {contractWritesEnabled&&<form onSubmit={saveContract} style={{display:'grid',gap:12,maxWidth:650,marginTop:20}}>
  <h3>Registrar contrato</h3>
  <label>Proposta aprovada<select required value={contractDraft.proposalId} onChange={e=>setContractDraft(v=>({...v,proposalId:e.target.value}))} style={{display:'block',width:'100%',padding:10}}>
- <option value="">Selecione</option>{data.proposals.filter(p=>p.status==='accepted').map(p=><option key={String(p.id)} value={String(p.id)}>{String(p.title)} — {String(p.client_name)}</option>)}
+ <option value="">Selecione</option>{data.proposals.filter(p=>p.status==='accepted'&&(!selectedClientId||String(p.client_id)===selectedClientId)).map(p=><option key={String(p.id)} value={String(p.id)}>{String(p.title)} — {String(p.client_name)}</option>)}
  </select></label>
  <label>Modalidade<select value={contractDraft.mode} onChange={e=>setContractDraft(v=>({...v,mode:e.target.value}))} style={{display:'block',width:'100%',padding:10}}>
  <option value="written">Formal por escrito</option><option value="verbal">Verbal</option><option value="whatsapp">WhatsApp</option></select></label>
