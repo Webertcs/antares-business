@@ -36,7 +36,7 @@ export default function ClientDetails({id,writesEnabled,proposalWritesEnabled,co
     attendees:Number(proposalDraft.attendees),unitPrice:Number(proposalDraft.unitPrice),fixedPrice:Number(proposalDraft.fixedPrice),
     discount:Number(proposalDraft.discount),deposit:Number(proposalDraft.deposit)}:
     {action:'contract',...contractDraft};
-   const response=await fetch('/api/business/gravar',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+   const response=await fetch(commercialForm==='proposal'?'/api/clientes/propostas':'/api/business/gravar',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
    const result=await response.json();
    if(!response.ok)throw Error(result.error||'Não foi possível salvar');
    setCommercialForm(null);await refreshCommercial();
