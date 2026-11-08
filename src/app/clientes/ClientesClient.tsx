@@ -37,8 +37,9 @@ export default function ClientsPage({ writesEnabled }: { writesEnabled: boolean 
  return()=>ctrl.abort();
  },[selected,clients]);
  const historyDialog=useRef<HTMLDialogElement>(null);
- useEffect(()=>{if(selected&&!form)historyDialog.current?.showModal();else if(form&&historyDialog.current?.open)historyDialog.current.close();},[selected,form]);
  const [form,setForm]=useState<'client'|'contact'|'event'|null>(null);
+ useEffect(()=>{if(selected&&!form)historyDialog.current?.showModal();else if(form&&historyDialog.current?.open)historyDialog.current.close();},[selected,form]);
+
  const formDialog=useRef<HTMLDialogElement>(null);
  const initialFields=useRef<Record<string,string>>({});
  const [editing,setEditing]=useState<string|null>(null);
