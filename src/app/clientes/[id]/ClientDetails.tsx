@@ -13,6 +13,7 @@ export default function ClientDetails({id,writesEnabled,proposalWritesEnabled,co
  const [activeTab,setActiveTab]=useState<'propostas'|'contratos'|'alunos'|'eventos'|'financeiro'|'fidelizacao'|'historico'|'observacoes'>('eventos');
  const [commercial,setCommercial]=useState<{proposals:Record<string,unknown>[];contracts:Record<string,unknown>[];unavailable:string[]}|null>(null);
  const [commercialError,setCommercialError]=useState('');
+ const [proposalFilter,setProposalFilter]=useState<'active'|'archived'|'all'>('active');
  const [commercialForm,setCommercialForm]=useState<'proposal'|'contract'|null>(null);
  const [commercialBusy,setCommercialBusy]=useState(false);
  const [commercialFeedback,setCommercialFeedback]=useState('');
@@ -53,15 +54,17 @@ export default function ClientDetails({id,writesEnabled,proposalWritesEnabled,co
  const [commercialActionBusy,setCommercialActionBusy]=useState(false);
  const [contractInline,setContractInline]=useState({mode:'written',terms:''});
  const statusNames:Record<string,string>={draft:'Rascunho',sent:'Enviada',accepted:'Aceita',rejected:'Recusada'};
- async function commercialAction(proposalId:string,action:'sent'|'accepted'|'rejected'|'contract'){
+ async function commercialAction(proposalId:string,action:'sent'|'accepted'|'rejected'|'contract'|'archive'|'restore'){
   if(commercialActionBusy)return;
+  if(action==='archive'&&!window.confirm('Arquivar esta proposta? Ela poderá ser reativada a qualquer momento.'))return;
+  if(action==='restore'&&!window.confirm('Reativar esta proposta?'))return;
   if(action==='rejected'&&!window.confirm('Registrar esta proposta como recusada?'))return;
   if(action==='accepted'&&!window.confirm('Confirmar que o cliente aceitou esta proposta?'))return;
   setCommercialActionBusy(true);setCommercialFeedback('');
   try{
    const response=await fetch('/api/clientes/comercial',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({proposalId,action,...(action==='contract'?contractInline:{})})});
    const result=await response.json();if(!response.ok)throw Error(result.error||'Operação não concluída');
-   await refreshCommercial();setContractFor(null);setCommercialFeedback(action==='contract'?'Contrato registrado com sucesso.':'Situação da proposta atualizada.');
+   await refreshCommercial();setContractFor(null);setCommercialFeedback(action==='contract'?'Contrato registrado com sucesso.':action==='archive'?'Proposta arquivada.':action==='restore'?'Proposta reativada.':'Situação da proposta atualizada.');
   }catch(e){setCommercialFeedback(e instanceof Error?e.message:'Operação não concluída');}
   finally{setCommercialActionBusy(false);}
  }
@@ -80,7 +83,7 @@ export default function ClientDetails({id,writesEnabled,proposalWritesEnabled,co
   const dest=phone.startsWith('55')?phone:'55'+phone;
   const msg=`Olá! Segue a proposta ${String(p.title||'ANTARES')} para ${client.name}, no valor de ${money(p.total)}. Encaminharei o PDF para sua avaliação. Aguardo seu retorno!`;
   window.open('https://wa.me/'+dest+'?text='+encodeURIComponent(msg),'_blank','noopener,noreferrer');
-  setCommercialFeedback('WhatsApp aberto. Anexe o PDF e confirme o envio; depois clique em Registrar envio.');
+  setCommercialFeedback('WhatsApp aberto. Anexe o PDF e confirme o envio; depois clique em Confirmar envio.');
  }
  const [finance,setFinance]=useState<{entries:Record<string,unknown>[];income:number;expenses:number}|null>(null);
  const [financeError,setFinanceError]=useState('');
@@ -124,6 +127,8 @@ export default function ClientDetails({id,writesEnabled,proposalWritesEnabled,co
  useEffect(()=>{const ctrl=new AbortController();fetch('/api/business',{cache:'no-store',signal:ctrl.signal}).then(async r=>{const data=await r.json();if(!r.ok)throw Error(data.error||'Consulta comercial indisponível');if(!ctrl.signal.aborted)setCommercial({proposals:Array.isArray(data.proposals)?data.proposals:[],contracts:Array.isArray(data.contracts)?data.contracts:[],unavailable:Array.isArray(data.unavailable)?data.unavailable:[]});}).catch(e=>{if(!ctrl.signal.aborted&&e?.name!=='AbortError')setCommercialError('Consulta comercial indisponível no momento.')});return()=>ctrl.abort()},[]);
  useEffect(()=>{const ctrl=new AbortController();fetch('/api/financeiro',{cache:'no-store',signal:ctrl.signal}).then(async r=>{const data=await r.json();if(!r.ok)throw Error(data.error||'Consulta financeira indisponível');if(!ctrl.signal.aborted)setFinance({entries:Array.isArray(data.entries)?data.entries:[],income:Number(data.income)||0,expenses:Number(data.expenses)||0});}).catch(e=>{if(!ctrl.signal.aborted&&e?.name!=='AbortError')setFinanceError('Não foi possível consultar o financeiro.');});return()=>ctrl.abort();},[]);
  const proposals=commercial?.proposals.filter(p=>String(p.client_id)===id)||[];
+ const visibleProposals=proposals.filter(p=>proposalFilter==='all'||(proposalFilter==='archived'?Boolean(p.archived_at):!p.archived_at));
+ const archivedCount=proposals.filter(p=>Boolean(p.archived_at)).length;
  const proposalIds=new Set(proposals.map(p=>String(p.id)));
  const contracts=commercial?.contracts.filter(c=>proposalIds.has(String(c.proposal_id)))||[];
  const actionLink:React.CSSProperties={display:'inline-block',padding:'9px 14px',background:'#145ac3',color:'#fff',borderRadius:9,fontWeight:700,textDecoration:'none',fontSize:13};
@@ -160,16 +165,20 @@ export default function ClientDetails({id,writesEnabled,proposalWritesEnabled,co
  <label style={formLabel}>Observações<textarea maxLength={4000} rows={3} style={formInput} value={proposalDraft.notes} onChange={e=>setProposalDraft(v=>({...v,notes:e.target.value}))}/></label>
  <p style={{margin:0}}>Total estimado: <strong>{money(Math.max(0,(proposalDraft.model==='per_student'?Number(proposalDraft.attendees)*Number(proposalDraft.unitPrice):proposalDraft.model==='fixed'?Number(proposalDraft.fixedPrice):0)-Number(proposalDraft.discount)))}</strong></p>
 <button type="submit" disabled={commercialBusy} style={{...actionLink,border:0,justifySelf:'start'}}>{commercialBusy?'Salvando…':'Salvar proposta'}</button></form>}
- {commercialError?<p role="alert">{commercialError}</p>:!commercial?<p>Carregando informações comerciais…</p>:commercial.unavailable.includes('proposals')?<p>Propostas temporariamente indisponíveis.</p>:proposals.length===0?<p>Nenhuma proposta vinculada a esta instituição.</p>:proposals.map(p=><div key={String(p.id)} style={row}><strong>{String(p.title||'Proposta')}</strong> · {money(p.total)} · <strong>{statusNames[String(p.status)]||String(p.status||'Sem situação')}</strong><div style={{fontSize:12}}>Criada em {dateBR(p.created_at?String(p.created_at):null)}</div>
+ <div role="group" aria-label="Filtrar propostas" style={{display:'flex',flexWrap:'wrap',gap:7,alignItems:'center',margin:'4px 0 12px'}}>
+ {([['active','Ativas',proposals.length-archivedCount],['archived','Arquivadas',archivedCount],['all','Todas',proposals.length]] as const).map(([value,label,count])=><button key={value} type="button" aria-pressed={proposalFilter===value} onClick={()=>setProposalFilter(value)} style={{...actionLink,border:'1px solid #91b7e8',background:proposalFilter===value?'#145ac3':'#e6f1ff',color:proposalFilter===value?'#fff':'#174987'}}>{label} ({count})</button>)}
+ </div>
+ {commercialError?<p role="alert">{commercialError}</p>:!commercial?<p>Carregando informações comerciais…</p>:commercial.unavailable.includes('proposals')?<p>Propostas temporariamente indisponíveis.</p>:visibleProposals.length===0?<p>{proposalFilter==='archived'?'Nenhuma proposta arquivada.':proposalFilter==='active'?'Nenhuma proposta ativa.':'Nenhuma proposta vinculada a esta instituição.'}</p>:visibleProposals.map(p=><div key={String(p.id)} style={row}><strong>{String(p.title||'Proposta')}</strong> · {money(p.total)} · <strong>{statusNames[String(p.status)]||String(p.status||'Sem situação')}</strong>{Boolean(p.archived_at)&&<span style={{marginLeft:8,color:'#526e96',fontWeight:700}}>· Arquivada</span>}<div style={{fontSize:12}}>Criada em {dateBR(p.created_at?String(p.created_at):null)}</div>
  <div style={{display:'flex',gap:7,flexWrap:'wrap',marginTop:10}}>
  <button type="button" onClick={()=>proposalPdf(p)} style={actionLink}>PDF / Imprimir</button>
  <button type="button" onClick={()=>openProposalWhatsapp(p)} style={actionLink}>WhatsApp</button>
- {proposalWritesEnabled&&['draft','sent'].includes(String(p.status))&&<>
- <button type="button" disabled={commercialActionBusy} onClick={()=>commercialAction(String(p.id),'sent')} style={actionLink}>Registrar envio</button>
+ {proposalWritesEnabled&&!p.archived_at&&['draft','sent'].includes(String(p.status))&&<>
+ <button type="button" disabled={commercialActionBusy} onClick={()=>commercialAction(String(p.id),'sent')} style={actionLink}>Confirmar envio</button>
  <button type="button" disabled={commercialActionBusy} onClick={()=>commercialAction(String(p.id),'accepted')} style={actionLink}>Aceita</button>
  <button type="button" disabled={commercialActionBusy} onClick={()=>commercialAction(String(p.id),'rejected')} style={{...actionLink,background:'#526e96'}}>Recusada</button>
  </>}
- {proposalWritesEnabled&&String(p.status)==='accepted'&&!contracts.some(c=>String(c.proposal_id)===String(p.id))&&<button type="button" onClick={()=>setContractFor(String(p.id))} style={actionLink}>Criar contrato</button>}
+ {proposalWritesEnabled&&<button type="button" disabled={commercialActionBusy} onClick={()=>commercialAction(String(p.id),p.archived_at?'restore':'archive')} style={{...actionLink,background:p.archived_at?'#166e9e':'#526e96'}}>{p.archived_at?'Reativar':'Arquivar'}</button>}
+ {proposalWritesEnabled&&!p.archived_at&&String(p.status)==='accepted'&&!contracts.some(c=>String(c.proposal_id)===String(p.id))&&<button type="button" onClick={()=>setContractFor(String(p.id))} style={actionLink}>Criar contrato</button>}
  </div>
  {contractFor===String(p.id)&&<form onSubmit={e=>{e.preventDefault();void commercialAction(String(p.id),'contract')}} style={{display:'grid',gap:9,maxWidth:540,marginTop:12}}>
  <label style={formLabel}>Modalidade<select style={formInput} value={contractInline.mode} onChange={e=>setContractInline(v=>({...v,mode:e.target.value}))}><option value="written">Formal por escrito</option><option value="verbal">Acordo verbal</option><option value="whatsapp">WhatsApp</option></select></label>
