@@ -10,7 +10,7 @@ export async function GET(){
   const results=await Promise.allSettled([
    sql`SELECT id,name,kind FROM public.crm_clients WHERE organization_id=${ctx.organizationId} ORDER BY name LIMIT 1000`,
    sql`SELECT p.id,p.client_id,c.name AS client_name,p.title,p.pricing_model,p.expected_attendees,
-       p.unit_price,p.fixed_price,p.discount,p.deposit,p.total,p.status,p.valid_until,p.created_at
+       p.unit_price,p.fixed_price,p.discount,p.deposit,p.total,p.status,p.valid_until,p.notes,p.created_at
        FROM public.business_proposals p JOIN public.crm_clients c
        ON c.id=p.client_id AND c.organization_id=p.organization_id
        WHERE p.organization_id=${ctx.organizationId} ORDER BY p.created_at DESC LIMIT 500`,
