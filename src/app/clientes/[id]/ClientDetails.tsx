@@ -70,7 +70,7 @@ export default function ClientDetails({id,writesEnabled}:{id:string;writesEnable
  </header>
  <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(170px,1fr))',gap:10,marginBottom:14}}>
  {([['Eventos',events.length],['Propostas',proposals.length],['Contratos',contracts.length]] as [string,number][]).map(([label,value])=><div key={label} style={{background:'#edf5ff',border:'1px solid #bdd3f3',borderTop:'4px solid #347fe0',borderRadius:12,padding:'12px 15px'}}><div style={{fontSize:12,fontWeight:600,color:'#42628b'}}>{label}</div><strong style={{fontSize:23,color:'#143e82'}}>{value}</strong></div>)}
- <div style={{background:'#effbf3',border:'1px solid #a7dfb7',borderTop:'4px solid #23a654',borderRadius:12,padding:'12px 15px'}}><div style={{fontSize:12,fontWeight:600,color:'#42628b'}}>Financeiro da instituição</div><strong style={{fontSize:14,color:'#143e82'}}>Consulte na aba Financeiro</strong></div>
+ <div style={{background:'#edf5ff',border:'1px solid #bdd3f3',borderTop:'4px solid #347fe0',borderRadius:12,padding:'12px 15px'}}><div style={{fontSize:12,fontWeight:600,color:'#42628b'}}>Financeiro da instituição</div><strong style={{display:'block',marginTop:5,fontSize:16,color:'#143e82'}}>Aguardando dados</strong><div style={{fontSize:11,color:'#42628b',marginTop:4}}>Valores individuais ainda não validados</div></div>
  </div>
  <section style={{...panel,borderLeftColor:'#397fda'}}><h2 style={heading}>Dados da instituição</h2>
  <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(165px,1fr))',gap:8,fontSize:12}}>
