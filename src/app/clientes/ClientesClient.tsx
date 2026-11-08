@@ -2,7 +2,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import Link from 'next/link';
 import styles from './clientes.module.css';
-type Client = {id:string;kind:string;name:string;email:string|null;phone:string|null;city:string|null;status:string;notes:string|null;created_at:string};
+type Client = {id:string;kind:string;name:string;email:string|null;phone:string|null;phone_secondary:string|null;city:string|null;status:string;notes:string|null;created_at:string};
 type Contact = {id:string;client_id:string;full_name:string;position:string|null;email:string|null;phone:string|null;whatsapp:boolean;is_primary:boolean};
 type Event = {id:string;client_id:string;title:string;event_kind:string;event_date:string|null;expected_attendees:number|null;pricing_model:string;price_per_person:number|null;fixed_amount:number|null;status:string;venue:string|null;notes:string|null};
 const kinds:Record<string,string>={school:'Escola',company:'Empresa',association:'Associação',private:'Particular',other:'Outro'};
@@ -69,7 +69,7 @@ export default function ClientsPage({ writesEnabled }: { writesEnabled: boolean 
  function openForm(type:'client'|'contact'|'event',client?:Client){
    setFeedback('');setForm(type);setEditing(type==='client'?client?.id||null:null);
    const nextFields:Record<string,string>=type==='client'?{name:client?.name||'',kind:client?.kind||'school',
-    email:client?.email||'',phone:client?.phone||'',city:client?.city||'',
+    email:client?.email||'',phone:client?.phone||'',phoneSecondary:client?.phone_secondary||'',city:client?.city||'',
     notes:client?.notes||'',status:client?.status||'prospect'}:
     type==='contact'?{name:'',position:'',email:'',phone:''}:
     {title:'',kind:'presentation',date:'',attendees:'',pricing:'per_student',price:'',fixed:'',
@@ -128,7 +128,7 @@ export default function ClientsPage({ writesEnabled }: { writesEnabled: boolean 
   try{
    const response=await fetch('/api/crm/clientes',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({
     action:'client',id:client.id,kind:client.kind,name:client.name,email:client.email||'',phone:client.phone||'',
-    city:client.city||'',notes:client.notes||'',status:archive?'inactive':restoreTo
+    phoneSecondary:client.phone_secondary||'',city:client.city||'',notes:client.notes||'',status:archive?'inactive':restoreTo
    })});
    const data=await response.json();if(!response.ok)throw Error(data.error||'Falha ao atualizar cliente');
    setFeedback(archive?'Cliente arquivado; registros e vínculos preservados.':'Cliente reativado.');
@@ -207,7 +207,7 @@ export default function ClientsPage({ writesEnabled }: { writesEnabled: boolean 
    <form onSubmit={submit} style={{display:'flex',flexDirection:'column',gap:12,width:'100%'}}>
     <fieldset disabled={saving} className={styles.formFields}>
     {(form==='client'?[
-      ['name','Nome'],['kind','Tipo'],['email','E-mail'],['phone','Telefone'],['city','Cidade'],['status','Situação'],['notes','Observações']
+      ['name','Nome'],['kind','Tipo'],['email','E-mail'],['phone','Telefone principal'],['phoneSecondary','Telefone secundário (opcional)'],['city','Cidade'],['status','Situação'],['notes','Observações']
     ]:form==='contact'?[
       ['name','Nome'],['position','Cargo/Função'],['email','E-mail'],['phone','Telefone'],['whatsapp','WhatsApp'],['primary','Contato principal']
     ]:[
