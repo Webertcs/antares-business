@@ -49,6 +49,39 @@ export default function ClientDetails({id,writesEnabled,proposalWritesEnabled,co
  const formInput:React.CSSProperties={display:'block',width:'100%',padding:10,border:'1px solid #abc7ed',borderRadius:9,marginTop:5,color:'#16325b',background:'#fff'};
  const formLabel:React.CSSProperties={fontSize:13,fontWeight:650,color:'#174987'};
 
+ const [contractFor,setContractFor]=useState<string|null>(null);
+ const [commercialActionBusy,setCommercialActionBusy]=useState(false);
+ const [contractInline,setContractInline]=useState({mode:'written',terms:''});
+ const statusNames:Record<string,string>={draft:'Rascunho',sent:'Enviada',accepted:'Aceita',rejected:'Recusada'};
+ async function commercialAction(proposalId:string,action:'sent'|'accepted'|'rejected'|'contract'){
+  if(commercialActionBusy)return;
+  if(action==='rejected'&&!window.confirm('Registrar esta proposta como recusada?'))return;
+  if(action==='accepted'&&!window.confirm('Confirmar que o cliente aceitou esta proposta?'))return;
+  setCommercialActionBusy(true);setCommercialFeedback('');
+  try{
+   const response=await fetch('/api/clientes/comercial',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({proposalId,action,...(action==='contract'?contractInline:{})})});
+   const result=await response.json();if(!response.ok)throw Error(result.error||'Operação não concluída');
+   await refreshCommercial();setContractFor(null);setCommercialFeedback(action==='contract'?'Contrato registrado com sucesso.':'Situação da proposta atualizada.');
+  }catch(e){setCommercialFeedback(e instanceof Error?e.message:'Operação não concluída');}
+  finally{setCommercialActionBusy(false);}
+ }
+ function proposalPdf(p:Record<string,unknown>){
+  if(!client)return;
+  const esc=(v:unknown)=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]||c));
+  const total=money(p.total);
+  const html=`<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><title>Proposta ANTARES</title><style>body{font-family:Arial,sans-serif;color:#18365f;padding:44px;max-width:800px;margin:auto}header{background:#153f86;color:white;padding:25px;border-radius:12px}h1{margin:0}table{border-collapse:collapse;width:100%;margin:24px 0}td{padding:12px;border-bottom:1px solid #d5e1f3}.total{font-size:23px;font-weight:bold;color:#145ac3}footer{margin-top:55px;font-size:12px;color:#536781}@media print{button{display:none}}</style></head><body><header><h1>ANTARES</h1><p>Planetário Móvel Digital · Proposta comercial</p></header><h2>${esc(p.title)}</h2><p><b>Instituição:</b> ${esc(client.name)}</p><table><tr><td>Modalidade</td><td>${esc(p.pricing_model==='per_student'?'Por aluno':p.pricing_model==='fixed'?'Valor fechado':'Gratuito')}</td></tr><tr><td>Participantes previstos</td><td>${esc(p.expected_attendees)}</td></tr><tr><td>Valor por aluno</td><td>${esc(money(p.unit_price))}</td></tr><tr><td>Valor fechado</td><td>${esc(money(p.fixed_price))}</td></tr><tr><td>Desconto</td><td>${esc(money(p.discount))}</td></tr><tr><td>Sinal</td><td>${esc(money(p.deposit))}</td></tr><tr><td>Validade</td><td>${esc(p.valid_until?dateBR(String(p.valid_until)):'A combinar')}</td></tr></table><p class="total">Total estimado: ${esc(total)}</p><p><b>Observações:</b> ${esc(p.notes||'A combinar')}</p><footer>Proposta sujeita a confirmação de disponibilidade. Documento comercial gerado pelo ANTARES CRM.</footer><button onclick="window.print()">Imprimir / Salvar PDF</button></body></html>`;
+  const win=window.open('','_blank');if(!win){setCommercialFeedback('Permita pop-ups para abrir o documento.');return;}
+  win.document.open();win.document.write(html);win.document.close();win.focus();
+ }
+ function openProposalWhatsapp(p:Record<string,unknown>){
+  if(!client)return;
+  const phone=(client.phone||client.phone_secondary||'').replace(/\D/g,'');
+  if(phone.length<10){setCommercialFeedback('Cadastre um telefone válido para enviar a proposta.');return;}
+  const dest=phone.startsWith('55')?phone:'55'+phone;
+  const msg=`Olá! Segue a proposta ${String(p.title||'ANTARES')} para ${client.name}, no valor de ${money(p.total)}. Encaminharei o PDF para sua avaliação. Aguardo seu retorno!`;
+  window.open('https://wa.me/'+dest+'?text='+encodeURIComponent(msg),'_blank','noopener,noreferrer');
+  setCommercialFeedback('WhatsApp aberto. Anexe o PDF e confirme o envio; depois clique em Registrar envio.');
+ }
  const [finance,setFinance]=useState<{entries:Record<string,unknown>[];income:number;expenses:number}|null>(null);
  const [financeError,setFinanceError]=useState('');
  const [client,setClient]=useState<Client|null>(null),[contacts,setContacts]=useState<Contact[]>([]),[events,setEvents]=useState<Event[]>([]),[groups,setGroups]=useState<Group[]>([]);
@@ -127,7 +160,23 @@ export default function ClientDetails({id,writesEnabled,proposalWritesEnabled,co
  <label style={formLabel}>Observações<textarea maxLength={4000} rows={3} style={formInput} value={proposalDraft.notes} onChange={e=>setProposalDraft(v=>({...v,notes:e.target.value}))}/></label>
  <p style={{margin:0}}>Total estimado: <strong>{money(Math.max(0,(proposalDraft.model==='per_student'?Number(proposalDraft.attendees)*Number(proposalDraft.unitPrice):proposalDraft.model==='fixed'?Number(proposalDraft.fixedPrice):0)-Number(proposalDraft.discount)))}</strong></p>
 <button type="submit" disabled={commercialBusy} style={{...actionLink,border:0,justifySelf:'start'}}>{commercialBusy?'Salvando…':'Salvar proposta'}</button></form>}
- {commercialError?<p role="alert">{commercialError}</p>:!commercial?<p>Carregando informações comerciais…</p>:commercial.unavailable.includes('proposals')?<p>Propostas temporariamente indisponíveis.</p>:proposals.length===0?<p>Nenhuma proposta vinculada a esta instituição.</p>:proposals.map(p=><div key={String(p.id)} style={row}><strong>{String(p.title||'Proposta')}</strong> · {money(p.total)} · {String(p.status||'Sem situação')}<div style={{fontSize:12}}>Criada em {dateBR(p.created_at?String(p.created_at):null)}</div></div>)}
+ {commercialError?<p role="alert">{commercialError}</p>:!commercial?<p>Carregando informações comerciais…</p>:commercial.unavailable.includes('proposals')?<p>Propostas temporariamente indisponíveis.</p>:proposals.length===0?<p>Nenhuma proposta vinculada a esta instituição.</p>:proposals.map(p=><div key={String(p.id)} style={row}><strong>{String(p.title||'Proposta')}</strong> · {money(p.total)} · <strong>{statusNames[String(p.status)]||String(p.status||'Sem situação')}</strong><div style={{fontSize:12}}>Criada em {dateBR(p.created_at?String(p.created_at):null)}</div>
+ <div style={{display:'flex',gap:7,flexWrap:'wrap',marginTop:10}}>
+ <button type="button" onClick={()=>proposalPdf(p)} style={actionLink}>PDF / Imprimir</button>
+ <button type="button" onClick={()=>openProposalWhatsapp(p)} style={actionLink}>WhatsApp</button>
+ {proposalWritesEnabled&&['draft','sent'].includes(String(p.status))&&<>
+ <button type="button" disabled={commercialActionBusy} onClick={()=>commercialAction(String(p.id),'sent')} style={actionLink}>Registrar envio</button>
+ <button type="button" disabled={commercialActionBusy} onClick={()=>commercialAction(String(p.id),'accepted')} style={actionLink}>Aceita</button>
+ <button type="button" disabled={commercialActionBusy} onClick={()=>commercialAction(String(p.id),'rejected')} style={{...actionLink,background:'#526e96'}}>Recusada</button>
+ </>}
+ {proposalWritesEnabled&&String(p.status)==='accepted'&&!contracts.some(c=>String(c.proposal_id)===String(p.id))&&<button type="button" onClick={()=>setContractFor(String(p.id))} style={actionLink}>Criar contrato</button>}
+ </div>
+ {contractFor===String(p.id)&&<form onSubmit={e=>{e.preventDefault();void commercialAction(String(p.id),'contract')}} style={{display:'grid',gap:9,maxWidth:540,marginTop:12}}>
+ <label style={formLabel}>Modalidade<select style={formInput} value={contractInline.mode} onChange={e=>setContractInline(v=>({...v,mode:e.target.value}))}><option value="written">Formal por escrito</option><option value="verbal">Acordo verbal</option><option value="whatsapp">WhatsApp</option></select></label>
+ <label style={formLabel}>Condições acordadas<textarea required minLength={8} maxLength={8000} rows={4} style={formInput} value={contractInline.terms} onChange={e=>setContractInline(v=>({...v,terms:e.target.value}))}/></label>
+ <div style={{display:'flex',gap:8}}><button type="submit" disabled={commercialActionBusy} style={actionLink}>Salvar contrato</button><button type="button" onClick={()=>setContractFor(null)} style={{...actionLink,background:'#526e96'}}>Cancelar</button></div>
+ </form>}
+ </div>)}
 </section>}
  {activeTab==='contratos'&&<section style={{...panel,borderLeftColor:'#3c7ad4'}}><h2 style={heading}>Contratos ({contracts.length})</h2>{contractWritesEnabled&&<button type="button" onClick={()=>{setCommercialFeedback('');setCommercialForm('contract')}} style={actionLink}>+ Novo contrato</button>}<p style={{fontSize:13}}>Contratos são vinculados a propostas aceitas desta instituição.</p>
  {commercialError?<p role="alert">{commercialError}</p>:!commercial?<p>Carregando contratos…</p>:commercial.unavailable.includes('contracts')||commercial.unavailable.includes('proposals')?<p>Contratos temporariamente indisponíveis.</p>:contracts.length===0?<p>Nenhum contrato vinculado a esta instituição.</p>:contracts.map(c=><div key={String(c.id)} style={row}><strong>{String(c.proposal_title||'Contrato')}</strong> · {String(c.status||'Sem situação')}<div style={{fontSize:12}}>Confirmado em {dateBR(c.confirmed_at?String(c.confirmed_at):null)}</div></div>)}
