@@ -137,7 +137,7 @@ export default function ClientDetails({id,writesEnabled,proposalWritesEnabled,co
  {commercialForm&&<><div style={{background:'linear-gradient(110deg,#12386f,#1769c7)',padding:'17px 22px',color:'white',display:'flex',justifyContent:'space-between',alignItems:'center'}}><strong>{commercialForm==='proposal'?'Nova proposta':'Novo contrato'}</strong><button type="button" disabled={commercialBusy} onClick={()=>setCommercialForm(null)} aria-label="Fechar" style={{color:'white',fontSize:22}}>×</button></div>
  <form onSubmit={saveCommercial} style={{padding:22,display:'grid',gap:12}}>
  <p style={{margin:0,fontSize:13}}>Instituição: <strong>{client.name}</strong> (vínculo fixo)</p>
- <>
+ {commercialForm==='contract'&&<>
 
  <label style={formLabel}>Proposta aceita<select required style={formInput} value={contractDraft.proposalId} onChange={e=>setContractDraft(v=>({...v,proposalId:e.target.value}))}><option value="">Selecione uma proposta aceita</option>{proposals.filter(p=>p.status==='accepted'&&!contracts.some(c=>String(c.proposal_id)===String(p.id))).map(p=><option key={String(p.id)} value={String(p.id)}>{String(p.title)}</option>)}</select></label>
  <label style={formLabel}>Modalidade<select style={formInput} value={contractDraft.mode} onChange={e=>setContractDraft(v=>({...v,mode:e.target.value}))}><option value="written">Formal por escrito</option><option value="verbal">Acordo verbal</option><option value="whatsapp">WhatsApp</option></select></label>
