@@ -92,6 +92,9 @@ export default function ClientsPage({ writesEnabled }: { writesEnabled: boolean 
  const setField=(key:string,value:string)=>setFields(f=>({...f,[key]:value}));
  async function submit(e:React.FormEvent<HTMLFormElement>){
    e.preventDefault();if(!writesEnabled || !form || saving)return;
+   if((form==='event'||form==='contact')&&!clients.some(c=>c.id===selected)){
+     setFeedback('Instituição não identificada. Feche o formulário e abra o cadastro pela ficha do cliente.');return;
+   }
    const body={...fields,action:form,id:editing,clientId:selected,
      whatsapp:fields.whatsapp==='true',primary:fields.primary==='true'};
    setFeedback('');setSaving(true);
@@ -202,8 +205,9 @@ export default function ClientsPage({ writesEnabled }: { writesEnabled: boolean 
   {feedback&&!form&&<p className={styles.feedback} role="status">{feedback}</p>}
   {form&&<dialog ref={formDialog} aria-labelledby="client-form-title" aria-modal="true" className={`${styles.editor} ${styles.formDialog}`} onCancel={e=>{e.preventDefault();closeForm();}}>
    <div className={styles.formHeading}>
-   <h2 id="client-form-title" style={{fontSize:22}}>{form==='client'?(editing?'Editar cliente':'Novo cliente'):form==='contact'?'Novo contato':'Nova apresentação'}</h2>
+   <h2 id="client-form-title" style={{fontSize:22}}>{form==='client'?(editing?'Editar cliente':'Novo cliente'):form==='contact'?'Novo contato':'Novo evento'}</h2>
    <button type="button" disabled={saving} onClick={closeForm} aria-label="Fechar formulário">×</button></div>
+   {form==='event'&&<div style={{padding:'11px 16px',background:'#eaf3ff',borderBottom:'1px solid #c5dcfa',color:'#174987',fontSize:13}}><strong>Instituição:</strong> {clients.find(c=>c.id===selected)?.name||'Não identificada'}<span style={{display:'block',fontSize:11,marginTop:3}}>Vínculo definido pela ficha do cliente e não editável neste formulário.</span></div>}
    <form onSubmit={submit} style={{display:'flex',flexDirection:'column',gap:12,width:'100%'}}>
     <fieldset disabled={saving} className={styles.formFields}>
     {(form==='client'?[
