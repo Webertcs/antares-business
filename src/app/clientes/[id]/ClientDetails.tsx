@@ -51,6 +51,17 @@ export default function ClientDetails({id,writesEnabled,proposalWritesEnabled,co
  const formLabel:React.CSSProperties={fontSize:13,fontWeight:650,color:'#174987'};
 
  const [contractFor,setContractFor]=useState<string|null>(null);
+ const [confirmContractId,setConfirmContractId]=useState<string|null>(null);
+ const [contractResponsible,setContractResponsible]=useState('');
+ const [confirmBusy,setConfirmBusy]=useState(false);
+ async function confirmContract(contractId:string){
+  if(confirmBusy||contractResponsible.trim().length<3)return;
+  if(!window.confirm('Confirma que o cliente efetivamente formalizou este contrato? O registro ficará auditado.'))return;
+  setConfirmBusy(true);setCommercialFeedback('');
+  try{const r=await fetch('/api/clientes/contratos/confirmar',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({contractId,responsible:contractResponsible.trim(),confirm:true})});const d=await r.json();if(!r.ok)throw Error(d.error||'Confirmação não concluída');await refreshCommercial();setConfirmContractId(null);setContractResponsible('');setCommercialFeedback('Contrato confirmado e registrado no histórico de auditoria.');}
+  catch(e){setCommercialFeedback(e instanceof Error?e.message:'Confirmação não concluída');}finally{setConfirmBusy(false);}
+ }
+
  const [commercialActionBusy,setCommercialActionBusy]=useState(false);
  const [contractInline,setContractInline]=useState({mode:'written',terms:''});
  const statusNames:Record<string,string>={draft:'Rascunho',sent:'Enviada',accepted:'Aceita',rejected:'Recusada'};
@@ -185,9 +196,22 @@ export default function ClientDetails({id,writesEnabled,proposalWritesEnabled,co
  </form>}
  </div>)}
 </section>}
- {activeTab==='contratos'&&<section style={{...panel,borderLeftColor:'#3c7ad4'}}><h2 style={heading}>Contratos ({contracts.length})</h2>{contractWritesEnabled&&<button type="button" onClick={()=>{setCommercialFeedback('');setCommercialForm('contract')}} style={actionLink}>+ Novo contrato</button>}<p style={{fontSize:13}}>Contratos são vinculados a propostas aceitas desta instituição.</p>
- {commercialError?<p role="alert">{commercialError}</p>:!commercial?<p>Carregando contratos…</p>:commercial.unavailable.includes('contracts')||commercial.unavailable.includes('proposals')?<p>Contratos temporariamente indisponíveis.</p>:contracts.length===0?<p>Nenhum contrato vinculado a esta instituição.</p>:contracts.map(c=><div key={String(c.id)} style={row}><strong>{String(c.proposal_title||'Contrato')}</strong> · {String(c.status||'Sem situação')}<div style={{fontSize:12}}>Confirmado em {dateBR(c.confirmed_at?String(c.confirmed_at):null)}</div></div>)}
-</section>}
+ {activeTab==='contratos'&&<section style={{...panel,borderLeftColor:'#3c7ad4'}}><h2 style={heading}>Contratos ({contracts.length})</h2><p style={{fontSize:13}}>Contratos vinculados a propostas aceitas de {client.name}. O cadastro não equivale à confirmação do cliente.</p>
+ {commercialError?<p role="alert">{commercialError}</p>:!commercial?<p>Carregando contratos…</p>:commercial.unavailable.includes('contracts')||commercial.unavailable.includes('proposals')?<p>Contratos temporariamente indisponíveis.</p>:contracts.length===0?<p>Nenhum contrato vinculado a esta instituição.</p>:contracts.map(c=>{
+ const status=String(c.status||'pending');const contractId=String(c.id);
+ const modeNames:Record<string,string>={written:'Formal por escrito',formal:'Formal por escrito',verbal:'Acordo verbal',whatsapp:'WhatsApp'};
+ return <div key={contractId} style={row}><strong>{String(c.proposal_title||'Contrato')}</strong> · <strong>{status==='pending'?'Pendente de confirmação':status==='confirmed'?'Confirmado':status==='cancelled'?'Cancelado':status}</strong>
+ <div style={{fontSize:12}}>Modalidade: {modeNames[String(c.confirmation_mode)]||String(c.confirmation_mode||'Não informada')}</div>
+ <div style={{fontSize:12}}>{status==='confirmed'?'Confirmado em '+dateBR(c.confirmed_at?String(c.confirmed_at):null):'Ainda não confirmado pelo cliente'}</div>
+ {c.confirmed_by_name&&<div style={{fontSize:12}}>Responsável informado: {String(c.confirmed_by_name)}</div>}
+ {status==='pending'&&<div style={{marginTop:10}}>
+ {confirmContractId===contractId?<form onSubmit={e=>{e.preventDefault();void confirmContract(contractId)}} style={{display:'grid',gap:10,maxWidth:540}}>
+ <label style={formLabel}>Nome de quem confirmou o acordo<input required minLength={3} maxLength={180} style={formInput} value={contractResponsible} onChange={e=>setContractResponsible(e.target.value)} placeholder="Nome do responsável pela confirmação"/></label>
+ <p style={{fontSize:12,margin:0}}>A data e a hora serão registradas pelo servidor. Confirme somente após o aceite real do cliente.</p>
+ <div style={{display:'flex',gap:8,flexWrap:'wrap'}}><button type="submit" disabled={confirmBusy||contractResponsible.trim().length<3} style={{...actionLink,border:0}}>{confirmBusy?'Confirmando…':'Confirmar contrato'}</button><button type="button" disabled={confirmBusy} onClick={()=>setConfirmContractId(null)} style={{...actionLink,background:'#526e96',border:0}}>Cancelar</button></div></form>:
+ <button type="button" onClick={()=>{setConfirmContractId(contractId);setContractResponsible('');setCommercialFeedback('')}} style={{...actionLink,border:0}}>Registrar confirmação</button>}</div>}
+ </div>})}
+ </section>}
  {commercialFeedback&&<p role="status" style={{...panel,borderLeftColor:'#169caa'}}>{commercialFeedback}</p>}
  <dialog ref={commercialDialog} onCancel={e=>{if(commercialBusy){e.preventDefault();return}setCommercialForm(null)}} style={{border:'1px solid #a8c6f0',borderRadius:16,padding:0,width:'min(590px,94vw)',maxHeight:'85vh',overflowY:'auto',boxShadow:'0 18px 60px #12356766'}}>
  {commercialForm&&<><div style={{background:'linear-gradient(110deg,#12386f,#1769c7)',padding:'17px 22px',color:'white',display:'flex',justifyContent:'space-between',alignItems:'center'}}><strong>{commercialForm==='proposal'?'Nova proposta':'Novo contrato'}</strong><button type="button" disabled={commercialBusy} onClick={()=>setCommercialForm(null)} aria-label="Fechar" style={{color:'white',fontSize:22}}>×</button></div>
