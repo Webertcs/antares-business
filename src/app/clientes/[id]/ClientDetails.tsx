@@ -148,6 +148,7 @@ export default function ClientDetails({id,writesEnabled,proposalWritesEnabled,co
    const refresh=await fetch('/api/crm/clientes',{cache:'no-store'});const data=await refresh.json();
    if(!refresh.ok)throw Error(data.error||'Evento salvo, mas não foi possível atualizar a lista.');
    setEvents((data.events||[]).filter((item:Event)=>item.client_id===id));
+   if(eventDraft.domeId){const domeResponse=await fetch('/api/eventos/cupula',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({eventId:result.id,domeId:eventDraft.domeId})});const domeResult=await domeResponse.json();if(!domeResponse.ok){setEventFeedback('Evento criado, mas a cúpula não foi vinculada: '+(domeResult.error||'erro desconhecido')+'. Abra o evento para tentar novamente.');setEventDraft(emptyEventDraft);return;}}
    setEventDraft(emptyEventDraft);setEventFeedback('Evento cadastrado com sucesso.');
   }catch(err){setEventFeedback(err instanceof Error?err.message:'Falha ao cadastrar evento.');}
   finally{setEventSaving(false);}
@@ -314,7 +315,7 @@ export default function ClientDetails({id,writesEnabled,proposalWritesEnabled,co
    <h3 style={{margin:'0 0 10px',color:'#174987',fontSize:15}}>Novo evento para {client?.name||'esta instituição'}</h3>
    <fieldset disabled={eventSaving} style={{border:0,padding:0,margin:0,display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(min(100%,160px),1fr))',gap:12}}>
     {([['title','Título'],['kind','Tipo de evento'],['date','Data'],['attendees','Participantes'],['domeId','Cúpula'],['pricing','Cobrança'],['price','Valor por participante'],['fixed','Valor fechado'],['status','Situação'],['venue','Local'],['notes','Observações']] as const).map(([key,label])=><label key={key} style={formLabel}>{label}
-     {key==='kind'||key==='pricing'||key==='status'?
+     {key==='domeId'?<select value={eventDraft.domeId} onChange={e=>setEventDraft(previous=>({...previous,domeId:e.target.value}))} style={formInput}><option value="">A definir</option>{domes.map(d=><option key={d.id} value={d.id}>{d.name}{d.capacity?' · '+d.capacity+' lugares':''}</option>)}</select>:key==='kind'||key==='pricing'||key==='status'?
       <select value={eventDraft[key]} onChange={e=>setEventDraft(previous=>({...previous,[key]:e.target.value}))} style={formInput}>
        {(key==='kind'?[['presentation','Apresentação'],['corporate','Corporativo'],['private','Particular'],['other','Outro']]:key==='pricing'?[['per_student','Por participante'],['fixed','Valor fechado'],['complimentary','Gratuito']]:Object.entries(eventStatuses)).map(([value,text])=><option key={value} value={value}>{text}</option>)}
       </select>:
