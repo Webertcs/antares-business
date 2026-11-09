@@ -57,7 +57,7 @@ export default function EventsList({events,total,page,pages,years,counts,filters
     <div style={{flex:'1 1 260px',minWidth:0}}>
      <div style={{display:'flex',alignItems:'center',gap:8,flexWrap:'wrap',marginBottom:3}}>
       <h2 style={{fontSize:15,fontWeight:700,lineHeight:1.3,margin:0,color:'#153d76'}}>{e.title}</h2>
-      <span style={{fontSize:12,fontWeight:500,lineHeight:1.4,padding:'3px 9px',borderRadius:999,border:'1px solid '+(statusStyles[e.status]?.border||'#c9d8eb'),background:statusStyles[e.status]?.background||'#e9f0fb',color:statusStyles[e.status]?.color||'#305781'}}>{statusNames[e.status]||e.status||'Situação a definir'}</span>
+      <span style={{fontSize:12,fontWeight:500,lineHeight:1.4,padding:'3px 9px',borderRadius:999,border:'1px solid '+(statusStyles[e.status]?.border||'#c9d8eb'),background:statusStyles[e.status]?.background||'#e9f0fb',color:statusStyles[e.status]?.color||'#305781'}}>{e.archived?'Arquivado':statusNames[e.status]||e.status||'Situação a definir'}</span>
      </div>
      <p style={{fontSize:14,lineHeight:1.45,color:'#315989',margin:'0 0 4px'}}>{e.client}</p>
      <div style={{display:'flex',gap:'4px 14px',flexWrap:'wrap',fontSize:13,lineHeight:1.5,color:'#42648e'}}>
