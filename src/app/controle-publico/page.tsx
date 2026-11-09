@@ -27,8 +27,8 @@ export default async function Page({searchParams}:{searchParams:Promise<Search>}
  return <RelationshipShell title="Controle de Público"><main style={{maxWidth:1100,margin:'0 auto',padding:'24px clamp(14px,2.5vw,26px)',display:'grid',gap:16,color:'#173668'}}> 
  <header style={{padding:22,borderRadius:14,color:'#fff',background:'linear-gradient(110deg,#08265d,#1768c2)'}}>
  <div style={{fontSize:12,letterSpacing:1.5,fontWeight:700}}>ANTARES · RELATÓRIOS</div><h1 style={{margin:'6px 0'}}>Controle de Público</h1></header>
- <form method="get" style={{display:'grid',gridTemplateColumns:'minmax(115px,145px) minmax(230px,1fr) 100px 145px',gap:12,padding:16,background:'#fff',border:'1px solid #c8dcf8',borderRadius:14,boxShadow:'0 5px 15px rgba(17,63,131,.06)'}}>
- <label style={{display:'grid',gap:7,minWidth:0,fontSize:13,fontWeight:700,color:'#16427f',maxWidth:145}}>Ano
+ <form method="get" style={{display:'grid',gridTemplateColumns:'minmax(155px,165px) minmax(230px,1fr) 100px 145px',gap:12,padding:16,background:'#fff',border:'1px solid #c8dcf8',borderRadius:14,boxShadow:'0 5px 15px rgba(17,63,131,.06)'}}>
+ <label style={{display:'grid',gap:7,minWidth:0,fontSize:13,fontWeight:700,color:'#16427f',maxWidth:165}}>Ano
  <select name="ano" defaultValue={year} style={{width:'100%',minWidth:0,padding:'12px 14px',borderRadius:10,border:'1px solid #a9c7f2',background:'#edf5ff',color:'#16427f',fontSize:14,fontWeight:600,cursor:'pointer'}}><option value="">Todos os anos</option>{years.map(y=><option key={y} value={y}>{y}</option>)}</select></label>
  <label style={{display:'grid',gap:7,minWidth:0,fontSize:13,fontWeight:700,color:'#16427f'}}>Instituição
  <select name="instituicao" defaultValue={client} style={{width:'100%',minWidth:0,padding:'12px 14px',borderRadius:10,border:'1px solid #a9c7f2',background:'#edf5ff',color:'#16427f',fontSize:14,fontWeight:600,cursor:'pointer'}}><option value="">Todas as instituições</option>{clients.map(c=><option key={String(c.id)} value={String(c.id)}>{String(c.name)}</option>)}</select></label>
