@@ -1,8 +1,9 @@
 'use client';
 import {useState} from 'react';
 import Link from 'next/link';
+import EventLifecycleActions from './EventLifecycleActions';
 import {useRouter} from 'next/navigation';
-type EventItem={id:string;title:string;date:string|null;status:string;attendees:number|null;client:string};
+type EventItem={id:string;title:string;date:string|null;status:string;attendees:number|null;client:string;archived:boolean};
 const statusNames:Record<string,string>={lead:'Oportunidade',quoted:'Orçado',reserved:'Reservado',confirmed:'Confirmado',completed:'Realizado',cancelled:'Cancelado',canceled:'Cancelado'};
 const statusStyles:Record<string,{background:string;color:string;border:string}>={
  lead:{background:'#edf3ff',color:'#24569b',border:'#c9daf8'},
@@ -64,7 +65,7 @@ export default function EventsList({events,total,page,pages,years,counts,filters
       {e.attendees!==null&&<span aria-label={e.attendees+' participantes previstos'}>👥 {e.attendees} participantes</span>}
      </div>
     </div>
-    <Link href={'/eventos/'+e.id} aria-label={'Abrir operação do evento '+e.title} style={{display:'inline-flex',alignItems:'center',justifyContent:'center',minHeight:44,padding:'10px 16px',borderRadius:9,background:'#2058cb',color:'#fff',fontSize:14,fontWeight:600,textDecoration:'none',whiteSpace:'nowrap'}}>Abrir operação →</Link>
+    <div><Link href={'/eventos/'+e.id} aria-label={'Abrir operação do evento '+e.title} style={{display:'inline-flex',alignItems:'center',justifyContent:'center',minHeight:44,padding:'10px 16px',borderRadius:9,background:'#2058cb',color:'#fff',fontSize:14,fontWeight:600,textDecoration:'none',whiteSpace:'nowrap'}}>Abrir operação →</Link><EventLifecycleActions eventId={e.id} status={e.status} archived={e.archived}/></div>
    </article></div>)}
   </div>}
   {pages>1&&<nav aria-label="Paginação dos eventos" style={{display:'flex',justifyContent:'center',alignItems:'center',gap:12,marginTop:14}}><button type="button" disabled={page<=1} onClick={()=>navigate({page:page-1})} style={{padding:'8px 12px',borderRadius:8,border:'1px solid #c5d6ee',background:'#eaf3ff',color:'#153d76',opacity:page<=1?.5:1}}>Anterior</button><span style={{fontSize:13,color:'#365e94'}}>{page} / {pages}</span><button type="button" disabled={page>=pages} onClick={()=>navigate({page:page+1})} style={{padding:'8px 12px',borderRadius:8,border:'1px solid #c5d6ee',background:'#eaf3ff',color:'#153d76',opacity:page>=pages?.5:1}}>Próxima</button></nav>}
