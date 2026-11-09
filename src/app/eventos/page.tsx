@@ -19,11 +19,11 @@ export default async function Page({searchParams}:{searchParams:Promise<Params>}
  FROM public.crm_events e JOIN public.crm_clients c ON c.id=e.client_id AND c.organization_id=e.organization_id
  WHERE e.organization_id=${ctx.organizationId} AND e.archived_at IS NULL`;
  const yearsRows=await db`SELECT DISTINCT EXTRACT(YEAR FROM event_date)::int AS year FROM public.crm_events WHERE organization_id=${ctx.organizationId} AND event_date IS NOT NULL ORDER BY year DESC`;
- const totalRows=await db`SELECT COUNT(*)::int AS total FROM public.crm_events e JOIN public.crm_clients c ON c.id=e.client_id AND c.organization_id=e.organization_id WHERE e.organization_id=${ctx.organizationId} AND e.archived_at IS NULL
+ const totalRows=await db`SELECT COUNT(*)::int AS total FROM public.crm_events e JOIN public.crm_clients c ON c.id=e.client_id AND c.organization_id=e.organization_id WHERE e.organization_id=${ctx.organizationId} AND (${view}='history' OR e.archived_at IS NULL)
  AND (${year}='all' OR EXTRACT(YEAR FROM e.event_date)::text=${year})
  AND (${status}='all' OR e.status=${status} OR (${status}='cancelled' AND e.status='canceled'))
  AND (${q}='' OR e.title ILIKE ${'%'+q+'%'} OR c.name ILIKE ${'%'+q+'%'})
- AND (${view}='all' OR (${view}='upcoming' AND (e.event_date>=CURRENT_DATE OR e.event_date IS NULL) AND e.status NOT IN ('completed','cancelled','canceled')) OR (${view}='history' AND (e.event_date<CURRENT_DATE OR e.status IN ('completed','cancelled','canceled'))))`;
+ AND (${view}='all' OR (${view}='upcoming' AND (e.event_date>=CURRENT_DATE OR e.event_date IS NULL) AND e.status NOT IN ('completed','cancelled','canceled')) OR (${view}='history' AND (e.archived_at IS NOT NULL OR e.event_date<CURRENT_DATE OR e.status IN ('completed','cancelled','canceled'))))`;
  const total=Number(totalRows[0]?.total||0);
  const pages=Math.max(1,Math.ceil(total/20));
  const current=Math.min(page,pages);
@@ -33,7 +33,7 @@ export default async function Page({searchParams}:{searchParams:Promise<Params>}
  AND (${year}='all' OR EXTRACT(YEAR FROM e.event_date)::text=${year})
  AND (${status}='all' OR e.status=${status} OR (${status}='cancelled' AND e.status='canceled'))
  AND (${q}='' OR e.title ILIKE ${'%'+q+'%'} OR c.name ILIKE ${'%'+q+'%'})
- AND (${view}='all' OR (${view}='upcoming' AND (e.event_date>=CURRENT_DATE OR e.event_date IS NULL) AND e.status NOT IN ('completed','cancelled','canceled')) OR (${view}='history' AND (e.event_date<CURRENT_DATE OR e.status IN ('completed','cancelled','canceled'))))
+ AND (${view}='all' OR (${view}='upcoming' AND (e.event_date>=CURRENT_DATE OR e.event_date IS NULL) AND e.status NOT IN ('completed','cancelled','canceled')) OR (${view}='history' AND (e.archived_at IS NOT NULL OR e.event_date<CURRENT_DATE OR e.status IN ('completed','cancelled','canceled'))))
  ORDER BY CASE WHEN ${view}='upcoming' THEN e.event_date END ASC NULLS LAST,
  CASE WHEN ${view}<>'upcoming' THEN e.event_date END DESC NULLS LAST,e.created_at DESC
  LIMIT 20 OFFSET ${(current-1)*20}`;
