@@ -17,9 +17,9 @@ export default async function Page({searchParams}:{searchParams:Promise<Params>}
  COUNT(*) FILTER (WHERE e.status='confirmed')::int AS confirmed,
  COUNT(*) FILTER (WHERE e.status='lead')::int AS opportunities
  FROM public.crm_events e JOIN public.crm_clients c ON c.id=e.client_id AND c.organization_id=e.organization_id
- WHERE e.organization_id=${ctx.organizationId}`;
+ WHERE e.organization_id=${ctx.organizationId} AND e.archived_at IS NULL`;
  const yearsRows=await db`SELECT DISTINCT EXTRACT(YEAR FROM event_date)::int AS year FROM public.crm_events WHERE organization_id=${ctx.organizationId} AND event_date IS NOT NULL ORDER BY year DESC`;
- const totalRows=await db`SELECT COUNT(*)::int AS total FROM public.crm_events e JOIN public.crm_clients c ON c.id=e.client_id AND c.organization_id=e.organization_id WHERE e.organization_id=${ctx.organizationId}
+ const totalRows=await db`SELECT COUNT(*)::int AS total FROM public.crm_events e JOIN public.crm_clients c ON c.id=e.client_id AND c.organization_id=e.organization_id WHERE e.organization_id=${ctx.organizationId} AND e.archived_at IS NULL
  AND (${year}='all' OR EXTRACT(YEAR FROM e.event_date)::text=${year})
  AND (${status}='all' OR e.status=${status} OR (${status}='cancelled' AND e.status='canceled'))
  AND (${q}='' OR e.title ILIKE ${'%'+q+'%'} OR c.name ILIKE ${'%'+q+'%'})
@@ -27,7 +27,7 @@ export default async function Page({searchParams}:{searchParams:Promise<Params>}
  const total=Number(totalRows[0]?.total||0);
  const pages=Math.max(1,Math.ceil(total/20));
  const current=Math.min(page,pages);
- const rows=await db`SELECT e.id,e.title,e.event_date,e.status,e.expected_attendees,c.name AS client_name
+ const rows=await db`SELECT e.id,e.title,e.event_date,e.status,e.expected_attendees,e.archived_at,c.name AS client_name
  FROM public.crm_events e JOIN public.crm_clients c ON c.id=e.client_id AND c.organization_id=e.organization_id
  WHERE e.organization_id=${ctx.organizationId}
  AND (${year}='all' OR EXTRACT(YEAR FROM e.event_date)::text=${year})
@@ -37,7 +37,7 @@ export default async function Page({searchParams}:{searchParams:Promise<Params>}
  ORDER BY CASE WHEN ${view}='upcoming' THEN e.event_date END ASC NULLS LAST,
  CASE WHEN ${view}<>'upcoming' THEN e.event_date END DESC NULLS LAST,e.created_at DESC
  LIMIT 20 OFFSET ${(current-1)*20}`;
- const events=rows.map(r=>({id:String(r.id),title:String(r.title),date:r.event_date?(r.event_date instanceof Date?r.event_date.toISOString().slice(0,10):/^\d{4}-\d{2}-\d{2}/.test(String(r.event_date))?String(r.event_date).slice(0,10):new Date(String(r.event_date)).toISOString().slice(0,10)):null,status:String(r.status||''),attendees:r.expected_attendees==null?null:Number(r.expected_attendees),client:String(r.client_name)}));
+ const events=rows.map(r=>({id:String(r.id),title:String(r.title),date:r.event_date?(r.event_date instanceof Date?r.event_date.toISOString().slice(0,10):/^\d{4}-\d{2}-\d{2}/.test(String(r.event_date))?String(r.event_date).slice(0,10):new Date(String(r.event_date)).toISOString().slice(0,10)):null,status:String(r.status||''),attendees:r.expected_attendees==null?null:Number(r.expected_attendees),client:String(r.client_name),archived:!!r.archived_at}));
  return <RelationshipShell title="Eventos"><main style={{maxWidth:1100,margin:'0 auto',padding:'24px clamp(14px,2.5vw,26px)',color:'#163968'}}>
  <header style={{marginBottom:16,padding:'20px clamp(16px,2.5vw,24px)',borderRadius:14,background:'linear-gradient(110deg,#0d2455 0%,#0c3c91 60%,#0860ba 100%)',boxShadow:'0 5px 14px rgba(11,47,111,.14)'}}>
   <p style={{fontSize:11,fontWeight:700,letterSpacing:'1.3px',color:'#b9dfff',margin:'0 0 8px'}}>GESTÃO DE EVENTOS · ANTARES</p>
