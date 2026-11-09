@@ -233,7 +233,7 @@ export default function ClientDetails({id,writesEnabled,proposalWritesEnabled,co
  return <div key={contractId} style={row}><strong>{String(c.proposal_title||'Contrato')}</strong> · <strong>{status==='pending'?'Pendente de confirmação':status==='confirmed'?'Confirmado':status==='cancelled'?'Cancelado':status}</strong>
  <div style={{fontSize:12}}>Modalidade: {modeNames[String(c.confirmation_mode)]||String(c.confirmation_mode||'Não informada')}</div>
  <div style={{fontSize:12}}>{status==='confirmed'?'Confirmado em '+dateBR(c.confirmed_at?String(c.confirmed_at):null):'Ainda não confirmado pelo cliente'}</div>
- {c.confirmed_by_name&&<div style={{fontSize:12}}>Responsável informado: {String(c.confirmed_by_name)}</div>}
+ {Boolean(c.confirmed_by_name)&&<div style={{fontSize:12}}>Responsável informado: {String(c.confirmed_by_name)}</div>}
  {status==='pending'&&<div style={{marginTop:10}}>
  {confirmContractId===contractId?<form onSubmit={e=>{e.preventDefault();void confirmContract(contractId)}} style={{display:'grid',gap:10,maxWidth:540}}>
  <label style={formLabel}>Nome de quem confirmou o acordo<input required minLength={3} maxLength={180} style={formInput} value={contractResponsible} onChange={e=>setContractResponsible(e.target.value)} placeholder="Nome do responsável pela confirmação"/></label>
