@@ -40,27 +40,6 @@ export default function ClientDetails({id,writesEnabled,proposalWritesEnabled,co
  const relationshipTier=totalRelationshipVisits>=8?'Diamante':totalRelationshipVisits>=4?'Ouro':totalRelationshipVisits>=2?'Prata':totalRelationshipVisits===1?'Bronze':'Sem categoria';
  const relationshipBenefits:Record<string,string>={'Bronze':'5% na segunda visita e acompanhamento','Prata':'10% e prioridade de agenda','Ouro':'15%, sessão extra a cada 5 visitas e material exclusivo','Diamante':'20%, sessão gratuita anual e selo Escola Parceira'};
  const pendingRelationship=relationship.actions.filter(a=>!a.archived&&a.status!=='completed'&&a.status!=='dismissed'&&a.due_date).sort((a,b)=>(a.due_date||'').localeCompare(b.due_date||''));
- const [notesDraft,setNotesDraft]=useState<string|null>(null);
- const [notesSaving,setNotesSaving]=useState(false);
- const [notesFeedback,setNotesFeedback]=useState('');
- const notesValue=notesDraft??client?.notes??'';
- const notesDirty=notesValue!==(client?.notes??'');
- async function saveNotes(){
-  if(!client||!notesDirty||notesSaving)return;
-  setNotesSaving(true);setNotesFeedback('');
-  try{
-   const response=await fetch('/api/crm/clientes',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'client',id:client.id,kind:client.kind,name:client.name,email:client.email||'',phone:client.phone||'',phoneSecondary:client.phone_secondary||'',city:client.city||'',status:client.status,notes:notesValue})});
-   const data=await response.json();if(!response.ok)throw Error(data.error||'Não foi possível salvar as observações.');
-   setClient(previous=>previous?{...previous,notes:notesValue}:previous);
-   setNotesDraft(null);setNotesFeedback('Observações salvas com sucesso.');
-  }catch(e){setNotesFeedback(e instanceof Error?e.message:'Falha ao salvar observações.');}
-  finally{setNotesSaving(false);}
- }
- useEffect(()=>{
-  const warn=(event:BeforeUnloadEvent)=>{if(notesDirty){event.preventDefault();event.returnValue='';}};
-  window.addEventListener('beforeunload',warn);
-  return()=>window.removeEventListener('beforeunload',warn);
- },[notesDirty]);
  const [activeTab,setActiveTab]=useState<'propostas'|'contratos'|'alunos'|'eventos'|'financeiro'|'fidelizacao'|'historico'|'observacoes'>('eventos');
  const [commercial,setCommercial]=useState<{proposals:Record<string,unknown>[];contracts:Record<string,unknown>[];unavailable:string[]}|null>(null);
  const [commercialError,setCommercialError]=useState('');
@@ -154,6 +133,27 @@ export default function ClientDetails({id,writesEnabled,proposalWritesEnabled,co
  const [financeDraftId,setFinanceDraftId]=useState<string|null>(null);
  const [financePaymentIds,setFinancePaymentIds]=useState<Record<string,string>>({});
  const [client,setClient]=useState<Client|null>(null),[contacts,setContacts]=useState<Contact[]>([]),[events,setEvents]=useState<Event[]>([]),[groups,setGroups]=useState<Group[]>([]);
+ const [notesDraft,setNotesDraft]=useState<string|null>(null);
+ const [notesSaving,setNotesSaving]=useState(false);
+ const [notesFeedback,setNotesFeedback]=useState('');
+ const notesValue=notesDraft??client?.notes??'';
+ const notesDirty=notesValue!==(client?.notes??'');
+ async function saveNotes(){
+  if(!client||!notesDirty||notesSaving)return;
+  setNotesSaving(true);setNotesFeedback('');
+  try{
+   const response=await fetch('/api/crm/clientes',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'client',id:client.id,kind:client.kind,name:client.name,email:client.email||'',phone:client.phone||'',phoneSecondary:client.phone_secondary||'',city:client.city||'',status:client.status,notes:notesValue})});
+   const data=await response.json();if(!response.ok)throw Error(data.error||'Não foi possível salvar as observações.');
+   setClient(previous=>previous?{...previous,notes:notesValue}:previous);
+   setNotesDraft(null);setNotesFeedback('Observações salvas com sucesso.');
+  }catch(e){setNotesFeedback(e instanceof Error?e.message:'Falha ao salvar observações.');}
+  finally{setNotesSaving(false);}
+ }
+ useEffect(()=>{
+  const warn=(event:BeforeUnloadEvent)=>{if(notesDirty){event.preventDefault();event.returnValue='';}};
+  window.addEventListener('beforeunload',warn);
+  return()=>window.removeEventListener('beforeunload',warn);
+ },[notesDirty]);
  const [loading,setLoading]=useState(true),[error,setError]=useState(''),[educationError,setEducationError]=useState('');
  const [newGroup,setNewGroup]=useState(false),[saving,setSaving]=useState(false),[groupError,setGroupError]=useState('');
  const groupDialog=useRef<HTMLDialogElement>(null);
