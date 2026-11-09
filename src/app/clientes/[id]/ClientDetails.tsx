@@ -16,11 +16,17 @@ export default function ClientDetails({id,writesEnabled,proposalWritesEnabled,co
   let active=true;
   const load=async()=>{
    try{
-    const [er,ar]=await Promise.all([fetch('/api/crm/clientes',{cache:'no-store'}),fetch('/api/fidelizacao/acoes',{cache:'no-store'})]);
-    if(!er.ok||!ar.ok)throw Error('Não foi possível consultar os dados de fidelização.');
-    const [ed,ad]=await Promise.all([er.json(),ar.json()]);
-    if(!Array.isArray(ed.events)||!Array.isArray(ad.actions))throw Error('Dados de fidelização indisponíveis.');
-    if(active)setRelationship({events:ed.events.filter((e:{client_id:string})=>e.client_id===id),actions:ad.actions.filter((a:{client_id:string})=>a.client_id===id),error:'',loading:false});
+    const [eventsResult,actionsResult]=await Promise.allSettled([
+     fetch('/api/crm/clientes',{cache:'no-store'}).then(async response=>{if(!response.ok)throw Error('Consulta de visitas indisponível.');const data=await response.json();if(!Array.isArray(data.events))throw Error('Dados de visitas inválidos.');return data.events as {client_id:string;id:string;title:string;event_date:string|null;status:string}[];}),
+     fetch('/api/fidelizacao/acoes',{cache:'no-store'}).then(async response=>{if(!response.ok)throw Error('Consulta de lembretes indisponível.');const data=await response.json();if(!Array.isArray(data.actions))throw Error('Dados de lembretes inválidos.');return data.actions as {client_id:string;id:string;due_date:string|null;status:string;note:string;action_kind:string;archived?:boolean}[];})
+    ]);
+    if(!active)return;
+    setRelationship(previous=>({
+     events:eventsResult.status==='fulfilled'?eventsResult.value.filter(e=>e.client_id===id):previous.events,
+     actions:actionsResult.status==='fulfilled'?actionsResult.value.filter(a=>a.client_id===id):previous.actions,
+     error:eventsResult.status==='rejected'?'Não foi possível atualizar as visitas. Verifique a conexão e tente novamente.':actionsResult.status==='rejected'?'Visitas carregadas; lembretes temporariamente indisponíveis.':'',
+     loading:false
+    }));
    }catch(e){if(active)setRelationship(v=>({...v,error:e instanceof Error?e.message:'Falha na consulta.',loading:false}));}
   };
   void load();
