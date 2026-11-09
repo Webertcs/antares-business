@@ -1,6 +1,6 @@
 'use client';
 import {useCallback,useEffect,useState} from 'react';
-type Closing={status:string;attendance:{actual_students:number;closed_at:string}|null;canClose:boolean;canCorrect?:boolean};
+type Closing={status:string;attendance:{actual_students:number;closed_at:string}|null;canClose:boolean;canCorrect?:boolean;diagnostics?:{checks:{owner:boolean;confirmed:boolean;datePresent:boolean;dateEligible:boolean;featureEnabled:boolean};eventDate:string;today:string}};
 export default function EventClosing({eventId}:{eventId:string}){
  const [editing,setEditing]=useState(false);
  const [data,setData]=useState<Closing|null>(null),[error,setError]=useState(''),[open,setOpen]=useState(false),[students,setStudents]=useState(''),[busy,setBusy]=useState(false),[message,setMessage]=useState('');
@@ -34,7 +34,7 @@ export default function EventClosing({eventId}:{eventId:string}){
    {data?.attendance?<div style={{display:'flex',alignItems:'center',gap:10,flexWrap:'wrap'}}><strong>{data.attendance.actual_students} alunos atendidos</strong>{data.canCorrect&&<button type="button" disabled={busy} onClick={()=>{setStudents(String(data.attendance?.actual_students??''));setMessage('');setEditing(true)}} style={{padding:'8px 12px',border:'1px solid #1554b0',borderRadius:9,color:'#1554b0',background:'#fff',fontWeight:700}}>Editar</button>}</div>:<button type="button" disabled={!data?.canClose||busy||data.status==='completed'} onClick={()=>setOpen(true)} style={{padding:'10px 14px',border:0,borderRadius:9,color:'#fff',background:data?.canClose?'#1554b0':'#7088ad',fontWeight:700,cursor:data?.canClose?'pointer':'not-allowed'}}>Encerrar evento</button>}
   </div>
   {data?.status==='completed'&&!data.attendance&&<p style={{fontSize:13}}>Evento já marcado como realizado. O registro de presença requer conferência antes de qualquer atualização.</p>}
-  {!data?.canClose&&!data?.attendance&&<p style={{fontSize:12,color:'#526888',marginBottom:0}}>Encerramento protegido: disponível após implantação e homologação da função segura no Neon.</p>}
+  {!data?.canClose&&!data?.attendance&&<p style={{fontSize:12,color:'#526888',marginBottom:0}}>{data?.diagnostics&&!data.diagnostics.checks.confirmed?'Para registrar o público, o evento precisa estar confirmado.':data?.diagnostics&&!data.diagnostics.checks.dateEligible?'O registro fica disponível na data do evento ou depois dela.':data?.diagnostics&&!data.diagnostics.checks.featureEnabled?'Registro de público aguardando ativação segura no ambiente.':'Encerramento protegido: aguardando liberação segura no Neon.'}</p>}
   {error&&<p role="status" style={{fontSize:12}}>{error}</p>}{message&&<p role="status">{message}</p>}
   {editing&&<div role="presentation" style={{position:'fixed',inset:0,zIndex:1000,display:'grid',placeItems:'center',background:'rgba(5,22,54,.72)',padding:20}}>
    <div role="dialog" aria-modal="true" aria-labelledby="correct-title" style={{background:'linear-gradient(160deg,#eef5ff 0%,#f8fbff 65%,#e9f2ff 100%)',color:'#163968',border:'1px solid #8fb6ed',borderRadius:18,width:'min(100%,470px)',boxShadow:'0 24px 70px #041e4c70',overflow:'hidden'}}>
@@ -55,7 +55,7 @@ export default function EventClosing({eventId}:{eventId:string}){
   {open&&<div role="presentation" style={{position:'fixed',inset:0,zIndex:1000,display:'grid',placeItems:'center',background:'rgba(5,22,54,.65)',padding:20}}>
    <div role="dialog" aria-modal="true" aria-labelledby="closing-title" style={{background:'#fff',padding:24,borderRadius:16,width:'min(100%,460px)',boxShadow:'0 20px 60px #0005'}}>
     <h2 id="closing-title" style={{margin:'0 0 8px',fontSize:21}}>Encerrar apresentação</h2>
-    <p>Informe o total de alunos que realmente participaram neste evento, somando todas as sessões sem duplicar participantes.</p>
+    <p>Informe o total de alunos que realmente participaram neste evento, sem contar a mesma pessoa duas vezes.</p>
     <label style={{display:'grid',gap:6,fontWeight:700}}>Alunos atendidos<input autoFocus type="number" min="0" max="100000" step="1" required value={students} onChange={e=>setStudents(e.target.value)} style={{padding:12,border:'1px solid #94add5',borderRadius:8}}/></label>
     {message&&<p role="alert">{message}</p>}
     <div style={{display:'flex',justifyContent:'flex-end',gap:10,marginTop:18}}>
