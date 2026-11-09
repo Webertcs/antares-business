@@ -4,6 +4,7 @@ import EventOperations from './EventOperations';
 import EventTeamPanel from './EventTeamPanel';
 import EventNotes from './EventNotes';
 import EventClosing from './EventClosing';
+import EventDomePicker from './EventDomePicker';
 export const dynamic='force-dynamic';
 const uuid=/^[0-9a-f]{8}(-[0-9a-f]{4}){3}-[0-9a-f]{12}$/i;
 const infoCard:React.CSSProperties={background:'linear-gradient(145deg,#fff 0%,#e9f1ff 100%)',border:'1px solid #c4d8ff',borderRadius:12,padding:'10px 12px',boxShadow:'0 6px 20px rgba(25,67,140,.07)',minWidth:0};
@@ -11,12 +12,13 @@ export default async function Page({params}:{params:Promise<{id:string}>}){
  const ctx=await requireMember();if(!ctx)redirect('/sem-acesso');
  const {id}=await params;if(!uuid.test(id))notFound();
  const db=getDb();
- const rows=await db`SELECT e.id,e.title,e.event_date,e.start_time,e.end_time,e.status,e.venue,e.notes,e.expected_attendees,
+ const rows=await db`SELECT e.id,e.title,e.event_date,e.start_time,e.end_time,e.status,e.venue,e.notes,e.expected_attendees,e.dome_id,
  c.name AS client_name,c.city,c.phone AS client_phone,d.name AS dome_name
  FROM public.crm_events e JOIN public.crm_clients c ON c.id=e.client_id AND c.organization_id=e.organization_id
  LEFT JOIN public.antares_domes d ON d.id=e.dome_id AND d.organization_id=e.organization_id
  WHERE e.id=${id} AND e.organization_id=${ctx.organizationId} LIMIT 1`;
  if(!rows.length)notFound();const e=rows[0];
+ const domeRows=ctx.role==='owner'?await db`SELECT id,name,capacity FROM public.antares_domes WHERE organization_id=${ctx.organizationId} AND active=true ORDER BY name`:[];
  const assigned=await db`SELECT t.id,COALESCE(NULLIF(p.display_name,''),t.full_name) AS full_name,p.photo_data FROM public.antares_event_team_assignments a JOIN public.team_members t ON t.id=a.member_id AND t.organization_id=a.organization_id AND t.active=true AND t.role='collaborator' LEFT JOIN public.antares_member_profiles p ON p.organization_id=t.organization_id AND p.member_id=t.id WHERE a.organization_id=${ctx.organizationId}::uuid AND a.event_id=${id}::uuid ORDER BY t.full_name,t.id`;
  const owners=await db`SELECT t.id,COALESCE(NULLIF(p.display_name,''),t.full_name) AS full_name,p.photo_data
  FROM public.team_members t LEFT JOIN public.antares_member_profiles p ON p.organization_id=t.organization_id AND p.member_id=t.id
@@ -37,6 +39,7 @@ export default async function Page({params}:{params:Promise<{id:string}>}){
  <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(170px,1fr))',gap:10}}>
  {([['Instituição',String(e.client_name),'🏫'],['Cúpula',String(e.dome_name||'A definir'),'🪐'],['Público previsto',e.expected_attendees==null?'A definir':String(e.expected_attendees),'👥']] as const).map(([label,value,icon])=><div key={label} style={infoCard}><div style={{display:'flex',alignItems:'center',gap:10}}><span aria-hidden="true" style={{fontSize:23,background:'#d9eaff',borderRadius:12,padding:8}}>{icon}</span><div style={{minWidth:0}}><div style={{fontSize:14,fontWeight:750,color:'#28589b',lineHeight:1.3}}>{label}</div><div style={{fontSize:15,fontWeight:400,overflowWrap:'anywhere',lineHeight:1.35}}>{value}</div></div></div></div>)}
  </div>
+ {ctx.role==='owner'&&<EventDomePicker eventId={id} initialDomeId={String(e.dome_id||'')} domes={domeRows.map(d=>({id:String(d.id),name:String(d.name),capacity:d.capacity==null?null:Number(d.capacity)}))}/>}
 
  <EventTeamPanel eventId={id} ownerName={String(eventOwner?.full_name||'Proprietário')} ownerPhoto={typeof eventOwner?.photo_data==='string'?eventOwner.photo_data:null} isOwner={ctx.role==='owner'} initialAssigned={assigned.map(m=>({id:String(m.id),full_name:String(m.full_name),photo_data:typeof m.photo_data==='string'?m.photo_data:null}))}/>
  <EventOperations eventId={id}/>
