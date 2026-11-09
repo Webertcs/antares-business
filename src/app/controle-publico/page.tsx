@@ -1,5 +1,6 @@
 import {redirect} from 'next/navigation';
 import Link from 'next/link';
+import RelationshipShell from '../RelationshipShell';
 import {requireMember,getDb} from '@/lib/equipe/auth';
 export const dynamic='force-dynamic';
 type Search={ano?:string;instituicao?:string};
@@ -21,7 +22,8 @@ export default async function Page({searchParams}:{searchParams:Promise<Search>}
  const total=filtered.reduce((s,r)=>s+Number(r.actual_students||0),0);
  const years=[...new Set(rows.map(r=>String(r.event_date||'').slice(0,4)).filter(v=>/^20\d{2}$/.test(v)))].sort().reverse();
  const card:React.CSSProperties={padding:18,borderRadius:12,background:'#eef5ff',border:'1px solid #bcd3fa'};
- return <main style={{display:'grid',gap:16,color:'#173668'}}>
+ const summary=[...new Map(filtered.map(r=>[String(r.client_id),String(r.client_name)])).entries()].map(([id,name])=>({id,name,events:filtered.filter(r=>String(r.client_id)===id).length,students:filtered.filter(r=>String(r.client_id)===id).reduce((n,r)=>n+Number(r.actual_students||0),0)})).sort((a,b)=>a.name.localeCompare(b.name,'pt-BR'));
+ return <RelationshipShell title="Controle de Público"><main style={{maxWidth:1100,margin:'0 auto',padding:'24px clamp(14px,2.5vw,26px)',display:'grid',gap:16,color:'#173668'}}> 
  <header style={{padding:22,borderRadius:14,color:'#fff',background:'linear-gradient(110deg,#08265d,#1768c2)'}}>
  <div style={{fontSize:12,letterSpacing:1.5,fontWeight:700}}>ANTARES · RELATÓRIOS</div><h1 style={{margin:'6px 0'}}>Controle de Público</h1><p style={{margin:0}}>Alunos efetivamente atendidos pelo planetário. Previsões não entram no acumulado.</p></header>
  <form method="get" style={{display:'flex',gap:10,flexWrap:'wrap',alignItems:'end',padding:14,background:'#fff',borderRadius:12}}>
@@ -32,7 +34,8 @@ export default async function Page({searchParams}:{searchParams:Promise<Search>}
  <div style={card}><div>Alunos atendidos</div><strong style={{fontSize:30}}>{fmt(total)}</strong></div>
  <div style={card}><div>Eventos contabilizados</div><strong style={{fontSize:30}}>{fmt(filtered.length)}</strong></div>
  <div style={card}><div>Instituições atendidas</div><strong style={{fontSize:30}}>{fmt(new Set(filtered.map(r=>String(r.client_id))).size)}</strong></div></div>
- <section style={{padding:16,borderRadius:12,background:'#fff',overflowX:'auto'}}><h2>Histórico por evento</h2>
+ <section style={{padding:18,border:'1px solid #c8dcf8',borderLeft:'4px solid #2675d6',borderRadius:12,background:'#fff',overflowX:'auto'}}><h2 style={{fontSize:19,margin:'0 0 12px'}}>Resumo por instituição</h2>{summary.length===0?<p>Nenhuma instituição com atendimento registrado neste período.</p>:<table style={{width:'100%',borderCollapse:'collapse',textAlign:'left'}}><thead><tr><th style={{padding:10,borderBottom:'2px solid #bcd3fa'}}>Instituição</th><th style={{padding:10,borderBottom:'2px solid #bcd3fa'}}>Eventos</th><th style={{padding:10,borderBottom:'2px solid #bcd3fa'}}>Alunos atendidos</th></tr></thead><tbody>{summary.map(r=><tr key={r.id}><td style={{padding:10,borderBottom:'1px solid #e3ebf6'}}>{r.name}</td><td>{fmt(r.events)}</td><td><strong>{fmt(r.students)}</strong></td></tr>)}</tbody></table>}</section>
+ <section style={{padding:18,border:'1px solid #c8dcf8',borderLeft:'4px solid #2675d6',borderRadius:12,background:'#fff',overflowX:'auto'}}><h2 style={{fontSize:19,margin:'0 0 12px'}}>Histórico por evento</h2>
  {!ready[0]?.ok?<p>Controle aguardando implantação da tabela de atendimentos no Neon.</p>:filtered.length===0?<p>Nenhum atendimento registrado para os filtros selecionados.</p>:
- <table style={{width:'100%',borderCollapse:'collapse',textAlign:'left'}}><thead><tr>{['Data','Instituição','Evento','Previstos','Atendidos'].map(h=><th key={h} style={{padding:10,borderBottom:'2px solid #bcd3fa'}}>{h}</th>)}</tr></thead><tbody>{filtered.map(r=><tr key={String(r.id)}><td style={{padding:10,borderBottom:'1px solid #e3ebf6'}}>{r.event_date?new Intl.DateTimeFormat('pt-BR',{timeZone:'UTC'}).format(new Date(String(r.event_date))):'—'}</td><td>{String(r.client_name)}</td><td><Link href={`/eventos/${r.id}`}>{String(r.title)}</Link></td><td>{r.expected_attendees==null?'—':fmt(Number(r.expected_attendees))}</td><td><strong>{fmt(Number(r.actual_students||0))}</strong></td></tr>)}</tbody></table>}</section></main>;
+ <table style={{width:'100%',borderCollapse:'collapse',textAlign:'left'}}><thead><tr>{['Data','Instituição','Evento','Previstos','Atendidos'].map(h=><th key={h} style={{padding:10,borderBottom:'2px solid #bcd3fa'}}>{h}</th>)}</tr></thead><tbody>{filtered.map(r=><tr key={String(r.id)}><td style={{padding:10,borderBottom:'1px solid #e3ebf6'}}>{r.event_date?new Intl.DateTimeFormat('pt-BR',{timeZone:'UTC'}).format(new Date(String(r.event_date))):'—'}</td><td>{String(r.client_name)}</td><td><Link href={`/eventos/${r.id}`}>{String(r.title)}</Link></td><td>{r.expected_attendees==null?'—':fmt(Number(r.expected_attendees))}</td><td><strong>{fmt(Number(r.actual_students||0))}</strong></td></tr>)}</tbody></table>}</section></main></RelationshipShell>;
 }
