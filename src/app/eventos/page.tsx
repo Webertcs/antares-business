@@ -29,7 +29,7 @@ export default async function Page({searchParams}:{searchParams:Promise<Params>}
  const current=Math.min(page,pages);
  const rows=await db`SELECT e.id,e.title,e.event_date,e.status,e.expected_attendees,e.archived_at,c.name AS client_name
  FROM public.crm_events e JOIN public.crm_clients c ON c.id=e.client_id AND c.organization_id=e.organization_id
- WHERE e.organization_id=${ctx.organizationId}
+ WHERE e.organization_id=${ctx.organizationId} AND (${view}='history' OR e.archived_at IS NULL)
  AND (${year}='all' OR EXTRACT(YEAR FROM e.event_date)::text=${year})
  AND (${status}='all' OR e.status=${status} OR (${status}='cancelled' AND e.status='canceled'))
  AND (${q}='' OR e.title ILIKE ${'%'+q+'%'} OR c.name ILIKE ${'%'+q+'%'})
