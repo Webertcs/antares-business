@@ -5,10 +5,14 @@ import Link from 'next/link';
 type Entry={id:string;entry_type:'income'|'expense';amount:number;description:string;occurred_on:string;reversal_of:string|null;presentation_title:string|null;dome_name:string|null};
 type Data={entries:Entry[];income:number;expenses:number;balance:number;writesEnabled:boolean;limited:boolean;domes:{id:string;name:string;active:boolean}[];presentations:{id:string;title:string;starts_at:string}[]};
 type Report={months:{periodo:string;receitas:number;despesas:number}[];years:{ano:number;receitas:number;despesas:number}[];domes:{cupula:string;receitas:number;despesas:number}[];proposals:{id:string;title:string;total:number;status:string}[];notes:string[]};
+type Receivable={id:string;client_id:string;client_name:string;description:string;total:number;paid:number;due_on:string};
+type Payment={id:string;client_id:string;client_name:string;description:string;amount:number;occurred_on:string};
 const brl=(n:number)=>new Intl.NumberFormat('pt-BR',{style:'currency',currency:'BRL'}).format(n);
 export default function FinanceiroClient(){
  const [data,setData]=useState<Data|null>(null);
  const [report,setReport]=useState<Report|null>(null);
+ const [receivables,setReceivables]=useState<{titles:Receivable[];payments:Payment[]}|null>(null);
+ const [receivableError,setReceivableError]=useState('');
  const [error,setError]=useState('');
  const [loading,setLoading]=useState(true);
  const [type,setType]=useState('all');
@@ -30,7 +34,11 @@ export default function FinanceiroClient(){
   if(!ledger.ok)throw new Error('Não foi possível atualizar o extrato.');
   setData(await ledger.json());
   if(reportResponse.ok)setReport(await reportResponse.json());
+  const r=await fetch('/api/financeiro/receber',{cache:'no-store'});
+  if(r.ok){const j=await r.json();setReceivables({titles:Array.isArray(j.titles)?j.titles:[],payments:Array.isArray(j.payments)?j.payments:[]});setReceivableError('');}
+  else setReceivableError('Contas a receber temporariamente indisponíveis.');
  }
+ useEffect(()=>{const c=new AbortController();fetch('/api/financeiro/receber',{cache:'no-store',signal:c.signal}).then(async r=>{if(!r.ok)throw Error('Contas a receber indisponíveis.');return r.json()}).then(j=>setReceivables({titles:Array.isArray(j.titles)?j.titles:[],payments:Array.isArray(j.payments)?j.payments:[]})).catch(e=>{if(e.name!=='AbortError')setReceivableError('Não foi possível carregar as contas a receber.')});return()=>c.abort()},[]);
  useEffect(()=>{const c=new AbortController();fetch('/api/financeiro/relatorios',{cache:'no-store',signal:c.signal}).then(r=>r.ok?r.json():null).then(j=>{if(j)setReport(j)}).catch(()=>{});return()=>c.abort()},[]);
  useEffect(()=>{const c=new AbortController();fetch('/api/financeiro',{cache:'no-store',signal:c.signal})
  .then(async r=>{const j=await r.json();if(!r.ok)throw Error(j.error||'Não foi possível carregar');return j;})
@@ -101,6 +109,18 @@ export default function FinanceiroClient(){
  </tr>)}</tbody></table>{entries.length===0&&<p>Nenhuma movimentação encontrada para os filtros selecionados.</p>}</div>
  {data.limited&&<p style={{color:'#92400e'}}>Exibindo somente os mil lançamentos mais recentes. Totais não são definitivos.</p>}
  </section>
+ {receivableError&&<p role="alert" style={{color:'#a32727'}}>{receivableError}</p>}
+ {receivables&&<section className="finance-print-hide" style={{...card,marginTop:20}}>
+ <h2>Contas a receber — todas as instituições</h2>
+ <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(180px,1fr))',gap:12,margin:'16px 0'}}>
+ {([['Total de cobranças',receivables.titles.reduce((n,t)=>n+Number(t.total||0),0)],['Já recebido',receivables.titles.reduce((n,t)=>n+Number(t.paid||0),0)],['Pendente',receivables.titles.reduce((n,t)=>n+Math.max(0,Number(t.total||0)-Number(t.paid||0)),0)]] as [string,number][]).map(([label,value])=><div key={label} style={{background:'#edf5ff',border:'1px solid #c5daf5',borderRadius:10,padding:14}}><small>{label}</small><h3 style={{margin:'8px 0 0'}}>{brl(value)}</h3></div>)}
+ </div>
+ <h3>Extrato de cobranças</h3>
+ <div style={{overflowX:'auto'}}><table style={{width:'100%',borderCollapse:'collapse',textAlign:'left',fontSize:13}}><thead><tr>{['Instituição','Descrição','Vencimento','Total','Recebido','Pendente'].map(h=><th key={h} style={{padding:9,borderBottom:'1px solid #ccd8ea'}}>{h}</th>)}</tr></thead><tbody>{receivables.titles.map(t=><tr key={t.id}><td style={{padding:9}}>{t.client_name}</td><td style={{padding:9}}>{t.description}</td><td style={{padding:9}}>{String(t.due_on).slice(0,10).split('-').reverse().join('/')}</td><td style={{padding:9}}>{brl(Number(t.total))}</td><td style={{padding:9}}>{brl(Number(t.paid))}</td><td style={{padding:9,fontWeight:700}}>{brl(Math.max(0,Number(t.total)-Number(t.paid)))}</td></tr>)}</tbody></table>{receivables.titles.length===0&&<p>Nenhuma cobrança cadastrada.</p>}</div>
+ <h3 style={{marginTop:22}}>Extrato de recebimentos por instituição</h3>
+ <div style={{overflowX:'auto'}}><table style={{width:'100%',borderCollapse:'collapse',textAlign:'left',fontSize:13}}><thead><tr>{['Data','Instituição','Descrição','Valor recebido'].map(h=><th key={h} style={{padding:9,borderBottom:'1px solid #ccd8ea'}}>{h}</th>)}</tr></thead><tbody>{receivables.payments.map(p=><tr key={p.id}><td style={{padding:9}}>{String(p.occurred_on).slice(0,10).split('-').reverse().join('/')}</td><td style={{padding:9}}>{p.client_name}</td><td style={{padding:9}}>{p.description}</td><td style={{padding:9,fontWeight:700,color:'#16724a'}}>+ {brl(Number(p.amount))}</td></tr>)}</tbody></table>{receivables.payments.length===0&&<p>Nenhum recebimento vinculado.</p>}</div>
+ <p style={{fontSize:12}}>Cobranças não entram no saldo do caixa até o recebimento confirmado. O extrato auditável acima continua sendo a fonte do caixa realizado.</p>
+ </section>}
  {report&&<section className="finance-report-print" style={{...card,marginTop:20}}>
  <h2>Fluxo de caixa e relatórios gerenciais</h2>
  <p style={{fontSize:13}}>Valores efetivamente realizados. Propostas comerciais não entram no saldo do caixa.</p>
