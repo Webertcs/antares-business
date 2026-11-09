@@ -92,6 +92,7 @@ export default function FinanceiroClient(){
  {error&&<p className="finance-print-hide" role="alert" style={{color:'#a32727'}}>{error}</p>}
  {data&&<><div className="finance-print-hide" style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(190px,1fr))',gap:14,margin:'26px 0'}}>
  {([['Entradas realizadas',data.income],['Saídas realizadas',data.expenses],['Saldo acumulado',data.balance]] as [string,number][]).map(([label,value])=><div style={card} key={label}><small>{label}</small><h2 style={{fontSize:25}}>{brl(value)}</h2></div>)}</div>
+ {receivables&&<div className="finance-print-hide" style={{...card,marginBottom:16,background:'#edf5ff',border:'1px solid #c5daf5'}}><strong style={{color:'#17457f'}}>Pendente de todas as instituições: {brl(receivables.titles.reduce((n,t)=>n+Math.max(0,Number(t.total)-Number(t.paid)),0))}</strong><p style={{fontSize:12,margin:'6px 0 0'}}>Cobranças ainda não recebidas; não integram o saldo realizado.</p></div>}
  <section className="finance-print-hide" style={card}><h2>Extrato auditável</h2>
  <p style={{fontSize:13}}>Lançamentos confirmados no livro-caixa. Estornos permanecem no histórico.</p>
  <div style={{display:'flex',gap:12,flexWrap:'wrap',margin:'15px 0'}}>
