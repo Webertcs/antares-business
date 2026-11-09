@@ -40,6 +40,27 @@ export default function ClientDetails({id,writesEnabled,proposalWritesEnabled,co
  const relationshipTier=totalRelationshipVisits>=8?'Diamante':totalRelationshipVisits>=4?'Ouro':totalRelationshipVisits>=2?'Prata':totalRelationshipVisits===1?'Bronze':'Sem categoria';
  const relationshipBenefits:Record<string,string>={'Bronze':'5% na segunda visita e acompanhamento','Prata':'10% e prioridade de agenda','Ouro':'15%, sessão extra a cada 5 visitas e material exclusivo','Diamante':'20%, sessão gratuita anual e selo Escola Parceira'};
  const pendingRelationship=relationship.actions.filter(a=>!a.archived&&a.status!=='completed'&&a.status!=='dismissed'&&a.due_date).sort((a,b)=>(a.due_date||'').localeCompare(b.due_date||''));
+ const [notesDraft,setNotesDraft]=useState<string|null>(null);
+ const [notesSaving,setNotesSaving]=useState(false);
+ const [notesFeedback,setNotesFeedback]=useState('');
+ const notesValue=notesDraft??client?.notes??'';
+ const notesDirty=notesValue!==(client?.notes??'');
+ async function saveNotes(){
+  if(!client||!notesDirty||notesSaving)return;
+  setNotesSaving(true);setNotesFeedback('');
+  try{
+   const response=await fetch('/api/crm/clientes',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'client',id:client.id,kind:client.kind,name:client.name,email:client.email||'',phone:client.phone||'',phoneSecondary:client.phone_secondary||'',city:client.city||'',status:client.status,notes:notesValue})});
+   const data=await response.json();if(!response.ok)throw Error(data.error||'Não foi possível salvar as observações.');
+   setClient(previous=>previous?{...previous,notes:notesValue}:previous);
+   setNotesDraft(null);setNotesFeedback('Observações salvas com sucesso.');
+  }catch(e){setNotesFeedback(e instanceof Error?e.message:'Falha ao salvar observações.');}
+  finally{setNotesSaving(false);}
+ }
+ useEffect(()=>{
+  const warn=(event:BeforeUnloadEvent)=>{if(notesDirty){event.preventDefault();event.returnValue='';}};
+  window.addEventListener('beforeunload',warn);
+  return()=>window.removeEventListener('beforeunload',warn);
+ },[notesDirty]);
  const [activeTab,setActiveTab]=useState<'propostas'|'contratos'|'alunos'|'eventos'|'financeiro'|'fidelizacao'|'historico'|'observacoes'>('eventos');
  const [commercial,setCommercial]=useState<{proposals:Record<string,unknown>[];contracts:Record<string,unknown>[];unavailable:string[]}|null>(null);
  const [commercialError,setCommercialError]=useState('');
@@ -280,7 +301,7 @@ export default function ClientDetails({id,writesEnabled,proposalWritesEnabled,co
  ...relationship.actions.map(a=>({key:'contato-'+a.id,date:a.due_date||'',label:'Relacionamento',detail:(a.note||a.action_kind||'Contato')+' · '+(a.status==='completed'?'Concluído':'Programado')}))
  ];entries.sort((a,b)=>b.date.localeCompare(a.date));return entries.length===0?<p style={{fontSize:13}}>Nenhum registro encontrado para esta instituição.</p>:<div style={{display:'grid',gap:9,marginTop:15}}>{entries.map(e=><div key={e.key} style={{border:'1px solid #d2e2f8',borderLeft:'3px solid #2771d5',borderRadius:9,padding:'11px 13px',background:'#f6f9ff'}}><div style={{display:'flex',justifyContent:'space-between',gap:10,flexWrap:'wrap'}}><strong style={{color:'#17457f',fontSize:13}}>{e.label}</strong><span style={{fontSize:12,color:'#58739b'}}>{dateBR(e.date||null)}</span></div><div style={{fontSize:13,marginTop:5,overflowWrap:'anywhere'}}>{e.detail}{e.link&&<> · <Link href={e.link} style={{color:'#1556ae',fontWeight:700}}>Ver evento</Link></>}</div></div>)}</div>})()}</section>}
 
- {activeTab==='observacoes'&&<section style={panel}><h2 style={heading}>Observações da instituição</h2><p style={{whiteSpace:'pre-wrap'}}>{client.notes||'Nenhuma observação cadastrada.'}</p><Link href={`/clientes?editId=${encodeURIComponent(id)}`} style={actionLink}>Editar observações</Link></section>}
+ {activeTab==='observacoes'&&<section style={panel}><h2 style={heading}>Observações da instituição</h2><p style={{fontSize:13,color:'#48678e'}}>Anotações gerais sobre o atendimento desta instituição.</p><textarea aria-label="Observações da instituição" maxLength={4000} rows={6} value={notesValue} onChange={e=>{setNotesDraft(e.target.value);setNotesFeedback('');}} style={{...formInput,resize:'vertical',lineHeight:1.6}}/><div style={{display:'flex',alignItems:'center',gap:12,flexWrap:'wrap',marginTop:12}}><button type="button" disabled={!notesDirty||notesSaving} onClick={()=>void saveNotes()} style={{...actionLink,border:0,cursor:notesDirty?'pointer':'not-allowed',opacity:!notesDirty||notesSaving?0.55:1}}>{notesSaving?'Salvando...':'Salvar observações'}</button>{notesDirty&&<span style={{fontSize:12,color:'#a05a12'}}>Alterações ainda não salvas</span>}</div>{notesFeedback&&<p role="status" style={{fontSize:13,color:notesFeedback.includes('sucesso')?'#16724a':'#a33b25'}}>{notesFeedback}</p>}</section>}
  </>}
  </main>;
 }
