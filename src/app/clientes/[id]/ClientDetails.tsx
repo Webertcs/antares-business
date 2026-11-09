@@ -10,7 +10,7 @@ const kinds:Record<string,string>={school:'Escola',company:'Empresa',association
 const statuses:Record<string,string>={prospect:'Prospecto',active:'Ativo',inactive:'Arquivado'};
 const eventStatuses:Record<string,string>={lead:'Oportunidade',quoted:'Orçado',reserved:'Reservado',confirmed:'Confirmado',completed:'Realizado',cancelled:'Cancelado'};
 const dateBR=(value:string|null)=>value?new Intl.DateTimeFormat('pt-BR',{timeZone:'UTC'}).format(new Date(value)):'Sem data';
-export default function ClientDetails({id,writesEnabled,proposalWritesEnabled,contractWritesEnabled,attendance}:{id:string;writesEnabled:boolean;proposalWritesEnabled:boolean;contractWritesEnabled:boolean;attendance:Attendance[]}){
+export default function ClientDetails({id,writesEnabled,proposalWritesEnabled,contractWritesEnabled,attendance,domes}:{id:string;writesEnabled:boolean;proposalWritesEnabled:boolean;contractWritesEnabled:boolean;attendance:Attendance[];domes:{id:string;name:string;capacity:number|null}[]}){
  const [relationship,setRelationship]=useState<{events:{id:string;title:string;event_date:string|null;status:string}[];actions:{id:string;due_date:string|null;status:string;note:string;action_kind:string;archived?:boolean}[];error:string;loading:boolean}>({events:[],actions:[],error:'',loading:true});
  useEffect(()=>{
   let active=true;
@@ -133,7 +133,7 @@ export default function ClientDetails({id,writesEnabled,proposalWritesEnabled,co
  const [financeDraftId,setFinanceDraftId]=useState<string|null>(null);
  const [financePaymentIds,setFinancePaymentIds]=useState<Record<string,string>>({});
  const [client,setClient]=useState<Client|null>(null),[contacts,setContacts]=useState<Contact[]>([]),[events,setEvents]=useState<Event[]>([]),[groups,setGroups]=useState<Group[]>([]);
- const emptyEventDraft={title:'',kind:'presentation',date:'',attendees:'',pricing:'per_student',price:'',fixed:'',status:'lead',venue:'',notes:''};
+ const emptyEventDraft={domeId:'',title:'',kind:'presentation',date:'',attendees:'',pricing:'per_student',price:'',fixed:'',status:'lead',venue:'',notes:''};
  const [eventDraft,setEventDraft]=useState(emptyEventDraft);
  const [eventSaving,setEventSaving]=useState(false);
  const [eventFeedback,setEventFeedback]=useState('');
