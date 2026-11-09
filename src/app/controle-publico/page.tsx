@@ -18,18 +18,22 @@ export default async function Page({searchParams}:{searchParams:Promise<Search>}
  JOIN public.crm_events e ON e.id=a.event_id AND e.organization_id=a.organization_id
  JOIN public.crm_clients c ON c.id=e.client_id AND c.organization_id=e.organization_id
  WHERE a.organization_id=${ctx.organizationId}::uuid ORDER BY e.event_date DESC NULLS LAST,e.title`:[];
- const filtered=rows.filter(r=>(!year||String(r.event_date||'').slice(0,4)===year)&&(!client||String(r.client_id)===client));
+ const eventYear=(value:unknown)=>{if(!value)return '';if(value instanceof Date)return String(value.getUTCFullYear());const raw=String(value);const iso=raw.match(/^(20\d{2})-/);if(iso)return iso[1];const parsed=new Date(raw);return Number.isNaN(parsed.getTime())?'':String(parsed.getUTCFullYear());};
+ const filtered=rows.filter(r=>(!year||eventYear(r.event_date)===year)&&(!client||String(r.client_id)===client));
  const total=filtered.reduce((s,r)=>s+Number(r.actual_students||0),0);
- const years=[...new Set(rows.map(r=>String(r.event_date||'').slice(0,4)).filter(v=>/^20\d{2}$/.test(v)))].sort().reverse();
+ const years=[...new Set(rows.map(r=>eventYear(r.event_date)).filter(v=>/^20\d{2}$/.test(v)))].sort().reverse();
  const card:React.CSSProperties={padding:18,borderRadius:12,background:'#eef5ff',border:'1px solid #bcd3fa'};
  const summary=[...new Map(filtered.map(r=>[String(r.client_id),String(r.client_name)])).entries()].map(([id,name])=>({id,name,events:filtered.filter(r=>String(r.client_id)===id).length,students:filtered.filter(r=>String(r.client_id)===id).reduce((n,r)=>n+Number(r.actual_students||0),0)})).sort((a,b)=>a.name.localeCompare(b.name,'pt-BR'));
  return <RelationshipShell title="Controle de Público"><main style={{maxWidth:1100,margin:'0 auto',padding:'24px clamp(14px,2.5vw,26px)',display:'grid',gap:16,color:'#173668'}}> 
  <header style={{padding:22,borderRadius:14,color:'#fff',background:'linear-gradient(110deg,#08265d,#1768c2)'}}>
- <div style={{fontSize:12,letterSpacing:1.5,fontWeight:700}}>ANTARES · RELATÓRIOS</div><h1 style={{margin:'6px 0'}}>Controle de Público</h1><p style={{margin:0}}>Alunos efetivamente atendidos pelo planetário. Previsões não entram no acumulado.</p></header>
- <form method="get" style={{display:'flex',gap:10,flexWrap:'wrap',alignItems:'end',padding:14,background:'#fff',borderRadius:12}}>
- <label>Ano<br/><select name="ano" defaultValue={year} style={{padding:10,borderRadius:8,border:'1px solid #bcd3fa'}}><option value="">Todos os anos</option>{years.map(y=><option key={y} value={y}>{y}</option>)}</select></label>
- <label>Instituição<br/><select name="instituicao" defaultValue={client} style={{padding:10,borderRadius:8,border:'1px solid #bcd3fa',maxWidth:300}}><option value="">Todas as instituições</option>{clients.map(c=><option key={String(c.id)} value={String(c.id)}>{String(c.name)}</option>)}</select></label>
- <button type="submit" style={{padding:'11px 18px',border:0,borderRadius:8,background:'#1556ae',color:'#fff',fontWeight:700,cursor:'pointer'}}>Filtrar</button><Link href="/controle-publico">Limpar filtros</Link></form>
+ <div style={{fontSize:12,letterSpacing:1.5,fontWeight:700}}>ANTARES · RELATÓRIOS</div><h1 style={{margin:'6px 0'}}>Controle de Público</h1></header>
+ <form method="get" style={{display:'grid',gridTemplateColumns:'repeat(2,minmax(0,1fr))',gap:14,padding:18,background:'#fff',border:'1px solid #c8dcf8',borderRadius:14,boxShadow:'0 5px 15px rgba(17,63,131,.06)'}}>
+ <label style={{display:'grid',gap:7,minWidth:0,fontSize:13,fontWeight:700,color:'#16427f'}}>Ano
+ <select name="ano" defaultValue={year} style={{width:'100%',minWidth:0,padding:'12px 14px',borderRadius:10,border:'1px solid #a9c7f2',background:'#edf5ff',color:'#16427f',fontSize:14,fontWeight:600,cursor:'pointer'}}><option value="">Todos os anos</option>{years.map(y=><option key={y} value={y}>{y}</option>)}</select></label>
+ <label style={{display:'grid',gap:7,minWidth:0,fontSize:13,fontWeight:700,color:'#16427f'}}>Instituição
+ <select name="instituicao" defaultValue={client} style={{width:'100%',minWidth:0,padding:'12px 14px',borderRadius:10,border:'1px solid #a9c7f2',background:'#edf5ff',color:'#16427f',fontSize:14,fontWeight:600,cursor:'pointer'}}><option value="">Todas as instituições</option>{clients.map(c=><option key={String(c.id)} value={String(c.id)}>{String(c.name)}</option>)}</select></label>
+ <button type="submit" style={{width:'100%',padding:'12px 16px',border:0,borderRadius:10,background:'linear-gradient(110deg,#174eab,#2875d9)',color:'#fff',fontSize:14,fontWeight:700,cursor:'pointer'}}>Filtrar</button>
+ <Link href="/controle-publico" style={{display:'flex',alignItems:'center',justifyContent:'center',width:'100%',padding:'12px 16px',border:'1px solid #a9c7f2',borderRadius:10,background:'#e9f2ff',color:'#16427f',fontSize:14,fontWeight:700,textDecoration:'none',boxSizing:'border-box'}}>Limpar filtros</Link></form>
  <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(190px,1fr))',gap:12}}>
  <div style={card}><div>Alunos atendidos</div><strong style={{fontSize:30}}>{fmt(total)}</strong></div>
  <div style={card}><div>Eventos contabilizados</div><strong style={{fontSize:30}}>{fmt(filtered.length)}</strong></div>
