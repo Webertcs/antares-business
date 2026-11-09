@@ -14,7 +14,7 @@ export async function GET(){
        FROM public.business_proposals p JOIN public.crm_clients c
        ON c.id=p.client_id AND c.organization_id=p.organization_id
        WHERE p.organization_id=${ctx.organizationId} ORDER BY p.created_at DESC LIMIT 500`,
-   sql`SELECT c.id,c.proposal_id,p.title AS proposal_title,c.confirmation_mode,c.status,c.confirmed_at,c.created_at
+   sql`SELECT c.id,c.proposal_id,p.title AS proposal_title,c.confirmation_mode,c.status,c.confirmed_at,c.confirmed_by_name,c.created_at
        FROM public.business_contracts c JOIN public.business_proposals p
        ON p.id=c.proposal_id AND p.organization_id=c.organization_id
        WHERE c.organization_id=${ctx.organizationId} ORDER BY c.created_at DESC LIMIT 500`,
