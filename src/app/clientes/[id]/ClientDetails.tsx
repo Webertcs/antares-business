@@ -69,14 +69,12 @@ export default function ClientDetails({id,writesEnabled,proposalWritesEnabled,co
   finally{setCommercialActionBusy(false);}
  }
  function proposalPdf(p:Record<string,unknown>){
-  if(!client)return;
-  const esc=(v:unknown)=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]||c));
-  const total=money(p.total);
-  const html=`<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><title>Proposta ANTARES</title><style>body{font-family:Arial,sans-serif;color:#18365f;padding:44px;max-width:800px;margin:auto}header{background:#153f86;color:white;padding:25px;border-radius:12px}h1{margin:0}table{border-collapse:collapse;width:100%;margin:24px 0}td{padding:12px;border-bottom:1px solid #d5e1f3}.total{font-size:23px;font-weight:bold;color:#145ac3}footer{margin-top:55px;font-size:12px;color:#536781}@media print{button{display:none}}</style></head><body><header><h1>ANTARES</h1><p>Planetário Móvel Digital · Proposta comercial</p></header><h2>${esc(p.title)}</h2><p><b>Instituição:</b> ${esc(client.name)}</p><table><tr><td>Modalidade</td><td>${esc(p.pricing_model==='per_student'?'Por aluno':p.pricing_model==='fixed'?'Valor fechado':'Gratuito')}</td></tr><tr><td>Participantes previstos</td><td>${esc(p.expected_attendees)}</td></tr><tr><td>Valor por aluno</td><td>${esc(money(p.unit_price))}</td></tr><tr><td>Valor fechado</td><td>${esc(money(p.fixed_price))}</td></tr><tr><td>Desconto</td><td>${esc(money(p.discount))}</td></tr><tr><td>Sinal</td><td>${esc(money(p.deposit))}</td></tr><tr><td>Validade</td><td>${esc(p.valid_until?dateBR(String(p.valid_until)):'A combinar')}</td></tr></table><p class="total">Total estimado: ${esc(total)}</p><p><b>Observações:</b> ${esc(p.notes||'A combinar')}</p><footer>Proposta sujeita a confirmação de disponibilidade. Documento comercial gerado pelo ANTARES CRM.</footer><button onclick="window.print()">Imprimir / Salvar PDF</button></body></html>`;
-  const win=window.open('','_blank');if(!win){setCommercialFeedback('Permita pop-ups para abrir o documento.');return;}
-  win.document.open();win.document.write(html);win.document.close();win.focus();
+  const proposalId=String(p.id||'');
+  if(!/^[a-f0-9]{8}(-[a-f0-9]{4}){3}-[a-f0-9]{12}$/i.test(proposalId)){setCommercialFeedback('Identificador da proposta inválido.');return;}
+  const win=window.open('/comercial/documentos/'+encodeURIComponent(proposalId),'_blank','noopener,noreferrer');
+  if(!win)setCommercialFeedback('Permita pop-ups para abrir o documento.');
  }
- function openProposalWhatsapp(p:Record<string,unknown>){
+  function openProposalWhatsapp(p:Record<string,unknown>){
   if(!client)return;
   const phone=(client.phone||client.phone_secondary||'').replace(/\D/g,'');
   if(phone.length<10){setCommercialFeedback('Cadastre um telefone válido para enviar a proposta.');return;}
