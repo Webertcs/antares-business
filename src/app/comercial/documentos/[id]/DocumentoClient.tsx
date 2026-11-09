@@ -13,7 +13,7 @@ export default function DocumentoClient({doc}:{doc:D}){
  const statusLabel:Record<string,string>={accepted:'Aceita',draft:'Rascunho',sent:'Enviada',negotiating:'Em negociação',rejected:'Recusada',cancelled:'Cancelada'};
  const today=new Intl.DateTimeFormat('pt-BR',{dateStyle:'long',timeZone:'America/Sao_Paulo'}).format(new Date());
  return <main style={{background:'#e8eef9',minHeight:'100vh',padding:'24px 12px',color:'#142d52',fontFamily:'Arial,sans-serif'}}>
- <style>{`@media print{ @page{size:A4;margin:10mm;} body{background:white!important} .screen-only{display:none!important} .document{box-shadow:none!important;border:none!important;margin:0!important;padding:0!important;max-width:none!important;font-size:11px!important;line-height:1.25!important} .document h1{font-size:19px!important;margin-top:14px!important} .document h2{font-size:14px!important;margin:9px 0!important}.document p{margin:5px 0!important}.document th,.document td{padding:5px!important}.document .document-header{padding:15px 18px!important;print-color-adjust:exact!important;-webkit-print-color-adjust:exact!important}.document .document-header img{height:64px!important;width:165px!important;object-fit:contain!important}.document section{margin-top:20px!important}.document footer{margin-top:18px!important} }`}</style>
+ <style>{`@media print{ @page{size:A4;margin:10mm;} body{background:white!important} .screen-only{display:none!important} .document{box-shadow:none!important;border:none!important;margin:0!important;padding:0!important;max-width:none!important;font-size:11px!important;line-height:1.25!important} .document h1{font-size:19px!important;margin-top:14px!important} .document h2{font-size:14px!important;margin:9px 0!important}.document p{margin:5px 0!important}.document th,.document td{padding:5px!important}.document .document-header{padding:15px 18px!important;print-color-adjust:exact!important;-webkit-print-color-adjust:exact!important}.document .document-header img{height:68px!important;width:165px!important;object-fit:contain!important}.document section{margin-top:20px!important}.document footer{margin-top:18px!important} }`}</style>
  <div className="screen-only" style={{maxWidth:850,margin:'0 auto 18px',display:'flex',gap:10,alignItems:'center',flexWrap:'wrap'}}>
  <Link href="/operacoes">← Operações</Link>
  <label style={{marginLeft:'auto'}}>Documento <select value={mode} onChange={e=>setMode(e.target.value as 'proposal'|'contract')} style={{padding:9,borderRadius:6}}><option value="proposal">Proposta comercial</option><option value="contract">Minuta de contrato</option></select></label>
@@ -30,8 +30,8 @@ export default function DocumentoClient({doc}:{doc:D}){
  </section>
  <article className="document" style={{maxWidth:850,margin:'auto',background:'white',padding:'26px clamp(20px,4vw,42px)',borderRadius:8,boxShadow:'0 5px 25px #1e3c7020'}}>
  <header className="document-header" style={{background:'linear-gradient(115deg,#102b62 0%,#1454aa 75%,#1768bc 100%)',borderRadius:12,padding:'24px 28px',display:'flex',alignItems:'center',justifyContent:'space-between',gap:24,flexWrap:'wrap',color:'#fff',breakInside:'avoid'}}>
- <div style={{background:'#fff',padding:'12px 16px',borderRadius:10,display:'flex',alignItems:'center',justifyContent:'center',minWidth:205,minHeight:94}}>
- <img src="/images/logo-antares.png" alt="Logomarca oficial ANTARES Planetário Móvel Digital" style={{width:205,maxWidth:'100%',height:82,objectFit:'contain'}}/>
+ <div style={{background:'#fff',padding:'10px 16px',borderRadius:10,display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',minWidth:205,minHeight:94}}>
+ <img src="/images/logo-antares.png" alt="Logomarca oficial ANTARES" style={{width:205,maxWidth:'100%',height:68,objectFit:'contain'}}/><span style={{fontSize:10,fontWeight:800,letterSpacing:'.7px',color:'#102b62',textAlign:'center',marginTop:2}}>PLANETÁRIO MÓVEL DIGITAL</span>
  </div>
  <div style={{textAlign:'right',flex:'1 1 190px'}}>
  <div style={{fontSize:11,letterSpacing:2,fontWeight:700,opacity:.85}}>ANTARES · PLANETÁRIO MÓVEL DIGITAL</div>
@@ -47,7 +47,6 @@ export default function DocumentoClient({doc}:{doc:D}){
  <p><strong>Endereço:</strong> {provider.address||'Não informado'}</p>
  <p><strong>Representante:</strong> {provider.representative||'Não informado'}</p>
  <p><strong>Atividade proposta:</strong> {doc.title}</p>
- <p><strong>Identificador da proposta:</strong> {doc.id}</p>
  <hr style={{border:0,borderTop:'1px solid #c9d7eb',margin:'24px 0'}}/>
  <h2 style={{fontSize:17}}>Condições comerciais</h2>
  <table style={{width:'100%',borderCollapse:'collapse',marginBottom:20}}>
