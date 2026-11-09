@@ -5,6 +5,7 @@ import EventTeamPanel from './EventTeamPanel';
 import EventNotes from './EventNotes';
 import EventClosing from './EventClosing';
 import EventDomePicker from './EventDomePicker';
+import EventLifecycleActions from '../EventLifecycleActions';
 export const dynamic='force-dynamic';
 const uuid=/^[0-9a-f]{8}(-[0-9a-f]{4}){3}-[0-9a-f]{12}$/i;
 const infoCard:React.CSSProperties={background:'linear-gradient(145deg,#fff 0%,#e9f1ff 100%)',border:'1px solid #c4d8ff',borderRadius:12,padding:'10px 12px',boxShadow:'0 6px 20px rgba(25,67,140,.07)',minWidth:0};
@@ -12,7 +13,7 @@ export default async function Page({params}:{params:Promise<{id:string}>}){
  const ctx=await requireMember();if(!ctx)redirect('/sem-acesso');
  const {id}=await params;if(!uuid.test(id))notFound();
  const db=getDb();
- const rows=await db`SELECT e.id,e.title,e.event_date,e.start_time,e.end_time,e.status,e.venue,e.notes,e.expected_attendees,e.dome_id,
+ const rows=await db`SELECT e.id,e.title,e.event_date,e.start_time,e.end_time,e.status,e.venue,e.notes,e.expected_attendees,e.dome_id,e.archived_at,
  c.name AS client_name,c.city,c.phone AS client_phone,d.name AS dome_name
  FROM public.crm_events e JOIN public.crm_clients c ON c.id=e.client_id AND c.organization_id=e.organization_id
  LEFT JOIN public.antares_domes d ON d.id=e.dome_id AND d.organization_id=e.organization_id
@@ -35,7 +36,7 @@ export default async function Page({params}:{params:Promise<{id:string}>}){
  <h1 style={{fontSize:'clamp(22px,2.4vw,29px)',fontWeight:800,margin:'5px 0',lineHeight:1.15,color:'#fff'}}>{String(e.title)}</h1>
  <div style={{display:'flex',alignItems:'center',gap:10,flexWrap:'wrap',fontWeight:600}}>
  <span>{date} · {String(e.start_time||'').slice(0,5)||'Horário a definir'}{e.end_time?'–'+String(e.end_time).slice(0,5):''}</span>
- </div></div></header>
+ <EventLifecycleActions eventId={id} status={String(e.status)} archived={!!e.archived_at}/></div></div></header>
  <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(170px,1fr))',gap:10}}>
  {([['Instituição',String(e.client_name),'🏫'],['Cúpula',String(e.dome_name||'A definir'),'🪐'],['Público previsto',e.expected_attendees==null?'A definir':String(e.expected_attendees),'👥']] as const).map(([label,value,icon])=><div key={label} style={infoCard}><div style={{display:'flex',alignItems:'center',gap:10}}><span aria-hidden="true" style={{fontSize:23,background:'#d9eaff',borderRadius:12,padding:8}}>{icon}</span><div style={{minWidth:0}}><div style={{fontSize:14,fontWeight:750,color:'#28589b',lineHeight:1.3}}>{label}</div><div style={{fontSize:15,fontWeight:400,overflowWrap:'anywhere',lineHeight:1.35}}>{value}</div></div></div></div>)}
  </div>
