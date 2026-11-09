@@ -312,8 +312,8 @@ export default function ClientDetails({id,writesEnabled,proposalWritesEnabled,co
   <h2 style={heading}>Eventos ({events.length})</h2>
   {writesEnabled&&<form onSubmit={saveEvent} style={{background:'#edf5ff',border:'1px solid #c3dafa',borderRadius:12,padding:14,marginBottom:14}}>
    <h3 style={{margin:'0 0 10px',color:'#174987',fontSize:15}}>Novo evento para {client?.name||'esta instituição'}</h3>
-   <fieldset disabled={eventSaving} style={{border:0,padding:0,margin:0,display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(190px,1fr))',gap:10}}>
-    {([['title','Título'],['kind','Tipo de evento'],['date','Data'],['attendees','Participantes'],['pricing','Cobrança'],['price','Valor por participante'],['fixed','Valor fechado'],['status','Situação'],['venue','Local'],['notes','Observações']] as const).map(([key,label])=><label key={key} style={formLabel}>{label}
+   <fieldset disabled={eventSaving} style={{border:0,padding:0,margin:0,display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(min(100%,160px),1fr))',gap:12}}>
+    {([['title','Título'],['kind','Tipo de evento'],['date','Data'],['attendees','Participantes'],['domeId','Cúpula'],['pricing','Cobrança'],['price','Valor por participante'],['fixed','Valor fechado'],['status','Situação'],['venue','Local'],['notes','Observações']] as const).map(([key,label])=><label key={key} style={formLabel}>{label}
      {key==='kind'||key==='pricing'||key==='status'?
       <select value={eventDraft[key]} onChange={e=>setEventDraft(previous=>({...previous,[key]:e.target.value}))} style={formInput}>
        {(key==='kind'?[['presentation','Apresentação'],['corporate','Corporativo'],['private','Particular'],['other','Outro']]:key==='pricing'?[['per_student','Por participante'],['fixed','Valor fechado'],['complimentary','Gratuito']]:Object.entries(eventStatuses)).map(([value,text])=><option key={value} value={value}>{text}</option>)}
