@@ -11,7 +11,7 @@ export async function GET(){
  if(!owner)return NextResponse.json({error:'Acesso exclusivo do proprietário.'},{status:403,headers:noStore});
  try{
   const db=getDb();
-  const [titles,clients]=await Promise.all([
+  const [titles,clients,payments]=await Promise.all([
    db`SELECT r.id,r.client_id,c.name AS client_name,r.description,r.total,r.due_on,r.created_at,
       COALESCE((SELECT SUM(l.amount)
         FROM public.antares_receivable_payments p
@@ -25,9 +25,17 @@ export async function GET(){
       WHERE r.organization_id=${owner.organizationId} AND r.cancelled_at IS NULL
       ORDER BY r.due_on LIMIT 500`,
    db`SELECT id,name FROM public.crm_clients WHERE organization_id=${owner.organizationId}
-      ORDER BY name LIMIT 500`
+      ORDER BY name LIMIT 500`,
+   db`SELECT p.id,p.receivable_id,r.client_id,c.name AS client_name,r.description,l.amount,l.occurred_on
+      FROM public.antares_receivable_payments p
+      JOIN public.antares_receivables r ON r.id=p.receivable_id AND r.organization_id=p.organization_id
+      JOIN public.crm_clients c ON c.id=r.client_id AND c.organization_id=r.organization_id
+      JOIN public.ledger_entries l ON l.id=p.ledger_id AND l.organization_id=p.organization_id
+      WHERE p.organization_id=${owner.organizationId} AND r.cancelled_at IS NULL AND l.entry_type='income'
+      AND NOT EXISTS(SELECT 1 FROM public.ledger_entries rv WHERE rv.organization_id=l.organization_id AND rv.reversal_of=l.id)
+      ORDER BY l.occurred_on DESC,l.created_at DESC LIMIT 1000`
   ]);
-  return NextResponse.json({titles,clients,writesEnabled:process.env.ANTARES_FINANCE_WRITES_ENABLED==='true'&&/^[a-f0-9]{64}$/i.test(process.env.ANTARES_FINANCE_CAPABILITY||'')},{headers:noStore});
+  return NextResponse.json({titles,clients,payments,writesEnabled:process.env.ANTARES_FINANCE_WRITES_ENABLED==='true'&&/^[a-f0-9]{64}$/i.test(process.env.ANTARES_FINANCE_CAPABILITY||'')},{headers:noStore});
  }catch{return NextResponse.json({error:'Contas a receber ainda não implantadas.'},{status:503,headers:noStore});}
 }
 export async function POST(req:Request){
