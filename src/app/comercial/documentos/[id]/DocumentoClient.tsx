@@ -13,7 +13,7 @@ export default function DocumentoClient({doc}:{doc:D}){
  const statusLabel:Record<string,string>={accepted:'Aceita',draft:'Rascunho',sent:'Enviada',negotiating:'Em negociação',rejected:'Recusada',cancelled:'Cancelada'};
  const today=new Intl.DateTimeFormat('pt-BR',{dateStyle:'long',timeZone:'America/Sao_Paulo'}).format(new Date());
  return <main style={{background:'#e8eef9',minHeight:'100vh',padding:'24px 12px',color:'#142d52',fontFamily:'Arial,sans-serif'}}>
- <style>{`@media print{ @page{size:A4;margin:10mm;} body{background:white!important} .screen-only{display:none!important} .document{box-shadow:none!important;border:none!important;margin:0!important;padding:0!important;max-width:none!important;font-size:11px!important;line-height:1.25!important} .document h1{font-size:19px!important;margin-top:14px!important} .document h2{font-size:14px!important;margin:9px 0!important}.document p{margin:5px 0!important}.document th,.document td{padding:5px!important}.document header{padding-bottom:7px!important}.document section{margin-top:20px!important}.document footer{margin-top:18px!important} }`}</style>
+ <style>{`@media print{ @page{size:A4;margin:10mm;} body{background:white!important} .screen-only{display:none!important} .document{box-shadow:none!important;border:none!important;margin:0!important;padding:0!important;max-width:none!important;font-size:11px!important;line-height:1.25!important} .document h1{font-size:19px!important;margin-top:14px!important} .document h2{font-size:14px!important;margin:9px 0!important}.document p{margin:5px 0!important}.document th,.document td{padding:5px!important}.document .document-header{padding:15px 18px!important;print-color-adjust:exact!important;-webkit-print-color-adjust:exact!important}.document .document-header img{height:64px!important;width:165px!important;object-fit:contain!important}.document section{margin-top:20px!important}.document footer{margin-top:18px!important} }`}</style>
  <div className="screen-only" style={{maxWidth:850,margin:'0 auto 18px',display:'flex',gap:10,alignItems:'center',flexWrap:'wrap'}}>
  <Link href="/operacoes">← Operações</Link>
  <label style={{marginLeft:'auto'}}>Documento <select value={mode} onChange={e=>setMode(e.target.value as 'proposal'|'contract')} style={{padding:9,borderRadius:6}}><option value="proposal">Proposta comercial</option><option value="contract">Minuta de contrato</option></select></label>
@@ -29,18 +29,24 @@ export default function DocumentoClient({doc}:{doc:D}){
  <label><input type="checkbox" checked={showNotes} onChange={e=>setShowNotes(e.target.checked)}/> Incluir observações da proposta após revisão (podem conter dados internos)</label>
  </section>
  <article className="document" style={{maxWidth:850,margin:'auto',background:'white',padding:'26px clamp(20px,4vw,42px)',borderRadius:8,boxShadow:'0 5px 25px #1e3c7020'}}>
- <header style={{borderBottom:'3px solid #1f63c7',paddingBottom:15,display:'flex',alignItems:'center',gap:20,flexWrap:'wrap'}}>
- <img src="/images/logo-antares.png" alt="ANTARES Planetário Móvel" style={{width:160,height:'auto'}}/>
- <div style={{marginLeft:'auto',textAlign:'right'}}><strong>ANTARES BUSINESS</strong><div style={{fontSize:12}}>Documento gerado do CRM</div></div>
+ <header className="document-header" style={{background:'linear-gradient(115deg,#102b62 0%,#1454aa 75%,#1768bc 100%)',borderRadius:12,padding:'24px 28px',display:'flex',alignItems:'center',justifyContent:'space-between',gap:24,flexWrap:'wrap',color:'#fff',breakInside:'avoid'}}>
+ <div style={{background:'#fff',padding:'12px 16px',borderRadius:10,display:'flex',alignItems:'center',justifyContent:'center',minWidth:205,minHeight:94}}>
+ <img src="/images/logo-antares.png" alt="Logomarca oficial ANTARES Planetário Móvel Digital" style={{width:205,maxWidth:'100%',height:82,objectFit:'contain'}}/>
+ </div>
+ <div style={{textAlign:'right',flex:'1 1 190px'}}>
+ <div style={{fontSize:11,letterSpacing:2,fontWeight:700,opacity:.85}}>ANTARES · PLANETÁRIO MÓVEL DIGITAL</div>
+ <div style={{fontSize:20,fontWeight:800,marginTop:8}}>{mode==='proposal'?'PROPOSTA COMERCIAL':'MINUTA DE CONTRATO'}</div>
+ <div style={{fontSize:12,opacity:.85,marginTop:6}}>Documento para apresentação à instituição</div>
+ </div>
  </header>
- <h1 style={{fontSize:23,marginTop:30}}>{mode==='proposal'?'PROPOSTA COMERCIAL':'MINUTA DE CONTRATO DE PRESTAÇÃO DE SERVIÇOS'}</h1>
+ <h1 style={{fontSize:22,marginTop:28,marginBottom:14,color:'#123f83'}}>{mode==='proposal'?'Proposta de experiência educacional':'Minuta de prestação de serviços'}</h1>
  {mode==='contract'&&<p style={{padding:10,background:'#fff5df',fontWeight:700}}>MINUTA NÃO ASSINADA — sem registro de formalização no CRM</p>}
- <p><strong>Contratante:</strong> {doc.clientName}</p>
+ <p style={{fontSize:15,padding:'12px 14px',background:'#eff6ff',borderLeft:'4px solid #2169c9',borderRadius:6}}><strong>Instituição contratante:</strong> {doc.clientName}</p>
  <p><strong>Prestador:</strong> {provider.name||'NÃO INFORMADO — preencher antes de emitir'}</p>
  <p><strong>Documento do prestador:</strong> {provider.document||'Não informado'}</p>
  <p><strong>Endereço:</strong> {provider.address||'Não informado'}</p>
  <p><strong>Representante:</strong> {provider.representative||'Não informado'}</p>
- <p><strong>Objeto:</strong> {doc.title}</p>
+ <p><strong>Atividade proposta:</strong> {doc.title}</p>
  <p><strong>Identificador da proposta:</strong> {doc.id}</p>
  <hr style={{border:0,borderTop:'1px solid #c9d7eb',margin:'24px 0'}}/>
  <h2 style={{fontSize:17}}>Condições comerciais</h2>
@@ -53,6 +59,7 @@ export default function DocumentoClient({doc}:{doc:D}){
  ['Sinal previsto',money(doc.deposit)],['Saldo após sinal (se recebido)',money(Math.max(0,doc.total-doc.deposit))],
  ['Validade da proposta',doc.validUntil||'Não informada']
  ].map(([label,value])=><tr key={label}><th style={{textAlign:'left',padding:10,borderBottom:'1px solid #e1e7f0',width:'50%'}}>{label}</th><td style={{padding:10,borderBottom:'1px solid #e1e7f0'}}>{value}</td></tr>)}</tbody></table>
+ <div style={{background:'#eaf3ff',border:'1px solid #b8d5fa',borderRadius:10,padding:'15px 20px',margin:'12px 0 18px',display:'flex',justifyContent:'space-between',gap:12,alignItems:'center',breakInside:'avoid'}}><strong style={{color:'#174987'}}>INVESTIMENTO TOTAL ESTIMADO</strong><strong style={{fontSize:24,color:'#1358b6'}}>{money(doc.total)}</strong></div>
  <p style={{fontSize:12}}>O sinal indicado é uma condição comercial prevista, não comprovação de pagamento.</p>
  <h2 style={{fontSize:17}}>Condições de pagamento</h2>
  <p style={{whiteSpace:'pre-wrap'}}>{doc.paymentTerms||'A definir e confirmar entre as partes.'}</p>
