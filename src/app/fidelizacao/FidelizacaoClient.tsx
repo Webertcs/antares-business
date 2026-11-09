@@ -119,10 +119,10 @@ export default function FidelizacaoClient(){
    const dated=completed.map(e=>parseDate(e.event_date)).filter((d):d is Date=>d!==null).sort((a,b)=>b.getTime()-a.getTime());
    const last=dated[0]||null;
    const days=cycle.days;
-   const yearly=dated.filter(d=>d.getUTCFullYear()===year).length;
-   const tier=yearly>=8?'Diamante':yearly>=4?'Ouro':yearly>=2?'Prata':yearly===1?'Bronze':'Sem categoria';
+   const totalVisits=dated.length;
+   const tier=totalVisits>=8?'Diamante':totalVisits>=4?'Ouro':totalVisits>=2?'Prata':totalVisits===1?'Bronze':'Sem categoria';
    const alert=days!==null&&days>=threshold?'Retomar contato':completed.length===0?'Novo / sem visita realizada':days!==null&&days>=60?'Acompanhar':'Relacionamento recente';
-   return {client,completed:yearly,last,days,tier,alert,priority:days!==null&&days>=threshold?0:days!==null&&days>=60?2:3};
+   return {client,completed:totalVisits,last,days,tier,alert,priority:days!==null&&days>=threshold?0:days!==null&&days>=60?2:3};
   }).sort((a,b)=>a.priority-b.priority||((b.days||0)-(a.days||0)));
  },[clients,events,todayKey]);
  const radar=useMemo(()=>{
