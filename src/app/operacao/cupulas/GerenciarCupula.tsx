@@ -20,7 +20,7 @@ export default function GerenciarCupula({dome,enabled}:{dome:Dome;enabled:boolea
    })});
    const body=await response.json();
    if(!response.ok)throw new Error(body.error||'Não foi possível atualizar a cúpula.');
-   setOpen(false);setConfirmText('');setMessage(action==='delete'?'Cúpula excluída.':'Cúpula atualizada.');router.refresh();
+   setOpen(false);setConfirmText('');setMessage(action==='delete'?'Cúpula excluída.':'Cúpula atualizada.');router.refresh();window.dispatchEvent(new Event('antares:cupulas-atualizadas'));
   }catch(e){setMessage(e instanceof Error?e.message:'Operação recusada.')}
   finally{setBusy(false)}
  }
