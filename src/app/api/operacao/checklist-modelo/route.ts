@@ -15,6 +15,16 @@ const safeDb = async () => {
       WHERE acl.grantee=0 AND acl.privilege_type='EXECUTE')) AS safe_functions
     FROM pg_roles WHERE rolname=current_user`;
   if(!checks[0]?.safe_role || !checks[0]?.safe_functions) {
+    const details = await db`SELECT p.proname AS function_name, pg_get_userbyid(p.proowner)='neondb_owner' AS owner_ok,
+      p.prosecdef AS security_definer, has_function_privilege(current_user,p.oid,'EXECUTE') AS runtime_execute,
+      NOT EXISTS(SELECT 1 FROM aclexplode(coalesce(p.proacl,acldefault('f',p.proowner))) acl
+        WHERE acl.grantee=0 AND acl.privilege_type='EXECUTE') AS public_revoked
+      FROM pg_proc p WHERE p.pronamespace='public'::regnamespace
+      AND p.proname IN ('antares_save_checklist_template','antares_read_checklist_template')`;
+    console.error('[ANTARES][checklist] Diagnóstico das funções:', details.map(row=>({
+      function_name:row.function_name, owner_ok:row.owner_ok, security_definer:row.security_definer,
+      runtime_execute:row.runtime_execute, public_revoked:row.public_revoked
+    })));
     console.error('[ANTARES][checklist] Diagnóstico de permissões:', {safe_role: checks[0]?.safe_role === true, safe_functions: checks[0]?.safe_functions === true});
     throw new Error('Permissões não verificadas');
   }
