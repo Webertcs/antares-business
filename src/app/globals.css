@@ -900,29 +900,5 @@
 }
 
 
-/* Agenda principal — acabamento noturno aprovado; escopo isolado para não afetar outros calendários. */
-.cal-page .fullcal{background:#07152d;border:1px solid #1e3f73;box-shadow:0 14px 34px rgba(4,18,46,.24);border-radius:16px}
-.cal-page .cal-toolbar{background:linear-gradient(105deg,#12356c,#1b5cb3)!important;border:1px solid #3273c2;box-shadow:0 6px 16px rgba(0,0,0,.3)!important}
-.cal-page .cal-weeknames{gap:3px;margin-bottom:3px}
-.cal-page .cal-weeknames span{background:#cfe1fc;color:#163c76;border-radius:5px;font-weight:800;font-size:12px}
-.cal-page .cal-days{gap:3px}
-.cal-page .cal-day{background:#202d42;border:1px solid #3c506e;border-radius:6px;color:#e6f0ff;box-shadow:inset 0 1px 0 rgba(255,255,255,.08);transition:background .15s,border-color .15s,box-shadow .15s}
-.cal-page .cal-day:hover{background:#304766;border-color:#77b7ff}
-.cal-page .cal-day.chosen{background:#254e84;outline:2px solid #8ec5ff;outline-offset:-2px}
-.cal-page .cal-day.outside{opacity:.48}
-.cal-page .cal-day>span{font-size:13px;color:#e8f2ff}
-.cal-page .cal-day small{background:#145a51;color:#c6ffed;border-left:3px solid #62e2bc;border-radius:4px;font-size:10px}
-.cal-page .cal-day small.reserve{background:#594523;color:#ffe8b2;border-left-color:#ffce75}
-@media(max-width:760px){.cal-page .fullcal{padding:12px}.cal-page .cal-weeknames span{font-size:11px}.cal-page .cal-day{min-height:75px}}
-
-
-/* Correção de contraste: regras globais do tema claro estavam prevalecendo sobre a Agenda. */
-.cal-page .fullcal .cal-scroller,.cal-page .fullcal .cal-grid,.cal-page .fullcal .cal-days{background:#07152d!important}
-.cal-page .fullcal .cal-days>.cal-day{background:#243249!important;color:#eaf3ff!important;border-color:#425677!important;opacity:1}
-.cal-page .fullcal .cal-days>.cal-day.outside{background:#17243a!important;opacity:.7}
-.cal-page .fullcal .cal-days>.cal-day:hover{background:#344c6e!important}
-.cal-page .fullcal .cal-days>.cal-day.chosen{background:#28548c!important;outline:2px solid #9dccff!important}
-.cal-page .fullcal .cal-days>.cal-day>span{color:#f4f8ff!important;opacity:1!important;font-size:13px!important;font-weight:800!important}
-.cal-page .fullcal .cal-days>.cal-day.outside>span{color:#afc3e4!important}
-.cal-page .fullcal .cal-days>.cal-day small{color:#d6ffef!important;background:#145a51!important}
-.cal-page .fullcal .cal-days>.cal-day small.reserve{color:#fff0cb!important;background:#594523!important}
+/* Agenda: somente a faixa do mês recebe destaque azul; grade e dias preservam o tema claro original. */
+.cal-page .cal-toolbar{background:linear-gradient(105deg,#12356c,#1b5cb3)!important;border:1px solid #3273c2;box-shadow:0 6px 16px rgba(12,49,108,.18)!important;border-radius:10px}
