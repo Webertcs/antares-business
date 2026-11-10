@@ -8,7 +8,8 @@ const safeDb = async () => {
   const db = getTeamWriteDb();
   const checks = await db`SELECT current_user='antares_team_runtime' AND NOT rolsuper AND NOT rolbypassrls AS safe_role,
     (SELECT count(*)=2 FROM pg_proc p WHERE p.pronamespace='public'::regnamespace
-    AND p.proname IN ('antares_save_checklist_template','antares_read_checklist_template')
+    AND p.oid IN ('public.antares_save_checklist_template(text,jsonb)'::regprocedure,
+                  'public.antares_read_checklist_template(text)'::regprocedure)
     AND p.prosecdef AND pg_get_userbyid(p.proowner)='neondb_owner'
     AND has_function_privilege(current_user,p.oid,'EXECUTE')
     AND NOT EXISTS(SELECT 1 FROM aclexplode(coalesce(p.proacl,acldefault('f',p.proowner))) acl
