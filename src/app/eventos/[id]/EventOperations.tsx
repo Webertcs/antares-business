@@ -42,7 +42,7 @@ export default function EventOperations({eventId}:{eventId:string}){
     if(!res.ok){const result=await res.json().catch(()=>({}));throw Error((result.error||'Falha ao incluir item.')+' '+added+' de '+missing.length+' itens adicionados.');}
     added++;
    }
-   setData(await load());setMessage(added+' novo(s) item(ns) adicionados. Marcações anteriores preservadas.');setFeedbackKind('success');
+   setData(await load());setMessage(added+' novo(s) item(ns) adicionados.');setFeedbackKind('success');
   }catch(e){try{setData(await load())}catch{}setMessage(e instanceof Error?e.message:'Erro ao atualizar checklist.');setFeedbackKind('error');}
   finally{setSyncing(false);}
  }
