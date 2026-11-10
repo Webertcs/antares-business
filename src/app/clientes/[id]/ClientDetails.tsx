@@ -238,7 +238,7 @@ export default function ClientDetails({id,writesEnabled,proposalWritesEnabled,co
  <div style={{fontSize:12,fontWeight:700,letterSpacing:1.5,color:'#b8dcff'}}>ANTARES · CLIENTES</div>
  <h1 style={{fontSize:25,lineHeight:1.25,margin:'5px 0 0'}}>{client.name}</h1>
  <div style={{fontSize:13,marginTop:5}}>{kinds[client.kind]||client.kind} · {client.city||'Cidade não informada'} · {statuses[client.status]||client.status}</div>
- <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(min(100%,220px),1fr))',gap:'9px 20px',marginTop:12,paddingTop:10,borderTop:'1px solid rgba(205,227,255,.34)'}}>
+ <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(min(100%,145px),1fr))',gap:'9px 20px',marginTop:12,paddingTop:10,borderTop:'1px solid rgba(205,227,255,.34)'}}>
  {([['Telefone',client.phone||'—'],...(client.phone_secondary?[['Telefone secundário',client.phone_secondary]]:[]),['E-mail',client.email||'—'],['Tipo',kinds[client.kind]||client.kind]] as [string,string][]).map(([label,value])=><div key={label} style={{minWidth:0}}><div style={{fontSize:12,fontWeight:650,color:'#b8dcff'}}>{label}</div><div style={{fontSize:14,lineHeight:1.4,overflowWrap:'anywhere',wordBreak:'normal',marginTop:2}}>{value}</div></div>)}
  </div>
  </header>
