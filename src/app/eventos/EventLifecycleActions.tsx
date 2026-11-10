@@ -13,9 +13,9 @@ export default function EventLifecycleActions({eventId,status,archived=false,onC
    setAction(null);setReason('');onChanged?.();router.refresh();
   }catch(e){setError(e instanceof Error?e.message:'Erro ao atualizar evento.');}finally{setBusy(false);}
  }
- return <div style={{display:'flex',gap:8,alignItems:'center',flexWrap:'wrap',marginTop:8}}>
-  {archived?<button type="button" onClick={()=>{setAction('restore');setError('');}} style={{padding:'7px 10px',borderRadius:8,border:'1px solid #b8cdee',background:'#edf5ff',color:'#174985'}}>Restaurar</button>:<>
-  {!closed&&<button type="button" onClick={()=>{setAction('cancel');setError('');}} style={{padding:'7px 10px',borderRadius:8,border:'1px solid #e8c6c6',background:'#fff2f2',color:'#9b3232'}}>Cancelar evento</button>}
+ return <div style={{display:'flex',gap:8,alignItems:'center',flexWrap:'wrap',marginTop:0}}>
+  {archived?<button type="button" onClick={()=>{setAction('restore');setError('');}} style={{padding:'7px 10px',minHeight:34,fontSize:12,fontWeight:600,borderRadius:8,border:'1px solid #b8cdee',background:'#edf5ff',color:'#174985'}}>Restaurar</button>:<>
+  {!closed&&<button type="button" onClick={()=>{setAction('cancel');setError('');}} style={{padding:'7px 10px',borderRadius:8,border:'1px solid #e8c6c6',background:'#fff2f2',color:'#9b3232'}}>Cancelar</button>}
   {!['confirmed','reserved','completed'].includes(status)&&<button type="button" onClick={()=>{setAction('archive');setError('');}} style={{padding:'7px 10px',borderRadius:8,border:'1px solid #b8cdee',background:'#edf5ff',color:'#174985'}}>Arquivar</button>}
   </>}
   {action&&<div role="dialog" aria-modal="true" aria-label="Confirmar alteração do evento" style={{position:'fixed',inset:0,zIndex:1000,background:'rgba(5,21,52,.65)',display:'grid',placeItems:'center',padding:16}}>
