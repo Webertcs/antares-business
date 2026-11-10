@@ -1,4 +1,3 @@
-import Link from 'next/link';
 import {redirect} from 'next/navigation';
 import {requireOwner,getDb} from '@/lib/equipe/auth';
 import NovaCupula from './NovaCupula';
@@ -50,8 +49,7 @@ export default async function CupulasPage(){
  const active=domes.filter(d=>d.active).length;
  const domeNames=(items:Dome[])=>{const names=items.slice(0,3).map(d=>d.name);return <p className="operation-metric-names">{names.length?names.join(' · '):'Nenhuma'}{items.length>3?` · +${items.length-3} outras`:''}</p>};
  return <main className="operation-detail">
-  <Link className="operation-detail-back" href="/?section=operacao">← Voltar</Link>
-  <header className="operation-detail-head"><div><h1>Cúpulas</h1><p>Estrutura e programação do planetário.</p></div></header>
+  <style>{`\n.operation-detail:has(.operation-dome-unified) .operation-detail-metrics>div{background:linear-gradient(145deg,#f8fbff,#dcecff);border:1px solid #b8d2f6;border-radius:14px;box-shadow:0 7px 20px rgba(25,83,161,.12);padding:18px}\n.operation-detail .operation-dome-unified{background:linear-gradient(145deg,#f1f7ff,#e2eeff);border:1px solid #b9d3f6;border-radius:16px;box-shadow:0 12px 28px rgba(25,83,161,.12)}\n.operation-detail .operation-dome-card{background:linear-gradient(150deg,#fff,#eaf3ff);border:1px solid #c4d9f5;border-radius:14px;box-shadow:0 6px 16px rgba(20,72,145,.11)}\n.operation-detail .operation-domes-heading{border-bottom:2px solid #c9ddf9;padding-bottom:12px}\n.operation-detail .operation-reservations{border-top:2px solid #c9ddf9;margin-top:16px;padding-top:14px}\n`}</style>
   {domeError?<p className="operation-detail-warning" role="alert">Não foi possível consultar as cúpulas neste momento.</p>:<>
    <div className="operation-detail-metrics">
     <div><span>Cúpulas cadastradas</span><strong>{domes.length}</strong>{domeNames(domes)}</div>
