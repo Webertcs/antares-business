@@ -15,7 +15,7 @@ export default function NovaCupula({enabled}:{enabled:boolean}){
    const response=await fetch('/api/agenda/preparar',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'create-dome',name:name.trim(),code:code.trim(),capacity:Number(capacity)})});
    const body=await response.json();
    if(!response.ok)throw Error(body.error||'Não foi possível cadastrar a cúpula.');
-   setOpen(false);setName('');setCode('');setCapacity('30');setMessage('Cúpula cadastrada e vinculada com sucesso.');router.refresh();
+   setOpen(false);setName('');setCode('');setCapacity('30');setMessage('Cúpula cadastrada e vinculada com sucesso.');router.refresh();window.dispatchEvent(new Event('antares:cupulas-atualizadas'));
   }catch(error){setMessage(error instanceof Error?error.message:'Não foi possível salvar.');}
   finally{setSaving(false)}
  }
