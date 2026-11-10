@@ -14,7 +14,10 @@ const safeDb = async () => {
     AND NOT EXISTS(SELECT 1 FROM aclexplode(coalesce(p.proacl,acldefault('f',p.proowner))) acl
       WHERE acl.grantee=0 AND acl.privilege_type='EXECUTE')) AS safe_functions
     FROM pg_roles WHERE rolname=current_user`;
-  if(!checks[0]?.safe_role || !checks[0]?.safe_functions) throw new Error('Permissões não verificadas');
+  if(!checks[0]?.safe_role || !checks[0]?.safe_functions) {
+    console.error('[ANTARES][checklist] Diagnóstico de permissões:', {safe_role: checks[0]?.safe_role === true, safe_functions: checks[0]?.safe_functions === true});
+    throw new Error('Permissões não verificadas');
+  }
   return db;
 };
 export async function GET(){
