@@ -20,6 +20,7 @@ export default function CupulasInline(){
   finally{setLoading(false)}
  },[]);
  useEffect(()=>{void load()},[load]);
+ useEffect(()=>{const onUpdate=()=>{void load()};window.addEventListener('antares:cupulas-atualizadas',onUpdate);return()=>window.removeEventListener('antares:cupulas-atualizadas',onUpdate)},[load]);
  const active=domes.filter(d=>d.active);
  const mapped=domes.filter(d=>d.mapped);
  const names=(items:Dome[])=>items.slice(0,3).map(d=>d.name).join(' · ')||'Nenhuma';
