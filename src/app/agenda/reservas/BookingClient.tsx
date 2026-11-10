@@ -59,7 +59,24 @@ export default function BookingClient({enabled}:{enabled:boolean}){
  try{const r=await fetch('/api/agenda/reservas',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({proposalId,domeId,start:new Date(start).toISOString(),end:new Date(end).toISOString()})});const v=await r.json();if(!r.ok)throw Error(v.error||'Reserva não registrada');await load();setStatus('Reserva registrada. Consulte a Agenda.');setProposalId('');setDomeId('');}
  catch(e){setStatus(e instanceof Error?e.message:'Erro');}finally{setBusy(false)}}
  return <main className="booking-refined">
- <div className="booking-heading"><div><h1>Reservas</h1><p>Agende apresentações com cúpulas e instituições vinculadas.</p></div></div>
+ <style>{`
+ .booking-refined{color:#173d77}
+ .booking-refined .booking-panel{background:linear-gradient(145deg,#f7fbff 0%,#e7f1ff 100%);border:1px solid #bdd5f6;border-radius:16px;box-shadow:0 10px 25px rgba(27,78,153,.12);padding:18px}
+ .booking-refined .booking-section-heading h2{color:#154987;font-weight:800}
+ .booking-refined .booking-metrics>div{background:linear-gradient(155deg,#fff,#eaf3ff);border:1px solid #c3d9f7;border-radius:12px;box-shadow:0 5px 13px rgba(29,78,156,.09);padding:14px}
+ .booking-refined .booking-metrics strong{color:#174c9a}
+ .booking-refined .booking-readiness-row{background:linear-gradient(145deg,#fff,#f1f7ff);border:1px solid #c3d8f5;border-radius:12px;box-shadow:0 4px 12px rgba(27,74,143,.09);padding:12px}
+ .booking-refined button:not(:disabled){cursor:pointer}
+ .booking-refined button:disabled{opacity:.5;cursor:not-allowed}
+ .booking-refined .booking-panel button:not(:disabled):hover{filter:brightness(.96);box-shadow:0 3px 10px rgba(26,76,150,.16)}
+ .booking-refined input,.booking-refined select{background:#fff;border:1px solid #b8d0f2;border-radius:9px;color:#204778;box-shadow:0 2px 6px rgba(35,84,155,.05)}
+ .booking-refined .booking-pill{background:#dbeafe;color:#1e4e9d;border-radius:999px;padding:6px 10px;font-weight:700}
+ .booking-refined .booking-calendar-link{background:linear-gradient(100deg,#1d4ed8,#1767cf);color:#fff;border:0;border-radius:10px;box-shadow:0 5px 13px rgba(29,78,216,.22);text-align:center;padding:10px 14px}
+ .booking-refined .booking-form>button{box-shadow:0 5px 12px rgba(29,78,216,.2);font-weight:700}
+ .booking-refined .booking-pagination-button{border:1px solid #b5cff6;border-radius:8px;padding:8px 13px;background:#e6f0ff;color:#1854a5;font-weight:700}
+ .booking-refined .booking-history-button{background:linear-gradient(110deg,#1d4ed8,#2873d5);color:#fff;border:0;border-radius:9px;padding:10px 16px;font-weight:700;box-shadow:0 5px 13px rgba(29,78,216,.18)}
+ .booking-refined .booking-secondary-panel{background:linear-gradient(150deg,#f8fbff,#e9f3ff);border:1px solid #bfd5f5;border-radius:14px;box-shadow:0 7px 18px rgba(27,78,153,.1);padding:18px;margin-top:20px;display:grid;gap:12px}
+ `}</style>
  {status&&<p role="status" className="booking-status">{status}</p>}
  <section className="booking-panel" aria-labelledby="booking-readiness-heading">
   <div className="booking-section-heading"><h2 id="booking-readiness-heading">Resumo das reservas</h2><span className="booking-pill">{enabled?'Cadastro disponível':'Somente consulta'}</span></div>
@@ -78,12 +95,12 @@ export default function BookingClient({enabled}:{enabled:boolean}){
   </div>
   <div className="booking-readiness-list">{bookings.slice((currentPage-1)*10,currentPage*10).map(b=><div key={b.presentation_id} className="booking-readiness-row"><div><strong>{b.proposal?.client_name||'Instituição não identificada'}</strong><span>{b.proposal?.title||'Proposta não identificada'} · {formatDate(b.starts_at)} · {b.dome_name||'Cúpula não informada'}</span></div><div style={{display:'flex',gap:10,alignItems:'center',flexWrap:'wrap'}}><span className="booking-ready">{b.status==='reserved'?'Reservada':b.status==='confirmed'?'Confirmada':b.status==='completed'?'Concluída':b.status==='cancelled'?'Cancelada':b.status}</span><button type="button" onClick={()=>openDetails(b.presentation_id)} style={{border:'1px solid #b7cbee',background:'#fff',color:'#1d4ed8',padding:'7px 12px',borderRadius:8,cursor:'pointer'}}>Ver detalhes</button></div></div>)}</div>
   {data&&bookings.length===0&&<p className="booking-empty">Nenhuma reserva encontrada para os filtros selecionados.</p>}
-  <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',gap:12,marginTop:12,flexWrap:'wrap'}}><span style={{fontSize:13}}>Exibindo {bookings.length?((currentPage-1)*10+1):0}–{Math.min(currentPage*10,bookings.length)} de {bookings.length} reservas</span><div style={{display:'flex',alignItems:'center',gap:8}}><button type="button" disabled={currentPage<=1} onClick={()=>setPage(p=>Math.max(1,p-1))}>Anterior</button><span>{currentPage} de {pageCount}</span><button type="button" disabled={currentPage>=pageCount} onClick={()=>setPage(p=>Math.min(pageCount,p+1))}>Próxima</button></div></div>
-  <div style={{marginTop:14}}><button type="button" onClick={()=>void openHistory()} style={{background:'#e8eefc',color:'#1d4ed8',border:'1px solid #b7cbee',borderRadius:8,padding:'9px 14px',cursor:'pointer'}}>Histórico de alterações</button></div>
+  <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',gap:12,marginTop:12,flexWrap:'wrap'}}><span style={{fontSize:13}}>Exibindo {bookings.length?((currentPage-1)*10+1):0}–{Math.min(currentPage*10,bookings.length)} de {bookings.length} reservas</span><div style={{display:'flex',alignItems:'center',gap:8}}><button type="button" className="booking-pagination-button" disabled={currentPage<=1} onClick={()=>setPage(p=>Math.max(1,p-1))}>Anterior</button><span>{currentPage} de {pageCount}</span><button type="button" className="booking-pagination-button" disabled={currentPage>=pageCount} onClick={()=>setPage(p=>Math.min(pageCount,p+1))}>Próxima</button></div></div>
+  <div style={{marginTop:14}}><button type="button" className="booking-history-button" onClick={()=>void openHistory()} style={{background:'#e8eefc',color:'#1d4ed8',border:'1px solid #b7cbee',borderRadius:8,padding:'9px 14px',cursor:'pointer'}}>Histórico de alterações</button></div>
   {data?.domes.length?<p className="booking-dome-names">Cúpulas: {data.domes.map(d=>d.name+(d.mapped?' ✓':' — vínculo pendente')).join(' · ')}</p>:data&&<p className="booking-empty">Ainda não há cúpulas cadastradas. Utilize a página Cúpulas para consultar a estrutura.</p>}
   {!enabled&&<p className="booking-readonly">Os agendamentos ainda não estão liberados para gravação. A configuração será validada antes da entrega.</p>}
  </section>
- {enabled&&data&&data.proposals.some(p=>!p.mapped)&&<section style={{border:'1px solid #bdcce4',padding:18,borderRadius:12,marginTop:20,display:'grid',gap:12}}>
+ {enabled&&data&&data.proposals.some(p=>!p.mapped)&&<section className="booking-secondary-panel">
  <h2>Preparar cadastros para a primeira reserva</h2>
  <p>Vincule a instituição da proposta aceita. Cadastre a cúpula na área Cúpulas.</p>
  {data.proposals.filter(p=>!p.mapped).map(p=><button disabled={busy} key={p.id} onClick={()=>prepare({action:'link-client',proposalId:p.id})} style={{padding:12}}>Vincular cliente: {p.client_name}</button>)}
