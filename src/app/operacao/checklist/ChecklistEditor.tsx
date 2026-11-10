@@ -41,17 +41,15 @@ export default function ChecklistEditor(){
   }catch(error){setMessage(error instanceof Error?error.message:'Falha ao salvar');}
   finally{setSaving(false);}
  }
- const button:React.CSSProperties={border:'1px solid #b8d0f4',borderRadius:8,padding:'7px 11px',color:'#174987',background:'#fff',cursor:'pointer'};
- return <section style={{background:'#eef5ff',border:'1px solid #c9dcf7',borderRadius:14,padding:24,marginTop:18}}>
+ const button:React.CSSProperties={border:'1px solid #b8d0f4',borderRadius:8,padding:'5px 9px',color:'#174987',background:'#fff',cursor:'pointer'};
+ return <section style={{background:'#eef5ff',border:'1px solid #c9dcf7',borderRadius:14,padding:18,marginTop:12}}>
   <h2 style={{fontSize:19,fontWeight:750,margin:'0 0 8px'}}>Modelo padrão do planetário</h2>
-  <p style={{lineHeight:1.5,margin:'0 0 16px'}}>Crie o checklist uma única vez. Este modelo será usado na preparação dos próximos eventos, sem alterar registros antigos.</p>
   {loading?<p>Carregando modelo...</p>:<>
-   <p style={{fontSize:13,margin:'0 0 12px',color:'#42658f'}}>{items.length} de 80 itens {changed?'· Alterações não salvas':'· Modelo atualizado'}</p>
    {items.length===0&&<p style={{padding:14,background:'#fff',borderRadius:8}}>Nenhum item cadastrado. Comece adicionando a primeira tarefa.</p>}
-   <div style={{display:'grid',gap:9}}>
-    {items.map((item,index)=><div key={index} style={{display:'flex',alignItems:'center',gap:8,background:'#fff',border:'1px solid #d4e2f5',borderRadius:10,padding:9}}>
-     <span style={{minWidth:25,fontWeight:700,color:'#5276a3'}}>{index+1}.</span>
-     <input aria-label={`Item ${index+1}`} value={item} disabled={!canEdit} maxLength={160} onChange={e=>setItems(previous=>previous.map((v,i)=>i===index?e.target.value:v))} style={{flex:1,minWidth:0,padding:8,border:'1px solid #c8d8ef',borderRadius:7,color:'#163d73',background:'#fff'}}/>
+   <div style={{display:'grid',gap:6}}>
+    {items.map((item,index)=><div key={index} style={{display:'flex',alignItems:'center',gap:8,background:'#fff',border:'1px solid #d4e2f5',borderRadius:10,padding:5}}>
+     <span style={{minWidth:22,fontWeight:700,color:'#5276a3'}}>{index+1}.</span>
+     <input aria-label={`Item ${index+1}`} value={item} disabled={!canEdit} maxLength={160} onChange={e=>setItems(previous=>previous.map((v,i)=>i===index?e.target.value:v))} style={{flex:1,minWidth:0,padding:6,border:'1px solid #c8d8ef',borderRadius:7,color:'#163d73',background:'#fff'}}/>
      {canEdit&&<>
       <button type="button" style={button} title="Mover para cima" disabled={index===0} onClick={()=>move(index,-1)}>↑</button>
       <button type="button" style={button} title="Mover para baixo" disabled={index===items.length-1} onClick={()=>move(index,1)}>↓</button>
@@ -59,6 +57,7 @@ export default function ChecklistEditor(){
      </>}
     </div>)}
    </div>
+   <p style={{fontSize:13,margin:'10px 0 0',color:'#42658f'}}>{items.length} de 80 itens{changed?' · Alterações não salvas':''}</p>
    {canEdit&&<><div style={{display:'flex',gap:8,marginTop:16,flexWrap:'wrap'}}>
     <input aria-label="Nova tarefa" placeholder="Ex.: Conferir projetor e cabos" maxLength={160} value={newItem} onChange={e=>setNewItem(e.target.value)} onKeyDown={e=>{if(e.key==='Enter'){e.preventDefault();add();}}} style={{flex:'1 1 240px',padding:12,border:'1px solid #b8d0f4',borderRadius:9,color:'#163d73',background:'#fff'}}/>
     <button type="button" onClick={add} style={{...button,background:'#dceafe',fontWeight:700}}>+ Adicionar item</button>
