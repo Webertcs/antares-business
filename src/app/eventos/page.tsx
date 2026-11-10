@@ -34,8 +34,16 @@ export default async function Page({searchParams}:{searchParams:Promise<Params>}
  AND (${status}='all' OR e.status=${status} OR (${status}='cancelled' AND e.status='canceled'))
  AND (${q}='' OR e.title ILIKE ${'%'+q+'%'} OR c.name ILIKE ${'%'+q+'%'})
  AND (${view}='all' OR (${view}='upcoming' AND (e.event_date>=CURRENT_DATE OR e.event_date IS NULL) AND e.status NOT IN ('completed','cancelled','canceled')) OR (${view}='history' AND (e.archived_at IS NOT NULL OR e.event_date<CURRENT_DATE OR e.status IN ('completed','cancelled','canceled'))))
- ORDER BY CASE WHEN ${view}='upcoming' THEN e.event_date END ASC NULLS LAST,
- CASE WHEN ${view}<>'upcoming' THEN e.event_date END DESC NULLS LAST,e.created_at DESC
+ ORDER BY
+ CASE WHEN ${view}='all' THEN
+  CASE WHEN e.event_date IS NULL THEN 2
+       WHEN e.event_date>=CURRENT_DATE AND e.status NOT IN ('completed','cancelled','canceled') AND e.archived_at IS NULL THEN 0
+       ELSE 1 END
+ ELSE 0 END ASC,
+ CASE WHEN ${view}='upcoming' OR (${view}='all' AND e.event_date>=CURRENT_DATE AND e.status NOT IN ('completed','cancelled','canceled') AND e.archived_at IS NULL) THEN e.event_date END ASC NULLS LAST,
+ CASE WHEN ${view}='history' OR (${view}='all' AND (e.event_date<CURRENT_DATE OR e.status IN ('completed','cancelled','canceled') OR e.archived_at IS NOT NULL)) THEN e.event_date END DESC NULLS LAST,
+ CASE WHEN e.event_date IS NULL THEN c.name END ASC,
+ e.created_at DESC,e.id ASC
  LIMIT 10 OFFSET ${(current-1)*10}`;
  const events=rows.map(r=>({id:String(r.id),title:String(r.title),date:r.event_date?(r.event_date instanceof Date?r.event_date.toISOString().slice(0,10):/^\d{4}-\d{2}-\d{2}/.test(String(r.event_date))?String(r.event_date).slice(0,10):new Date(String(r.event_date)).toISOString().slice(0,10)):null,status:String(r.status||''),attendees:r.expected_attendees==null?null:Number(r.expected_attendees),client:String(r.client_name),archived:!!r.archived_at}));
  return <RelationshipShell title="Eventos"><main style={{maxWidth:1100,margin:'0 auto',padding:'24px clamp(14px,2.5vw,26px)',color:'#163968'}}>
