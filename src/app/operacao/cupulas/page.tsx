@@ -7,49 +7,20 @@ export const dynamic='force-dynamic';
 export const runtime='nodejs';
 
 type Dome={id:string;name:string;code:string|null;capacity:number|null;active:boolean;mapped:boolean};
-type Booking={id:string;title:string;dome_name:string;starts_at:string;ends_at:string;status:string};
-type Summary={accepted:number;linked_clients:number;linked_domes:number;reservations:number};
-const fmt=new Intl.DateTimeFormat('pt-BR',{dateStyle:'short',timeStyle:'short',timeZone:'America/Sao_Paulo'});
-const safeDate=(value:string)=>{const d=new Date(value);return Number.isFinite(d.getTime())?fmt.format(d):'Data indisponível'};
 export default async function CupulasPage(){
  const owner=await requireOwner();if(!owner)redirect('/sem-acesso');
  const db=getDb();
- const results=await Promise.allSettled([
-  db`SELECT d.id,d.name,d.code,d.capacity,d.active,
+ const domesResult=await Promise.allSettled([db`SELECT d.id,d.name,d.code,d.capacity,d.active,
     EXISTS(SELECT 1 FROM public.antares_dome_links l
      WHERE l.organization_id=d.organization_id AND l.antares_dome_id=d.id) AS mapped
    FROM public.antares_domes d WHERE d.organization_id=${owner.organizationId}
-   ORDER BY d.active DESC,d.name ASC`,
-  db`SELECT
-    (SELECT count(*)::int FROM public.business_proposals p
-     WHERE p.organization_id=${owner.organizationId} AND p.status='accepted') AS accepted,
-    (SELECT count(*)::int FROM public.business_proposals p
-     JOIN public.antares_client_links l ON l.organization_id=p.organization_id AND l.crm_client_id=p.client_id
-     WHERE p.organization_id=${owner.organizationId} AND p.status='accepted') AS linked_clients,
-    (SELECT count(*)::int FROM public.antares_dome_links l
-     JOIN public.antares_domes d ON d.id=l.antares_dome_id AND d.organization_id=l.organization_id
-     WHERE l.organization_id=${owner.organizationId} AND d.active) AS linked_domes,
-    (SELECT count(*)::int FROM public.antares_proposal_reservations r
-     WHERE r.organization_id=${owner.organizationId}) AS reservations`,
-  db`SELECT p.id,p.title,COALESCE(d.name,'Cúpula não identificada') AS dome_name,
-     p.starts_at,p.ends_at,p.status
-     FROM public.antares_proposal_reservations r
-     JOIN public.presentations p ON p.id=r.presentation_id AND p.organization_id=r.organization_id
-     LEFT JOIN public.antares_dome_links l ON l.organization_id=p.organization_id AND l.equipment_id=p.dome_id
-     LEFT JOIN public.antares_domes d ON d.id=l.antares_dome_id AND d.organization_id=l.organization_id
-     WHERE r.organization_id=${owner.organizationId}
-       AND p.starts_at>=now() AND p.status NOT IN ('cancelled','canceled')
-     ORDER BY p.starts_at ASC LIMIT 5`
- ]);
- const domes=results[0].status==='fulfilled'?results[0].value as Dome[]:[];
- const summary=results[1].status==='fulfilled'?(results[1].value[0] as Summary):null;
- const upcoming=results[2].status==='fulfilled'?results[2].value as Booking[]:[];
- const domeError=results[0].status==='rejected';
- const reservationsError=results[1].status==='rejected'||results[2].status==='rejected';
+   ORDER BY d.active DESC,d.name ASC`]);
+ const domes=domesResult[0].status==='fulfilled'?domesResult[0].value as Dome[]:[];
+ const domeError=domesResult[0].status==='rejected';
  const active=domes.filter(d=>d.active).length;
  const domeNames=(items:Dome[])=>{const names=items.slice(0,3).map(d=>d.name);return <p className="operation-metric-names">{names.length?names.join(' · '):'Nenhuma'}{items.length>3?` · +${items.length-3} outras`:''}</p>};
  return <main className="operation-detail">
-  <style>{`\n.operation-detail:has(.operation-dome-unified) .operation-detail-metrics>div{background:linear-gradient(145deg,#f8fbff,#dcecff);border:1px solid #b8d2f6;border-radius:14px;box-shadow:0 7px 20px rgba(25,83,161,.12);padding:18px}\n.operation-detail .operation-dome-unified{background:linear-gradient(145deg,#f1f7ff,#e2eeff);border:1px solid #b9d3f6;border-radius:16px;box-shadow:0 12px 28px rgba(25,83,161,.12)}\n.operation-detail .operation-dome-card{background:linear-gradient(150deg,#fff,#eaf3ff);border:1px solid #c4d9f5;border-radius:14px;box-shadow:0 6px 16px rgba(20,72,145,.11)}\n.operation-detail .operation-domes-heading{border-bottom:2px solid #c9ddf9;padding-bottom:12px}\n.operation-detail .operation-reservations{border-top:2px solid #c9ddf9;margin-top:16px;padding-top:14px}\n`}</style>
+  <style>{`\n.operation-detail:has(.operation-dome-unified) .operation-detail-metrics>div{background:linear-gradient(145deg,#f8fbff,#dcecff);border:1px solid #b8d2f6;border-radius:14px;box-shadow:0 7px 20px rgba(25,83,161,.12);padding:18px}\n.operation-detail .operation-dome-unified{background:linear-gradient(145deg,#f1f7ff,#e2eeff);border:1px solid #b9d3f6;border-radius:16px;box-shadow:0 12px 28px rgba(25,83,161,.12)}\n.operation-detail .operation-dome-card{background:linear-gradient(150deg,#fff,#eaf3ff);border:1px solid #c4d9f5;border-radius:14px;box-shadow:0 6px 16px rgba(20,72,145,.11)}\n.operation-detail .operation-domes-heading{border-bottom:2px solid #c9ddf9;padding-bottom:12px}\n`}</style>
   {domeError?<p className="operation-detail-warning" role="alert">Não foi possível consultar as cúpulas neste momento.</p>:<>
    <div className="operation-detail-metrics">
     <div><span>Cúpulas cadastradas</span><strong>{domes.length}</strong>{domeNames(domes)}</div>
@@ -65,23 +36,6 @@ export default async function CupulasPage(){
      <div><dt>Capacidade</dt><dd>{d.capacity?d.capacity+' pessoas':'Não informada'}</dd></div>
      <div><dt>Vínculo operacional</dt><dd>{d.mapped?'Vinculada':'Sem vínculo'}</dd></div></dl><GerenciarCupula dome={d} enabled={process.env.ANTARES_AGENDA_WRITES_ENABLED==='true'}/>
     </article>)}</div>}
-    <section className="operation-reservations" aria-labelledby="operation-reservations-title">
-     <div className="operation-reservations-head"><h2 id="operation-reservations-title">Reservas vinculadas</h2><span className="operation-reservations-badge">{summary?summary.reservations:'—'} registro(s)</span></div>
-     {reservationsError?<p role="alert" className="operation-detail-warning">Não foi possível consultar as reservas neste momento.</p>:<>
-      <div className="operation-reservations-metrics">
-       <div><span>Propostas aceitas</span><strong>{summary?.accepted??0}</strong></div>
-       <div><span>Propostas com cliente vinculado</span><strong>{summary?.linked_clients??0}</strong></div>
-       <div><span>Cúpulas aptas e vinculadas</span><strong>{summary?.linked_domes??0}</strong></div>
-      </div>
-      <h3>Próximas apresentações</h3>
-      {upcoming.length===0?<div className="operation-detail-empty operation-reservations-empty"><p>Nenhuma apresentação futura vinculada.</p><small>As reservas aparecerão aqui após sua confirmação.</small></div>:
-       <div className="operation-reservations-items">{upcoming.map(item=><article key={item.id} className="operation-reservation-item">
-        <div><strong>{item.title}</strong><span>{item.dome_name}</span></div>
-        <div><time dateTime={item.starts_at}>{safeDate(item.starts_at)}</time><span>Até {safeDate(item.ends_at)}</span></div>
-       </article>)}</div>}
-      {summary!==null&&summary.reservations>upcoming.length&&<p className="operation-reservations-more">Exibindo até cinco apresentações futuras. O histórico de reservas permanece disponível na Agenda.</p>}
-     </>}
-    </section>
    </section>
   </>}
  </main>;
