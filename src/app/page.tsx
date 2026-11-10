@@ -11,5 +11,5 @@ export default async function Home() {
   const context = await requireMember();
   if (!context) redirect('/sem-acesso');
   const isDeveloper = context.role === 'owner' && Boolean(process.env.ANTARES_DEVELOPER_SUBJECT) && process.env.ANTARES_DEVELOPER_SUBJECT === context.user.id;
-  return <DashboardClient role={context.role} profileKey={context.memberId} accountLabel={isDeveloper ? 'Proprietário / Desenvolvedor' : context.role === 'owner' ? 'Proprietário' : 'Colaborador'} />;
+  return <DashboardClient agendaWritesEnabled={process.env.ANTARES_AGENDA_WRITES_ENABLED==='true'} role={context.role} profileKey={context.memberId} accountLabel={isDeveloper ? 'Proprietário / Desenvolvedor' : context.role === 'owner' ? 'Proprietário' : 'Colaborador'} />;
 }
