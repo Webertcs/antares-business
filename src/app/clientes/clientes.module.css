@@ -168,3 +168,20 @@
 .clientsTable th:nth-child(4) {width:12%;}
 .clientsTable th:nth-child(5) {width:25%;}
 @media(max-width:900px) {.clientsTable {min-width:800px;}}
+
+/* Auditoria visual Clientes — 10/11/2026: legibilidade, escala e consistência. */
+.page {--client-blue:#174987;--client-border:#c6d9f4;--client-soft:#edf5ff;}
+.page .metric {border-color:var(--client-border);background:linear-gradient(125deg,#f3f8ff,#fff);box-shadow:0 5px 18px #1437680d;}
+.page .metric div {font-size:13px;font-weight:650;color:#42628b;}
+.page .metric strong {font-size:24px!important;line-height:1.25;color:#143e82;}
+.page .sectionHeading h2,.page .directoryHeader h2 {font-size:19px;font-weight:750;color:var(--client-blue);}
+.page .clientsTable td {font-size:13px!important;line-height:1.45;}
+.page .clientsTable .clientName {font-size:13px;line-height:1.4;}
+.page .clientsTable .actions button {font-size:12px!important;min-height:36px!important;padding:7px 8px!important;}
+.page .clientsTable th {font-size:12px;line-height:1.4;}
+.page .formFields label,.page .filterSearch,.page .filterKind {font-size:13px;}
+.page .formHeading h2,.page .historyHeading h2 {font-size:21px;line-height:1.3;}
+.page .historyBody h2 {font-size:21px;}
+.page .historyBody h3 {font-size:17px;}
+.page .caption,.page .sectionHeading p,.page .directoryHeader p {color:#426184;line-height:1.55;}
+@media(max-width:900px){.page .clientsTable {min-width:850px;}}
