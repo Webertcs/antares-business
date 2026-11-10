@@ -25,7 +25,7 @@ export default async function Page({searchParams}:{searchParams:Promise<Params>}
  AND (${q}='' OR e.title ILIKE ${'%'+q+'%'} OR c.name ILIKE ${'%'+q+'%'})
  AND (${view}='all' OR (${view}='upcoming' AND (e.event_date>=CURRENT_DATE OR e.event_date IS NULL) AND e.status NOT IN ('completed','cancelled','canceled')) OR (${view}='history' AND (e.archived_at IS NOT NULL OR e.event_date<CURRENT_DATE OR e.status IN ('completed','cancelled','canceled'))))`;
  const total=Number(totalRows[0]?.total||0);
- const pages=Math.max(1,Math.ceil(total/20));
+ const pages=Math.max(1,Math.ceil(total/10));
  const current=Math.min(page,pages);
  const rows=await db`SELECT e.id,e.title,e.event_date,e.status,e.expected_attendees,e.archived_at,c.name AS client_name
  FROM public.crm_events e JOIN public.crm_clients c ON c.id=e.client_id AND c.organization_id=e.organization_id
@@ -36,7 +36,7 @@ export default async function Page({searchParams}:{searchParams:Promise<Params>}
  AND (${view}='all' OR (${view}='upcoming' AND (e.event_date>=CURRENT_DATE OR e.event_date IS NULL) AND e.status NOT IN ('completed','cancelled','canceled')) OR (${view}='history' AND (e.archived_at IS NOT NULL OR e.event_date<CURRENT_DATE OR e.status IN ('completed','cancelled','canceled'))))
  ORDER BY CASE WHEN ${view}='upcoming' THEN e.event_date END ASC NULLS LAST,
  CASE WHEN ${view}<>'upcoming' THEN e.event_date END DESC NULLS LAST,e.created_at DESC
- LIMIT 20 OFFSET ${(current-1)*20}`;
+ LIMIT 10 OFFSET ${(current-1)*10}`;
  const events=rows.map(r=>({id:String(r.id),title:String(r.title),date:r.event_date?(r.event_date instanceof Date?r.event_date.toISOString().slice(0,10):/^\d{4}-\d{2}-\d{2}/.test(String(r.event_date))?String(r.event_date).slice(0,10):new Date(String(r.event_date)).toISOString().slice(0,10)):null,status:String(r.status||''),attendees:r.expected_attendees==null?null:Number(r.expected_attendees),client:String(r.client_name),archived:!!r.archived_at}));
  return <RelationshipShell title="Eventos"><main style={{maxWidth:1100,margin:'0 auto',padding:'24px clamp(14px,2.5vw,26px)',color:'#163968'}}>
  <header style={{marginBottom:16,padding:'20px clamp(16px,2.5vw,24px)',borderRadius:14,background:'linear-gradient(110deg,#0d2455 0%,#0c3c91 60%,#0860ba 100%)',boxShadow:'0 5px 14px rgba(11,47,111,.14)'}}>
