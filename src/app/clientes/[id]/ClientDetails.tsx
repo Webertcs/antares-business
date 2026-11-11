@@ -49,7 +49,8 @@ export default function ClientDetails({id,writesEnabled,proposalWritesEnabled,co
  const [commercialForm,setCommercialForm]=useState<'proposal'|'contract'|null>(null);
  const [commercialBusy,setCommercialBusy]=useState(false);
  const [commercialFeedback,setCommercialFeedback]=useState('');
- const [proposalDraft,setProposalDraft]=useState({title:'',model:'per_student',attendees:'30',unitPrice:'10',fixedPrice:'0',discount:'0',deposit:'0',validUntil:'',notes:''});
+ const emptyProposalDraft={title:'',model:'',attendees:'',unitPrice:'',fixedPrice:'',discount:'',deposit:'',validUntil:'',notes:''};
+ const [proposalDraft,setProposalDraft]=useState(emptyProposalDraft);
  const [contractDraft,setContractDraft]=useState({proposalId:'',mode:'written',terms:''});
  const commercialDialog=useRef<HTMLDialogElement>(null);
  useEffect(()=>{if(commercialForm)commercialDialog.current?.showModal();else commercialDialog.current?.close()},[commercialForm]);
@@ -75,6 +76,7 @@ export default function ClientDetails({id,writesEnabled,proposalWritesEnabled,co
    const result=await response.json();
    if(!response.ok)throw Error(result.error||'Não foi possível salvar');
    setCommercialForm(null);await refreshCommercial();
+   if(action==='proposal')setProposalDraft({...emptyProposalDraft});
    setCommercialFeedback(action==='proposal'?'Proposta cadastrada com sucesso.':'Contrato cadastrado com sucesso.');
   }catch(err){setCommercialFeedback(err instanceof Error?err.message:'Operação não concluída');}
   finally{setCommercialBusy(false);}
@@ -270,7 +272,7 @@ export default function ClientDetails({id,writesEnabled,proposalWritesEnabled,co
  {activeTab==='propostas'&&<section style={{...panel,borderLeftColor:'#169caa'}}><h2 style={heading}>Propostas e orçamentos ({proposals.length})</h2><p style={{fontSize:13}}>Propostas comerciais vinculadas a {client.name}.</p>
  {proposalWritesEnabled&&<form onSubmit={saveCommercial} style={{display:'grid',gap:12,maxWidth:680,padding:'14px 0 20px'}}><p style={{fontSize:13,margin:0}}>Instituição: <strong>{client.name}</strong> (vínculo fixo)</p>
  <label style={formLabel}>Título<input required maxLength={180} style={formInput} value={proposalDraft.title} onChange={e=>setProposalDraft(v=>({...v,title:e.target.value}))}/></label>
- <label style={formLabel}>Cobrança<select style={formInput} value={proposalDraft.model} onChange={e=>setProposalDraft(v=>({...v,model:e.target.value}))}><option value="per_student">Por aluno</option><option value="fixed">Valor fechado</option><option value="complimentary">Gratuito</option></select></label>
+ <label style={formLabel}>Cobrança<select required style={formInput} value={proposalDraft.model} onChange={e=>setProposalDraft(v=>({...v,model:e.target.value}))}><option value="" disabled>Selecione a cobrança</option><option value="per_student">Por aluno</option><option value="fixed">Valor fechado</option><option value="complimentary">Gratuito</option></select></label>
  <label style={formLabel}>Participantes previstos<input required type="number" min={0} step={1} style={formInput} value={proposalDraft.attendees} onChange={e=>setProposalDraft(v=>({...v,attendees:e.target.value}))}/></label>
  {proposalDraft.model==='per_student'&&<label style={formLabel}>Preço por aluno (R$)<input required type="number" min={0} step="0.01" style={formInput} value={proposalDraft.unitPrice} onChange={e=>setProposalDraft(v=>({...v,unitPrice:e.target.value}))}/></label>}
  {proposalDraft.model==='fixed'&&<label style={formLabel}>Valor fechado (R$)<input required type="number" min={0} step="0.01" style={formInput} value={proposalDraft.fixedPrice} onChange={e=>setProposalDraft(v=>({...v,fixedPrice:e.target.value}))}/></label>}
@@ -278,7 +280,7 @@ export default function ClientDetails({id,writesEnabled,proposalWritesEnabled,co
  <label style={formLabel}>Sinal (R$)<input type="number" min={0} step="0.01" style={formInput} value={proposalDraft.deposit} onChange={e=>setProposalDraft(v=>({...v,deposit:e.target.value}))}/></label>
  <label style={formLabel}>Validade<input type="date" style={formInput} value={proposalDraft.validUntil} onChange={e=>setProposalDraft(v=>({...v,validUntil:e.target.value}))}/></label>
  <label style={formLabel}>Observações<textarea maxLength={4000} rows={3} style={formInput} value={proposalDraft.notes} onChange={e=>setProposalDraft(v=>({...v,notes:e.target.value}))}/></label>
- <p style={{margin:0}}>Total estimado: <strong>{money(Math.max(0,(proposalDraft.model==='per_student'?Number(proposalDraft.attendees)*Number(proposalDraft.unitPrice):proposalDraft.model==='fixed'?Number(proposalDraft.fixedPrice):0)-Number(proposalDraft.discount)))}</strong></p>
+ <p style={{margin:0}}>Total estimado: <strong>{proposalDraft.model?money(Math.max(0,(proposalDraft.model==='per_student'?Number(proposalDraft.attendees)*Number(proposalDraft.unitPrice):proposalDraft.model==='fixed'?Number(proposalDraft.fixedPrice):0)-Number(proposalDraft.discount))):'—'}</strong></p>
 <button type="submit" disabled={commercialBusy} style={{...actionLink,border:0,justifySelf:'start'}}>{commercialBusy?'Salvando…':'Salvar proposta'}</button></form>}
  <div role="group" aria-label="Filtrar propostas" style={{display:'flex',flexWrap:'wrap',gap:7,alignItems:'center',margin:'4px 0 12px'}}>
  {([['active','Ativas',proposals.length-archivedCount],['archived','Arquivadas',archivedCount],['all','Todas',proposals.length]] as const).map(([value,label,count])=><button key={value} type="button" aria-pressed={proposalFilter===value} onClick={()=>setProposalFilter(value)} style={{...actionLink,border:'1px solid #91b7e8',background:proposalFilter===value?'#145ac3':'#e6f1ff',color:proposalFilter===value?'#fff':'#174987'}}>{label} ({count})</button>)}
