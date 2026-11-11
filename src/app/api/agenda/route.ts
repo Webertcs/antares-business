@@ -19,7 +19,16 @@ export async function GET(){
       ORDER BY p.starts_at DESC LIMIT 1000`,
    db`SELECT id,name,active FROM public.antares_domes
       WHERE organization_id=${ctx.organizationId} ORDER BY name`,
-   db`SELECT id,client_id,title AS event_title,event_date,status,start_time,end_time,dome_id FROM public.crm_events WHERE organization_id=${ctx.organizationId} AND event_date IS NOT NULL ORDER BY event_date DESC LIMIT 1000`
+   db`SELECT e.id,e.client_id,e.title AS event_title,e.event_date,e.status,e.start_time,e.end_time,e.dome_id
+      FROM public.crm_events e
+      WHERE e.organization_id=${ctx.organizationId}
+        AND e.event_date IS NOT NULL
+        AND NOT EXISTS (
+          SELECT 1 FROM public.antares_presentation_event_links l
+          JOIN public.presentations p ON p.id=l.presentation_id AND p.organization_id=e.organization_id
+          WHERE l.event_id=e.id AND l.organization_id=e.organization_id
+        )
+      ORDER BY e.event_date DESC LIMIT 1000`
   ]);
   return NextResponse.json({bookings,domes,crmEvents},{headers:{'Cache-Control':'private, no-store'}});
  }catch{return NextResponse.json({error:'Agenda indisponível. Confira a estrutura de apresentações.'},{status:503,headers:{'Cache-Control':'no-store'}});}
