@@ -87,6 +87,8 @@ export default function ClientDetails({id,writesEnabled,proposalWritesEnabled,co
  const [contractFor,setContractFor]=useState<string|null>(null);
  const [confirmContractId,setConfirmContractId]=useState<string|null>(null);
  const [contractResponsible,setContractResponsible]=useState('');
+ const [editingDocumentId,setEditingDocumentId]=useState<string|null>(null);
+ const [documentDraft,setDocumentDraft]=useState({title:'',institution:'',responsible:'',object:'',terms:''});
  const [confirmBusy,setConfirmBusy]=useState(false);
  async function confirmContract(contractId:string){
   if(confirmBusy||contractResponsible.trim().length<3)return;
@@ -313,6 +315,17 @@ export default function ClientDetails({id,writesEnabled,proposalWritesEnabled,co
  <div style={{fontSize:12}}>Modalidade: {modeNames[String(c.confirmation_mode)]||String(c.confirmation_mode||'Não informada')}</div>
  <div style={{fontSize:12}}>{status==='confirmed'?'Confirmado em '+dateBR(c.confirmed_at?String(c.confirmed_at):null):'Ainda não confirmado pelo cliente'}</div>
  {Boolean(c.confirmed_by_name)&&<div style={{fontSize:12}}>Responsável informado: {String(c.confirmed_by_name)}</div>}
+ <div style={{marginTop:10}}><button type="button" style={actionLink} onClick={()=>{const proposal=proposals.find(p=>String(p.id)===String(c.proposal_id));setDocumentDraft({title:String(c.proposal_title||'Contrato de prestação de serviços'),institution:client.name,responsible:String(c.confirmed_by_name||''),object:'Apresentação de planetário móvel — '+String(c.proposal_title||'serviço educacional'),terms:String(c.terms||c.agreed_terms||proposal?.notes||'')});setEditingDocumentId(contractId);}}>Elaborar documento</button></div>
+ {editingDocumentId===contractId&&<div style={{marginTop:12,padding:16,background:'#e9f3ff',border:'1px solid #9cc4f6',borderRadius:12,display:'grid',gap:12}}>
+ <strong style={{color:'#123c80'}}>Minuta do contrato · edição local</strong>
+ <p style={{margin:0,fontSize:12}}>Os campos foram preenchidos com informações disponíveis. Esta minuta ainda não é salva nem enviada. Confira tudo antes de utilizar.</p>
+ <label style={formLabel}>Título<input style={formInput} value={documentDraft.title} onChange={e=>setDocumentDraft(v=>({...v,title:e.target.value}))}/></label>
+ <label style={formLabel}>Instituição<input style={formInput} value={documentDraft.institution} onChange={e=>setDocumentDraft(v=>({...v,institution:e.target.value}))}/></label>
+ <label style={formLabel}>Representante<input style={formInput} value={documentDraft.responsible} onChange={e=>setDocumentDraft(v=>({...v,responsible:e.target.value}))}/></label>
+ <label style={formLabel}>Objeto<textarea style={formInput} rows={3} value={documentDraft.object} onChange={e=>setDocumentDraft(v=>({...v,object:e.target.value}))}/></label>
+ <label style={formLabel}>Cláusulas e condições<textarea style={formInput} rows={7} value={documentDraft.terms} onChange={e=>setDocumentDraft(v=>({...v,terms:e.target.value}))}/></label>
+ <button type="button" style={{...actionLink,background:'#526e96',justifySelf:'start'}} onClick={()=>setEditingDocumentId(null)}>Fechar minuta</button>
+ </div>}
  {status==='pending'&&<div style={{marginTop:10}}>
  {confirmContractId===contractId?<form onSubmit={e=>{e.preventDefault();void confirmContract(contractId)}} style={{display:'grid',gap:10,maxWidth:540}}>
  <label style={formLabel}>Nome de quem confirmou o acordo<input required minLength={3} maxLength={180} style={formInput} value={contractResponsible} onChange={e=>setContractResponsible(e.target.value)} placeholder="Nome do responsável pela confirmação"/></label>
