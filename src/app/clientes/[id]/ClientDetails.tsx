@@ -94,6 +94,26 @@ export default function ClientDetails({id,writesEnabled,proposalWritesEnabled,co
   catch(e){setCommercialFeedback(e instanceof Error?e.message:'Confirmação não concluída');}finally{setConfirmBusy(false);}
  }
 
+ const [closingProposal,setClosingProposal]=useState<{id:string;title:string}|null>(null);
+ const [closingMode,setClosingMode]=useState('verbal');
+ const [closingResponsible,setClosingResponsible]=useState('');
+ const [closingTerms,setClosingTerms]=useState('');
+ const [closingBusy,setClosingBusy]=useState(false);
+ const [closingError,setClosingError]=useState('');
+ async function closeDeal(e:React.FormEvent<HTMLFormElement>){
+  e.preventDefault();
+  if(!closingProposal||closingBusy)return;
+  setClosingBusy(true);setClosingError('');
+  try{
+   const response=await fetch('/api/clientes/fechar-negocio',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({proposalId:closingProposal.id,mode:closingMode,responsible:closingResponsible.trim(),terms:closingTerms.trim()})});
+   const result=await response.json();
+   if(!response.ok)throw Error(result.error||'Não foi possível fechar o negócio.');
+   await refreshCommercial();
+   setClosingProposal(null);setClosingResponsible('');setClosingTerms('');
+   setCommercialFeedback('Negócio fechado! Contrato confirmado e registrado no histórico.');
+  }catch(err){setClosingError(err instanceof Error?err.message:'Não foi possível concluir.');}
+  finally{setClosingBusy(false);}
+ }
  const [commercialActionBusy,setCommercialActionBusy]=useState(false);
  const [contractInline,setContractInline]=useState({mode:'written',terms:''});
  const statusNames:Record<string,string>={draft:'Rascunho',sent:'Enviada',accepted:'Aceita',rejected:'Recusada'};
@@ -269,7 +289,7 @@ export default function ClientDetails({id,writesEnabled,proposalWritesEnabled,co
  <button type="button" onClick={()=>openProposalWhatsapp(p)} style={actionLink}>WhatsApp</button>
  {proposalWritesEnabled&&!p.archived_at&&['draft','sent'].includes(String(p.status))&&<>
  <button type="button" disabled={commercialActionBusy} onClick={()=>commercialAction(String(p.id),'sent')} style={actionLink}>Confirmar envio</button>
- <button type="button" disabled={commercialActionBusy} onClick={()=>commercialAction(String(p.id),'accepted')} style={actionLink}>Aceita</button>
+ <button type="button" disabled={commercialActionBusy||closingBusy} onClick={()=>{setClosingProposal({id:String(p.id),title:String(p.title||'Proposta')});setClosingMode('verbal');setClosingResponsible('');setClosingTerms('');setClosingError('');setCommercialFeedback('');}} style={{...actionLink,background:'#1464c7'}}>Fechar negócio</button>
  <button type="button" disabled={commercialActionBusy} onClick={()=>commercialAction(String(p.id),'rejected')} style={{...actionLink,background:'#526e96'}}>Recusada</button>
  </>}
  {proposalWritesEnabled&&<button type="button" disabled={commercialActionBusy} onClick={()=>commercialAction(String(p.id),p.archived_at?'restore':'archive')} style={{...actionLink,background:p.archived_at?'#166e9e':'#526e96'}}>{p.archived_at?'Reativar':'Arquivar'}</button>}
@@ -298,6 +318,17 @@ export default function ClientDetails({id,writesEnabled,proposalWritesEnabled,co
  <button type="button" onClick={()=>{setConfirmContractId(contractId);setContractResponsible('');setCommercialFeedback('')}} style={{...actionLink,border:0}}>Registrar confirmação</button>}</div>}
  </div>})}
  </section>}
+ {closingProposal&&<div role="presentation" style={{position:'fixed',inset:0,zIndex:1100,display:'flex',alignItems:'center',justifyContent:'center',padding:16,background:'rgba(5,21,52,.67)'}}>
+ <section role="dialog" aria-modal="true" aria-labelledby="close-deal-title" style={{width:'min(100%,520px)',maxHeight:'90vh',overflowY:'auto',background:'#fff',borderRadius:16,boxShadow:'0 24px 65px #071b3e77',color:'#16325b'}}>
+ <div style={{padding:'18px 22px',background:'linear-gradient(110deg,#0c327c,#1765c4)',color:'#fff',borderRadius:'16px 16px 0 0'}}><h3 id="close-deal-title" style={{margin:0}}>Fechar negócio</h3><p style={{margin:'6px 0 0',fontSize:13}}>{closingProposal.title}</p></div>
+ <form onSubmit={closeDeal} style={{padding:22,display:'grid',gap:14}}>
+ <label style={formLabel}>Como o acordo foi confirmado?<select autoFocus required value={closingMode} onChange={e=>setClosingMode(e.target.value)} style={formInput}><option value="verbal">Acordo verbal</option><option value="whatsapp">WhatsApp</option><option value="written">Contrato escrito já formalizado</option></select></label>
+ <label style={formLabel}>Quem confirmou pela instituição?<input required minLength={3} maxLength={180} value={closingResponsible} onChange={e=>setClosingResponsible(e.target.value)} style={formInput} placeholder="Nome do responsável"/></label>
+ <label style={formLabel}>Condições combinadas<textarea required minLength={8} maxLength={8000} rows={4} value={closingTerms} onChange={e=>setClosingTerms(e.target.value)} style={formInput} placeholder="Resumo do que foi acordado"/></label>
+ <p style={{fontSize:12,margin:0,color:'#42628b'}}>{closingMode==='written'?'Conclua somente se o contrato escrito já estiver formalizado.':'Ao concluir, o acordo será registrado como confirmado, com data, hora e responsável.'}</p>
+ {closingError&&<p role="alert" style={{margin:0,color:'#a52835'}}>{closingError}</p>}
+ <div style={{display:'flex',gap:9,justifyContent:'flex-end',flexWrap:'wrap'}}><button type="button" disabled={closingBusy} onClick={()=>setClosingProposal(null)} style={{...actionLink,background:'#526e96',border:0}}>Voltar</button><button type="submit" disabled={closingBusy||closingResponsible.trim().length<3||closingTerms.trim().length<8} style={{...actionLink,background:'#145ac3',border:0}}>{closingBusy?'Concluindo…':'Concluir fechamento'}</button></div>
+ </form></section></div>}
  {commercialFeedback&&<p role="status" style={{...panel,borderLeftColor:'#169caa'}}>{commercialFeedback}</p>}
  <dialog ref={commercialDialog} onCancel={e=>{if(commercialBusy){e.preventDefault();return}setCommercialForm(null)}} style={{border:'1px solid #a8c6f0',borderRadius:16,padding:0,width:'min(590px,94vw)',maxHeight:'85vh',overflowY:'auto',boxShadow:'0 18px 60px #12356766'}}>
  {commercialForm&&<><div style={{background:'linear-gradient(110deg,#12386f,#1769c7)',padding:'17px 22px',color:'white',display:'flex',justifyContent:'space-between',alignItems:'center'}}><strong>{commercialForm==='proposal'?'Nova proposta':'Novo contrato'}</strong><button type="button" disabled={commercialBusy} onClick={()=>setCommercialForm(null)} aria-label="Fechar" style={{color:'white',fontSize:22}}>×</button></div>
