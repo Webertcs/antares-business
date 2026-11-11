@@ -324,7 +324,7 @@ export default function ClientDetails({id,writesEnabled,proposalWritesEnabled,co
  <label style={formLabel}>Representante<input style={formInput} value={documentDraft.responsible} onChange={e=>setDocumentDraft(v=>({...v,responsible:e.target.value}))}/></label>
  <label style={formLabel}>Objeto<textarea style={formInput} rows={3} value={documentDraft.object} onChange={e=>setDocumentDraft(v=>({...v,object:e.target.value}))}/></label>
  <label style={formLabel}>Cláusulas e condições<textarea style={formInput} rows={7} value={documentDraft.terms} onChange={e=>setDocumentDraft(v=>({...v,terms:e.target.value}))}/></label>
- <button type="button" style={{...actionLink,background:'#526e96',justifySelf:'start'}} onClick={()=>setEditingDocumentId(null)}>Fechar minuta</button>
+ <button type="button" style={{...actionLink,background:'#145ac3',color:'#fff',border:'1px solid #0f4ca8',justifySelf:'start'}} onClick={()=>setEditingDocumentId(null)}>Fechar minuta</button>
  </div>}
  {status==='pending'&&<div style={{marginTop:10}}>
  {confirmContractId===contractId?<form onSubmit={e=>{e.preventDefault();void confirmContract(contractId)}} style={{display:'grid',gap:10,maxWidth:540}}>
