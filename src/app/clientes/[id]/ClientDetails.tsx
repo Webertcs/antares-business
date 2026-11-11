@@ -113,6 +113,7 @@ export default function ClientDetails({id,writesEnabled,proposalWritesEnabled,co
    await refreshCommercial();
    setClosingProposal(null);setClosingResponsible('');setClosingTerms('');
    setCommercialFeedback('Negócio fechado! Contrato confirmado e registrado no histórico.');
+   window.location.assign('/agenda/reservas?proposalId='+encodeURIComponent(closingProposal.id));
   }catch(err){setClosingError(err instanceof Error?err.message:'Não foi possível concluir.');}
   finally{setClosingBusy(false);}
  }
