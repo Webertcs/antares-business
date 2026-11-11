@@ -9,8 +9,11 @@ export async function GET(){
   const db=getDb();
   const [bookings,domes,crmEvents]=await Promise.all([
    db`SELECT p.id,p.title AS event_title,p.starts_at,p.ends_at,p.status,
-      p.dome_id,COALESCE(d.name,'Sem cúpula') AS dome_name
+      p.dome_id,COALESCE(d.name,'Sem cúpula') AS dome_name,
+      l.event_id AS linked_event_id
       FROM public.presentations p
+      LEFT JOIN public.antares_presentation_event_links l
+        ON l.presentation_id=p.id AND l.organization_id=p.organization_id
       LEFT JOIN public.antares_dome_links dl
         ON dl.equipment_id=p.dome_id AND dl.organization_id=p.organization_id
       LEFT JOIN public.antares_domes d
