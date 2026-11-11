@@ -19,14 +19,14 @@ export default function EventLifecycleActions({eventId,status,archived=false,onC
   {!['confirmed','reserved','completed'].includes(status)&&<button type="button" onClick={()=>{setAction('archive');setError('');}} style={{padding:'3px 6px',fontSize:11,minHeight:25,borderRadius:7,border:'1px solid #b8cdee',background:'#edf5ff',color:'#174985'}}>Arquivar</button>}
   </>}
   {action&&<div role="dialog" aria-modal="true" aria-label="Confirmar alteração do evento" style={{position:'fixed',inset:0,zIndex:1000,background:'rgba(5,21,52,.65)',display:'grid',placeItems:'center',padding:16}}>
-   <div style={{width:'min(100%,460px)',background:'#fff',color:'#163968',padding:22,borderRadius:15,boxShadow:'0 12px 36px #071e4a55'}}>
-    <h3 style={{margin:'0 0 10px'}}> {action==='cancel'?'Cancelar evento':action==='archive'?'Arquivar evento':'Restaurar evento'} </h3>
+   <div style={{width:'min(100%,460px)',background:'#fff',color:'#163968',padding:22,borderRadius:15,boxShadow:'0 18px 48px #071e4a66'}}>
+    <div style={{margin:'-22px -22px 18px',padding:'16px 22px',borderRadius:'15px 15px 0 0',background:'linear-gradient(110deg,#0c327c,#1765c4)',color:'#fff'}}><h3 style={{margin:0,fontSize:18,fontWeight:800}}>{action==='cancel'?'Cancelar evento':action==='archive'?'Arquivar evento':'Restaurar evento'}</h3></div>
     <p style={{fontSize:14}}>{action==='cancel'?'O evento será cancelado, mas permanecerá no histórico.':action==='archive'?'O cadastro sairá das listas principais, mas não será excluído do Neon. Eventos com vínculos podem ser bloqueados.':'O evento arquivado voltará às listas principais.'}</p>
     {action==='cancel'&&<label style={{display:'block',fontSize:13,fontWeight:700}}>Motivo do cancelamento<textarea autoFocus value={reason} maxLength={1000} onChange={e=>setReason(e.target.value)} rows={4} style={{display:'block',width:'100%',boxSizing:'border-box',marginTop:6,padding:10,border:'1px solid #aac7ed',borderRadius:8}}/></label>}
     {error&&<p role="alert" style={{color:'#a12b2b',fontSize:13}}>{error}</p>}
     <div style={{display:'flex',justifyContent:'flex-end',gap:10,marginTop:16}}>
      <button type="button" disabled={busy} onClick={()=>{setAction(null);setReason('');setError('');}} style={{padding:'9px 14px',border:'1px solid #b9cdec',borderRadius:8,background:'#fff',color:'#174985'}}>Voltar</button>
-     <button type="button" disabled={busy||(action==='cancel'&&reason.trim().length<5)} onClick={submit} style={{padding:'9px 14px',border:0,borderRadius:8,background:'#195ac2',color:'#fff',opacity:busy?.6:1}}>{busy?'Salvando…':'Confirmar'}</button>
+     <button type="button" disabled={busy||(action==='cancel'&&reason.trim().length<5)} onClick={submit} style={{padding:'9px 14px',border:0,borderRadius:8,background:'linear-gradient(110deg,#1753bd,#117bd4)',color:'#fff',fontWeight:750,opacity:busy?.6:1}}>{busy?'Salvando…':'Confirmar'}</button>
     </div>
    </div>
   </div>}
