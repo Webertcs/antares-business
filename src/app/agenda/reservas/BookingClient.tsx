@@ -18,6 +18,19 @@ export default function BookingClient({enabled}:{enabled:boolean}){
  const [proposalId,setProposalId]=useState(''),[domeId,setDomeId]=useState(''),[start,setStart]=useState(''),[end,setEnd]=useState('');
  async function load(){const r=await fetch('/api/agenda/reservas',{cache:'no-store'});const v=await r.json();if(!r.ok)throw Error(v.error||'Consulta falhou');setData(v);}
  useEffect(()=>{load().then(()=>setStatus('')).catch(e=>setStatus(e.message));},[]);
+ useEffect(()=>{
+  const target=new URLSearchParams(window.location.search).get('proposalId');
+  if(!target||!data)return;
+  window.history.replaceState(null,'',window.location.pathname);
+  if(!enabled){setStatus('Agendamento indisponível no momento.');return;}
+  const proposal=data.proposals.find(p=>p.id===target);
+  if(!proposal){setStatus('Proposta não encontrada para agendamento.');return;}
+  if(data.links.some(l=>l.proposal_id===target)){setStatus('Esta proposta já possui uma reserva.');return;}
+  if(!proposal.mapped){setStatus('Antes de agendar, vincule esta instituição à operação.');return;}
+  setProposalId(target);setDomeId('');setStart('');setEnd('');
+  setModalError('');setConfirmBooking(false);setNewOpen(true);setStatus('');
+ },[data,enabled]);
+
  const eligible=data?.proposals.filter(p=>p.mapped&&!data.links.some(l=>l.proposal_id===p.id))||[];
  const domes=data?.domes.filter(d=>d.mapped)||[];
  const selectedBooking=data?.links.find(l=>l.presentation_id===detailId);
