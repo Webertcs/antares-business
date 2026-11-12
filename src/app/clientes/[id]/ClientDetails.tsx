@@ -605,11 +605,11 @@ export default function ClientDetails({id,writesEnabled,proposalWritesEnabled,co
  <div style={{display:'flex',gap:9,justifyContent:'flex-end',flexWrap:'wrap'}}><button type="button" disabled={closingBusy} onClick={()=>setClosingProposal(null)} style={{...actionLink,background:'#526e96',border:0}}>Voltar</button><button type="submit" disabled={closingBusy||closingResponsible.trim().length<3||closingTerms.trim().length<8} style={{...actionLink,background:'#145ac3',border:0}}>{closingBusy?'Concluindo…':'Concluir fechamento'}</button></div>
  </form></section></div>}
  {commercialFeedback&&<p role="status" style={{...panel,borderLeftColor:'#169caa'}}>{commercialFeedback}</p>}
- <dialog ref={commercialDialog} onCancel={e=>{if(commercialBusy){e.preventDefault();return}setCommercialForm(null)}} style={{border:'1px solid #a8c6f0',borderRadius:16,padding:0,width:'min(590px,94vw)',maxHeight:'85vh',overflowY:'auto',boxShadow:'0 18px 60px #12356766'}}>
- {commercialForm&&<><div style={{background:'linear-gradient(110deg,#12386f,#1769c7)',padding:'17px 22px',color:'white',display:'flex',justifyContent:'space-between',alignItems:'center'}}><strong>{commercialForm==='proposal'?'Nova proposta':'Novo contrato'}</strong><button type="button" disabled={commercialBusy} onClick={()=>setCommercialForm(null)} aria-label="Fechar" style={{color:'white',fontSize:22}}>×</button></div>
- <form onSubmit={saveCommercial} style={{padding:22,display:'grid',gap:12}}>
+ <dialog ref={commercialDialog} onCancel={e=>{if(commercialBusy){e.preventDefault();return}setCommercialForm(null)}} style={{border:'1px solid #a8c6f0',borderRadius:16,padding:0,width:'min(540px,94vw)',maxHeight:'94dvh',overflowY:'auto',position:'fixed',top:'50%',left:'50%',transform:'translate(-50%,-50%)',margin:0,boxShadow:'0 18px 60px #12356766'}}>
+ {commercialForm&&<><div style={{background:'linear-gradient(110deg,#12386f,#1769c7)',padding:'12px 18px',color:'white',display:'flex',justifyContent:'space-between',alignItems:'center'}}><strong>{commercialForm==='proposal'?'Nova proposta':'Novo contrato'}</strong><button type="button" disabled={commercialBusy} onClick={()=>setCommercialForm(null)} aria-label="Fechar" style={{color:'white',fontSize:22}}>×</button></div>
+ <form onSubmit={saveCommercial} style={{padding:'14px 18px',display:'grid',gap:8}}>
  <p style={{margin:0,fontSize:13}}>Instituição: <strong>{client.name}</strong> (vínculo fixo)</p>
- {commercialForm==='proposal'&&<div style={{display:'grid',gap:12}}><p style={{fontSize:13,margin:0}}>Instituição: <strong>{client.name}</strong> (vínculo fixo)</p>
+ {commercialForm==='proposal'&&<div style={{display:'grid',gap:8}}>
  <label style={formLabel}>Título<input required maxLength={180} style={formInput} value={proposalDraft.title} onChange={e=>setProposalDraft(v=>({...v,title:e.target.value}))}/></label>
  <label style={formLabel}>Cobrança<select required style={formInput} value={proposalDraft.model} onChange={e=>setProposalDraft(v=>({...v,model:e.target.value}))}><option value="" disabled>Selecione a cobrança</option><option value="per_student">Por aluno</option><option value="fixed">Valor fechado</option><option value="complimentary">Gratuito</option></select></label>
  <label style={formLabel}>Participantes previstos<input required type="number" min={0} step={1} style={formInput} value={proposalDraft.attendees} onChange={e=>setProposalDraft(v=>({...v,attendees:e.target.value}))}/></label>
@@ -618,7 +618,7 @@ export default function ClientDetails({id,writesEnabled,proposalWritesEnabled,co
  <label style={formLabel}>Desconto (R$)<input type="number" min={0} step="0.01" style={formInput} value={proposalDraft.discount} onChange={e=>setProposalDraft(v=>({...v,discount:e.target.value}))}/></label>
  <label style={formLabel}>Sinal (R$)<input type="number" min={0} step="0.01" style={formInput} value={proposalDraft.deposit} onChange={e=>setProposalDraft(v=>({...v,deposit:e.target.value}))}/></label>
  <label style={formLabel}>Validade<input type="date" style={formInput} value={proposalDraft.validUntil} onChange={e=>setProposalDraft(v=>({...v,validUntil:e.target.value}))}/></label>
- <label style={formLabel}>Observações<textarea maxLength={4000} rows={3} style={formInput} value={proposalDraft.notes} onChange={e=>setProposalDraft(v=>({...v,notes:e.target.value}))}/></label>
+ <label style={formLabel}>Observações<textarea maxLength={4000} rows={2} style={formInput} value={proposalDraft.notes} onChange={e=>setProposalDraft(v=>({...v,notes:e.target.value}))}/></label>
  <p style={{margin:0}}>Total estimado: <strong>{proposalDraft.model?money(Math.max(0,(proposalDraft.model==='per_student'?Number(proposalDraft.attendees)*Number(proposalDraft.unitPrice):proposalDraft.model==='fixed'?Number(proposalDraft.fixedPrice):0)-Number(proposalDraft.discount))):'—'}</strong></p>
 </div>}
  {commercialForm==='contract'&&<>
