@@ -229,7 +229,7 @@ export default function ClientDetails({id,writesEnabled,proposalWritesEnabled,co
   .signature{flex:1;text-align:center;border-top:1px solid #526985;padding-top:10px;font-size:10pt;color:#183b66;break-inside:avoid}
   footer{margin-top:38px;border-top:1px solid #d7e2f1;padding-top:10px;color:#536780;font-size:9pt}
   .toolbar{max-width:210mm;margin:18px auto;display:flex;gap:10px}.toolbar button{background:#145ac3;color:#fff;border:0;border-radius:8px;padding:12px 20px;cursor:pointer}
-  @media print{body{background:#fff}main{margin:0;padding:0;min-height:0;box-shadow:none}.toolbar{display:none}header img{width:100%;height:auto;max-width:100%}h1,h2{break-after:avoid}.signatures{break-inside:avoid;page-break-inside:avoid}p{orphans:3;widows:3}}
+  @media print{body{background:#fff;font-size:9.5pt;line-height:1.3}main{width:100%;max-width:none;margin:0;padding:0;min-height:0;box-shadow:none}.toolbar{display:none}header{margin-bottom:9px;padding-bottom:0}header img{display:block;width:auto;max-width:100%;height:auto;max-height:34mm;margin:0 auto;object-fit:contain}h1{font-size:15pt;margin-bottom:10px;padding:7px 9px}h2{font-size:9pt;margin:10px 0 4px;padding-bottom:3px}p{margin-bottom:6px;orphans:3;widows:3}h1,h2{break-after:avoid}.signatures{margin-top:22px;padding-top:10px;gap:24px;break-inside:avoid;page-break-inside:avoid}.signature{font-size:9pt;padding-top:7px}}
   </style></head><body><div class="toolbar"><button onclick="window.print()">Imprimir / Salvar em PDF</button></div><main>
   <header><img src="${escapeHtml(logo)}" alt="ANTARES" onerror="this.style.display='none'"></header>
   <h1>${escapeHtml(draft.title)}</h1>
