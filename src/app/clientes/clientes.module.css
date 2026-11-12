@@ -227,3 +227,10 @@
 .page .dialog{padding:0 18px 18px;overflow:hidden;}.page .dialog h2{margin:0 -18px 12px;padding:14px 18px;font-size:19px;color:#fff;background:linear-gradient(112deg,#153e7b,#2168c2);}
 .page .dialog .actions{justify-content:flex-end;}.page .dialog .actions button:first-child{background:linear-gradient(115deg,#1d63c7,#10478e);color:#fff;}
 @media(max-width:640px){.page .hero{padding:16px!important;}.page .hero h1{font-size:21px!important;}.page .metric{min-height:70px;}.page .formHeading,.page .historyHeading{padding:13px 15px;}.page .formDialog form{padding:14px 15px 0;}.page .directoryHeader{margin:-16px -16px 12px;}}
+
+/* Ação de cadastro integrada ao cabeçalho da base de clientes */
+.page .directoryControls{display:flex;align-items:center;justify-content:flex-end;flex-wrap:wrap;gap:9px;}
+.page .directoryCreateButton{display:inline-flex;align-items:center;justify-content:center;min-height:34px;padding:7px 13px;border:1px solid #205bb1;border-radius:9px;background:linear-gradient(110deg,#256bd2,#114589);box-shadow:0 3px 10px rgba(20,70,143,.19);font-size:12px;font-weight:750;color:white;white-space:nowrap;}
+.page .directoryCreateButton:hover:not(:disabled){background:linear-gradient(110deg,#2e7ce8,#155ab3);transform:translateY(-1px);box-shadow:0 5px 13px rgba(20,70,143,.23);}
+.page .directoryCreateButton:disabled{opacity:.58;cursor:not-allowed;}
+@media(max-width:560px){.page .directoryControls{width:100%;justify-content:space-between;gap:8px}.page .directoryCreateButton{flex:1;min-width:130px}}
