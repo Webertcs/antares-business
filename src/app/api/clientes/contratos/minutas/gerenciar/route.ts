@@ -18,7 +18,7 @@ export async function POST(request:NextRequest){
   const body=await request.json();
   if(!body||typeof body.draftId!=='string'||!uuid.test(body.draftId)||!['archive','restore'].includes(body.action))return error('Operação inválida.');
   const db=getTeamWriteDb();
-  const checks=await db`SELECT current_user='antares_team_runtime' AND NOT rolsuper AND NOT rolbypassrls AS safe_role,
+  const checks=await db`SELECT EXISTS(SELECT 1 FROM pg_catalog.pg_roles r WHERE r.rolname=current_user AND r.rolname='antares_team_runtime' AND NOT r.rolsuper AND NOT r.rolbypassrls) AS safe_role,
     EXISTS(SELECT 1 FROM pg_proc p WHERE p.pronamespace='public'::regnamespace AND p.proname='antares_manage_contract_draft'
       AND p.prosecdef AND pg_get_userbyid(p.proowner)='neondb_owner'
       AND has_function_privilege(current_user,p.oid,'EXECUTE')
