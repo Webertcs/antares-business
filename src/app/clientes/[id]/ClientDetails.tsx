@@ -150,7 +150,8 @@ export default function ClientDetails({id,writesEnabled,proposalWritesEnabled,co
   }catch(e){setDocumentNotice(e instanceof Error?e.message:'Falha ao salvar minuta.');}
   finally{setDocumentBusy(false);}
  }
- function fillDocumentFromProposal(contractId:string){
+ const [pendingProposalFill,setPendingProposalFill]=useState<string|null>(null);
+ function fillDocumentFromProposal(contractId:string,confirmed=false){
   const contract=commercial?.contracts.find(c=>String(c.id)===contractId);
   const proposal=commercial?.proposals.find(p=>String(p.id)===String(contract?.proposal_id||''));
   if(!contract||!proposal){setDocumentNotice('Não foi possível localizar a proposta vinculada.');return;}
@@ -184,7 +185,8 @@ export default function ClientDetails({id,writesEnabled,proposalWritesEnabled,co
    String(proposal.notes||'').trim()?'Observações da proposta: '+String(proposal.notes).trim():'',
    'Este é um modelo editável. Conferir os dados e revisar juridicamente as cláusulas antes da assinatura.'
   ].filter((line,index,all)=>line!==''||all[index-1]!=='');
-  if((documentDraft.title||documentDraft.institution||documentDraft.responsible||documentDraft.object||documentDraft.terms)&&!window.confirm('Substituir os campos atuais pelos dados da proposta? Salve antes qualquer alteração que queira preservar.'))return;
+  if(!confirmed){setPendingProposalFill(contractId);return;}
+  setPendingProposalFill(null);
   setDocumentSavedId(null);
   setDocumentDraft({title:'Contrato de prestação de serviços — '+title,institution:client?.name||'',responsible:String(contract.confirmed_by_name||''),object:'Apresentação de planetário móvel — '+title,terms:lines.join('\\n')});
   setDocumentNotice('Dados da proposta carregados para edição. Confira e salve uma nova minuta antes de gerar o PDF.');
@@ -556,5 +558,6 @@ export default function ClientDetails({id,writesEnabled,proposalWritesEnabled,co
 
  {activeTab==='observacoes'&&<section style={panel}><h2 style={heading}>Observações da instituição</h2><p style={{fontSize:13,color:'#48678e'}}>Anotações gerais sobre o atendimento desta instituição.</p><textarea aria-label="Observações da instituição" maxLength={4000} rows={6} value={notesValue} onChange={e=>{setNotesDraft(e.target.value);setNotesFeedback('');}} style={{...formInput,resize:'vertical',lineHeight:1.6}}/><div style={{display:'flex',alignItems:'center',gap:12,flexWrap:'wrap',marginTop:12}}><button type="button" disabled={!notesDirty||notesSaving} onClick={()=>void saveNotes()} style={{...actionLink,border:0,cursor:notesDirty?'pointer':'not-allowed',opacity:!notesDirty||notesSaving?0.55:1}}>{notesSaving?'Salvando...':'Salvar observações'}</button>{notesDirty&&<span style={{fontSize:12,color:'#a05a12'}}>Alterações ainda não salvas</span>}</div>{notesFeedback&&<p role="status" style={{fontSize:13,color:notesFeedback.includes('sucesso')?'#16724a':'#a33b25'}}>{notesFeedback}</p>}</section>}
  </>}
+ {pendingProposalFill&&<div role="presentation" style={{position:'fixed',inset:0,zIndex:1000,background:'rgba(5,19,48,.7)',display:'flex',alignItems:'center',justifyContent:'center',padding:16}}><div role="dialog" aria-modal="true" aria-labelledby="confirm-proposal-fill-title" style={{width:'100%',maxWidth:450,background:'#eef5ff',border:'2px solid #4c94ec',borderRadius:16,boxShadow:'0 22px 65px rgba(0,0,0,.35)',overflow:'hidden',color:'#163b72'}}><div style={{background:'linear-gradient(110deg,#103a81,#1268c9)',padding:'17px 22px',color:'white'}}><h3 id="confirm-proposal-fill-title" style={{margin:0,fontSize:19}}>Preencher contrato</h3></div><div style={{padding:22}}><p style={{margin:'0 0 10px',fontSize:14,lineHeight:1.6}}>Deseja preencher o contrato com os dados da proposta?</p><p style={{margin:0,fontSize:13,lineHeight:1.6,color:'#47658c'}}>Os campos atuais serão substituídos. Salve antes qualquer alteração que queira preservar. As minutas já salvas continuarão disponíveis.</p><div style={{display:'flex',justifyContent:'flex-end',gap:10,marginTop:22,flexWrap:'wrap'}}><button type="button" onClick={()=>setPendingProposalFill(null)} style={{background:'#e1e9f5',color:'#194a85',border:'1px solid #b6cbea',borderRadius:9,padding:'10px 16px',fontWeight:700,cursor:'pointer'}}>Voltar</button><button type="button" onClick={()=>fillDocumentFromProposal(pendingProposalFill,true)} style={{background:'#1263c7',color:'#fff',border:0,borderRadius:9,padding:'10px 16px',fontWeight:700,cursor:'pointer'}}>Confirmar preenchimento</button></div></div></div></div>}
  </main>;
 }
