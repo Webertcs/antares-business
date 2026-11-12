@@ -335,15 +335,6 @@ export default function ClientDetails({id,writesEnabled,proposalWritesEnabled,co
  <nav aria-label="Seções do cliente" style={{display:'flex',flexWrap:'wrap',gap:8,margin:'14px 0'}}>{([['eventos','Eventos'],['propostas','Propostas'],['contratos','Contratos'],['alunos','Alunos'],['fidelizacao','Fidelização'],['financeiro','Financeiro'],['historico','Histórico'],['observacoes','Observações']] as const).map(([key,label])=><button key={key} type="button" aria-current={activeTab===key?'page':undefined} onClick={()=>setActiveTab(key)} style={{cursor:'pointer',border:'1px solid #a9c7ee',borderRadius:10,padding:'10px 15px',fontWeight:700,background:activeTab===key?'linear-gradient(110deg,#0862cf,#16458e)':'#eaf3ff',color:activeTab===key?'#fff':'#174987'}}>{label}</button>)}</nav>
  {activeTab==='propostas'&&<section style={{...panel,borderLeftColor:'#169caa'}}><h2 style={heading}>Propostas e orçamentos ({proposals.length})</h2><p style={{fontSize:13}}>Propostas comerciais vinculadas a {client.name}.</p>
  {proposalWritesEnabled&&<form onSubmit={saveCommercial} style={{display:'grid',gap:12,maxWidth:680,padding:'14px 0 20px'}}><p style={{fontSize:13,margin:0}}>Instituição: <strong>{client.name}</strong> (vínculo fixo)</p>
- {savedDrafts.length>0&&<div style={{display:'grid',gap:8,padding:12,background:'#f7fbff',border:'1px solid #b4d1f4',borderRadius:10}}>
- <strong style={{color:'#174987'}}>Minutas salvas ({savedDrafts.length})</strong>
- {savedDrafts.map(d=><div key={d.id} style={{display:'flex',alignItems:'center',justifyContent:'space-between',flexWrap:'wrap',gap:8,padding:9,borderRadius:8,background:d.archived_at?'#edf1f7':'#e5f0ff'}}>
- <span style={{fontSize:13,color:'#123c80'}}><strong>{d.title}</strong> · versão {d.version_number}{d.archived_at?' · Arquivada':''}</span>
- <div style={{display:'flex',gap:6,flexWrap:'wrap'}}>
- {!d.archived_at&&<button type="button" disabled={documentBusy} style={{...actionLink,background:'#145ac3'}} onClick={()=>selectSavedDraft(d)}>Editar</button>}
- <button type="button" disabled={documentBusy} style={{...actionLink,background:d.archived_at?'#145ac3':'#566b8a'}} onClick={()=>setDraftManage({id:d.id,action:d.archived_at?'restore':'archive',title:d.title,contractId})}>{d.archived_at?'Reativar':'Arquivar'}</button>
- </div></div>)}
- </div>}
  <label style={formLabel}>Título<input required maxLength={180} style={formInput} value={proposalDraft.title} onChange={e=>setProposalDraft(v=>({...v,title:e.target.value}))}/></label>
  <label style={formLabel}>Cobrança<select required style={formInput} value={proposalDraft.model} onChange={e=>setProposalDraft(v=>({...v,model:e.target.value}))}><option value="" disabled>Selecione a cobrança</option><option value="per_student">Por aluno</option><option value="fixed">Valor fechado</option><option value="complimentary">Gratuito</option></select></label>
  <label style={formLabel}>Participantes previstos<input required type="number" min={0} step={1} style={formInput} value={proposalDraft.attendees} onChange={e=>setProposalDraft(v=>({...v,attendees:e.target.value}))}/></label>
@@ -389,6 +380,15 @@ export default function ClientDetails({id,writesEnabled,proposalWritesEnabled,co
  {editingDocumentId===contractId&&<div style={{marginTop:12,padding:16,background:'#e9f3ff',border:'1px solid #9cc4f6',borderRadius:12,display:'grid',gap:12}}>
  <strong style={{color:'#123c80'}}>Minuta do contrato · edição local</strong>
  <p style={{margin:0,fontSize:12}}>Edite os campos e clique em Salvar rascunho. Documentos arquivados permanecem disponíveis para reativação. O envio ao cliente ainda não está habilitado.</p>
+ {savedDrafts.length>0&&<div style={{display:'grid',gap:8,padding:12,background:'#f7fbff',border:'1px solid #b4d1f4',borderRadius:10}}>
+ <strong style={{color:'#174987'}}>Minutas salvas ({savedDrafts.length})</strong>
+ {savedDrafts.map(d=><div key={d.id} style={{display:'flex',alignItems:'center',justifyContent:'space-between',flexWrap:'wrap',gap:8,padding:9,borderRadius:8,background:d.archived_at?'#edf1f7':'#e5f0ff'}}>
+ <span style={{fontSize:13,color:'#123c80'}}><strong>{d.title}</strong> · versão {d.version_number}{d.archived_at?' · Arquivada':''}</span>
+ <div style={{display:'flex',gap:6,flexWrap:'wrap'}}>
+ {!d.archived_at&&<button type="button" disabled={documentBusy} style={{...actionLink,background:'#145ac3'}} onClick={()=>selectSavedDraft(d)}>Editar</button>}
+ <button type="button" disabled={documentBusy} style={{...actionLink,background:d.archived_at?'#145ac3':'#566b8a'}} onClick={()=>setDraftManage({id:d.id,action:d.archived_at?'restore':'archive',title:d.title,contractId})}>{d.archived_at?'Reativar':'Arquivar'}</button>
+ </div></div>)}
+ </div>}
  <label style={formLabel}>Título<input style={formInput} value={documentDraft.title} onChange={e=>setDocumentDraft(v=>({...v,title:e.target.value}))}/></label>
  <label style={formLabel}>Instituição<input style={formInput} value={documentDraft.institution} onChange={e=>setDocumentDraft(v=>({...v,institution:e.target.value}))}/></label>
  <label style={formLabel}>Representante<input style={formInput} value={documentDraft.responsible} onChange={e=>setDocumentDraft(v=>({...v,responsible:e.target.value}))}/></label>
