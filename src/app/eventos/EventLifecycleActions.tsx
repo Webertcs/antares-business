@@ -25,7 +25,7 @@ export default function EventLifecycleActions({eventId,status,archived=false,onC
     {action==='cancel'&&<label style={{display:'block',fontSize:13,fontWeight:700}}>Motivo do cancelamento<textarea autoFocus value={reason} maxLength={1000} onChange={e=>setReason(e.target.value)} rows={4} style={{display:'block',width:'100%',boxSizing:'border-box',marginTop:6,padding:10,border:'1px solid #aac7ed',borderRadius:8}}/></label>}
     {error&&<p role="alert" style={{color:'#a12b2b',fontSize:13}}>{error}</p>}
     <div style={{display:'flex',justifyContent:'flex-end',gap:10,marginTop:16}}>
-     <button type="button" disabled={busy} onClick={()=>{setAction(null);setReason('');setError('');}} style={{padding:'9px 14px',border:'1px solid #b9cdec',borderRadius:8,background:'#fff',color:'#174985'}}>Voltar</button>
+     <button className="antares-event-secondary" type="button" disabled={busy} onClick={()=>{setAction(null);setReason('');setError('');}} style={{padding:'9px 14px',border:'1px solid #b9cdec',borderRadius:8,background:'#fff',color:'#174985'}}>Voltar</button>
      <button type="button" disabled={busy||(action==='cancel'&&reason.trim().length<5)} onClick={submit} style={{padding:'9px 14px',border:0,borderRadius:8,background:'linear-gradient(110deg,#1753bd,#117bd4)',color:'#fff',fontWeight:750,opacity:busy?.6:1}}>{busy?'Salvando…':'Confirmar'}</button>
     </div>
    </div>
