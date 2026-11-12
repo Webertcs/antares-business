@@ -1117,3 +1117,91 @@
  .antares-client-detail .client-premium-tab .client-premium-entry{padding:10px!important;}
 }
 @media(prefers-reduced-motion:reduce){.antares-client-detail .client-premium-tab button:not(:disabled):hover{transform:none;}}
+
+
+/* ANTARES Premium V3 - largura integral dos cards internos de Clientes */
+/* Mantem a ficha alinhada: sem exceder o painel nem diminuir botoes de acao. */
+.antares-client-detail,
+.antares-client-detail .client-detail-metrics,
+.antares-client-detail .client-detail-tabs,
+.antares-client-detail .client-premium-tab {
+  width:100%;
+  max-width:100%;
+  min-width:0;
+  box-sizing:border-box;
+}
+.antares-client-detail .client-detail-metrics {
+  grid-template-columns:repeat(4,minmax(0,1fr))!important;
+  align-items:stretch;
+}
+.antares-client-detail .client-detail-metrics .client-detail-metric {
+  width:100%;
+  min-width:0;
+  box-sizing:border-box;
+  align-self:stretch;
+  overflow-wrap:anywhere;
+}
+/* As oito abas deixam de terminar no meio do painel. */
+.antares-client-detail .client-detail-tabs {
+  display:grid!important;
+  grid-template-columns:repeat(8,minmax(0,1fr));
+  gap:7px!important;
+  align-items:stretch;
+}
+.antares-client-detail .client-detail-tabs > button {
+  width:100%;
+  min-width:0;
+  min-height:37px;
+  padding:8px 5px!important;
+  box-sizing:border-box;
+  text-align:center;
+  white-space:normal;
+  overflow-wrap:break-word;
+  font-size:11.5px;
+  line-height:1.2;
+}
+/* Cards das propostas, contratos, eventos, visitas e historico. */
+.antares-client-detail .client-premium-tab .client-premium-entry,
+.antares-client-detail .client-premium-tab .client-premium-stat,
+.antares-client-detail .client-premium-tab .client-premium-form,
+.antares-client-detail .client-premium-tab .client-premium-editor {
+  width:100%!important;
+  max-width:100%!important;
+  min-width:0;
+  box-sizing:border-box;
+}
+/* Paineis diretos, resumos de duas/tres colunas, blocos e tabelas. */
+.antares-client-detail section.client-premium-tab > div:not([role="presentation"]):not([role="dialog"]),
+.antares-client-detail section.client-premium-tab > form,
+.antares-client-detail section.client-premium-tab > textarea {
+  width:100%;
+  max-width:100%;
+  min-width:0;
+  box-sizing:border-box;
+}
+.antares-client-detail .client-premium-tab > div[style*="grid"] > *,
+.antares-client-detail .client-premium-tab fieldset > * {
+  min-width:0;
+  box-sizing:border-box;
+}
+.antares-client-detail .client-premium-tab table {
+  width:100%!important;
+}
+/* Tabelas extensas continuam com rolagem horizontal onde necessario. */
+@media(max-width:940px) {
+  .antares-client-detail .client-detail-tabs {
+    grid-template-columns:repeat(4,minmax(0,1fr));
+  }
+}
+@media(max-width:570px) {
+  .antares-client-detail .client-detail-metrics {
+    grid-template-columns:repeat(2,minmax(0,1fr))!important;
+  }
+  .antares-client-detail .client-detail-tabs {
+    grid-template-columns:repeat(2,minmax(0,1fr));
+  }
+  .antares-client-detail .client-detail-tabs > button {
+    font-size:12px;
+    padding:9px 6px!important;
+  }
+}
