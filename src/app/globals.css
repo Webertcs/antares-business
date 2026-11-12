@@ -1671,3 +1671,31 @@
  .antares-events-history-button:hover,
  .antares-event-lifecycle>:is(.antares-event-cancel,.antares-event-archive,.antares-event-restore):hover{transform:none}
 }
+
+
+/* ANTARES Premium — botoes secundarios de Eventos */
+.antares-events-page .antares-event-secondary,
+.antares-event-center .antares-event-secondary{
+ display:inline-flex;
+ align-items:center;
+ justify-content:center;
+ min-height:34px;
+ padding:8px 14px!important;
+ border-radius:9px!important;
+ border:1px solid #2a64ab!important;
+ color:#fff!important;
+ background:linear-gradient(125deg,#568bc5,#27558e)!important;
+ box-shadow:0 3px 9px rgba(15,57,121,.18)!important;
+ font-size:12px;
+ font-weight:750!important;
+}
+.antares-events-page .antares-event-secondary:hover:not(:disabled),
+.antares-event-center .antares-event-secondary:hover:not(:disabled){
+ background:linear-gradient(125deg,#3975bf,#18457e)!important;
+ transform:translateY(-1px);
+}
+.antares-events-page .antares-event-secondary:disabled,
+.antares-event-center .antares-event-secondary:disabled{
+ opacity:.55;
+ cursor:not-allowed;
+}
