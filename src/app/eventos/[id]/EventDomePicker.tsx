@@ -4,7 +4,7 @@ import {useRouter} from 'next/navigation';
 export default function EventDomePicker({eventId,initialDomeId,domes}:{eventId:string;initialDomeId:string;domes:{id:string;name:string;capacity:number|null}[]}){
  const router=useRouter();
  const [selected,setSelected]=useState(initialDomeId),[saved,setSaved]=useState(initialDomeId),[busy,setBusy]=useState(false),[message,setMessage]=useState('');
- return <div style={{background:'#edf5ff',border:'1px solid #c4d8ff',borderRadius:12,padding:12}}>
+ return <div className="antares-event-center-dome" style={{background:'#edf5ff',border:'1px solid #c4d8ff',borderRadius:12,padding:12}}>
  <label style={{display:'block',fontSize:13,fontWeight:700,color:'#28589b'}}>🪐 Cúpula do evento
  <select value={selected} onChange={e=>{setSelected(e.target.value);setMessage('');}} style={{display:'block',width:'100%',marginTop:6,padding:10,borderRadius:8,border:'1px solid #b7cdec',background:'#fff',color:'#173668'}}>
  <option value="">A definir</option>{domes.map(d=><option key={d.id} value={d.id}>{d.name}</option>)}</select></label>
