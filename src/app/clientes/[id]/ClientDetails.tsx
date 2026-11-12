@@ -106,6 +106,8 @@ export default function ClientDetails({id,writesEnabled,proposalWritesEnabled,co
  const [confirmContractId,setConfirmContractId]=useState<string|null>(null);
  const [contractResponsible,setContractResponsible]=useState('');
  const [editingDocumentId,setEditingDocumentId]=useState<string|null>(null);
+ const customContractPrefix='[ANTARES_CONTRATO_LIVRE_V1]\\n';
+ const [documentMode,setDocumentMode]=useState<'standard'|'custom'>('standard');
  const [documentDraft,setDocumentDraft]=useState({title:'',institution:'',responsible:'',object:'',terms:'',contractor_legal_name:'',contractor_document:'',contractor_address:'',provider_legal_name:'',provider_document:'',provider_address:'',provider_representative:''});
  type LegalProfile={legal_name:string;document_number:string;full_address:string;representative:string};
  const [legalProfiles,setLegalProfiles]=useState<{provider:LegalProfile|null;contractor:LegalProfile|null}>({provider:null,contractor:null});
@@ -161,6 +163,7 @@ export default function ClientDetails({id,writesEnabled,proposalWritesEnabled,co
  }
  function selectSavedDraft(draft:SavedDraft){
   setDocumentSavedId(draft.id);
+  setDocumentMode(draft.terms.startsWith(customContractPrefix)?'custom':'standard');
   setDocumentDraft({title:draft.title,institution:draft.institution,responsible:draft.responsible,object:draft.object_text,terms:draft.terms,contractor_legal_name:draft.contractor_legal_name||'',contractor_document:draft.contractor_document||'',contractor_address:draft.contractor_address||'',provider_legal_name:draft.provider_legal_name||'',provider_document:draft.provider_document||'',provider_address:draft.provider_address||'',provider_representative:draft.provider_representative||''});
   setDocumentNotice('Minuta recuperada · versão '+draft.version_number);
  }
@@ -187,7 +190,7 @@ export default function ClientDetails({id,writesEnabled,proposalWritesEnabled,co
  }
 
  async function openDocument(contract:Record<string,unknown>,contractId:string){
-  setDocumentNotice('');setDocumentSavedId(null);
+  setDocumentNotice('');setDocumentSavedId(null);setDocumentMode('standard');
   setDocumentDraft({title:'',institution:'',responsible:'',object:'',terms:'',contractor_legal_name:'',contractor_document:'',contractor_address:'',provider_legal_name:'',provider_document:'',provider_address:'',provider_representative:''});
   setEditingDocumentId(contractId);
   try{
@@ -249,6 +252,7 @@ export default function ClientDetails({id,writesEnabled,proposalWritesEnabled,co
   if(!confirmed){setPendingProposalFill(contractId);return;}
   setPendingProposalFill(null);
   setDocumentSavedId(null);
+  setDocumentMode('standard');
   setDocumentDraft(v=>({title:'Contrato de prestação de serviços — '+title,institution:client?.name||'',responsible:String(contract.confirmed_by_name||contacts.find(c=>c.is_primary)?.full_name||''),object:'Apresentação de planetário móvel — '+title,terms:combineContractTerms(lines.join('\n'),presentation),contractor_legal_name:v.contractor_legal_name||client?.name||'',contractor_document:v.contractor_document,contractor_address:v.contractor_address,provider_legal_name:v.provider_legal_name,provider_document:v.provider_document,provider_address:v.provider_address,provider_representative:v.provider_representative}));
   setDocumentNotice('');
  }
@@ -276,11 +280,12 @@ export default function ClientDetails({id,writesEnabled,proposalWritesEnabled,co
   </style></head><body><div class="toolbar"><button onclick="window.print()">Imprimir / Salvar em PDF</button></div><main>
   <header><img src="${escapeHtml(logo)}" alt="ANTARES" onerror="this.style.display='none'"></header>
   <h1>${escapeHtml(draft.title)}</h1>
-  <h2>Instituição contratante</h2><p>${escapeHtml(draft.institution)}</p>
+  ${draft.terms.startsWith(customContractPrefix)?'<h2>Contrato personalizado</h2><p class="text">'+line(draft.terms.slice(customContractPrefix.length))+'</p>':`<h2>Instituição contratante</h2><p>${escapeHtml(draft.institution)}</p>
   <h2>Representante da instituição</h2><p>${escapeHtml(draft.responsible||'Não informado')}</p>
   <h2>Identificação das partes</h2>\n  <p><strong>Contratante:</strong> ${escapeHtml(draft.contractor_legal_name||draft.institution)}${draft.contractor_document?' — CPF/CNPJ: '+escapeHtml(draft.contractor_document):''}${draft.contractor_address?' — Endereço: '+escapeHtml(draft.contractor_address):''}</p>\n  <p><strong>Contratada:</strong> ${escapeHtml(draft.provider_legal_name||'Planetário ANTARES')}${draft.provider_document?' — CPF/CNPJ: '+escapeHtml(draft.provider_document):''}${draft.provider_address?' — Endereço: '+escapeHtml(draft.provider_address):''}${draft.provider_representative?' — Representante: '+escapeHtml(draft.provider_representative):''}</p>\n  <h2>Objeto do contrato</h2><p class="text">${line(draft.object_text||'Não informado')}</p>
   ${presentationLabels.some(label=>splitContractTerms(draft.terms).fields[label])?'<h2>Dados da apresentação</h2>'+presentationLabels.filter(label=>splitContractTerms(draft.terms).fields[label]).map(label=>'<p><strong>'+escapeHtml(label)+':</strong> '+escapeHtml(splitContractTerms(draft.terms).fields[label])+'</p>').join(''):''}
   <h2>Cláusulas e condições</h2><p class="text">${line(splitContractTerms(draft.terms).clauses||'Não informado')}</p>
+  `}
   <div class="signatures"><div class="signature">${escapeHtml(draft.responsible||'Representante da instituição')}<br>CONTRATANTE</div>
   <div class="signature">${escapeHtml(draft.provider_representative||'Representante do Planetário ANTARES')}<br>CONTRATADA</div></div>
   
@@ -517,7 +522,17 @@ export default function ClientDetails({id,writesEnabled,proposalWritesEnabled,co
  <div style={{marginTop:10}}><button type="button" style={actionLink} onClick={()=>{void openDocument(c,contractId);}}>Elaborar documento</button></div>
  {editingDocumentId===contractId&&<div style={{marginTop:12,padding:16,background:'#e9f3ff',border:'1px solid #9cc4f6',borderRadius:12,display:'grid',gap:12}}>
  <strong style={{color:'#123c80'}}>Minuta do contrato · edição local</strong>
-  <div><button type="button" disabled={documentBusy} style={{...actionLink,background:'#145ac3'}} onClick={()=>fillDocumentFromProposal(contractId)}>Preencher com dados da proposta</button></div>
+  <div style={{display:'flex',gap:8,flexWrap:'wrap'}}>
+ <button type="button" disabled={documentBusy} style={{...actionLink,background:documentMode==='standard'?'#145ac3':'#587497'}} onClick={()=>fillDocumentFromProposal(contractId)}>Preencher com dados da proposta</button>
+ <button type="button" disabled={documentBusy} style={{...actionLink,background:documentMode==='custom'?'#145ac3':'#587497'}} onClick={()=>{
+ if(documentMode==='custom')return;
+ if(documentDraft.terms.trim()&&!window.confirm('Abrir contrato livre? O texto do modelo atual será substituído no editor. Salve antes se quiser preservá-lo.'))return;
+ setDocumentSavedId(null);
+ setDocumentMode('custom');
+ setDocumentDraft(v=>({...v,title:v.title||'Contrato personalizado',institution:v.institution||client?.name||'',terms:customContractPrefix}));
+ setDocumentNotice('Contrato livre iniciado. Escreva seu texto e salve como uma nova minuta.');
+ }}>Criar contrato livre</button>
+ </div>
  <p style={{margin:0,fontSize:12}}>Edite os campos e clique em Salvar rascunho. Documentos arquivados permanecem disponíveis para reativação. O envio ao cliente ainda não está habilitado.</p>
  {savedDrafts.length>0&&<div style={{display:'grid',gap:8,padding:12,background:'#f7fbff',border:'1px solid #b4d1f4',borderRadius:10}}>
  <strong style={{color:'#174987'}}>Minutas salvas ({savedDrafts.length})</strong>
@@ -547,6 +562,7 @@ export default function ClientDetails({id,writesEnabled,proposalWritesEnabled,co
  <label style={formLabel}>Contratada — endereço completo<input style={formInput} maxLength={500} value={documentDraft.provider_address} onChange={e=>setDocumentDraft(v=>({...v,provider_address:e.target.value}))}/></label>
  <label style={formLabel}>Contratada — representante legal<input style={formInput} maxLength={180} value={documentDraft.provider_representative} onChange={e=>setDocumentDraft(v=>({...v,provider_representative:e.target.value}))}/></label>
  </section>
+ {documentMode==='custom'?<label style={formLabel}>Texto completo do contrato<textarea style={{...formInput,fontWeight:400,lineHeight:1.7,minHeight:380}} rows={18} placeholder="Escreva aqui o contrato do seu jeito: cláusulas, condições e demais informações." value={documentDraft.terms.startsWith(customContractPrefix)?documentDraft.terms.slice(customContractPrefix.length):documentDraft.terms} onChange={e=>setDocumentDraft(v=>({...v,terms:customContractPrefix+e.target.value}))}/></label>:<>
  <label style={formLabel}>Objeto<textarea style={formInput} rows={3} value={documentDraft.object} onChange={e=>setDocumentDraft(v=>({...v,object:e.target.value}))}/></label>
  <section style={{padding:14,border:'1px solid #b4d1f4',borderRadius:12,background:'#f7fbff',display:'grid',gap:10}}>
  <strong style={{color:'#174987'}}>Dados da apresentação</strong>
@@ -562,6 +578,7 @@ export default function ClientDetails({id,writesEnabled,proposalWritesEnabled,co
  const previous=splitContractTerms(v.terms);
  return {...v,terms:combineContractTerms(e.target.value,previous.fields)};
  })}/></label>
+ </>}
  {documentNotice&&<p role="status" style={{margin:0,fontSize:13,color:'#174987'}}>{documentNotice}</p>}
  <div style={{display:'flex',gap:8,flexWrap:'wrap'}}>
  <button type="button" disabled={documentBusy||documentDraft.title.trim().length<3||documentDraft.institution.trim().length<2} style={{...actionLink,background:'#16803c'}} onClick={()=>void saveDocument(contractId)}>{documentBusy?'Salvando…':'Salvar rascunho'}</button>
