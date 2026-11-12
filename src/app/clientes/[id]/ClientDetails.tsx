@@ -206,7 +206,7 @@ export default function ClientDetails({id,writesEnabled,proposalWritesEnabled,co
   if(!confirmed){setPendingProposalFill(contractId);return;}
   setPendingProposalFill(null);
   setDocumentSavedId(null);
-  setDocumentDraft({title:'Contrato de prestação de serviços — '+title,institution:client?.name||'',responsible:String(contract.confirmed_by_name||''),object:'Apresentação de planetário móvel — '+title,terms:lines.join('\n'),contractor_legal_name:'',contractor_document:'',contractor_address:'',provider_legal_name:'',provider_document:'',provider_address:'',provider_representative:''});
+  setDocumentDraft(v=>({title:'Contrato de prestação de serviços — '+title,institution:client?.name||'',responsible:String(contract.confirmed_by_name||contacts.find(c=>c.is_primary)?.full_name||''),object:'Apresentação de planetário móvel — '+title,terms:lines.join('\n'),contractor_legal_name:v.contractor_legal_name||client?.name||'',contractor_document:v.contractor_document,contractor_address:v.contractor_address,provider_legal_name:v.provider_legal_name,provider_document:v.provider_document,provider_address:v.provider_address,provider_representative:v.provider_representative}));
   setDocumentNotice('');
  }
  function printSavedContract(){
