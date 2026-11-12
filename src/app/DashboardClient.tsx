@@ -129,7 +129,20 @@ function CalendarFull({bookings,domes,onSaved,loading,initialSelectedDate}:{book
  const move=(n:number)=>setMonth(new Date(year,m+n,1));
  
  const display=new Intl.DateTimeFormat('pt-BR',{month:'long',year:'numeric'}).format(first);
- return <div className="cal-page"><section className="panel fullcal"><div className="cal-toolbar" style={{background:'linear-gradient(110deg,#123566,#2369c4)',borderRadius:12,padding:'14px 18px',color:'#fff',boxShadow:'0 6px 18px rgba(18,53,102,.15)',display:'flex',alignItems:'center',justifyContent:'space-between',gap:12,flexWrap:'wrap'}}><div><h2 style={{color:'#fff',margin:0,fontSize:17}}>Calendário de apresentações</h2></div><div className="cal-controls" style={{display:'flex',alignItems:'center',gap:10,background:'rgba(7,31,75,.32)',borderRadius:10,padding:'6px 9px',border:'1px solid rgba(255,255,255,.2)'}}><button aria-label="Mês anterior" onClick={()=>move(-1)} style={{background:'#fff',color:'#123566',borderRadius:7,fontWeight:800}}>‹</button><strong style={{textTransform:'capitalize',color:'#fff',fontSize:16,minWidth:150,textAlign:'center'}}>{display}</strong><button aria-label="Mês seguinte" onClick={()=>move(1)} style={{background:'#fff',color:'#123566',borderRadius:7,fontWeight:800}}>›</button><button onClick={()=>{setMonth(new Date(new Date().getFullYear(),new Date().getMonth(),1));setSelected('')}} style={{background:'#dbeafe',color:'#123566',fontWeight:700,borderRadius:7}}>Mês atual</button></div></div>
+ return <div className="cal-page antares-agenda-premium"><section className="panel fullcal">
+ <div className="cal-toolbar antares-agenda-toolbar">
+  <div className="antares-agenda-title">
+   <span className="antares-agenda-title-icon" aria-hidden="true"><CalendarDays size={21}/></span>
+   <h2>Calendário de apresentações</h2>
+  </div>
+  <div className="cal-controls antares-agenda-controls">
+   <button type="button" className="antares-agenda-arrow" aria-label="Mês anterior" title="Mês anterior" onClick={()=>move(-1)}><ChevronLeft size={18}/></button>
+   <strong className="antares-agenda-month" aria-live="polite"><CalendarDays size={15} aria-hidden="true"/><span>{display}</span></strong>
+   <button type="button" className="antares-agenda-arrow" aria-label="Mês seguinte" title="Mês seguinte" onClick={()=>move(1)}><ChevronRight size={18}/></button>
+   <span className="antares-agenda-control-divider" aria-hidden="true"/>
+   <button type="button" className="antares-agenda-current" onClick={()=>{setMonth(new Date(new Date().getFullYear(),new Date().getMonth(),1));setSelected('')}}><CalendarDays size={15} aria-hidden="true"/>Mês atual</button>
+  </div>
+ </div>
  <div className="cal-scroller"><div className="cal-grid"><div className="cal-weeknames">{['Seg','Ter','Qua','Qui','Sex','Sáb','Dom'].map(n=><span key={n}>{n}</span>)}</div><div className="cal-days">{cells.map(d=>{const key=dateKey(d),ev=calendarEvents.filter(e=>e.date===key);return <button key={key} className={'cal-day '+(d.getMonth()!==m?'outside ':'')+(selected===key?'chosen':'')} onClick={()=>{setSelected(key);setDetailDate(ev.length?key:null)}} aria-label={`${d.toLocaleDateString('pt-BR')}, ${ev.length} apresentações`}><span>{d.getDate()}</span>{ev.map(e=><small key={e.id} className={e.status==='Reservado'?'reserve':''}>{e.time} · {e.name}</small>)}</button>})}</div></div></div>
  </section>{loading&&<p role="status">Carregando reservas...</p>}
   {detailDate&&<div role="presentation" style={{position:'fixed',inset:0,zIndex:9999,background:'rgba(7,23,53,.72)',display:'flex',alignItems:'center',justifyContent:'center',padding:16}}>
