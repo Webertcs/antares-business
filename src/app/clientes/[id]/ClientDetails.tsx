@@ -470,6 +470,19 @@ export default function ClientDetails({id,writesEnabled,proposalWritesEnabled,co
  <label style={formLabel}>Instituição<input style={formInput} value={documentDraft.institution} onChange={e=>setDocumentDraft(v=>({...v,institution:e.target.value}))}/></label>
  <label style={formLabel}>Representante<input style={formInput} value={documentDraft.responsible} onChange={e=>setDocumentDraft(v=>({...v,responsible:e.target.value}))}/></label>
  <label style={formLabel}>Objeto<textarea style={formInput} rows={3} value={documentDraft.object} onChange={e=>setDocumentDraft(v=>({...v,object:e.target.value}))}/></label>
+ <section style={{padding:14,border:'1px solid #b4d1f4',borderRadius:12,background:'#f7fbff',display:'grid',gap:10}}>
+ <strong style={{color:'#174987'}}>Dados da apresentação</strong>
+ <p style={{margin:0,fontSize:12,color:'#47668b'}}>Preencha os dados confirmados. Eles serão incluídos nas cláusulas da minuta, sem alterar a proposta ou o evento.</p>
+ {(['Data da apresentação','Local e endereço','Horários e sessões','Público previsto','Valor total e sinal','Forma e prazo de pagamento'] as const).map(label=>{
+ const prefix=label+': ';
+ const current=documentDraft.terms.split('\\n').find(line=>line.startsWith(prefix))?.slice(prefix.length)||'';
+ return <label key={label} style={formLabel}>{label}<input style={formInput} value={current} placeholder="A confirmar" onChange={e=>setDocumentDraft(v=>{
+ const lines=v.terms.split('\\n').filter(line=>!line.startsWith(prefix));
+ const next=e.target.value.trim();
+ return {...v,terms:[...lines,...(next?[prefix+next]:[])].join('\\n')};
+ })}/></label>;
+ })}
+ </section>
  <label style={formLabel}>Cláusulas e condições<textarea style={formInput} rows={7} value={documentDraft.terms} onChange={e=>setDocumentDraft(v=>({...v,terms:e.target.value}))}/></label>
  {documentNotice&&<p role="status" style={{margin:0,fontSize:13,color:'#174987'}}>{documentNotice}</p>}
  <div style={{display:'flex',gap:8,flexWrap:'wrap'}}>
