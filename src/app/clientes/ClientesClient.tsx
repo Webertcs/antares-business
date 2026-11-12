@@ -148,17 +148,14 @@ export default function ClientsPage({ writesEnabled }: { writesEnabled: boolean 
    <div><p style={{letterSpacing:2,fontSize:12}}>ANTARES · RELACIONAMENTO</p>
     <h1 style={{fontSize:24,fontWeight:750}}>Clientes e Eventos</h1>
     <p>Escolas, empresas, associações e apresentações em um só lugar.</p></div>
-   <div className={styles.headerActions}>
    {!writesEnabled&&<span className={styles.access}>Somente consulta</span>}
-   <Link href="/vitrine/inbox" className={styles.headerButton}>Solicitações da vitrine</Link>
-   <button type="button" className={styles.headerButton} disabled={!writesEnabled||saving} onClick={()=>openForm('client')}>+ Novo cliente</button></div>
   </div>
   <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(160px,1fr))',gap:10,marginBottom:14}}>
    {[['Clientes cadastrados',clients.length],['Em acompanhamento',clients.filter(c=>c.status!=='inactive').length],['Arquivados',clients.filter(c=>c.status==='inactive').length],['Escolas cadastradas',countBy('school')],['Eventos registrados',events.length]].map(([t,n])=>
     <section className={styles.metric} key={t}><div>{t}</div><strong style={{fontSize:26}}>{n}</strong></section>)}
   </div>
   <section className={styles.directory} style={{border:'1px solid #bdd6f5',borderRadius:14,padding:16,marginBottom:16}}>
-   <div className={styles.directoryHeader}><div><h2>Base de clientes</h2><p>Encontre cadastros e acompanhe o relacionamento.</p></div><span className={styles.resultCount}>{filtered.length} na lista</span></div>
+   <div className={styles.directoryHeader}><div><h2>Base de clientes</h2><p>Encontre cadastros e acompanhe o relacionamento.</p></div><div className={styles.directoryControls}><span className={styles.resultCount}>{filtered.length} na lista</span><button type="button" className={styles.directoryCreateButton} disabled={!writesEnabled||saving} onClick={()=>openForm('client')}>+ Novo cliente</button></div></div>
    <div className={styles.filterPanel}>
     <label className={styles.filterSearch}><span>⌕ Pesquisar clientes</span>
      <input value={query} onChange={e=>setQuery(e.target.value)} placeholder="Nome, cidade ou e-mail" aria-label="Buscar clientes"/>
