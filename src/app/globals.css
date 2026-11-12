@@ -912,3 +912,29 @@
 .sidebar .brand-lockup:has(.antares-logo-home-premium)>span{text-align:center;margin-top:7px!important}
 @media(max-width:760px){.sidebar .antares-logo-home-premium{width:164px}.sidebar .antares-logo-home-premium .antares-logo-art-premium{max-height:106px}}
 @media(prefers-reduced-motion:reduce){.sidebar .antares-logo-home-premium{transition:none}.sidebar .antares-logo-home-premium:hover{transform:none}}
+
+
+/* ANTARES Premium - ficha de Clientes */
+.antares-client-detail{font-size:13px;line-height:1.45;color:#173e72;}
+.antares-client-detail .client-detail-hero{border:1px solid #337ccf;background:linear-gradient(112deg,#143a78,#1b60b6 70%,#2c79cc)!important;box-shadow:0 8px 22px rgba(15,67,144,.18)!important;}
+.antares-client-detail .client-detail-metrics{grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:8px;}
+.antares-client-detail .client-detail-metric{min-width:0;min-height:62px!important;padding:8px 12px!important;border:1px solid #c0d7f4!important;border-top:3px solid #347fe0!important;border-radius:10px!important;background:linear-gradient(115deg,#f4f9ff,#e6f1ff)!important;box-shadow:0 4px 12px rgba(20,69,142,.09);transition:transform .15s ease,box-shadow .15s ease;}
+.antares-client-detail .client-detail-metric:nth-child(2){border-top-color:#18a7a0!important}.antares-client-detail .client-detail-metric:nth-child(3){border-top-color:#5c87d6!important}.antares-client-detail .client-detail-metric:nth-child(4){border-top-color:#e2a24a!important}
+.antares-client-detail .client-detail-metric:hover{transform:translateY(-1px);box-shadow:0 6px 15px rgba(20,69,142,.14)}
+.antares-client-detail .client-detail-metric strong{font-size:19px!important;line-height:1.2!important;overflow-wrap:anywhere}
+.antares-client-detail .client-detail-metric:last-child strong{font-size:15px!important}
+.antares-client-detail .client-detail-tabs{margin:11px 0 12px!important;gap:6px!important;}
+.antares-client-detail .client-detail-tabs button{font-size:12px!important;line-height:1.2;min-height:35px;padding:7px 12px!important;border-radius:8px!important;box-shadow:0 2px 6px rgba(14,72,144,.07);transition:transform .15s ease,box-shadow .15s ease;}
+.antares-client-detail .client-detail-tabs button[aria-current="page"]{background:linear-gradient(115deg,#1a61bf,#123c7b)!important;color:#fff!important;border-color:#236ac9!important;box-shadow:0 4px 11px rgba(19,75,156,.23);}
+.antares-client-detail .client-detail-tabs button:hover{transform:translateY(-1px);box-shadow:0 4px 10px rgba(14,72,144,.14)}
+.antares-client-detail :is(input,select,textarea){border-color:#bcd5f4;accent-color:#1d62c4;font-size:12px;max-width:100%;}
+.antares-client-detail :is(input,select,textarea):focus-visible{outline:2px solid #4c9afa;outline-offset:1px;}
+.antares-client-detail button{font-family:inherit;font-size:12px;line-height:1.25;transition:transform .14s ease,box-shadow .14s ease,background .14s ease;}
+.antares-client-detail button:not(:disabled):hover{filter:brightness(1.035)}
+.antares-client-detail section{scroll-margin-top:16px;}
+.antares-client-detail dialog{border:1px solid #9dbfea!important;border-radius:16px!important;box-shadow:0 22px 66px rgba(8,28,67,.3)!important;color:#173e72;}
+.antares-client-detail dialog::backdrop{background:rgba(8,27,62,.67);backdrop-filter:blur(2px);}
+.antares-client-detail dialog :is(input,select,textarea){border:1px solid #bdd5f5;border-radius:8px;}
+@media(max-width:900px){.antares-client-detail .client-detail-metrics{grid-template-columns:repeat(2,minmax(0,1fr))!important}}
+@media(max-width:560px){.antares-client-detail{padding:12px!important}.antares-client-detail .client-detail-metrics{grid-template-columns:repeat(2,minmax(0,1fr))!important}.antares-client-detail .client-detail-tabs button{flex:1;min-width:calc(25% - 6px);}.antares-client-detail .client-detail-metric strong{font-size:17px!important}}
+@media(prefers-reduced-motion:reduce){.antares-client-detail button,.antares-client-detail .client-detail-metric{transition:none!important}.antares-client-detail button:hover,.antares-client-detail .client-detail-metric:hover{transform:none}}
