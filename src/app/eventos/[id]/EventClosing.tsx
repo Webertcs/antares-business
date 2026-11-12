@@ -28,7 +28,7 @@ export default function EventClosing({eventId}:{eventId:string}){
    setData(await load());setOpen(false);setMessage('Evento encerrado e presença registrada.');
   }catch(e){setMessage(e instanceof Error?e.message:'Erro no encerramento')}finally{setBusy(false)}
  }
- return <section aria-label="Fechamento operacional e controle de público" style={{border:'1px solid #8cb7f3',borderRadius:16,overflow:'hidden',background:'linear-gradient(145deg,#f1f7ff,#ffffff)',color:'#173668',boxShadow:'0 10px 26px rgba(16,67,145,.12)'}}>
+ return <section className="antares-event-center-closing" aria-label="Fechamento operacional e controle de público" style={{border:'1px solid #8cb7f3',borderRadius:16,overflow:'hidden',background:'linear-gradient(145deg,#f1f7ff,#ffffff)',color:'#173668',boxShadow:'0 10px 26px rgba(16,67,145,.12)'}}>
   <div style={{background:'linear-gradient(110deg,#09265f,#1353a5 72%,#1769bf)',padding:'14px 17px',color:'#fff',display:'flex',alignItems:'center',gap:11}}>
    <span aria-hidden="true" style={{fontSize:23,background:'rgba(255,255,255,.15)',borderRadius:11,padding:'7px 10px'}}>📊</span>
    <div><strong style={{fontSize:17,display:'block'}}>Fechamento operacional · Controle de público</strong><span style={{fontSize:12,color:'#d7eaff'}}>Registro oficial de alunos atendidos por evento</span></div>
