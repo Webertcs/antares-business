@@ -84,6 +84,21 @@ export default function ClientDetails({id,writesEnabled,proposalWritesEnabled,co
  const formInput:React.CSSProperties={display:'block',width:'100%',padding:10,border:'1px solid #abc7ed',borderRadius:9,marginTop:5,color:'#16325b',background:'#fff'};
  const formLabel:React.CSSProperties={fontSize:13,fontWeight:650,color:'#174987'};
 
+ const presentationLabels=['Data da apresentação','Local e endereço','Horários e sessões','Público previsto','Valor total e sinal','Forma e prazo de pagamento'] as const;
+ function splitContractTerms(value:string){
+  const fields:Record<string,string>={};
+  const clauses:string[]=[];
+  for(const line of value.split('\\n')){
+   const label=presentationLabels.find(item=>line.startsWith(item+': '));
+   if(label)fields[label]=line.slice(label.length+2);
+   else clauses.push(line);
+  }
+  return {fields,clauses:clauses.join('\\n').trim()};
+ }
+ function combineContractTerms(clauses:string,fields:Record<string,string>){
+  const entries=presentationLabels.filter(label=>fields[label]?.trim()).map(label=>label+': '+fields[label].trim());
+  return [...entries,...(clauses.trim()?[clauses.trim()]:[])].join('\\n\\n');
+ }
  const [contractFor,setContractFor]=useState<string|null>(null);
  const [confirmContractId,setConfirmContractId]=useState<string|null>(null);
  const [contractResponsible,setContractResponsible]=useState('');
@@ -218,7 +233,8 @@ export default function ClientDetails({id,writesEnabled,proposalWritesEnabled,co
   <h2>Instituição contratante</h2><p>${escapeHtml(draft.institution)}</p>
   <h2>Representante da instituição</h2><p>${escapeHtml(draft.responsible||'Não informado')}</p>
   <h2>Objeto do contrato</h2><p class="text">${line(draft.object_text||'Não informado')}</p>
-  <h2>Cláusulas e condições</h2><p class="text">${line(draft.terms||'Não informado')}</p>
+  ${presentationLabels.some(label=>splitContractTerms(draft.terms).fields[label])?'<h2>Dados da apresentação</h2>'+presentationLabels.filter(label=>splitContractTerms(draft.terms).fields[label]).map(label=>'<p><strong>'+escapeHtml(label)+':</strong> '+escapeHtml(splitContractTerms(draft.terms).fields[label])+'</p>').join(''):''}
+  <h2>Cláusulas e condições</h2><p class="text">${line(splitContractTerms(draft.terms).clauses||'Não informado')}</p>
   <div class="signatures"><div class="signature">${escapeHtml(draft.responsible||'Representante da instituição')}<br>CONTRATANTE</div>
   <div class="signature">Representante do Planetário ANTARES<br>CONTRATADA</div></div>
   
@@ -472,18 +488,18 @@ export default function ClientDetails({id,writesEnabled,proposalWritesEnabled,co
  <label style={formLabel}>Objeto<textarea style={formInput} rows={3} value={documentDraft.object} onChange={e=>setDocumentDraft(v=>({...v,object:e.target.value}))}/></label>
  <section style={{padding:14,border:'1px solid #b4d1f4',borderRadius:12,background:'#f7fbff',display:'grid',gap:10}}>
  <strong style={{color:'#174987'}}>Dados da apresentação</strong>
- <p style={{margin:0,fontSize:12,color:'#47668b'}}>Preencha os dados confirmados. Eles serão incluídos nas cláusulas da minuta, sem alterar a proposta ou o evento.</p>
- {(['Data da apresentação','Local e endereço','Horários e sessões','Público previsto','Valor total e sinal','Forma e prazo de pagamento'] as const).map(label=>{
- const prefix=label+': ';
- const current=documentDraft.terms.split('\\n').find(line=>line.startsWith(prefix))?.slice(prefix.length)||'';
- return <label key={label} style={formLabel}>{label}<input style={formInput} value={current} placeholder="A confirmar" onChange={e=>setDocumentDraft(v=>{
- const lines=v.terms.split('\\n').filter(line=>!line.startsWith(prefix));
- const next=e.target.value.trim();
- return {...v,terms:[...lines,...(next?[prefix+next]:[])].join('\\n')};
+ {presentationLabels.map(label=>{
+ const parts=splitContractTerms(documentDraft.terms);
+ return <label key={label} style={formLabel}>{label}<input style={formInput} value={parts.fields[label]||''} placeholder="A confirmar" onChange={e=>setDocumentDraft(v=>{
+ const previous=splitContractTerms(v.terms);
+ return {...v,terms:combineContractTerms(previous.clauses,{...previous.fields,[label]:e.target.value})};
  })}/></label>;
  })}
  </section>
- <label style={formLabel}>Cláusulas e condições<textarea style={formInput} rows={7} value={documentDraft.terms} onChange={e=>setDocumentDraft(v=>({...v,terms:e.target.value}))}/></label>
+ <label style={formLabel}>Cláusulas e condições<textarea style={{...formInput,fontWeight:400,lineHeight:1.65}} rows={12} value={splitContractTerms(documentDraft.terms).clauses} onChange={e=>setDocumentDraft(v=>{
+ const previous=splitContractTerms(v.terms);
+ return {...v,terms:combineContractTerms(e.target.value,previous.fields)};
+ })}/></label>
  {documentNotice&&<p role="status" style={{margin:0,fontSize:13,color:'#174987'}}>{documentNotice}</p>}
  <div style={{display:'flex',gap:8,flexWrap:'wrap'}}>
  <button type="button" disabled={documentBusy||documentDraft.title.trim().length<3||documentDraft.institution.trim().length<2} style={{...actionLink,background:'#16803c'}} onClick={()=>void saveDocument(contractId)}>{documentBusy?'Salvando…':'Salvar rascunho'}</button>
