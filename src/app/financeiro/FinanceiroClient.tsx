@@ -92,7 +92,23 @@ export default function FinanceiroClient(){
  .finance-report-print table { border-collapse:collapse !important; width:100% !important; font-size:10pt !important; }
  .finance-report-print th,.finance-report-print td { border-bottom:1px solid #ddd !important; padding:6px !important; }
  .finance-report-print tr { break-inside:avoid !important; }
- }`}</style><main style={{background:'#f3f6fc',color:'#11264d',minHeight:'100%',padding:'clamp(16px,3vw,32px)',fontFamily:'Arial,sans-serif'}}>
+
+ .finance-premium { background:linear-gradient(145deg,#edf4ff 0%,#f6f9ff 48%,#e9f1ff 100%) !important; }
+ .finance-premium > div > header {box-shadow:0 12px 26px rgba(17,62,129,.18);border:1px solid #3979c6;}
+ .finance-premium nav[aria-label="Áreas financeiras"] {padding:7px;background:#e3eeff;border:1px solid #c8dcfa;border-radius:12px;box-shadow:inset 0 1px 3px rgba(27,73,137,.08);}
+ .finance-premium nav[aria-label="Áreas financeiras"] button {box-shadow:0 3px 7px rgba(30,77,145,.12);transition:transform .15s ease,box-shadow .15s ease,background .15s ease;}
+ .finance-premium nav[aria-label="Áreas financeiras"] button:hover {transform:translateY(-2px);box-shadow:0 6px 13px rgba(30,77,145,.2);}
+ .finance-premium nav[aria-label="Áreas financeiras"] button[aria-pressed="true"] {background:linear-gradient(125deg,#17488d,#3179d7) !important;box-shadow:0 4px 10px rgba(23,72,141,.25);}
+ .finance-premium section.finance-print-hide {background:linear-gradient(165deg,#fff 0%,#f5f9ff 100%);}
+ .finance-premium section.finance-print-hide select {background:#edf5ff;border:1px solid #b7d0f3;border-radius:8px;color:#194981;font-weight:600;}
+ .finance-premium section.finance-print-hide table tbody tr:nth-child(even) {background:rgba(225,237,255,.48);}
+ .finance-premium section.finance-print-hide table tbody tr:hover {background:#e6f1ff;}
+ .finance-premium section.finance-print-hide table td {padding:9px 8px !important;}
+ .finance-premium section.finance-print-hide table td button {background:#e9f2ff;border:1px solid #a9c7ed !important;border-radius:7px !important;color:#174b91;font-weight:700;cursor:pointer;}
+ .finance-premium section.finance-print-hide table td button:hover {background:#d7e8ff;}
+ @media(max-width:760px){.finance-premium nav[aria-label="Áreas financeiras"] {gap:6px !important;}.finance-premium nav[aria-label="Áreas financeiras"] button {font-size:12px;padding:9px !important;}}
+ @media print {.finance-premium {background:white !important;}.finance-premium section.finance-print-hide table td {padding:6px !important;}}
+ }`}</style><main className="finance-premium" style={{background:'#f3f6fc',color:'#11264d',minHeight:'100%',padding:'clamp(16px,3vw,32px)',fontFamily:'Arial,sans-serif'}}>
  <div style={{maxWidth:1120,margin:'0 auto'}}>
  
  <header className="finance-print-hide" style={{background:'linear-gradient(110deg,#143b78,#2467ba)',color:'#fff',borderRadius:16,padding:'22px 24px',display:'flex',justifyContent:'space-between',alignItems:'center',gap:12,flexWrap:'wrap'}}><div><small style={{letterSpacing:1.5}}>ANTARES BUSINESS</small><h1 style={{fontSize:25,margin:'5px 0'}}>Financeiro</h1><p style={{margin:0,fontSize:13}}>Controle de receitas, despesas e recebimentos</p></div></header>
