@@ -10,7 +10,7 @@ export async function GET(req:NextRequest){
  if(!contractId||!uuid.test(contractId))return fail('Contrato inválido.');
  try{
   const db=getDb();
-  const rows=await db`SELECT d.id,d.contract_id,d.title,d.institution,d.responsible,d.object_text,d.terms,d.version_number,d.archived_at,d.deleted_at
+  const rows=await db`SELECT d.id,d.contract_id,d.title,d.institution,d.responsible,d.object_text,d.terms,d.version_number,d.archived_at,d.deleted_at,d.contractor_legal_name,d.contractor_document,d.contractor_address,d.provider_legal_name,d.provider_document,d.provider_address,d.provider_representative
   FROM public.antares_contract_drafts d
   JOIN public.business_contracts c ON c.id=d.contract_id AND c.organization_id=d.organization_id
   WHERE d.organization_id=${owner.organizationId} AND d.contract_id=${contractId}::uuid AND d.deleted_at IS NULL
@@ -28,15 +28,15 @@ export async function POST(req:NextRequest){
   const b=await req.json();
   if(!b||typeof b!=='object'||typeof b.contractId!=='string'||!uuid.test(b.contractId)||
    (b.draftId!==null&&b.draftId!==undefined&&(typeof b.draftId!=='string'||!uuid.test(b.draftId)))||
-   ![['title',3,200],['institution',2,200],['responsible',0,180],['object',0,8000],['terms',0,16000]].every(([key,min,max])=>typeof b[key as string]==='string'&&(b[key as string] as string).trim().length>=Number(min)&&(b[key as string] as string).length<=Number(max)))return fail('Dados da minuta inválidos.');
+   ![['title',3,200],['institution',2,200],['responsible',0,180],['object',0,8000],['terms',0,16000],...[["contractor_legal_name",0,240],["contractor_document",0,30],["contractor_address",0,500],["provider_legal_name",0,240],["provider_document",0,30],["provider_address",0,500],["provider_representative",0,180]]].every(([key,min,max])=>typeof b[key as string]==='string'&&(b[key as string] as string).trim().length>=Number(min)&&(b[key as string] as string).length<=Number(max)))return fail('Dados da minuta inválidos.');
   const db=getTeamWriteDb();
   const checks=await db`SELECT EXISTS(SELECT 1 FROM pg_catalog.pg_roles r WHERE r.rolname=current_user AND r.rolname='antares_team_runtime' AND NOT r.rolsuper AND NOT r.rolbypassrls) AS safe_role,
-   EXISTS(SELECT 1 FROM pg_proc p WHERE p.pronamespace='public'::regnamespace AND p.proname='antares_save_contract_draft'
+   EXISTS(SELECT 1 FROM pg_proc p WHERE p.pronamespace='public'::regnamespace AND p.proname='antares_save_contract_draft_v2'
    AND p.prosecdef AND pg_get_userbyid(p.proowner)='neondb_owner'
    AND has_function_privilege(current_user,p.oid,'EXECUTE')
    AND NOT EXISTS(SELECT 1 FROM aclexplode(coalesce(p.proacl,acldefault('f',p.proowner))) a WHERE a.grantee=0 AND a.privilege_type='EXECUTE')) AS safe_function`;
   if(!checks[0]?.safe_role||!checks[0]?.safe_function)return fail('Salvamento ainda não autorizado.',503);
-  const result=await db`SELECT public.antares_save_contract_draft(${owner.user.id},${b.contractId}::uuid,${b.draftId||null}::uuid,${b.title},${b.institution},${b.responsible},${b.object},${b.terms}) AS id`;
+  const result=await db`SELECT public.antares_save_contract_draft_v2(${owner.user.id},${b.contractId}::uuid,${b.draftId||null}::uuid,${b.title},${b.institution},${b.responsible},${b.object},${b.terms},${b.contractor_legal_name},${b.contractor_document},${b.contractor_address},${b.provider_legal_name},${b.provider_document},${b.provider_address},${b.provider_representative}) AS id`;
   return NextResponse.json({id:result[0]?.id},{headers:{'Cache-Control':'no-store'}});
  }catch(e){console.error('[ANTARES][minutas]',e instanceof Error?e.message:'Erro');return fail('Não foi possível salvar a minuta.',409);}
 }
