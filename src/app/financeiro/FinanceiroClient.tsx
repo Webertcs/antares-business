@@ -1,5 +1,6 @@
 'use client';
 import {useEffect,useState} from 'react';
+import FinanceReport from './FinanceReport';
 
 type Entry={id:string;entry_type:'income'|'expense';amount:number;description:string;occurred_on:string;reversal_of:string|null;presentation_title:string|null;dome_name:string|null};
 type Data={entries:Entry[];income:number;expenses:number;balance:number;writesEnabled:boolean;limited:boolean;domes:{id:string;name:string;active:boolean}[];presentations:{id:string;title:string;starts_at:string}[]};
@@ -154,18 +155,7 @@ export default function FinanceiroClient(){
  <div style={{overflowX:'auto'}}><table style={{width:'100%',borderCollapse:'collapse',textAlign:'left',fontSize:13}}><thead><tr>{['Data','Instituição','Descrição','Valor recebido'].map(h=><th key={h} style={{padding:9,borderBottom:'1px solid #ccd8ea'}}>{h}</th>)}</tr></thead><tbody>{receivables.payments.map(p=><tr key={p.id}><td style={{padding:9}}>{String(p.occurred_on).slice(0,10).split('-').reverse().join('/')}</td><td style={{padding:9}}>{p.client_name}</td><td style={{padding:9}}>{p.description}</td><td style={{padding:9,fontWeight:700,color:'#16724a'}}>+ {brl(Number(p.amount))}</td></tr>)}</tbody></table>{receivables.payments.length===0&&<p>Nenhum recebimento vinculado.</p>}</div>
  
  </section>}
- {section==='relatorios'&&report&&<section className="finance-report-print" style={{...card,marginTop:20}}>
- <h2>Fluxo de caixa e relatórios gerenciais</h2>
- <p style={{fontSize:13}}>Valores efetivamente realizados. Propostas comerciais não entram no saldo do caixa.</p>
- <div style={{overflowX:'auto'}}><h3>Resumo mensal</h3><table style={{width:'100%',textAlign:'left'}}><thead><tr><th>Período</th><th>Receitas</th><th>Despesas</th><th>Saldo</th></tr></thead><tbody>{report.months.map(m=><tr key={m.periodo}><td>{m.periodo}</td><td>{brl(Number(m.receitas))}</td><td>{brl(Number(m.despesas))}</td><td>{brl(Number(m.receitas)-Number(m.despesas))}</td></tr>)}</tbody></table>{!report.months.length&&<p>Sem movimentações realizadas.</p>}</div>
- <h3>Resumo anual</h3><div style={{overflowX:'auto'}}><table style={{width:'100%',textAlign:'left'}}><thead><tr><th>Ano</th><th>Receitas</th><th>Despesas</th><th>Resultado de caixa</th></tr></thead><tbody>{report.years.map(y=><tr key={y.ano}><td>{y.ano}</td><td>{brl(Number(y.receitas))}</td><td>{brl(Number(y.despesas))}</td><td>{brl(Number(y.receitas)-Number(y.despesas))}</td></tr>)}</tbody></table></div>
- <h3>Por cúpula</h3><div style={{overflowX:'auto'}}><table style={{width:'100%',textAlign:'left'}}><thead><tr><th>Cúpula</th><th>Receitas</th><th>Despesas</th><th>Saldo</th></tr></thead><tbody>{report.domes.map(d=><tr key={d.cupula}><td>{d.cupula}</td><td>{brl(Number(d.receitas))}</td><td>{brl(Number(d.despesas))}</td><td>{brl(Number(d.receitas)-Number(d.despesas))}</td></tr>)}</tbody></table></div>
- <h3>Carteira comercial — valores previstos</h3><p style={{fontSize:13}}>Propostas em andamento ou aceitas. Não constituem, por si só, títulos a receber e não entram no saldo bancário.</p>
- {report.proposals.map(p=><p key={p.id} style={{fontSize:14}}>{p.title} — {brl(Number(p.total||0))} ({p.status==='accepted'?'Aceita':p.status==='draft'?'Rascunho':p.status==='sent'?'Enviada':p.status==='rejected'?'Recusada':p.status==='archived'?'Arquivada':p.status})</p>)}
- {!report.proposals.length&&<p>Sem propostas comerciais abertas.</p>}
- <button type="button" className="finance-print-hide" onClick={()=>window.print()} style={{padding:'10px 14px',borderRadius:8,background:'#2454d3',color:'white'}}>Imprimir relatório / salvar PDF</button>
- <p style={{fontSize:12,opacity:.7}}>Relatório gerencial de caixa. Não substitui balanço patrimonial, DRE ou balancete contábil.</p>
- </section>}
+ {section==='relatorios'&&report&&<FinanceReport report={report}/>} 
   {entryModalOpen&&<div className="finance-print-hide" role="presentation" style={{position:'fixed',inset:0,zIndex:5000,background:'rgba(7,24,53,.68)',display:'flex',alignItems:'center',justifyContent:'center',padding:16}}><section role="dialog" aria-modal="true" aria-label="Novo lançamento" style={{...card,width:'min(100%,530px)',maxHeight:'92vh',overflowY:'auto',padding:0,boxShadow:'0 24px 70px #091b3b66'}}><header style={{background:'linear-gradient(110deg,#143b78,#2467ba)',color:'#fff',padding:'15px 18px',display:'flex',justifyContent:'space-between',alignItems:'center'}}><h2 style={{margin:0,fontSize:18}}>Novo lançamento</h2><button type="button" onClick={closeEntry} aria-label="Fechar" style={{background:'transparent',border:0,color:'white',fontSize:23,cursor:'pointer'}}>×</button></header><div style={{padding:20,background:'linear-gradient(180deg,#f2f7ff 0%,#fff 75%)',color:'#173e73'}}>
  <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(190px,1fr))',gap:14}}>
  <label>Tipo<select value={entryType} onChange={e=>{setEntryType(e.target.value);setPendingId(null);}} style={{display:'block',width:'100%',padding:'11px 12px',marginTop:6,border:'1px solid #b7cdeb',borderRadius:9,background:'#fff',color:'#173e73',outlineColor:'#2868c8'}}><option value="income">Receita recebida</option><option value="expense">Despesa paga</option></select></label>
