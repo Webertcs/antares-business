@@ -13,7 +13,7 @@ export default function EventNotes({eventId,initialNotes,canEdit}:{eventId:strin
   }catch(e){setFailed(true);setFeedback(e instanceof Error?e.message:'Erro ao salvar')}
   finally{setBusy(false)}
  }
- return <section aria-label="Observações do evento" style={{border:'1px solid #8db6f6',borderRadius:16,overflow:'hidden',background:'linear-gradient(120deg,#e4efff,#f7faff)',boxShadow:'0 8px 22px rgba(16,65,147,.13)'}}>
+ return <section className="antares-event-center-notes" aria-label="Observações do evento" style={{border:'1px solid #8db6f6',borderRadius:16,overflow:'hidden',background:'linear-gradient(120deg,#e4efff,#f7faff)',boxShadow:'0 8px 22px rgba(16,65,147,.13)'}}>
  <div style={{padding:'9px 12px',fontWeight:800,color:'#fff',background:'linear-gradient(105deg,#07357f,#0756b8)',display:'flex',alignItems:'center',justifyContent:'space-between',gap:10,flexWrap:'wrap'}}>
  <strong style={{fontSize:14,color:'#fff'}}>📝 Observações</strong>
  <span style={{fontSize:12,color:'#d9eaff'}}>{notes.trim()?'Aviso operacional':'Nenhuma observação'}</span>
