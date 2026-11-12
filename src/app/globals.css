@@ -906,9 +906,9 @@
 
 /* ANTARES Premium - logo do menu lateral: versao vertical para leitura em espaco estreito */
 .sidebar .brand-lockup:has(.antares-logo-home-premium){align-items:center;width:100%;max-width:195px}
-.sidebar .antares-logo-home-premium{display:flex;align-items:center;justify-content:center;width:160px;max-width:100%;padding:5px;background:linear-gradient(140deg,#ffffff,#eaf4ff);border:1px solid #b9d6fa;border-radius:12px;box-shadow:0 5px 18px rgba(0,0,0,.18);transition:transform .2s ease,box-shadow .2s ease}
-.sidebar .antares-logo-home-premium:hover{transform:translateY(-1px);box-shadow:0 8px 20px rgba(20,119,209,.24)}
+.sidebar .antares-logo-home-premium{display:flex;align-items:center;justify-content:center;width:174px;max-width:100%;padding:0;background:transparent;border:0;border-radius:0;box-shadow:none;transition:transform .2s ease,filter .2s ease}
+.sidebar .antares-logo-home-premium:hover{transform:translateY(-1px);filter:drop-shadow(0 3px 8px rgba(25,181,255,.24))}
 .sidebar .antares-logo-home-premium .antares-logo-art-premium{display:block;width:100%;height:auto;max-height:112px;object-fit:contain;object-position:center}
 .sidebar .brand-lockup:has(.antares-logo-home-premium)>span{text-align:center;margin-top:7px!important}
-@media(max-width:760px){.sidebar .antares-logo-home-premium{width:150px}.sidebar .antares-logo-home-premium .antares-logo-art-premium{max-height:106px}}
+@media(max-width:760px){.sidebar .antares-logo-home-premium{width:164px}.sidebar .antares-logo-home-premium .antares-logo-art-premium{max-height:106px}}
 @media(prefers-reduced-motion:reduce){.sidebar .antares-logo-home-premium{transition:none}.sidebar .antares-logo-home-premium:hover{transform:none}}
