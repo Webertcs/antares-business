@@ -142,22 +142,22 @@ export default function ClientsPage({ writesEnabled }: { writesEnabled: boolean 
   finally{setSaving(false)}
  }
  const countBy=(k:string)=>clients.filter(c=>c.kind===k).length;
- return <main className={styles.page} style={{maxWidth:1180,margin:'0 auto',padding:'28px 18px',fontFamily:'system-ui'}}>
+ return <main className={styles.page} style={{maxWidth:1180,margin:'0 auto',padding:'16px 18px 32px',fontFamily:'system-ui'}}>
 
-  <div className={styles.hero} style={{display:'flex',justifyContent:'space-between',alignItems:'center',gap:16,flexWrap:'wrap',margin:'20px 0'}}>
+  <div className={styles.hero} style={{display:'flex',justifyContent:'space-between',alignItems:'center',gap:12,flexWrap:'wrap',margin:'8px 0 14px'}}>
    <div><p style={{letterSpacing:2,fontSize:12}}>ANTARES · RELACIONAMENTO</p>
-    <h1 style={{fontSize:30,fontWeight:750}}>Clientes e Eventos</h1>
+    <h1 style={{fontSize:24,fontWeight:750}}>Clientes e Eventos</h1>
     <p>Escolas, empresas, associações e apresentações em um só lugar.</p></div>
    <div className={styles.headerActions}>
    {!writesEnabled&&<span className={styles.access}>Somente consulta</span>}
    <Link href="/vitrine/inbox" className={styles.headerButton}>Solicitações da vitrine</Link>
    <button type="button" className={styles.headerButton} disabled={!writesEnabled||saving} onClick={()=>openForm('client')}>+ Novo cliente</button></div>
   </div>
-  <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(160px,1fr))',gap:12,marginBottom:20}}>
+  <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(160px,1fr))',gap:10,marginBottom:14}}>
    {[['Clientes cadastrados',clients.length],['Em acompanhamento',clients.filter(c=>c.status!=='inactive').length],['Arquivados',clients.filter(c=>c.status==='inactive').length],['Escolas cadastradas',countBy('school')],['Eventos registrados',events.length]].map(([t,n])=>
     <section className={styles.metric} key={t}><div>{t}</div><strong style={{fontSize:26}}>{n}</strong></section>)}
   </div>
-  <section className={styles.directory} style={{border:'1px solid #94a3b8',borderRadius:14,padding:18,marginBottom:20}}>
+  <section className={styles.directory} style={{border:'1px solid #bdd6f5',borderRadius:14,padding:16,marginBottom:16}}>
    <div className={styles.directoryHeader}><div><h2>Base de clientes</h2><p>Encontre cadastros e acompanhe o relacionamento.</p></div><span className={styles.resultCount}>{filtered.length} na lista</span></div>
    <div className={styles.filterPanel}>
     <label className={styles.filterSearch}><span>⌕ Pesquisar clientes</span>
@@ -177,7 +177,7 @@ export default function ClientsPage({ writesEnabled }: { writesEnabled: boolean 
     <thead><tr>{['Cliente','Tipo','Cidade','Situação','Detalhes'].map(x=><th key={x} style={{padding:'12px 8px',borderBottom:'1px solid #94a3b8'}}>{x}</th>)}</tr></thead>
     <tbody>{filtered.map(c=><tr key={c.id}><td style={{padding:10,borderBottom:'1px solid #94a3b8'}}><strong className={styles.clientName}>{c.name}</strong></td>
     <td>{kinds[c.kind]||c.kind}</td><td>{c.city||'—'}</td><td><span className={styles.badge} data-status={c.status}>{c.status==='inactive'?'Arquivado':statuses[c.status]||c.status}</span></td>
-    <td><div className={styles.actions}><Link href={`/clientes/${c.id}`} aria-label={`${viewLabel(c.kind)}: ${c.name}`} style={{padding:8,borderRadius:8,background:'#2563eb',color:'white',textDecoration:'none',display:'inline-block'}}>{viewLabel(c.kind)}</Link> {writesEnabled&&<><button disabled={saving} onClick={()=>openForm('client',c)}>Editar</button> <button type="button" disabled={saving} onClick={()=>archiveClient(c)} style={{padding:8,borderRadius:8,border:'1px solid #a9bddc',background:'#eef4ff',color:'#234d89'}}>{c.status==='inactive'?'Reativar':'Arquivar'}</button></>}</div></td></tr>)}</tbody></table></div>}
+    <td><div className={styles.actions}><Link href={`/clientes/${c.id}`} aria-label={`${viewLabel(c.kind)}: ${c.name}`} className={styles.viewAction}>{viewLabel(c.kind)}</Link> {writesEnabled&&<><button disabled={saving} onClick={()=>openForm('client',c)}>Editar</button> <button type="button" disabled={saving} onClick={()=>archiveClient(c)} className={styles.archiveAction}>{c.status==='inactive'?'Reativar':'Arquivar'}</button></>}</div></td></tr>)}</tbody></table></div>}
   </section>
   {active&&<dialog ref={historyDialog} aria-modal="true" aria-labelledby="history-title" className={styles.historyDialog} onCancel={e=>{e.preventDefault();setSelected(null);}}>
    <div className={styles.historyHeading}><h2 id="history-title">{active.kind==='school'?'Ficha da escola':active.kind==='company'?'Ficha da empresa':active.kind==='association'?'Ficha da associação':'Ficha do cliente'}</h2><button type="button" onClick={()=>setSelected(null)} aria-label="Fechar histórico">×</button></div>
