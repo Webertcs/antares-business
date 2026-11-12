@@ -106,7 +106,7 @@ export default function ClientDetails({id,writesEnabled,proposalWritesEnabled,co
  const [confirmContractId,setConfirmContractId]=useState<string|null>(null);
  const [contractResponsible,setContractResponsible]=useState('');
  const [editingDocumentId,setEditingDocumentId]=useState<string|null>(null);
- const customContractPrefix='[ANTARES_CONTRATO_LIVRE_V1]\\n';
+ const customContractPrefix='[ANTARES_CONTRATO_LIVRE_V1]\n';
  const [documentMode,setDocumentMode]=useState<'standard'|'custom'>('standard');
  const [documentDraft,setDocumentDraft]=useState({title:'',institution:'',responsible:'',object:'',terms:'',contractor_legal_name:'',contractor_document:'',contractor_address:'',provider_legal_name:'',provider_document:'',provider_address:'',provider_representative:''});
  type LegalProfile={legal_name:string;document_number:string;full_address:string;representative:string};
