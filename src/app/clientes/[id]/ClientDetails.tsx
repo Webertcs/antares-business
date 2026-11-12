@@ -183,11 +183,11 @@ export default function ClientDetails({id,writesEnabled,proposalWritesEnabled,co
   page.document.write(`<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><title>${escapeHtml(draft.title)} - ANTARES</title><style>
   @page{size:A4;margin:18mm 17mm}*{box-sizing:border-box}body{font:12pt/1.55 Arial,sans-serif;color:#18304e;margin:0;background:#f0f4fa}
   main{max-width:210mm;margin:20px auto;padding:20mm 17mm;background:#fff;min-height:270mm;box-shadow:0 4px 20px #ccd4df}
-  header{display:block;width:100%;border-bottom:3px solid #174b91;padding-bottom:10px;margin-bottom:26px}
+  header{display:block;width:100%;padding-bottom:10px;margin-bottom:26px}
   header img{display:block;width:100%;height:auto;max-width:100%;object-fit:contain}
   .brand{display:none}h1{font-size:19pt;text-align:center;color:#102b50;margin:0 0 27px;padding:12px 10px;background:#edf3fb;border-left:4px solid #174b91;letter-spacing:.5px}
   h2{font-size:10pt;color:#123c70;text-transform:uppercase;letter-spacing:1px;margin:24px 0 9px;padding-bottom:6px;border-bottom:1px solid #d6e1ef}
-  p{margin:0 0 14px;overflow-wrap:anywhere}.text{white-space:normal}.signatures{display:flex;gap:32px;margin-top:76px;padding-top:22px;border-top:2px solid #174b91}
+  p{margin:0 0 14px;overflow-wrap:anywhere}.text{white-space:normal}.signatures{display:flex;gap:32px;margin-top:76px;padding-top:22px}
   .signature{flex:1;text-align:center;border-top:1px solid #526985;padding-top:10px;font-size:10pt;color:#183b66}
   footer{margin-top:38px;border-top:1px solid #d7e2f1;padding-top:10px;color:#536780;font-size:9pt}
   .toolbar{max-width:210mm;margin:18px auto;display:flex;gap:10px}.toolbar button{background:#145ac3;color:#fff;border:0;border-radius:8px;padding:12px 20px;cursor:pointer}
