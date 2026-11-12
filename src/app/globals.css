@@ -1205,3 +1205,196 @@
     padding:9px 6px!important;
   }
 }
+
+
+/* ANTARES Premium - Agenda: cabecalho e navegacao mensal */
+.cal-page.antares-agenda-premium .fullcal{
+ background:linear-gradient(180deg,#eff6ff 0%,#e6f0ff 100%);
+ border:1px solid #c2d9fb;
+ border-radius:17px;
+ box-shadow:0 12px 28px rgba(18,66,143,.12),0 2px 7px rgba(17,65,137,.07);
+}
+.cal-page.antares-agenda-premium .cal-toolbar{
+ position:relative;
+ isolation:isolate;
+ overflow:hidden;
+ display:flex;
+ align-items:center;
+ justify-content:space-between;
+ gap:12px;
+ margin-bottom:12px;
+ padding:13px 16px;
+ border:1px solid rgba(93,177,255,.55);
+ border-radius:13px;
+ background:radial-gradient(ellipse at 89% -80%,rgba(51,196,255,.58) 0%,transparent 55%),linear-gradient(112deg,#08295c 0%,#064b9e 54%,#0d397c 100%)!important;
+ color:#fff;
+ box-shadow:0 8px 20px rgba(7,51,115,.24),inset 0 1px 0 rgba(255,255,255,.23)!important;
+}
+.cal-page.antares-agenda-premium .cal-toolbar::after{
+ content:"";
+ position:absolute;
+ inset:auto -5% -40px 34%;
+ height:60px;
+ border-radius:50%;
+ background:radial-gradient(ellipse,rgba(0,153,255,.42),transparent 70%);
+ transform:rotate(-6deg);
+ pointer-events:none;
+ z-index:-1;
+}
+.cal-page.antares-agenda-premium .antares-agenda-title{
+ display:flex;
+ align-items:center;
+ gap:11px;
+ min-width:0;
+}
+.cal-page.antares-agenda-premium .antares-agenda-title-icon{
+ flex-shrink:0;
+ width:37px;
+ height:37px;
+ display:grid;
+ place-items:center;
+ border-radius:11px;
+ color:#e1f5ff;
+ background:linear-gradient(145deg,rgba(29,174,255,.36),rgba(7,63,150,.44));
+ border:1px solid rgba(131,214,255,.45);
+ box-shadow:inset 0 1px 1px #ffffff4a,0 4px 12px #001f4d40;
+}
+.cal-page.antares-agenda-premium .cal-toolbar h2,
+.agenda-compact-content .cal-page.antares-agenda-premium .cal-toolbar h2{
+ color:#fff!important;
+ font-size:clamp(14px,1.28vw,18px);
+ font-weight:800;
+ line-height:1.2;
+ margin:0;
+ letter-spacing:-.2px;
+ text-shadow:0 1px 2px rgba(0,28,81,.34);
+}
+.cal-page.antares-agenda-premium .antares-agenda-controls{
+ display:flex;
+ align-items:center;
+ justify-content:flex-end;
+ gap:7px;
+ padding:0;
+ margin:0;
+ flex-wrap:nowrap;
+ border:0;
+ background:transparent;
+ min-width:0;
+}
+.cal-page.antares-agenda-premium .antares-agenda-controls button{
+ min-height:34px;
+ display:inline-flex;
+ align-items:center;
+ justify-content:center;
+ gap:7px;
+ border-radius:25px;
+ font-weight:800;
+ font-size:11px;
+ color:white;
+ transition:transform .16s ease,box-shadow .16s ease,filter .16s ease;
+}
+.cal-page.antares-agenda-premium .antares-agenda-controls button:hover{
+ transform:translateY(-1px);
+ filter:brightness(1.13);
+ box-shadow:0 5px 13px rgba(0,26,79,.36);
+}
+.cal-page.antares-agenda-premium .antares-agenda-controls button:focus-visible{
+ outline:3px solid #b7efff;
+ outline-offset:3px;
+}
+.cal-page.antares-agenda-premium .antares-agenda-controls .antares-agenda-arrow{
+ width:35px;
+ min-width:35px;
+ padding:0;
+ border:1px solid #59bcff;
+ background:linear-gradient(180deg,#1765b5,#082e68);
+ box-shadow:inset 0 1px 2px #ffffff30,0 3px 9px #00193d63;
+}
+.cal-page.antares-agenda-premium .antares-agenda-month{
+ display:inline-flex;
+ align-items:center;
+ justify-content:center;
+ gap:7px;
+ padding:0 13px;
+ min-width:150px;
+ min-height:35px;
+ box-sizing:border-box;
+ background:linear-gradient(180deg,#2687fa,#0759ca);
+ border:1px solid #7dc8ff;
+ border-radius:28px;
+ box-shadow:inset 0 1px 2px #ffffff59,0 3px 12px #031d5a80;
+ color:white;
+ text-align:center;
+ font-size:12px;
+ font-weight:800;
+ text-transform:capitalize;
+ line-height:1.15;
+ white-space:nowrap;
+}
+.cal-page.antares-agenda-premium .antares-agenda-month svg{flex-shrink:0}
+.cal-page.antares-agenda-premium .antares-agenda-control-divider{
+ width:1px;
+ height:24px;
+ background:rgba(192,228,255,.32);
+ margin:0 4px;
+ flex-shrink:0;
+}
+.cal-page.antares-agenda-premium .antares-agenda-controls .antares-agenda-current{
+ white-space:nowrap;
+ padding:0 14px;
+ border:1px solid #70bdff;
+ background:linear-gradient(180deg,#156dbe,#0b396f);
+ box-shadow:inset 0 1px 2px #ffffff42,0 3px 11px #001d4d5c;
+}
+.cal-page.antares-agenda-premium .cal-weeknames{
+ overflow:hidden;
+ border-radius:10px 10px 0 0;
+ margin-bottom:3px;
+}
+.cal-page.antares-agenda-premium .cal-weeknames span{
+ color:#1d427e;
+ font-weight:800;
+ background:linear-gradient(180deg,#edf6ff,#cfe2ff);
+ border-bottom:1px solid #a9c9f3;
+}
+.cal-page.antares-agenda-premium .cal-days .cal-day{
+ background:linear-gradient(150deg,#fff,#f1f7ff);
+ border-color:#d3e2f9;
+}
+.cal-page.antares-agenda-premium .cal-days .cal-day.outside{
+ background:#e9f1fc;
+}
+.cal-page.antares-agenda-premium .cal-days .cal-day:hover{
+ background:#e1efff;
+ border-color:#8db4ed;
+ box-shadow:inset 0 0 0 1px #a5cbfa;
+}
+.cal-page.antares-agenda-premium .cal-days .cal-day.chosen{
+ background:#d4e7ff;
+ border-color:#397ddd;
+ box-shadow:inset 0 0 0 2px #397ddd;
+}
+@media(max-width:1050px){
+ .cal-page.antares-agenda-premium .cal-toolbar{
+   gap:10px;
+ }
+ .cal-page.antares-agenda-premium .cal-toolbar h2{font-size:15px}
+ .cal-page.antares-agenda-premium .antares-agenda-month{min-width:139px;padding:0 10px;font-size:11px}
+ .cal-page.antares-agenda-premium .antares-agenda-controls .antares-agenda-current{padding:0 11px}
+}
+@media(max-width:760px){
+ .cal-page.antares-agenda-premium .cal-toolbar{
+   justify-content:center;
+   padding:12px 10px;
+   flex-wrap:wrap;
+ }
+ .cal-page.antares-agenda-premium .antares-agenda-title{width:100%;justify-content:center}
+ .cal-page.antares-agenda-premium .antares-agenda-controls{width:100%;justify-content:center;gap:6px}
+ .cal-page.antares-agenda-premium .antares-agenda-control-divider{display:none}
+ .cal-page.antares-agenda-premium .antares-agenda-month{min-width:0;padding:0 9px}
+ .cal-page.antares-agenda-premium .antares-agenda-controls .antares-agenda-current{padding:0 9px}
+}
+@media(prefers-reduced-motion:reduce){
+ .cal-page.antares-agenda-premium .antares-agenda-controls button{transition:none}
+ .cal-page.antares-agenda-premium .antares-agenda-controls button:hover{transform:none}
+}
