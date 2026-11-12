@@ -85,19 +85,22 @@ export default function ClientDetails({id,writesEnabled,proposalWritesEnabled,co
  const formLabel:React.CSSProperties={fontSize:13,fontWeight:650,color:'#174987'};
 
  const presentationLabels=['Data da apresentação','Local e endereço','Horários e sessões','Público previsto','Valor total e sinal','Forma e prazo de pagamento'] as const;
+ function normalizeContractBreaks(value:string){
+  return value.replace(/\\r\\n/g,'\n').replace(/\\n/g,'\n').replace(/\r\n?/g,'\n');
+ }
  function splitContractTerms(value:string){
   const fields:Record<string,string>={};
   const clauses:string[]=[];
-  for(const line of value.split('\\n')){
+  for(const line of normalizeContractBreaks(value).split('\n')){
    const label=presentationLabels.find(item=>line.startsWith(item+': '));
    if(label)fields[label]=line.slice(label.length+2);
    else clauses.push(line);
   }
-  return {fields,clauses:clauses.join('\\n').trim()};
+  return {fields,clauses:clauses.join('\n').trim()};
  }
  function combineContractTerms(clauses:string,fields:Record<string,string>){
   const entries=presentationLabels.filter(label=>fields[label]?.trim()).map(label=>label+': '+fields[label].trim());
-  return [...entries,...(clauses.trim()?[clauses.trim()]:[])].join('\\n\\n');
+  return [...entries,...(clauses.trim()?[clauses.trim()]:[])].join('\n\n');
  }
  const [contractFor,setContractFor]=useState<string|null>(null);
  const [confirmContractId,setConfirmContractId]=useState<string|null>(null);
@@ -203,14 +206,14 @@ export default function ClientDetails({id,writesEnabled,proposalWritesEnabled,co
   if(!confirmed){setPendingProposalFill(contractId);return;}
   setPendingProposalFill(null);
   setDocumentSavedId(null);
-  setDocumentDraft({title:'Contrato de prestação de serviços — '+title,institution:client?.name||'',responsible:String(contract.confirmed_by_name||''),object:'Apresentação de planetário móvel — '+title,terms:lines.join('\\n')});
+  setDocumentDraft({title:'Contrato de prestação de serviços — '+title,institution:client?.name||'',responsible:String(contract.confirmed_by_name||''),object:'Apresentação de planetário móvel — '+title,terms:lines.join('\n')});
   setDocumentNotice('');
  }
  function printSavedContract(){
   const draft=savedDrafts.find(d=>d.id===documentSavedId&&!d.archived_at);
   if(!draft){setDocumentNotice('Salve a minuta antes de gerar o PDF.');return;}
   const escapeHtml=(value:string)=>value.replace(/[&<>"']/g,char=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]||char));
-  const line=(value:string)=>escapeHtml(value).replace(/\\n/g,'<br>');
+  const line=(value:string)=>escapeHtml(normalizeContractBreaks(value)).replace(/\n/g,'<br>');
   const page=window.open('','_blank');
   if(!page){setDocumentNotice('Permita a abertura de janelas para visualizar o contrato.');return;}
   const logo=new URL('/antares-logo-pdf.png',window.location.origin).href;
