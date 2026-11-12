@@ -185,3 +185,45 @@
 .page .historyBody h3 {font-size:17px;}
 .page .caption,.page .sectionHeading p,.page .directoryHeader p {color:#426184;line-height:1.55;}
 @media(max-width:900px){.page .clientsTable {min-width:850px;}}
+
+
+/* ANTARES Premium - Clientes e modais (nov/2026) */
+.page {--client-navy:#123b78;--client-blue:#155ec0;--client-soft:#edf5ff;--client-border:#bdd6f5;color:#183e72;font-size:13px;line-height:1.45;}
+.page .hero{padding:18px 22px!important;border:1px solid #357bd6;border-radius:15px;background:linear-gradient(112deg,#143a78 0%,#1d5dad 68%,#287bd0 100%);box-shadow:0 10px 24px rgba(13,54,116,.17);}
+.page .hero h1{font-size:24px!important;line-height:1.18;letter-spacing:-.5px;margin:6px 0 4px;}
+.page .hero p{margin:0 0 4px;font-size:13px;line-height:1.45;color:#e7f2ff;}
+.page .hero p:first-child{font-size:10px!important;font-weight:800;letter-spacing:1.2px!important;color:#c8e1ff;}
+.page .hero .headerButton{min-height:34px;padding:6px 11px;background:linear-gradient(110deg,#1e65ca,#12468f);border:1px solid #80baff;box-shadow:0 3px 10px #071d4b35;border-radius:8px;color:white;font-size:12px;}
+.page .hero .headerButton:hover:not(:disabled){background:linear-gradient(110deg,#2b78eb,#185db6);transform:translateY(-1px);box-shadow:0 5px 13px #071d4b45;}
+.page .metric{padding:11px 13px;min-height:78px;background:linear-gradient(135deg,#f5f9ff,#eaf3ff)!important;border:1px solid #c5daf6;border-top:3px solid #2b70d2;border-radius:11px;box-shadow:0 4px 13px rgba(22,67,135,.075);}
+.page .metric:nth-of-type(2){border-top-color:#14a58a;}.page .metric:nth-of-type(3){border-top-color:#8493b3;}.page .metric:nth-of-type(4){border-top-color:#4888e4;}.page .metric:nth-of-type(5){border-top-color:#9a72dd;}
+.page .metric div{font-size:12px!important;line-height:1.3;color:#4e6890;}
+.page .metric strong{font-size:21px!important;line-height:1.2;margin-top:5px;color:#113f80;}
+.page .directory{background:linear-gradient(165deg,#fafdff,#eff5ff 100%);border:1px solid #bfd6f5!important;box-shadow:0 8px 23px rgba(19,65,131,.085);}
+.page .directoryHeader{padding:12px 16px;margin:-16px -16px 13px;background:linear-gradient(110deg,#e1edff,#f5f9ff);border-radius:13px 13px 0 0;}
+.page .directoryHeader h2{font-size:17px!important;}.page .directoryHeader p{font-size:12px;margin:3px 0 0;}
+.page .filterPanel{padding:11px 12px;gap:10px;margin-bottom:12px;background:#eaf3ff;border-color:#c1d9f7;}
+.page .filterSearch input,.page .filterKind select{min-height:38px;padding:7px 10px;font-size:13px;}
+.page .filterArchived{min-height:38px;padding:6px 10px;font-size:12px;}
+.page .clientsTable{border-spacing:0 3px!important;}
+.page .clientsTable th{background:#dbe9ff!important;color:#164780!important;font-size:11px!important;padding:8px 10px!important;}
+.page .clientsTable td{font-size:12px!important;padding:7px 9px!important;line-height:1.35;}
+.page .clientsTable .clientName{font-size:12px!important;line-height:1.35;}
+.page .clientsTable tbody tr{background:#f1f6ff;}.page .clientsTable tbody tr:nth-child(even){background:#e7f0fc;}.page .clientsTable tbody tr:hover{background:#d9eaff;}
+.page .clientsTable .actions{gap:6px;align-items:center;}
+.page .clientsTable .viewAction{display:inline-flex;align-items:center;justify-content:center;min-height:34px;flex:1;white-space:nowrap;padding:7px 9px;border-radius:8px;background:linear-gradient(115deg,#266fd6,#15509b);color:#fff;font-size:12px;font-weight:750;box-shadow:0 3px 9px rgba(15,77,155,.18);}
+.page .clientsTable .viewAction:hover{background:linear-gradient(115deg,#2e80f0,#165db8);transform:translateY(-1px);}
+.page .clientsTable .actions button{min-height:34px!important;padding:6px 9px!important;font-size:12px!important;border-radius:8px;box-shadow:0 2px 7px rgba(17,59,122,.085);}
+.page .clientsTable .archiveAction{background:linear-gradient(135deg,#dce6f4,#cddbee);color:#264c7b;border-color:#a9bfdf;}
+.page :is(.formDialog,.historyDialog,.dialog){border:1px solid #9ebfea;box-shadow:0 24px 72px rgba(7,28,67,.32);}
+.page .formHeading,.page .historyHeading{padding:15px 20px;background:linear-gradient(115deg,#123b7a,#1b62bc 68%,#307cda);}
+.page .formHeading h2,.page .historyHeading h2{font-size:19px!important;}
+.page .formDialog form{padding:16px 20px 0;}.page .formFields{gap:11px 14px;}.page .formFields label{font-size:12px;}
+.page .formFields input,.page .formFields select{min-height:38px;padding:7px 10px;background:#f6faff;}
+.page .formActions{margin-top:12px;padding:12px 0 16px;}
+.page .formActions button{min-height:36px;padding:6px 12px;font-size:12px;}
+.page .historyBody{padding:15px 20px;}.page .historyBody h2{font-size:19px!important;}.page .historyBody h3{font-size:15px;}
+.page .historyBody li{padding:10px 12px;margin:6px 0;}
+.page .dialog{padding:0 18px 18px;overflow:hidden;}.page .dialog h2{margin:0 -18px 12px;padding:14px 18px;font-size:19px;color:#fff;background:linear-gradient(112deg,#153e7b,#2168c2);}
+.page .dialog .actions{justify-content:flex-end;}.page .dialog .actions button:first-child{background:linear-gradient(115deg,#1d63c7,#10478e);color:#fff;}
+@media(max-width:640px){.page .hero{padding:16px!important;}.page .hero h1{font-size:21px!important;}.page .metric{min-height:70px;}.page .formHeading,.page .historyHeading{padding:13px 15px;}.page .formDialog form{padding:14px 15px 0;}.page .directoryHeader{margin:-16px -16px 12px;}}
