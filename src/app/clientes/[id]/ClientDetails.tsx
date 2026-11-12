@@ -89,6 +89,30 @@ export default function ClientDetails({id,writesEnabled,proposalWritesEnabled,co
  const [contractResponsible,setContractResponsible]=useState('');
  const [editingDocumentId,setEditingDocumentId]=useState<string|null>(null);
  const [documentDraft,setDocumentDraft]=useState({title:'',institution:'',responsible:'',object:'',terms:''});
+ const [documentSavedId,setDocumentSavedId]=useState<string|null>(null);
+ const [documentBusy,setDocumentBusy]=useState(false);
+ const [documentNotice,setDocumentNotice]=useState('');
+ async function openDocument(contract:Record<string,unknown>,contractId:string){
+  const proposal=commercial?.proposals.find(p=>String(p.id)===String(contract.proposal_id));
+  setDocumentNotice('');setDocumentSavedId(null);
+  setDocumentDraft({title:String(contract.proposal_title||'Contrato de prestação de serviços'),institution:client.name,responsible:String(contract.confirmed_by_name||''),object:'Apresentação de planetário móvel — '+String(contract.proposal_title||'serviço educacional'),terms:String(contract.terms||proposal?.notes||'')});
+  setEditingDocumentId(contractId);
+  try{
+   const response=await fetch('/api/clientes/contratos/minutas?contractId='+encodeURIComponent(contractId),{cache:'no-store'});
+   const data=await response.json();if(!response.ok)throw Error(data.error||'Consulta indisponível');
+   const draft=(data.drafts as Record<string,unknown>[]|undefined)?.find(d=>!d.archived_at);
+   if(draft){setDocumentSavedId(String(draft.id));setDocumentDraft({title:String(draft.title||''),institution:String(draft.institution||''),responsible:String(draft.responsible||''),object:String(draft.object_text||''),terms:String(draft.terms||'')});setDocumentNotice('Minuta salva recuperada · versão '+String(draft.version_number));}
+  }catch{setDocumentNotice('Não foi possível consultar minutas salvas. Não salve até verificar a conexão.');}
+ }
+ async function saveDocument(contractId:string){
+  if(documentBusy)return;setDocumentBusy(true);setDocumentNotice('');
+  try{
+   const response=await fetch('/api/clientes/contratos/minutas',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({contractId,draftId:documentSavedId,...documentDraft})});
+   const data=await response.json();if(!response.ok)throw Error(data.error||'Falha ao salvar');
+   setDocumentSavedId(String(data.id));setDocumentNotice('Minuta salva no Neon com histórico de versões.');
+  }catch(e){setDocumentNotice(e instanceof Error?e.message:'Falha ao salvar minuta.');}
+  finally{setDocumentBusy(false);}
+ }
  const [confirmBusy,setConfirmBusy]=useState(false);
  async function confirmContract(contractId:string){
   if(confirmBusy||contractResponsible.trim().length<3)return;
@@ -315,7 +339,7 @@ export default function ClientDetails({id,writesEnabled,proposalWritesEnabled,co
  <div style={{fontSize:12}}>Modalidade: {modeNames[String(c.confirmation_mode)]||String(c.confirmation_mode||'Não informada')}</div>
  <div style={{fontSize:12}}>{status==='confirmed'?'Confirmado em '+dateBR(c.confirmed_at?String(c.confirmed_at):null):'Ainda não confirmado pelo cliente'}</div>
  {Boolean(c.confirmed_by_name)&&<div style={{fontSize:12}}>Responsável informado: {String(c.confirmed_by_name)}</div>}
- <div style={{marginTop:10}}><button type="button" style={actionLink} onClick={()=>{const proposal=proposals.find(p=>String(p.id)===String(c.proposal_id));setDocumentDraft({title:String(c.proposal_title||'Contrato de prestação de serviços'),institution:client.name,responsible:String(c.confirmed_by_name||''),object:'Apresentação de planetário móvel — '+String(c.proposal_title||'serviço educacional'),terms:String(c.terms||c.agreed_terms||proposal?.notes||'')});setEditingDocumentId(contractId);}}>Elaborar documento</button></div>
+ <div style={{marginTop:10}}><button type="button" style={actionLink} onClick={()=>{void openDocument(c,contractId);}}>Elaborar documento</button></div>
  {editingDocumentId===contractId&&<div style={{marginTop:12,padding:16,background:'#e9f3ff',border:'1px solid #9cc4f6',borderRadius:12,display:'grid',gap:12}}>
  <strong style={{color:'#123c80'}}>Minuta do contrato · edição local</strong>
  <p style={{margin:0,fontSize:12}}>Os campos foram preenchidos com informações disponíveis. Esta minuta ainda não é salva nem enviada. Confira tudo antes de utilizar.</p>
@@ -324,7 +348,11 @@ export default function ClientDetails({id,writesEnabled,proposalWritesEnabled,co
  <label style={formLabel}>Representante<input style={formInput} value={documentDraft.responsible} onChange={e=>setDocumentDraft(v=>({...v,responsible:e.target.value}))}/></label>
  <label style={formLabel}>Objeto<textarea style={formInput} rows={3} value={documentDraft.object} onChange={e=>setDocumentDraft(v=>({...v,object:e.target.value}))}/></label>
  <label style={formLabel}>Cláusulas e condições<textarea style={formInput} rows={7} value={documentDraft.terms} onChange={e=>setDocumentDraft(v=>({...v,terms:e.target.value}))}/></label>
- <button type="button" style={{...actionLink,background:'#145ac3',color:'#fff',border:'1px solid #0f4ca8',justifySelf:'start'}} onClick={()=>setEditingDocumentId(null)}>Fechar minuta</button>
+ {documentNotice&&<p role="status" style={{margin:0,fontSize:13,color:'#174987'}}>{documentNotice}</p>}
+ <div style={{display:'flex',gap:8,flexWrap:'wrap'}}>
+ <button type="button" disabled={documentBusy||documentDraft.title.trim().length<3||documentDraft.institution.trim().length<2} style={{...actionLink,background:'#16803c'}} onClick={()=>void saveDocument(contractId)}>{documentBusy?'Salvando…':'Salvar rascunho'}</button>
+ <button type="button" disabled={documentBusy} style={{...actionLink,background:'#145ac3',color:'#fff',border:'1px solid #0f4ca8'}} onClick={()=>setEditingDocumentId(null)}>Fechar minuta</button>
+ </div>
  </div>}
  {status==='pending'&&<div style={{marginTop:10}}>
  {confirmContractId===contractId?<form onSubmit={e=>{e.preventDefault();void confirmContract(contractId)}} style={{display:'grid',gap:10,maxWidth:540}}>
