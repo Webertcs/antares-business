@@ -177,36 +177,40 @@ export default function ClientDetails({id,writesEnabled,proposalWritesEnabled,co
   const total=Number(proposal.total);
   const deposit=Number(proposal.deposit||0);
   const students=Number(proposal.attendees||0);
+  // Os dados operacionais pertencem aos campos próprios, não ao texto das cláusulas.
+  const presentation:Record<string,string>={
+   'Data da apresentação':'',
+   'Local e endereço':'',
+   'Horários e sessões':'',
+   'Público previsto':students>0?String(students)+' participantes':'',
+   'Valor total e sinal':Number.isFinite(total)&&total>0?money(total)+(deposit>0?' · Sinal: '+money(deposit):''):'',
+   'Forma e prazo de pagamento':''
+  };
   const lines=[
    '1. OBJETO DO CONTRATO',
    'A CONTRATADA prestará à CONTRATANTE o serviço de apresentação de planetário móvel referente a: '+title+'.',
-   students>0?'Público previsto: '+students+' participantes.':'Público previsto: [informar quantidade de participantes].',
    '',
    '2. DATA, LOCAL E ESTRUTURA',
-   'Data da apresentação: [confirmar data]. Local: [informar endereço]. Horários e quantidade de sessões: [confirmar].',
-   'A CONTRATANTE deverá disponibilizar espaço adequado, acesso para montagem e desmontagem e infraestrutura elétrica compatível, conforme condições acordadas entre as partes.',
+   'A CONTRATANTE disponibilizará espaço adequado, acesso para montagem e desmontagem e infraestrutura elétrica compatível, conforme as condições acordadas.',
    '',
    '3. VALORES E PAGAMENTO',
-   Number.isFinite(total)?'Valor total previsto na proposta: '+money(total)+'.':'Valor total: [informar].',
-   deposit>0?'Sinal previsto na proposta: '+money(deposit)+'.':'Sinal: [informar se aplicável].',
-   'Forma de pagamento, vencimentos e saldo: [confirmar conforme negociação].',
+   'Os valores, eventual sinal, forma de pagamento e vencimentos serão aqueles expressamente registrados nos dados da apresentação e confirmados pelas partes.',
    '',
    '4. RESPONSABILIDADES',
-   'A CONTRATADA realizará as apresentações e a operação dos equipamentos conforme o serviço contratado e as condições técnicas acordadas.',
-   'A CONTRATANTE organizará o acesso ao local e o acompanhamento dos participantes, conforme as condições combinadas.',
+   'A CONTRATADA realizará as apresentações e operará os equipamentos conforme o serviço contratado e as condições técnicas acordadas.',
+   'A CONTRATANTE organizará o acesso ao local e o acompanhamento dos participantes.',
    '',
    '5. REMARCAÇÃO E CANCELAMENTO',
-   'Prazos, eventuais custos, devolução de valores e condições para remarcação: [definir expressamente com a CONTRATANTE antes da assinatura].',
+   'Condições de remarcação, cancelamento, custos e eventuais devoluções deverão ser definidas expressamente antes da assinatura.',
    '',
    '6. DISPOSIÇÕES FINAIS',
    'Alterações de escopo, horários ou valores deverão ser acordadas entre as partes e registradas por escrito.',
-   String(proposal.notes||'').trim()?'Observações da proposta: '+String(proposal.notes).trim():'',
-   'Este é um modelo editável. Conferir os dados e revisar juridicamente as cláusulas antes da assinatura.'
+   String(proposal.notes||'').trim()?'Observações da proposta: '+String(proposal.notes).trim():''
   ].filter((line,index,all)=>line!==''||all[index-1]!=='');
   if(!confirmed){setPendingProposalFill(contractId);return;}
   setPendingProposalFill(null);
   setDocumentSavedId(null);
-  setDocumentDraft(v=>({title:'Contrato de prestação de serviços — '+title,institution:client?.name||'',responsible:String(contract.confirmed_by_name||contacts.find(c=>c.is_primary)?.full_name||''),object:'Apresentação de planetário móvel — '+title,terms:lines.join('\n'),contractor_legal_name:v.contractor_legal_name||client?.name||'',contractor_document:v.contractor_document,contractor_address:v.contractor_address,provider_legal_name:v.provider_legal_name,provider_document:v.provider_document,provider_address:v.provider_address,provider_representative:v.provider_representative}));
+  setDocumentDraft(v=>({title:'Contrato de prestação de serviços — '+title,institution:client?.name||'',responsible:String(contract.confirmed_by_name||contacts.find(c=>c.is_primary)?.full_name||''),object:'Apresentação de planetário móvel — '+title,terms:combineContractTerms(lines.join('\n'),presentation),contractor_legal_name:v.contractor_legal_name||client?.name||'',contractor_document:v.contractor_document,contractor_address:v.contractor_address,provider_legal_name:v.provider_legal_name,provider_document:v.provider_document,provider_address:v.provider_address,provider_representative:v.provider_representative}));
   setDocumentNotice('');
  }
  function printSavedContract(){
@@ -239,7 +243,7 @@ export default function ClientDetails({id,writesEnabled,proposalWritesEnabled,co
   ${presentationLabels.some(label=>splitContractTerms(draft.terms).fields[label])?'<h2>Dados da apresentação</h2>'+presentationLabels.filter(label=>splitContractTerms(draft.terms).fields[label]).map(label=>'<p><strong>'+escapeHtml(label)+':</strong> '+escapeHtml(splitContractTerms(draft.terms).fields[label])+'</p>').join(''):''}
   <h2>Cláusulas e condições</h2><p class="text">${line(splitContractTerms(draft.terms).clauses||'Não informado')}</p>
   <div class="signatures"><div class="signature">${escapeHtml(draft.responsible||'Representante da instituição')}<br>CONTRATANTE</div>
-  <div class="signature">Representante do Planetário ANTARES<br>CONTRATADA</div></div>
+  <div class="signature">${escapeHtml(draft.provider_representative||'Representante do Planetário ANTARES')}<br>CONTRATADA</div></div>
   
   </main></body></html>`);
   page.document.close();
