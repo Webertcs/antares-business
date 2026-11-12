@@ -27,6 +27,13 @@ export default function FinanceiroClient(){
  const [dome,setDome]=useState('all');
  const [section,setSection]=useState<'extrato'|'receber'|'relatorios'|'lancamento'>('extrato');
  const [entryPage,setEntryPage]=useState(1);
+ const [showValues,setShowValues]=useState(false);
+ const [entryModalOpen,setEntryModalOpen]=useState(false);
+ const [confirmEntry,setConfirmEntry]=useState(false);
+ const [discardEntry,setDiscardEntry]=useState(false);
+ const privateMoney=(value:number)=>showValues?brl(value):'R$ •••••';
+ const entryDirty=Boolean(amount||description||presentation||entryType!=='income');
+ const closeEntry=()=>{if(saving)return;if(entryDirty)setDiscardEntry(true);else setEntryModalOpen(false);};
  async function refreshFinance(){
   const [ledger,reportResponse]=await Promise.all([
    fetch('/api/financeiro',{cache:'no-store'}),
@@ -49,12 +56,13 @@ export default function FinanceiroClient(){
  if(saving)return;
  const parsed=Number(amount.replace(',','.'));
  if(!Number.isFinite(parsed)||parsed<=0||!description.trim()||!date){setNotice('Preencha valor, descrição e data válidos.');return;}
- if(!window.confirm('Confirma o lançamento de '+brl(parsed)+' como '+(entryType==='income'?'receita':'despesa')+'? Esta operação ficará registrada no livro-caixa.'))return;
+ if(!confirmEntry){setConfirmEntry(true);return;}
+ setConfirmEntry(false);
  const id=pendingId||crypto.randomUUID();setPendingId(id);setSaving(true);setNotice('');
  try{const response=await fetch('/api/financeiro',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({id,entry_type:entryType,amount:parsed,description,occurred_on:date,presentation_id:presentation||null})});
  const result=await response.json();if(!response.ok)throw new Error(result.error||'Falha no lançamento');
  await refreshFinance();
- setNotice(result.alreadyExists?'Lançamento já registrado anteriormente; não foi duplicado.':'Lançamento registrado.');setAmount('');setDescription('');setPresentation('');setPendingId(null);
+ setNotice(result.alreadyExists?'Lançamento já registrado anteriormente; não foi duplicado.':'Lançamento registrado.');setAmount('');setDescription('');setPresentation('');setPendingId(null);setEntryModalOpen(false);
  }catch(e){setNotice(e instanceof Error?e.message:'Falha desconhecida. Confira o extrato antes de reenviar.');}finally{setSaving(false);}
  }
  async function reverseEntry(id:string){
@@ -87,13 +95,13 @@ export default function FinanceiroClient(){
  }`}</style><main style={{background:'#f3f6fc',color:'#11264d',minHeight:'100%',padding:'clamp(16px,3vw,32px)',fontFamily:'Arial,sans-serif'}}>
  <div style={{maxWidth:1120,margin:'0 auto'}}>
  
- <header className="finance-print-hide" style={{background:'linear-gradient(110deg,#143b78,#2467ba)',color:'#fff',borderRadius:16,padding:'22px 24px',display:'flex',justifyContent:'space-between',alignItems:'center',gap:12,flexWrap:'wrap'}}><div><small style={{letterSpacing:1.5}}>ANTARES BUSINESS</small><h1 style={{fontSize:30,margin:'5px 0'}}>Financeiro</h1><p style={{margin:0,fontSize:13}}>Controle de receitas, despesas e recebimentos</p></div><button type="button" onClick={()=>setSection('lancamento')} style={{background:'#fff',color:'#174c91',fontWeight:700,border:0,borderRadius:9,padding:'12px 16px',cursor:'pointer'}}>+ Novo lançamento</button></header>
+ <header className="finance-print-hide" style={{background:'linear-gradient(110deg,#143b78,#2467ba)',color:'#fff',borderRadius:16,padding:'22px 24px',display:'flex',justifyContent:'space-between',alignItems:'center',gap:12,flexWrap:'wrap'}}><div><small style={{letterSpacing:1.5}}>ANTARES BUSINESS</small><h1 style={{fontSize:25,margin:'5px 0'}}>Financeiro</h1><p style={{margin:0,fontSize:13}}>Controle de receitas, despesas e recebimentos</p></div><button type="button" onClick={()=>{setNotice('');setEntryModalOpen(true);}} style={{background:'#fff',color:'#174c91',fontWeight:700,border:0,borderRadius:9,padding:'12px 16px',cursor:'pointer'}}>+ Novo lançamento</button></header>
  {loading&&<p className="finance-print-hide">Carregando movimentações...</p>}
  {error&&<p className="finance-print-hide" role="alert" style={{color:'#a32727'}}>{error}</p>}
- {data&&<><div className="finance-print-hide" style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(190px,1fr))',gap:14,margin:'26px 0'}}>
- {([['Entradas realizadas',data.income],['Saídas realizadas',data.expenses],['Saldo acumulado',data.balance],['A receber',receivables?.titles.reduce((n,t)=>n+Math.max(0,Number(t.total)-Number(t.paid)),0)??0]] as [string,number][]).map(([label,value])=><div style={{...card,borderTop:label==='Entradas realizadas'?'3px solid #159b79':label==='Saídas realizadas'?'3px solid #e39c46':label==='A receber'?'3px solid #4388e5':'3px solid #245bb2'}} key={label}><small style={{color:'#486489',fontWeight:600}}>{label}</small><h2 style={{fontSize:23,margin:'10px 0 0',color:'#173d78'}}>{brl(value)}</h2></div>)}</div>
+ {data&&<><div className="finance-print-hide" style={{display:'flex',justifyContent:'flex-end',margin:'12px 0 -8px'}}><button type="button" onClick={()=>setShowValues(v=>!v)} aria-pressed={showValues} style={{background:'#e9f2ff',border:'1px solid #bed0e8',color:'#17457f',padding:'7px 12px',borderRadius:8,cursor:'pointer',fontWeight:700}}>{showValues?'Ocultar valores':'Mostrar valores'}</button></div><div className="finance-print-hide" style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(155px,1fr))',gap:10,margin:'18px 0'}}>
+ {([['Entradas realizadas',data.income],['Saídas realizadas',data.expenses],['Saldo acumulado',data.balance],['A receber',receivables?.titles.reduce((n,t)=>n+Math.max(0,Number(t.total)-Number(t.paid)),0)??0]] as [string,number][]).map(([label,value])=><div style={{...card,padding:12,borderRadius:10,borderTop:label==='Entradas realizadas'?'3px solid #159b79':label==='Saídas realizadas'?'3px solid #e39c46':label==='A receber'?'3px solid #4388e5':'3px solid #245bb2'}} key={label}><small style={{color:'#486489',fontWeight:600}}>{label}</small><h2 style={{fontSize:17,margin:'6px 0 0',color:'#173d78'}}>{privateMoney(value)}</h2></div>)}</div>
  {receivables&&<p className="finance-print-hide" style={{fontSize:12,color:'#557092',margin:'-12px 0 18px'}}>O valor a receber é uma previsão e não integra o saldo realizado.</p>}
- <nav className="finance-print-hide" aria-label="Áreas financeiras" style={{display:'flex',flexWrap:'wrap',gap:8,margin:'0 0 18px'}}>{([['extrato','Extrato'],['receber','Contas a receber'],['relatorios','Relatórios e fluxo de caixa'],['lancamento','Novo lançamento']] as const).map(([key,label])=><button type="button" key={key} onClick={()=>setSection(key)} aria-pressed={section===key} style={{background:section===key?'#1c55a4':'#e9f2ff',color:section===key?'white':'#17457f',border:'1px solid #b7d1f3',padding:'10px 14px',borderRadius:9,fontWeight:700,cursor:'pointer'}}>{label}</button>)}</nav>
+ <nav className="finance-print-hide" aria-label="Áreas financeiras" style={{display:'flex',flexWrap:'wrap',gap:8,margin:'0 0 18px'}}>{([['extrato','Extrato'],['receber','Contas a receber'],['relatorios','Relatórios e fluxo de caixa'],['lancamento','Novo lançamento']] as const).map(([key,label])=><button type="button" key={key} onClick={()=>key==='lancamento'?setEntryModalOpen(true):setSection(key)} aria-pressed={section===key} style={{background:section===key?'#1c55a4':'#e9f2ff',color:section===key?'white':'#17457f',border:'1px solid #b7d1f3',padding:'10px 14px',borderRadius:9,fontWeight:700,cursor:'pointer'}}>{label}</button>)}</nav>
  {section==='extrato'&&<section className="finance-print-hide" style={card}><h2>Extrato auditável</h2>
  <p style={{fontSize:13}}>Lançamentos confirmados no livro-caixa. Estornos permanecem no histórico.</p>
  <div style={{display:'flex',gap:12,flexWrap:'wrap',margin:'15px 0'}}>
@@ -136,8 +144,8 @@ export default function FinanceiroClient(){
  <button type="button" className="finance-print-hide" onClick={()=>window.print()} style={{padding:'10px 14px',borderRadius:8,background:'#2454d3',color:'white'}}>Imprimir relatório / salvar PDF</button>
  <p style={{fontSize:12,opacity:.7}}>Relatório gerencial de caixa. Não substitui balanço patrimonial, DRE ou balancete contábil.</p>
  </section>}
-  {section==='lancamento'&&<section className="finance-print-hide" style={{...card,marginTop:20}}><h2>Novo lançamento</h2><p>Somente valores efetivamente recebidos ou pagos. Propostas e sinais previstos não devem ser lançados como recebidos.</p>
- <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(210px,1fr))',gap:12}}>
+  {entryModalOpen&&<div className="finance-print-hide" role="presentation" style={{position:'fixed',inset:0,zIndex:5000,background:'rgba(7,24,53,.68)',display:'flex',alignItems:'center',justifyContent:'center',padding:16}}><section role="dialog" aria-modal="true" aria-label="Novo lançamento" style={{...card,width:'min(100%,530px)',maxHeight:'92vh',overflowY:'auto',padding:0,boxShadow:'0 24px 70px #091b3b66'}}><header style={{background:'linear-gradient(110deg,#143b78,#2467ba)',color:'#fff',padding:'15px 18px',display:'flex',justifyContent:'space-between',alignItems:'center'}}><h2 style={{margin:0,fontSize:18}}>Novo lançamento</h2><button type="button" onClick={closeEntry} aria-label="Fechar" style={{background:'transparent',border:0,color:'white',fontSize:23,cursor:'pointer'}}>×</button></header><div style={{padding:18}}><p style={{fontSize:12,margin:'0 0 14px'}}>Registre somente valores já recebidos ou pagos.</p>
+ <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(190px,1fr))',gap:12}}>
  <label>Tipo<select value={entryType} onChange={e=>{setEntryType(e.target.value);setPendingId(null);}} style={{display:'block',width:'100%',padding:10}}><option value="income">Receita recebida</option><option value="expense">Despesa paga</option></select></label>
  <label>Valor (R$)<input value={amount} onChange={e=>{setAmount(e.target.value);setPendingId(null);}} inputMode="decimal" placeholder="0,00" style={{display:'block',width:'100%',padding:10}}/></label>
  <label>Data<input type="date" value={date} onChange={e=>{setDate(e.target.value);setPendingId(null);}} style={{display:'block',width:'100%',padding:10}}/></label>
@@ -145,10 +153,12 @@ export default function FinanceiroClient(){
  </div>
  <label style={{display:'block',marginTop:14}}>Descrição<input value={description} maxLength={500} onChange={e=>{setDescription(e.target.value);setPendingId(null);}} placeholder="Ex.: recebimento da apresentação / combustível" style={{display:'block',width:'100%',padding:10}}/></label>
  {data.writesEnabled===false&&<p role="status" style={{background:'#fff7ed',padding:12,borderRadius:9,color:'#8a4618'}}>Lançamentos temporariamente bloqueados enquanto a integração é homologada. O extrato e os relatórios continuam disponíveis.</p>}
- <button type="button" disabled={saving||!data.writesEnabled} onClick={saveEntry} style={{background:'#2454d3',color:'white',padding:'12px 18px',borderRadius:9,marginTop:14}}>{saving?'Registrando...':'Confirmar lançamento'}</button>
+ <div style={{display:'flex',justifyContent:'flex-end',gap:8,marginTop:16}}><button type="button" onClick={closeEntry} disabled={saving} style={{padding:'10px 15px',borderRadius:8,background:'#e9f2ff',border:0,color:'#17457f'}}>Cancelar</button><button type="button" disabled={saving||!data.writesEnabled} onClick={saveEntry} style={{background:'#2454d3',color:'white',padding:'10px 15px',borderRadius:9,border:0}}>{saving?'Registrando...':'Confirmar lançamento'}</button></div>
  {notice&&<p role="status">{notice}</p>}
  <p style={{fontSize:12,opacity:.7}}>Em caso de erro, confira o extrato antes de tentar novamente. Estornos criam um lançamento inverso, preservando o original. </p>
- </section>}
+ </div></section></div>}
+ {confirmEntry&&<div className="finance-print-hide" style={{position:'fixed',inset:0,zIndex:5100,background:'rgba(7,24,53,.75)',display:'flex',alignItems:'center',justifyContent:'center',padding:16}}><section role="alertdialog" aria-modal="true" aria-label="Confirmar lançamento" style={{...card,width:'min(100%,420px)',padding:0,overflow:'hidden'}}><header style={{background:'#174b91',color:'white',padding:16,fontWeight:700}}>Confirmar movimentação</header><div style={{padding:18}}><p>Registrar {brl(Number(amount.replace(',','.')))} como {entryType==='income'?'receita':'despesa'}? O lançamento ficará no histórico auditável.</p><div style={{display:'flex',justifyContent:'flex-end',gap:8}}><button type="button" onClick={()=>setConfirmEntry(false)}>Voltar</button><button type="button" disabled={saving} onClick={saveEntry} style={{background:'#2454d3',color:'white',border:0,borderRadius:8,padding:'10px 14px'}}>Confirmar</button></div></div></section></div>}
+ {discardEntry&&<div className="finance-print-hide" style={{position:'fixed',inset:0,zIndex:5100,background:'rgba(7,24,53,.75)',display:'flex',alignItems:'center',justifyContent:'center',padding:16}}><section role="alertdialog" aria-modal="true" aria-label="Descartar lançamento" style={{...card,width:'min(100%,420px)',padding:0,overflow:'hidden'}}><header style={{background:'#174b91',color:'white',padding:16,fontWeight:700}}>Descartar preenchimento?</header><div style={{padding:18}}><p>As informações não salvas serão perdidas.</p><div style={{display:'flex',justifyContent:'flex-end',gap:8}}><button type="button" onClick={()=>setDiscardEntry(false)}>Continuar editando</button><button type="button" onClick={()=>{setDiscardEntry(false);setEntryModalOpen(false);setAmount('');setDescription('');setPresentation('');setEntryType('income');setPendingId(null);}} style={{background:'#a33c43',color:'white',border:0,borderRadius:8,padding:'10px 14px'}}>Descartar</button></div></div></section></div>}
  </>}
  </div></main></>;
 }
