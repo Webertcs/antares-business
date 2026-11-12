@@ -107,6 +107,43 @@ export default function ClientDetails({id,writesEnabled,proposalWritesEnabled,co
  const [contractResponsible,setContractResponsible]=useState('');
  const [editingDocumentId,setEditingDocumentId]=useState<string|null>(null);
  const [documentDraft,setDocumentDraft]=useState({title:'',institution:'',responsible:'',object:'',terms:'',contractor_legal_name:'',contractor_document:'',contractor_address:'',provider_legal_name:'',provider_document:'',provider_address:'',provider_representative:''});
+ type LegalProfile={legal_name:string;document_number:string;full_address:string;representative:string};
+ const [legalProfiles,setLegalProfiles]=useState<{provider:LegalProfile|null;contractor:LegalProfile|null}>({provider:null,contractor:null});
+ const [legalProfileBusy,setLegalProfileBusy]=useState(false);
+ async function loadLegalProfiles(){
+  if(!client?.id)return null;
+  const response=await fetch('/api/clientes/contratos/dados-juridicos?clientId='+encodeURIComponent(client.id),{cache:'no-store'});
+  const data=await response.json();
+  if(!response.ok)throw Error(data.error||'Cadastro jurídico indisponível');
+  setLegalProfiles({provider:data.provider||null,contractor:data.contractor||null});
+  return data as {provider:LegalProfile|null;contractor:LegalProfile|null};
+ }
+ function applyLegalProfiles(profiles:{provider:LegalProfile|null;contractor:LegalProfile|null},onlyEmpty=true){
+  setDocumentDraft(v=>({
+   ...v,
+   contractor_legal_name:onlyEmpty&&v.contractor_legal_name?v.contractor_legal_name:profiles.contractor?.legal_name||v.contractor_legal_name,
+   contractor_document:onlyEmpty&&v.contractor_document?v.contractor_document:profiles.contractor?.document_number||v.contractor_document,
+   contractor_address:onlyEmpty&&v.contractor_address?v.contractor_address:profiles.contractor?.full_address||v.contractor_address,
+   provider_legal_name:onlyEmpty&&v.provider_legal_name?v.provider_legal_name:profiles.provider?.legal_name||v.provider_legal_name,
+   provider_document:onlyEmpty&&v.provider_document?v.provider_document:profiles.provider?.document_number||v.provider_document,
+   provider_address:onlyEmpty&&v.provider_address?v.provider_address:profiles.provider?.full_address||v.provider_address,
+   provider_representative:onlyEmpty&&v.provider_representative?v.provider_representative:profiles.provider?.representative||v.provider_representative
+  }));
+ }
+ async function saveLegalProfile(kind:'provider'|'contractor'){
+  if(!client?.id||legalProfileBusy)return;
+  setLegalProfileBusy(true);setDocumentNotice('');
+  try{
+   const data=kind==='provider'
+    ?{legal_name:documentDraft.provider_legal_name,document_number:documentDraft.provider_document,full_address:documentDraft.provider_address,representative:documentDraft.provider_representative}
+    :{legal_name:documentDraft.contractor_legal_name,document_number:documentDraft.contractor_document,full_address:documentDraft.contractor_address,representative:documentDraft.responsible};
+   const response=await fetch('/api/clientes/contratos/dados-juridicos',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({kind,clientId:client.id,...data})});
+   const result=await response.json();if(!response.ok)throw Error(result.error||'Falha ao salvar cadastro jurídico');
+   await loadLegalProfiles();
+   setDocumentNotice(kind==='provider'?'Dados jurídicos do planetário salvos para próximos contratos.':'Dados jurídicos da instituição salvos para próximos contratos.');
+  }catch(e){setDocumentNotice(e instanceof Error?e.message:'Falha no cadastro jurídico.');}
+  finally{setLegalProfileBusy(false);}
+ }
  const [documentSavedId,setDocumentSavedId]=useState<string|null>(null);
  const [documentBusy,setDocumentBusy]=useState(false);
  const [documentNotice,setDocumentNotice]=useState('');
@@ -157,6 +194,8 @@ export default function ClientDetails({id,writesEnabled,proposalWritesEnabled,co
    const drafts=await loadDocumentDrafts(contractId);
    const draft=drafts.find(d=>!d.archived_at);
    if(draft)selectSavedDraft(draft);
+   const profiles=await loadLegalProfiles();
+   if(profiles&&!draft)applyLegalProfiles(profiles);
   }catch{setDocumentNotice('Não foi possível consultar minutas salvas. Não salve até verificar a conexão.');}
  }
  async function saveDocument(contractId:string){
@@ -494,6 +533,12 @@ export default function ClientDetails({id,writesEnabled,proposalWritesEnabled,co
  <label style={formLabel}>Representante<input style={formInput} value={documentDraft.responsible} onChange={e=>setDocumentDraft(v=>({...v,responsible:e.target.value}))}/></label>
  <section style={{padding:14,border:'1px solid #b4d1f4',borderRadius:12,background:'#f7fbff',display:'grid',gap:10}}>
  <strong style={{color:'#174987'}}>Identificação das partes</strong>
+ <div style={{display:'flex',gap:8,flexWrap:'wrap'}}>
+ <button type="button" disabled={legalProfileBusy} style={{...actionLink,background:'#145ac3'}} onClick={()=>void saveLegalProfile('contractor')}>Salvar dados da instituição</button>
+ <button type="button" disabled={legalProfileBusy} style={{...actionLink,background:'#145ac3'}} onClick={()=>void saveLegalProfile('provider')}>Salvar dados do planetário</button>
+ <button type="button" disabled={legalProfileBusy} style={{...actionLink,background:'#526b8d'}} onClick={()=>applyLegalProfiles(legalProfiles,true)}>Preencher campos vazios do cadastro</button>
+ </div>
+
  <label style={formLabel}>Contratante — razão social / nome civil<input style={formInput} maxLength={240} value={documentDraft.contractor_legal_name} onChange={e=>setDocumentDraft(v=>({...v,contractor_legal_name:e.target.value}))}/></label>
  <label style={formLabel}>Contratante — CPF/CNPJ<input style={formInput} maxLength={30} value={documentDraft.contractor_document} onChange={e=>setDocumentDraft(v=>({...v,contractor_document:e.target.value}))}/></label>
  <label style={formLabel}>Contratante — endereço completo<input style={formInput} maxLength={500} value={documentDraft.contractor_address} onChange={e=>setDocumentDraft(v=>({...v,contractor_address:e.target.value}))}/></label>
