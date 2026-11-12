@@ -150,6 +150,41 @@ export default function ClientDetails({id,writesEnabled,proposalWritesEnabled,co
   }catch(e){setDocumentNotice(e instanceof Error?e.message:'Falha ao salvar minuta.');}
   finally{setDocumentBusy(false);}
  }
+ function printSavedContract(){
+  const draft=savedDrafts.find(d=>d.id===documentSavedId&&!d.archived_at);
+  if(!draft){setDocumentNotice('Salve a minuta antes de gerar o PDF.');return;}
+  const escapeHtml=(value:string)=>value.replace(/[&<>"']/g,char=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]||char));
+  const line=(value:string)=>escapeHtml(value).replace(/\\n/g,'<br>');
+  const page=window.open('','_blank');
+  if(!page){setDocumentNotice('Permita a abertura de janelas para visualizar o contrato.');return;}
+  const logo=new URL('/antares-logo-pdf.png',window.location.origin).href;
+  page.document.open();
+  page.document.write(`<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><title>${escapeHtml(draft.title)} - ANTARES</title><style>
+  @page{size:A4;margin:18mm 17mm}*{box-sizing:border-box}body{font:12pt/1.55 Arial,sans-serif;color:#18304e;margin:0;background:#f0f4fa}
+  main{max-width:210mm;margin:20px auto;padding:20mm 17mm;background:#fff;min-height:270mm;box-shadow:0 4px 20px #ccd4df}
+  header{display:flex;align-items:center;justify-content:space-between;gap:18px;border-bottom:3px solid #174b91;padding-bottom:16px;margin-bottom:28px}
+  header img{width:230px;max-width:55%;max-height:100px;object-fit:contain;object-position:left center}
+  .brand{color:#174b91;text-align:right;font-size:10pt;font-weight:700;letter-spacing:1px}h1{font-size:18pt;text-align:center;color:#123c80;margin:0 0 24px}
+  h2{font-size:11pt;color:#174b91;text-transform:uppercase;letter-spacing:.5px;margin:23px 0 7px}
+  p{margin:0 0 12px;overflow-wrap:anywhere}.text{white-space:normal}.signatures{display:flex;gap:32px;margin-top:70px}
+  .signature{flex:1;text-align:center;border-top:1px solid #273b55;padding-top:8px;font-size:10pt}
+  footer{margin-top:38px;border-top:1px solid #d7e2f1;padding-top:10px;color:#536780;font-size:9pt}
+  .toolbar{max-width:210mm;margin:18px auto;display:flex;gap:10px}.toolbar button{background:#145ac3;color:#fff;border:0;border-radius:8px;padding:12px 20px;cursor:pointer}
+  @media print{body{background:#fff}main{margin:0;padding:0;min-height:0;box-shadow:none}.toolbar{display:none}header img{max-height:90px}}
+  </style></head><body><div class="toolbar"><button onclick="window.print()">Imprimir / Salvar em PDF</button></div><main>
+  <header><img src="${escapeHtml(logo)}" alt="ANTARES" onerror="this.style.display='none'"><span class="brand">ANTARES<br>DOCUMENTO CONTRATUAL</span></header>
+  <h1>${escapeHtml(draft.title)}</h1>
+  <h2>Instituição contratante</h2><p>${escapeHtml(draft.institution)}</p>
+  <h2>Representante da instituição</h2><p>${escapeHtml(draft.responsible||'Não informado')}</p>
+  <h2>Objeto do contrato</h2><p class="text">${line(draft.object_text||'Não informado')}</p>
+  <h2>Cláusulas e condições</h2><p class="text">${line(draft.terms||'Não informado')}</p>
+  <div class="signatures"><div class="signature">${escapeHtml(draft.responsible||'Representante da instituição')}<br>CONTRATANTE</div>
+  <div class="signature">Representante do Planetário ANTARES<br>CONTRATADA</div></div>
+  <footer>ANTARES · Minuta salva · Versão ${draft.version_number}. Confira os dados e as condições antes da assinatura.</footer>
+  </main></body></html>`);
+  page.document.close();
+  setDocumentNotice('Visualização da versão salva aberta. Confira o documento antes de imprimir.');
+ }
  const [confirmBusy,setConfirmBusy]=useState(false);
  async function confirmContract(contractId:string){
   if(confirmBusy||contractResponsible.trim().length<3)return;
@@ -397,7 +432,8 @@ export default function ClientDetails({id,writesEnabled,proposalWritesEnabled,co
  {documentNotice&&<p role="status" style={{margin:0,fontSize:13,color:'#174987'}}>{documentNotice}</p>}
  <div style={{display:'flex',gap:8,flexWrap:'wrap'}}>
  <button type="button" disabled={documentBusy||documentDraft.title.trim().length<3||documentDraft.institution.trim().length<2} style={{...actionLink,background:'#16803c'}} onClick={()=>void saveDocument(contractId)}>{documentBusy?'Salvando…':'Salvar rascunho'}</button>
- <button type="button" disabled={documentBusy} style={{...actionLink,background:'#145ac3',color:'#fff',border:'1px solid #0f4ca8'}} onClick={()=>setEditingDocumentId(null)}>Fechar minuta</button>
+ <button type="button" disabled={documentBusy||!savedDrafts.some(d=>d.id===documentSavedId&&!d.archived_at)} style={{...actionLink,background:'#145ac3'}} onClick={printSavedContract}>Visualizar / PDF salvo</button>
+  <button type="button" disabled={documentBusy} style={{...actionLink,background:'#145ac3',color:'#fff',border:'1px solid #0f4ca8'}} onClick={()=>setEditingDocumentId(null)}>Fechar minuta</button>
  </div>
  </div>}
  {status==='pending'&&<div style={{marginTop:10}}>
