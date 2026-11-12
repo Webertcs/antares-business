@@ -30,7 +30,7 @@ export async function POST(req:NextRequest){
    (b.draftId!==null&&b.draftId!==undefined&&(typeof b.draftId!=='string'||!uuid.test(b.draftId)))||
    ![['title',3,200],['institution',2,200],['responsible',0,180],['object',0,8000],['terms',0,16000]].every(([key,min,max])=>typeof b[key as string]==='string'&&(b[key as string] as string).trim().length>=Number(min)&&(b[key as string] as string).length<=Number(max)))return fail('Dados da minuta inválidos.');
   const db=getTeamWriteDb();
-  const checks=await db`SELECT current_user='antares_team_runtime' AND NOT rolsuper AND NOT rolbypassrls AS safe_role,
+  const checks=await db`SELECT EXISTS(SELECT 1 FROM pg_catalog.pg_roles r WHERE r.rolname=current_user AND r.rolname='antares_team_runtime' AND NOT r.rolsuper AND NOT r.rolbypassrls) AS safe_role,
    EXISTS(SELECT 1 FROM pg_proc p WHERE p.pronamespace='public'::regnamespace AND p.proname='antares_save_contract_draft'
    AND p.prosecdef AND pg_get_userbyid(p.proowner)='neondb_owner'
    AND has_function_privilege(current_user,p.oid,'EXECUTE')
