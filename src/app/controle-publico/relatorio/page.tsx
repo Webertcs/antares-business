@@ -16,9 +16,33 @@ export default async function Page({searchParams}:{searchParams:Promise<Search>}
  const total=filtered.reduce((n,r)=>n+Number(r.actual_students||0),0);
  const summary=[...new Map(filtered.map(r=>[String(r.client_id),String(r.client_name)])).entries()].map(([id,name])=>({id,name,events:filtered.filter(r=>String(r.client_id)===id).length,students:filtered.filter(r=>String(r.client_id)===id).reduce((n,r)=>n+Number(r.actual_students||0),0)})).sort((a,b)=>a.name.localeCompare(b.name,'pt-BR'));
  const selected=client?summary.find(r=>r.id===client)?.name||'Instituição selecionada':'Todas as instituições';
- return <><AutoPrint/><style>{`@page{size:A4;margin:14mm}*{box-sizing:border-box}body{font:12px Arial,sans-serif;color:#173668;margin:0;background:#edf3fc}.sheet{max-width:850px;margin:25px auto;background:white;padding:28px;min-height:100vh}.header{background:linear-gradient(110deg,#08265d,#1768c2);color:white;padding:22px;border-radius:9px}.brand{font-size:24px;font-weight:800;letter-spacing:2px}.subtitle{font-size:11px;letter-spacing:1px}.filters{margin:18px 0;color:#355b8c}.stats{display:flex;gap:10px;margin:16px 0}.stat{flex:1;background:#eef5ff;border:1px solid #bcd3fa;border-radius:8px;padding:13px}.stat strong{display:block;font-size:22px;margin-top:5px}h2{font-size:16px;margin:24px 0 10px}table{width:100%;border-collapse:collapse;font-size:11px}th{text-align:left;background:#e8f1ff;color:#16427f}th,td{padding:9px 7px;border-bottom:1px solid #d7e4f5}tr{break-inside:avoid}footer{margin-top:25px;border-top:1px solid #c8dcf8;padding-top:10px;font-size:10px;color:#52729e}.actions{max-width:850px;margin:20px auto;display:flex;gap:10px}.actions button,.actions a{background:#1559b7;color:white;border:0;border-radius:8px;padding:12px 18px;font-weight:700;text-decoration:none;cursor:pointer}@media print{body{background:white}.sheet{margin:0;padding:0;min-height:auto}.actions{display:none}.header,.stat,th{print-color-adjust:exact;-webkit-print-color-adjust:exact}}`}</style>
+ return <><AutoPrint/><style>{`@page{size:A4;margin:13mm}
+*{box-sizing:border-box}body{font:12px Arial,Helvetica,sans-serif;color:#183b70;margin:0;background:#edf3fc}
+.sheet{max-width:880px;width:100%;margin:20px auto;background:white;padding:26px;min-height:100vh;box-shadow:0 10px 25px #0e408020}
+.header{display:flex;align-items:center;gap:18px;background:linear-gradient(110deg,#092e69,#134f9b 65%,#2172c8);color:white;padding:18px;border-radius:12px;min-height:101px}
+.logo-tile{flex:0 0 140px;display:flex;align-items:center;justify-content:center;padding:7px 9px;border:1px solid #d0e6fc;background:white;border-radius:9px;min-height:60px}
+.logo-tile img{display:block;width:100%;height:auto;max-height:54px;object-fit:contain}
+.header-copy{flex:1;min-width:0}.eyebrow{font-size:9px;font-weight:800;color:#c4e3ff;letter-spacing:1.2px}
+.header h1{font-size:22px;margin:6px 0 4px;font-weight:800;letter-spacing:-.2px}.header p{font-size:10px;margin:0;color:#dbeeff}
+.issue{font-size:9px;color:#ebf7ff;text-align:right;white-space:nowrap;align-self:flex-start;padding-top:4px}
+.filters{background:linear-gradient(110deg,#f0f7ff,#e7f1ff);border:1px solid #c3daf8;border-radius:9px;padding:10px 13px;margin:15px 0;color:#295b94;font-size:10px}
+.stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin:14px 0}
+.stat{background:linear-gradient(130deg,#fbfdff,#edf5ff);border:1px solid #bfd6f7;border-top:3px solid #2b7ddd;border-radius:10px;padding:12px 13px;min-height:75px;color:#28588d;font-size:10px;font-weight:700}
+.stat:nth-child(2){border-top-color:#16a88b}.stat:nth-child(3){border-top-color:#9270d8}
+.stat strong{display:block;color:#124182;font-size:22px;margin-top:6px;font-weight:800}
+h2{font-size:13px;margin:17px 0 0;padding:11px 13px;color:white;background:linear-gradient(110deg,#0c387b,#2371c8);border-radius:9px 9px 0 0;break-after:avoid}
+table{width:100%;border-collapse:collapse;font-size:10px;border:1px solid #c5daf6;border-top:0}
+thead{display:table-header-group}th{text-align:left;background:#dfeeff;color:#164980;border-bottom:2px solid #aacaf0;white-space:nowrap;font-size:9px}
+th,td{padding:8px 9px;border-bottom:1px solid #d7e4f5;vertical-align:middle}
+tbody tr:nth-child(even){background:#edf5ff}tbody tr:nth-child(odd){background:#fafcff}
+tr{break-inside:avoid;page-break-inside:avoid}td strong{color:#174887}
+footer{margin-top:20px;border-top:1px solid #b7d0f2;padding-top:10px;font-size:9px;color:#55759c;text-align:center}
+.actions{max-width:880px;margin:16px auto;display:flex;align-items:center;gap:10px;justify-content:space-between;padding:0 8px}
+.actions span{font-size:12px;color:#1a477f}.actions a{background:linear-gradient(110deg,#286fd1,#0e468e);color:#fff;border:1px solid #1956a5;border-radius:9px;padding:11px 17px;font-weight:800;text-decoration:none;box-shadow:0 3px 10px #144b9333}
+@media(max-width:600px){.sheet{padding:12px}.header{flex-wrap:wrap}.issue{margin-left:auto}.logo-tile{flex-basis:120px}.stat strong{font-size:18px}th,td{padding:6px 4px}}
+@media print{body{background:white;-webkit-print-color-adjust:exact;print-color-adjust:exact}.sheet{margin:0;max-width:none;padding:0;min-height:auto;box-shadow:none}.actions{display:none}.header,.stat,.filters,h2,th,tbody tr:nth-child(even){-webkit-print-color-adjust:exact;print-color-adjust:exact}.header,.stats{break-inside:avoid}}`}</style>
  <div className="actions"><span style={{padding:"12px 0",fontWeight:700}}>Para salvar em PDF, use Ctrl+P e escolha “Salvar como PDF”</span><a href="/controle-publico">Voltar</a></div>
- <main className="sheet"><header className="header"><div className="brand">✦ ANTARES</div><div className="subtitle">RELATÓRIO DE ATENDIMENTOS · CONTROLE DE PÚBLICO</div><h1>Alunos atendidos</h1></header>
+ <main className="sheet"><header className="header"><div className="logo-tile"><img src="/antares-logo-horizontal.png" alt="ANTARES Business" /></div><div className="header-copy"><div className="eyebrow">ANTARES BUSINESS · RELATÓRIO OFICIAL</div><h1>Controle de Público</h1><p>Alunos atendidos e eventos contabilizados</p></div><div className="issue">Emissão<br/>{new Date().toLocaleDateString('pt-BR',{timeZone:'America/Sao_Paulo'})}</div></header>
  <p className="filters"><strong>Período:</strong> {year||'Todos os anos'} &nbsp; | &nbsp; <strong>Instituição:</strong> {selected}</p>
  <div className="stats"><div className="stat">Alunos atendidos<strong>{fmt(total)}</strong></div><div className="stat">Eventos contabilizados<strong>{fmt(filtered.length)}</strong></div><div className="stat">Instituições atendidas<strong>{fmt(new Set(filtered.map(r=>String(r.client_id))).size)}</strong></div></div>
  <h2>Resumo por instituição</h2><table><thead><tr><th>Instituição</th><th>Eventos</th><th>Alunos atendidos</th></tr></thead><tbody>{summary.map(r=><tr key={r.id}><td>{r.name}</td><td>{fmt(r.events)}</td><td><strong>{fmt(r.students)}</strong></td></tr>)}{!summary.length&&<tr><td colSpan={3}>Nenhum atendimento registrado.</td></tr>}</tbody></table>
