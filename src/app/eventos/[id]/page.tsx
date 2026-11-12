@@ -31,16 +31,16 @@ export default async function Page({params}:{params:Promise<{id:string}>}){
  const maps='https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(address);
  const waze='https://waze.com/ul?q='+encodeURIComponent(address)+'&navigate=yes';
  const date=(()=>{if(!e.event_date)return 'A definir';const raw=e.event_date;const parsed=raw instanceof Date?raw:new Date(String(raw));return Number.isNaN(parsed.getTime())?'Data indisponível':new Intl.DateTimeFormat('pt-BR',{timeZone:'UTC'}).format(parsed);})();
- return <div style={{display:'grid',gap:9,color:'#173668',paddingBottom:12}}>
- <header style={{position:'relative',overflow:'hidden',borderRadius:14,padding:'clamp(12px,1.6vw,20px)',color:'#fff',minHeight:100,background:'radial-gradient(ellipse at 80% 12%,rgba(0,159,255,.32),transparent 42%),linear-gradient(115deg,#061c51 0%,#0c348b 65%,#0a4ea1 100%)',boxShadow:'0 12px 28px rgba(12,39,111,.2)'}}>
+ return <div className="antares-event-center" style={{display:'grid',gap:9,color:'#173668',paddingBottom:12}}>
+ <header className="antares-event-center-hero" style={{position:'relative',overflow:'hidden',borderRadius:14,padding:'clamp(12px,1.6vw,20px)',color:'#fff',minHeight:100,background:'radial-gradient(ellipse at 80% 12%,rgba(0,159,255,.32),transparent 42%),linear-gradient(115deg,#061c51 0%,#0c348b 65%,#0a4ea1 100%)',boxShadow:'0 12px 28px rgba(12,39,111,.2)'}}>
  <div style={{position:'relative',zIndex:1,maxWidth:'75%'}}>
  <div style={{fontSize:12,fontWeight:800,letterSpacing:1.5,color:'#9edcff'}}>CENTRAL DO EVENTO · ANTARES</div>
  <h1 style={{fontSize:'clamp(22px,2.4vw,29px)',fontWeight:800,margin:'5px 0',lineHeight:1.15,color:'#fff'}}>{String(e.title)}</h1>
  <div style={{display:'flex',alignItems:'center',gap:10,flexWrap:'wrap',fontWeight:600}}>
  <span>{date} · {String(e.start_time||'').slice(0,5)||'Horário a definir'}{e.end_time?'–'+String(e.end_time).slice(0,5):''}</span>
  <EventLifecycleActions eventId={id} status={String(e.status)} archived={!!e.archived_at}/></div></div></header>
- <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(170px,1fr))',gap:10}}>
- {([['Instituição',String(e.client_name),'🏫'],['Cúpula',String(e.dome_name||'A definir'),'🪐'],['Público previsto',e.expected_attendees==null?'A definir':String(e.expected_attendees),'👥']] as const).map(([label,value,icon])=><div key={label} style={infoCard}><div style={{display:'flex',alignItems:'center',gap:10}}><span aria-hidden="true" style={{fontSize:23,background:'#d9eaff',borderRadius:12,padding:8}}>{icon}</span><div style={{minWidth:0}}><div style={{fontSize:14,fontWeight:750,color:'#28589b',lineHeight:1.3}}>{label}</div><div style={{fontSize:15,fontWeight:400,overflowWrap:'anywhere',lineHeight:1.35}}>{value}</div></div></div></div>)}
+ <div className="antares-event-center-metrics" style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(170px,1fr))',gap:10}}>
+ {([['Instituição',String(e.client_name),'🏫'],['Cúpula',String(e.dome_name||'A definir'),'🪐'],['Público previsto',e.expected_attendees==null?'A definir':String(e.expected_attendees),'👥']] as const).map(([label,value,icon])=><div key={label} className="antares-event-center-metric" style={infoCard}><div style={{display:'flex',alignItems:'center',gap:10}}><span aria-hidden="true" style={{fontSize:23,background:'#d9eaff',borderRadius:12,padding:8}}>{icon}</span><div style={{minWidth:0}}><div style={{fontSize:14,fontWeight:750,color:'#28589b',lineHeight:1.3}}>{label}</div><div style={{fontSize:15,fontWeight:400,overflowWrap:'anywhere',lineHeight:1.35}}>{value}</div></div></div></div>)}
  </div>
  {ctx.role==='owner'&&!hasLinkedReservation&&<EventDomePicker eventId={id} initialDomeId={String(e.dome_id||'')} domes={domeRows.map(d=>({id:String(d.id),name:String(d.name),capacity:d.capacity==null?null:Number(d.capacity)}))}/>}
 
