@@ -1,6 +1,5 @@
 'use client';
 import {useEffect,useState} from 'react';
-import Link from 'next/link';
 
 type Entry={id:string;entry_type:'income'|'expense';amount:number;description:string;occurred_on:string;reversal_of:string|null;presentation_title:string|null;dome_name:string|null};
 type Data={entries:Entry[];income:number;expenses:number;balance:number;writesEnabled:boolean;limited:boolean;domes:{id:string;name:string;active:boolean}[];presentations:{id:string;title:string;starts_at:string}[]};
@@ -26,6 +25,8 @@ export default function FinanceiroClient(){
  const [notice,setNotice]=useState('');
  const [reversing,setReversing]=useState<string|null>(null);
  const [dome,setDome]=useState('all');
+ const [section,setSection]=useState<'extrato'|'receber'|'relatorios'|'lancamento'>('extrato');
+ const [entryPage,setEntryPage]=useState(1);
  async function refreshFinance(){
   const [ledger,reportResponse]=await Promise.all([
    fetch('/api/financeiro',{cache:'no-store'}),
@@ -70,6 +71,8 @@ export default function FinanceiroClient(){
  }
  const reversed=new Set((data?.entries||[]).map(x=>x.reversal_of).filter(Boolean));
  const entries=(data?.entries||[]).filter(e=>(type==='all'||e.entry_type===type)&&(dome==='all'||e.dome_name===dome));
+ const pageSize=10;
+ const pagedEntries=entries.slice((entryPage-1)*pageSize,entryPage*pageSize);
  const card={border:'1px solid #bed0e8',borderRadius:14,padding:20,background:'#fff'};
  return <><style>{`@media print {
  @page { size: A4 portrait; margin: 14mm; }
@@ -84,34 +87,33 @@ export default function FinanceiroClient(){
  }`}</style><main style={{background:'#f3f6fc',color:'#11264d',minHeight:'100%',padding:'clamp(16px,3vw,32px)',fontFamily:'Arial,sans-serif'}}>
  <div style={{maxWidth:1120,margin:'0 auto'}}>
  
- <p className="finance-print-hide" style={{letterSpacing:2,fontSize:12,marginTop:25}}>ANTARES BUSINESS · BLOCO 07C</p>
- <h1 className="finance-print-hide" style={{fontSize:32,margin:'8px 0'}}>Gestão financeira</h1>
- <div className="finance-print-hide" style={{marginBottom:15}}><Link href="/financeiro/receber" style={{display:'inline-block',padding:'10px 16px',background:'#2454d3',color:'white',borderRadius:8}}>Contas a receber</Link></div>
- <p className="finance-print-hide">Livro-caixa real, sem incluir propostas ou sinais apenas previstos. Acesso exclusivo do proprietário.</p>
+ <header className="finance-print-hide" style={{background:'linear-gradient(110deg,#143b78,#2467ba)',color:'#fff',borderRadius:16,padding:'22px 24px',display:'flex',justifyContent:'space-between',alignItems:'center',gap:12,flexWrap:'wrap'}}><div><small style={{letterSpacing:1.5}}>ANTARES BUSINESS</small><h1 style={{fontSize:30,margin:'5px 0'}}>Financeiro</h1><p style={{margin:0,fontSize:13}}>Controle de receitas, despesas e recebimentos</p></div><button type="button" onClick={()=>setSection('lancamento')} style={{background:'#fff',color:'#174c91',fontWeight:700,border:0,borderRadius:9,padding:'12px 16px',cursor:'pointer'}}>+ Novo lançamento</button></header>
  {loading&&<p className="finance-print-hide">Carregando movimentações...</p>}
  {error&&<p className="finance-print-hide" role="alert" style={{color:'#a32727'}}>{error}</p>}
  {data&&<><div className="finance-print-hide" style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(190px,1fr))',gap:14,margin:'26px 0'}}>
  {([['Entradas realizadas',data.income],['Saídas realizadas',data.expenses],['Saldo acumulado',data.balance]] as [string,number][]).map(([label,value])=><div style={card} key={label}><small>{label}</small><h2 style={{fontSize:25}}>{brl(value)}</h2></div>)}</div>
  {receivables&&<div className="finance-print-hide" style={{...card,marginBottom:16,background:'#edf5ff',border:'1px solid #c5daf5'}}><strong style={{color:'#17457f'}}>Pendente de todas as instituições: {brl(receivables.titles.reduce((n,t)=>n+Math.max(0,Number(t.total)-Number(t.paid)),0))}</strong><p style={{fontSize:12,margin:'6px 0 0'}}>Cobranças ainda não recebidas; não integram o saldo realizado.</p></div>}
- <section className="finance-print-hide" style={card}><h2>Extrato auditável</h2>
+ <nav className="finance-print-hide" aria-label="Áreas financeiras" style={{display:'flex',flexWrap:'wrap',gap:8,margin:'0 0 18px'}}>{([['extrato','Extrato'],['receber','Contas a receber'],['relatorios','Relatórios e fluxo de caixa'],['lancamento','Novo lançamento']] as const).map(([key,label])=><button type="button" key={key} onClick={()=>setSection(key)} aria-pressed={section===key} style={{background:section===key?'#1c55a4':'#e9f2ff',color:section===key?'white':'#17457f',border:'1px solid #b7d1f3',padding:'10px 14px',borderRadius:9,fontWeight:700,cursor:'pointer'}}>{label}</button>)}</nav>
+ {section==='extrato'&&<section className="finance-print-hide" style={card}><h2>Extrato auditável</h2>
  <p style={{fontSize:13}}>Lançamentos confirmados no livro-caixa. Estornos permanecem no histórico.</p>
  <div style={{display:'flex',gap:12,flexWrap:'wrap',margin:'15px 0'}}>
- <label>Tipo <select value={type} onChange={e=>setType(e.target.value)} style={{padding:8,marginLeft:6}}><option value="all">Todos</option><option value="income">Receitas</option><option value="expense">Despesas</option></select></label>
- <label>Cúpula <select value={dome} onChange={e=>setDome(e.target.value)} style={{padding:8,marginLeft:6}}><option value="all">Todas</option>{data.domes.map(d=><option key={d.id} value={d.name}>{d.name}</option>)}</select></label>
+ <label>Tipo <select value={type} onChange={e=>{setType(e.target.value);setEntryPage(1);}} style={{padding:8,marginLeft:6}}><option value="all">Todos</option><option value="income">Receitas</option><option value="expense">Despesas</option></select></label>
+ <label>Cúpula <select value={dome} onChange={e=>{setDome(e.target.value);setEntryPage(1);}} style={{padding:8,marginLeft:6}}><option value="all">Todas</option>{data.domes.map(d=><option key={d.id} value={d.name}>{d.name}</option>)}</select></label>
  </div>
  <div style={{overflowX:'auto'}}><table style={{width:'100%',borderCollapse:'collapse',textAlign:'left'}}>
  <thead><tr>{['Data','Descrição','Tipo','Apresentação / cúpula','Valor'].map(x=><th key={x} style={{padding:12,borderBottom:'1px solid #ccd8ea'}}>{x}</th>)}</tr></thead>
- <tbody>{entries.map(e=><tr key={e.id}>
+ <tbody>{pagedEntries.map(e=><tr key={e.id}>
  <td style={{padding:12,borderBottom:'1px solid #e3eaf3',whiteSpace:'nowrap'}}>{String(e.occurred_on).slice(0,10).split('-').reverse().join('/')}</td>
  <td style={{padding:12,borderBottom:'1px solid #e3eaf3'}}>{e.description}{e.reversal_of&&' (estorno)'}</td>
  <td style={{padding:12,borderBottom:'1px solid #e3eaf3'}}>{e.entry_type==='income'?'Receita':'Despesa'}</td>
  <td style={{padding:12,borderBottom:'1px solid #e3eaf3'}}>{e.presentation_title||'Não vinculada'}{e.dome_name&&' · '+e.dome_name}</td>
  <td style={{padding:12,borderBottom:'1px solid #e3eaf3',fontWeight:700}}>{e.entry_type==='income'?'+':'−'} {brl(Number(e.amount))} {data.writesEnabled&&!e.reversal_of&&!reversed.has(e.id)&&<button type="button" disabled={!!reversing} onClick={()=>reverseEntry(e.id)} style={{marginLeft:8,padding:5,border:'1px solid #bdcbe0',borderRadius:6}}>Estornar</button>}</td>
  </tr>)}</tbody></table>{entries.length===0&&<p>Nenhuma movimentação encontrada para os filtros selecionados.</p>}</div>
+ {entries.length>pageSize&&<div style={{display:'flex',alignItems:'center',justifyContent:'flex-end',gap:12,marginTop:14}}><button type="button" disabled={entryPage<=1} onClick={()=>setEntryPage(p=>Math.max(1,p-1))}>Anterior</button><span>Página {Math.min(entryPage,Math.ceil(entries.length/pageSize))} de {Math.ceil(entries.length/pageSize)}</span><button type="button" disabled={entryPage*pageSize>=entries.length} onClick={()=>setEntryPage(p=>p+1)}>Próxima</button></div>}
  {data.limited&&<p style={{color:'#92400e'}}>Exibindo somente os mil lançamentos mais recentes. Totais não são definitivos.</p>}
- </section>
+ </section>}
  {receivableError&&<p role="alert" style={{color:'#a32727'}}>{receivableError}</p>}
- {receivables&&<section className="finance-print-hide" style={{...card,marginTop:20}}>
+ {section==='receber'&&receivables&&<section className="finance-print-hide" style={{...card,marginTop:20}}>
  <h2>Contas a receber — todas as instituições</h2>
  <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(180px,1fr))',gap:12,margin:'16px 0'}}>
  {([['Total de cobranças',receivables.titles.reduce((n,t)=>n+Number(t.total||0),0)],['Já recebido',receivables.titles.reduce((n,t)=>n+Number(t.paid||0),0)],['Pendente',receivables.titles.reduce((n,t)=>n+Math.max(0,Number(t.total||0)-Number(t.paid||0)),0)]] as [string,number][]).map(([label,value])=><div key={label} style={{background:'#edf5ff',border:'1px solid #c5daf5',borderRadius:10,padding:14}}><small>{label}</small><h3 style={{margin:'8px 0 0'}}>{brl(value)}</h3></div>)}
@@ -122,7 +124,7 @@ export default function FinanceiroClient(){
  <div style={{overflowX:'auto'}}><table style={{width:'100%',borderCollapse:'collapse',textAlign:'left',fontSize:13}}><thead><tr>{['Data','Instituição','Descrição','Valor recebido'].map(h=><th key={h} style={{padding:9,borderBottom:'1px solid #ccd8ea'}}>{h}</th>)}</tr></thead><tbody>{receivables.payments.map(p=><tr key={p.id}><td style={{padding:9}}>{String(p.occurred_on).slice(0,10).split('-').reverse().join('/')}</td><td style={{padding:9}}>{p.client_name}</td><td style={{padding:9}}>{p.description}</td><td style={{padding:9,fontWeight:700,color:'#16724a'}}>+ {brl(Number(p.amount))}</td></tr>)}</tbody></table>{receivables.payments.length===0&&<p>Nenhum recebimento vinculado.</p>}</div>
  <p style={{fontSize:12}}>Cobranças não entram no saldo do caixa até o recebimento confirmado. O extrato auditável acima continua sendo a fonte do caixa realizado.</p>
  </section>}
- {report&&<section className="finance-report-print" style={{...card,marginTop:20}}>
+ {section==='relatorios'&&report&&<section className="finance-report-print" style={{...card,marginTop:20}}>
  <h2>Fluxo de caixa e relatórios gerenciais</h2>
  <p style={{fontSize:13}}>Valores efetivamente realizados. Propostas comerciais não entram no saldo do caixa.</p>
  <div style={{overflowX:'auto'}}><h3>Resumo mensal</h3><table style={{width:'100%',textAlign:'left'}}><thead><tr><th>Período</th><th>Receitas</th><th>Despesas</th><th>Saldo</th></tr></thead><tbody>{report.months.map(m=><tr key={m.periodo}><td>{m.periodo}</td><td>{brl(Number(m.receitas))}</td><td>{brl(Number(m.despesas))}</td><td>{brl(Number(m.receitas)-Number(m.despesas))}</td></tr>)}</tbody></table>{!report.months.length&&<p>Sem movimentações realizadas.</p>}</div>
@@ -134,7 +136,7 @@ export default function FinanceiroClient(){
  <button type="button" className="finance-print-hide" onClick={()=>window.print()} style={{padding:'10px 14px',borderRadius:8,background:'#2454d3',color:'white'}}>Imprimir relatório / salvar PDF</button>
  <p style={{fontSize:12,opacity:.7}}>Relatório gerencial de caixa. Não substitui balanço patrimonial, DRE ou balancete contábil.</p>
  </section>}
-  <section className="finance-print-hide" style={{...card,marginTop:20}}><h2>Novo lançamento</h2><p>Somente valores efetivamente recebidos ou pagos. Propostas e sinais previstos não devem ser lançados como recebidos.</p>
+  {section==='lancamento'&&<section className="finance-print-hide" style={{...card,marginTop:20}}><h2>Novo lançamento</h2><p>Somente valores efetivamente recebidos ou pagos. Propostas e sinais previstos não devem ser lançados como recebidos.</p>
  <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(210px,1fr))',gap:12}}>
  <label>Tipo<select value={entryType} onChange={e=>{setEntryType(e.target.value);setPendingId(null);}} style={{display:'block',width:'100%',padding:10}}><option value="income">Receita recebida</option><option value="expense">Despesa paga</option></select></label>
  <label>Valor (R$)<input value={amount} onChange={e=>{setAmount(e.target.value);setPendingId(null);}} inputMode="decimal" placeholder="0,00" style={{display:'block',width:'100%',padding:10}}/></label>
@@ -145,8 +147,8 @@ export default function FinanceiroClient(){
  {data.writesEnabled===false&&<p role="status" style={{background:'#fff7ed',padding:12,borderRadius:9,color:'#8a4618'}}>Lançamentos temporariamente bloqueados enquanto a integração é homologada. O extrato e os relatórios continuam disponíveis.</p>}
  <button type="button" disabled={saving||!data.writesEnabled} onClick={saveEntry} style={{background:'#2454d3',color:'white',padding:'12px 18px',borderRadius:9,marginTop:14}}>{saving?'Registrando...':'Confirmar lançamento'}</button>
  {notice&&<p role="status">{notice}</p>}
- <p style={{fontSize:12,opacity:.7}}>Em caso de erro, confira o extrato antes de tentar novamente. Estornos criam um lançamento inverso, preservando o original. A função fica disponível somente após migração e homologação.</p>
- </section>
+ <p style={{fontSize:12,opacity:.7}}>Em caso de erro, confira o extrato antes de tentar novamente. Estornos criam um lançamento inverso, preservando o original. </p>
+ </section>}
  </>}
  </div></main></>;
 }
