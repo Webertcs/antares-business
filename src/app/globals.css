@@ -938,3 +938,182 @@
 @media(max-width:900px){.antares-client-detail .client-detail-metrics{grid-template-columns:repeat(2,minmax(0,1fr))!important}}
 @media(max-width:560px){.antares-client-detail{padding:12px!important}.antares-client-detail .client-detail-metrics{grid-template-columns:repeat(2,minmax(0,1fr))!important}.antares-client-detail .client-detail-tabs button{flex:1;min-width:calc(25% - 6px);}.antares-client-detail .client-detail-metric strong{font-size:17px!important}}
 @media(prefers-reduced-motion:reduce){.antares-client-detail button,.antares-client-detail .client-detail-metric{transition:none!important}.antares-client-detail button:hover,.antares-client-detail .client-detail-metric:hover{transform:none}}
+
+
+/* ANTARES Premium V2 - acabamento unificado nas oito abas de Clientes */
+/* Escopo restrito à ficha do cliente: não altera painéis de outros módulos. */
+.antares-client-detail {
+  --client-accent:#2875d3;
+  --client-deep:#123b79;
+  --client-line:#bad3f3;
+  --client-elev:0 7px 20px rgba(18,65,133,.11),0 2px 5px rgba(18,65,133,.05);
+}
+.antares-client-detail .client-detail-metric[aria-current="page"] {
+  background:linear-gradient(130deg,#e3f1ff,#cee4ff)!important;
+  border-top-color:#0755c2!important;
+  box-shadow:0 0 0 1px #8eb7ed,0 5px 13px rgba(16,83,172,.17)!important;
+}
+.antares-client-detail .client-detail-tabs button[aria-current="page"] {
+  background:linear-gradient(110deg,#1652a3,#236dcc)!important;
+  border:1px solid #2c73ce!important;
+  box-shadow:0 5px 12px rgba(9,63,135,.22)!important;
+}
+/* Um único painel, tipografia e cabeçalho para Eventos, Propostas, Contratos,
+   Alunos, Fidelização, Financeiro, Histórico e Observações. */
+.antares-client-detail section.client-premium-tab {
+  margin:0 0 16px!important;
+  padding:16px!important;
+  border:1px solid #b9d3f4!important;
+  border-top:3px solid var(--client-accent)!important;
+  border-left:1px solid #b9d3f4!important;
+  border-radius:14px!important;
+  background:linear-gradient(155deg,#f5f9ff 0%,#eaf3ff 52%,#f5faff 100%)!important;
+  box-shadow:var(--client-elev)!important;
+  font-size:13px;
+  color:#1a427a;
+  overflow-wrap:anywhere;
+}
+.antares-client-detail section.client-premium-tab[data-client-tab="propostas"]{--client-accent:#16a59f;}
+.antares-client-detail section.client-premium-tab[data-client-tab="contratos"]{--client-accent:#527ee4;}
+.antares-client-detail section.client-premium-tab[data-client-tab="alunos"]{--client-accent:#29a6c3;}
+.antares-client-detail section.client-premium-tab[data-client-tab="fidelizacao"]{--client-accent:#7a70d9;}
+.antares-client-detail section.client-premium-tab[data-client-tab="financeiro"]{--client-accent:#1d9c8c;}
+.antares-client-detail section.client-premium-tab[data-client-tab="historico"]{--client-accent:#3d86db;}
+.antares-client-detail section.client-premium-tab[data-client-tab="observacoes"]{--client-accent:#5a82cc;}
+.antares-client-detail .client-premium-tab > h2 {
+  display:flex;
+  align-items:center;
+  min-height:48px;
+  margin:-16px -16px 14px!important;
+  padding:11px 16px!important;
+  border-radius:11px 11px 0 0;
+  background:linear-gradient(108deg,#123b79 0%,#1d5fac 65%,#2c79ce 100%);
+  border-bottom:3px solid var(--client-accent);
+  box-shadow:0 4px 11px rgba(17,69,148,.13);
+  color:#fff!important;
+  font-size:17px!important;
+  font-weight:800!important;
+  letter-spacing:-.15px;
+  line-height:1.25!important;
+}
+.antares-client-detail .client-premium-tab > h3 {
+  margin:14px 0 10px!important;
+  color:#163e79!important;
+  font-size:15px!important;
+  font-weight:750!important;
+}
+.antares-client-detail .client-premium-tab > p {
+  margin:0 0 11px;
+  font-size:12px!important;
+  line-height:1.45;
+  color:#4d6c91;
+}
+.antares-client-detail .client-premium-tab .client-premium-entry {
+  margin-bottom:8px!important;
+  padding:11px 13px!important;
+  border:1px solid #c2d8f6!important;
+  border-left:4px solid var(--client-accent)!important;
+  border-radius:10px!important;
+  background:linear-gradient(105deg,#f8fbff 0%,#e7f2ff 100%)!important;
+  box-shadow:0 3px 11px rgba(12,71,151,.08)!important;
+  font-size:13px!important;
+  line-height:1.42!important;
+  color:#1a427a;
+}
+.antares-client-detail .client-premium-tab .client-premium-entry:nth-of-type(even){
+  background:linear-gradient(105deg,#eef6ff 0%,#dfeeff 100%)!important;
+}
+.antares-client-detail .client-premium-tab .client-premium-entry strong{color:#16447f;font-weight:800;}
+.antares-client-detail .client-premium-tab .client-premium-entry > div + div{margin-top:5px;}
+.antares-client-detail .client-premium-tab .client-premium-entry a{
+  color:#1557b2;font-weight:800;text-decoration:none;
+}
+.antares-client-detail .client-premium-tab .client-premium-entry a:hover{text-decoration:underline;}
+.antares-client-detail .client-premium-tab .client-premium-form,
+.antares-client-detail .client-premium-tab .client-premium-editor {
+  padding:15px!important;
+  margin:12px 0 14px!important;
+  border:1px solid #a9c9ef!important;
+  border-top:3px solid #2874d3!important;
+  border-radius:12px!important;
+  background:linear-gradient(132deg,#e6f1ff,#f6faff)!important;
+  box-shadow:0 5px 16px rgba(14,68,143,.1);
+}
+.antares-client-detail .client-premium-tab .client-premium-form fieldset{gap:9px 12px!important;}
+.antares-client-detail .client-premium-tab label{font-size:12px!important;font-weight:750;color:#184780;}
+.antares-client-detail .client-premium-tab :is(input:not([type="checkbox"]),select,textarea){
+  min-height:35px;
+  border:1px solid #b7d2f3!important;
+  border-radius:8px!important;
+  background:#fff!important;
+  box-shadow:inset 0 1px 2px rgba(16,60,112,.04);
+  color:#1b4278;
+  font-size:13px!important;
+}
+.antares-client-detail .client-premium-tab textarea{min-height:72px;}
+.antares-client-detail .client-premium-tab .client-premium-form textarea{min-height:86px!important;}
+.antares-client-detail .client-premium-tab :is(input,select,textarea):focus-visible{outline:2px solid #5ba1f4!important;outline-offset:1px;}
+.antares-client-detail .client-premium-tab button:not(:disabled){
+  border-radius:8px!important;
+  font-size:12px!important;
+  font-weight:750!important;
+  box-shadow:0 3px 9px rgba(13,68,149,.17)!important;
+}
+.antares-client-detail .client-premium-tab button:not(:disabled):hover{
+  transform:translateY(-1px);
+  box-shadow:0 6px 13px rgba(13,68,149,.24)!important;
+}
+.antares-client-detail .client-premium-tab button:disabled{opacity:.55;cursor:not-allowed;}
+.antares-client-detail .client-premium-tab button[aria-pressed="true"]{
+  color:#fff!important;
+  background:linear-gradient(112deg,#1754a6,#2470d2)!important;
+  border-color:#2365bf!important;
+}
+.antares-client-detail .client-premium-tab button[aria-pressed="false"]{
+  background:#e0edff!important;
+  color:#194b89!important;
+  border-color:#a8c8ee!important;
+}
+.antares-client-detail .client-premium-tab .client-premium-stat{
+  padding:12px 14px!important;
+  border:1px solid #bfd5f4!important;
+  border-top:3px solid #2678da!important;
+  border-radius:11px!important;
+  background:linear-gradient(135deg,#f6faff,#e6f1ff)!important;
+  box-shadow:0 5px 13px rgba(21,71,139,.1);
+}
+.antares-client-detail .client-premium-tab .client-premium-stat:nth-child(2){border-top-color:#169e7d!important;}
+.antares-client-detail .client-premium-tab .client-premium-stat:nth-child(3){border-top-color:#e29c32!important;}
+.antares-client-detail .client-premium-tab .client-premium-stat strong:last-child{font-size:20px!important;}
+.antares-client-detail .client-premium-tab table{width:100%;font-size:12px!important;}
+.antares-client-detail .client-premium-tab table th{
+  background:#dceaff;
+  color:#173e7a;
+  border-bottom:2px solid #98c2f3!important;
+  font-size:12px!important;
+  padding:9px 10px!important;
+}
+.antares-client-detail .client-premium-tab table td{
+  padding:9px 10px!important;
+  border-bottom:1px solid #d3e2f5!important;
+  font-size:12px!important;
+}
+.antares-client-detail .client-premium-tab table tbody tr:nth-child(odd){background:#f7fbff;}
+.antares-client-detail .client-premium-tab table tbody tr:nth-child(even){background:#e5f0ff;}
+.antares-client-detail .client-premium-tab table tbody tr:hover{background:#d7eaff;}
+.antares-client-detail .client-premium-tab .client-premium-timeline{padding:11px 13px!important;}
+/* Os modais de confirmação também seguem o visual, sem alterar seus eventos e ações. */
+.antares-client-detail [role="dialog"]:not(dialog){
+  border:1px solid #87b4ed!important;
+  border-radius:15px!important;
+  box-shadow:0 22px 62px rgba(3,24,59,.3)!important;
+}
+.antares-client-detail dialog,
+.antares-client-detail [role="dialog"]{font-family:inherit;font-size:13px;}
+@media(max-width:650px){
+ .antares-client-detail section.client-premium-tab{padding:12px!important;}
+ .antares-client-detail .client-premium-tab > h2{margin:-12px -12px 12px!important;padding:11px 12px!important;font-size:16px!important;}
+ .antares-client-detail .client-premium-tab .client-premium-form,.antares-client-detail .client-premium-tab .client-premium-editor{padding:12px!important;}
+ .antares-client-detail .client-premium-tab .client-premium-entry{padding:10px!important;}
+}
+@media(prefers-reduced-motion:reduce){.antares-client-detail .client-premium-tab button:not(:disabled):hover{transform:none;}}
