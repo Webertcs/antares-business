@@ -150,6 +150,27 @@ export default function ClientDetails({id,writesEnabled,proposalWritesEnabled,co
   }catch(e){setDocumentNotice(e instanceof Error?e.message:'Falha ao salvar minuta.');}
   finally{setDocumentBusy(false);}
  }
+ function fillDocumentFromProposal(contractId:string){
+  const contract=commercial?.contracts.find(c=>String(c.id)===contractId);
+  const proposal=commercial?.proposals.find(p=>String(p.id)===String(contract?.proposal_id||''));
+  if(!contract||!proposal){setDocumentNotice('Não foi possível localizar a proposta vinculada.');return;}
+  const title=String(proposal.title||'Apresentação de planetário móvel');
+  const total=Number(proposal.total);
+  const deposit=Number(proposal.deposit||0);
+  const students=Number(proposal.attendees||0);
+  const lines=[
+   'Serviço contratado: '+title+'.',
+   students>0?'Público previsto: '+students+' participantes.':'',
+   Number.isFinite(total)?'Valor total da proposta: '+money(total)+'.':'',
+   deposit>0?'Sinal previsto na proposta: '+money(deposit)+'.':'',
+   String(proposal.notes||'').trim()?'Observações da proposta: '+String(proposal.notes).trim():'',
+   'Data, local, horários, forma de pagamento e condições de cancelamento: preencher e confirmar com a instituição antes da assinatura.'
+  ].filter(Boolean);
+  if((documentDraft.title||documentDraft.institution||documentDraft.responsible||documentDraft.object||documentDraft.terms)&&!window.confirm('Substituir os campos atuais pelos dados da proposta? Salve antes qualquer alteração que queira preservar.'))return;
+  setDocumentSavedId(null);
+  setDocumentDraft({title:'Contrato de prestação de serviços — '+title,institution:client?.name||'',responsible:String(contract.confirmed_by_name||''),object:'Apresentação de planetário móvel — '+title,terms:lines.join('\\n')});
+  setDocumentNotice('Dados da proposta carregados para edição. Confira e salve uma nova minuta antes de gerar o PDF.');
+ }
  function printSavedContract(){
   const draft=savedDrafts.find(d=>d.id===documentSavedId&&!d.archived_at);
   if(!draft){setDocumentNotice('Salve a minuta antes de gerar o PDF.');return;}
@@ -414,6 +435,7 @@ export default function ClientDetails({id,writesEnabled,proposalWritesEnabled,co
  <div style={{marginTop:10}}><button type="button" style={actionLink} onClick={()=>{void openDocument(c,contractId);}}>Elaborar documento</button></div>
  {editingDocumentId===contractId&&<div style={{marginTop:12,padding:16,background:'#e9f3ff',border:'1px solid #9cc4f6',borderRadius:12,display:'grid',gap:12}}>
  <strong style={{color:'#123c80'}}>Minuta do contrato · edição local</strong>
+  <div><button type="button" disabled={documentBusy} style={{...actionLink,background:'#145ac3'}} onClick={()=>fillDocumentFromProposal(contractId)}>Preencher com dados da proposta</button></div>
  <p style={{margin:0,fontSize:12}}>Edite os campos e clique em Salvar rascunho. Documentos arquivados permanecem disponíveis para reativação. O envio ao cliente ainda não está habilitado.</p>
  {savedDrafts.length>0&&<div style={{display:'grid',gap:8,padding:12,background:'#f7fbff',border:'1px solid #b4d1f4',borderRadius:10}}>
  <strong style={{color:'#174987'}}>Minutas salvas ({savedDrafts.length})</strong>
