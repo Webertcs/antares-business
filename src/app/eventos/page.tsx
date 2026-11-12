@@ -46,8 +46,8 @@ export default async function Page({searchParams}:{searchParams:Promise<Params>}
  e.created_at DESC,e.id ASC
  LIMIT 10 OFFSET ${(current-1)*10}`;
  const events=rows.map(r=>({id:String(r.id),title:String(r.title),date:r.event_date?(r.event_date instanceof Date?r.event_date.toISOString().slice(0,10):/^\d{4}-\d{2}-\d{2}/.test(String(r.event_date))?String(r.event_date).slice(0,10):new Date(String(r.event_date)).toISOString().slice(0,10)):null,status:String(r.status||''),attendees:r.expected_attendees==null?null:Number(r.expected_attendees),client:String(r.client_name),archived:!!r.archived_at}));
- return <RelationshipShell title="Eventos"><main style={{maxWidth:1100,margin:'0 auto',padding:'24px clamp(14px,2.5vw,26px)',color:'#163968'}}>
- <header style={{marginBottom:16,padding:'20px clamp(16px,2.5vw,24px)',borderRadius:14,background:'linear-gradient(110deg,#0d2455 0%,#0c3c91 60%,#0860ba 100%)',boxShadow:'0 5px 14px rgba(11,47,111,.14)'}}>
+ return <RelationshipShell title="Eventos"><main className="antares-events-page" style={{maxWidth:1100,margin:'0 auto',padding:'24px clamp(14px,2.5vw,26px)',color:'#163968'}}>
+ <header className="antares-events-hero" style={{marginBottom:16,padding:'20px clamp(16px,2.5vw,24px)',borderRadius:14,background:'linear-gradient(110deg,#0d2455 0%,#0c3c91 60%,#0860ba 100%)',boxShadow:'0 5px 14px rgba(11,47,111,.14)'}}>
   <p style={{fontSize:11,fontWeight:700,letterSpacing:'1.3px',color:'#b9dfff',margin:'0 0 8px'}}>GESTÃO DE EVENTOS · ANTARES</p>
   <h1 style={{fontSize:'clamp(23px,2.5vw,30px)',fontWeight:750,lineHeight:1.2,margin:'0 0 6px',color:'#fff'}}>Eventos</h1>
   <p style={{fontSize:14,lineHeight:1.5,margin:0,color:'#e1efff'}}>Consulte os eventos cadastrados e abra a preparação operacional.</p>
