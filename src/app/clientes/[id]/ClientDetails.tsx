@@ -189,7 +189,7 @@ export default function ClientDetails({id,writesEnabled,proposalWritesEnabled,co
   setPendingProposalFill(null);
   setDocumentSavedId(null);
   setDocumentDraft({title:'Contrato de prestação de serviços — '+title,institution:client?.name||'',responsible:String(contract.confirmed_by_name||''),object:'Apresentação de planetário móvel — '+title,terms:lines.join('\\n')});
-  setDocumentNotice('Dados da proposta carregados para edição. Confira e salve uma nova minuta antes de gerar o PDF.');
+  setDocumentNotice('');
  }
  function printSavedContract(){
   const draft=savedDrafts.find(d=>d.id===documentSavedId&&!d.archived_at);
