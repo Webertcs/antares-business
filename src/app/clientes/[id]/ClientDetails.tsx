@@ -93,9 +93,8 @@ export default function ClientDetails({id,writesEnabled,proposalWritesEnabled,co
  const [documentBusy,setDocumentBusy]=useState(false);
  const [documentNotice,setDocumentNotice]=useState('');
  async function openDocument(contract:Record<string,unknown>,contractId:string){
-  const proposal=commercial?.proposals.find(p=>String(p.id)===String(contract.proposal_id));
   setDocumentNotice('');setDocumentSavedId(null);
-  setDocumentDraft({title:String(contract.proposal_title||'Contrato de prestação de serviços'),institution:client?.name||'',responsible:String(contract.confirmed_by_name||''),object:'Apresentação de planetário móvel — '+String(contract.proposal_title||'serviço educacional'),terms:String(contract.terms||proposal?.notes||'')});
+  setDocumentDraft({title:'',institution:'',responsible:'',object:'',terms:''});
   setEditingDocumentId(contractId);
   try{
    const response=await fetch('/api/clientes/contratos/minutas?contractId='+encodeURIComponent(contractId),{cache:'no-store'});
