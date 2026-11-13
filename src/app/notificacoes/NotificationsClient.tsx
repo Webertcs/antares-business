@@ -54,7 +54,7 @@ export default function NotificationsClient(){
   <header className="notificacoes-hero">
    <div className="notificacoes-hero-title">
     <span className="notificacoes-hero-icon"><Bell size={26}/></span>
-    <div><span className="notificacoes-eyebrow">ANTARES BUSINESS · CENTRAL DE ATENÇÃO</span>
+    <div><span className="notificacoes-eyebrow">ANTARES BUSINESS · NOTIFICAÇÕES</span>
      <h1>Central de Notificações</h1>
      <p>Avisos e pendências dos módulos, sem perder o controle do atendimento.</p>
     </div>
