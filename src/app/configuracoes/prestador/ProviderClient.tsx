@@ -27,8 +27,8 @@ function maskPhone(raw:string){
 }
 const fields:{key:Field;label:string;long?:boolean;max:number;placeholder?:string}[]=[
  {key:'name',label:'Razão social / Nome',long:true,max:180},
- {key:'document',label:'CPF ou CNPJ',max:20,placeholder:'000.000.000-00 ou 00.000.000/0000-00'},
- {key:'phone',label:'Telefone de contato',max:15,placeholder:'(61) 92546-XXXX'},
+ {key:'document',label:'CPF ou CNPJ',max:20,placeholder:'CPF: ___.___.___-__ ou CNPJ: __.___.___/____-__'},
+ {key:'phone',label:'Telefone de contato',max:15,placeholder:'(__) _____-____'},
  {key:'address',label:'Endereço da empresa',long:true,max:300},
  {key:'representative',label:'Representante',long:true,max:180},
 ];
