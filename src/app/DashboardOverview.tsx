@@ -1,7 +1,7 @@
 'use client';
 import {useEffect,useMemo,useState} from 'react';
 import Link from 'next/link';
-import {ArrowUpRight,Bell,CalendarDays,ChevronLeft,ChevronRight,ClipboardCheck,FileText,Users,Wallet,BarChart3,Clock3,BriefcaseBusiness,CheckCircle2} from 'lucide-react';
+import {ArrowUpRight,Bell,CalendarDays,ChevronLeft,ChevronRight,ClipboardCheck,FileText,Users,Wallet,BarChart3,Clock3,BriefcaseBusiness,CheckCircle2,Eye,EyeOff} from 'lucide-react';
 import type {NotificationFeed} from '@/lib/notificacoes/types';
 type Booking={id:string;event_title:string;dome_name:string;starts_at:string;status:string;crmDateOnly?:boolean;start_time?:string|null;linked_event_id?:string|null};
 type Reminder={id:string;client_name:string;due_date:string|null;priority:string;status:string;note:string};
@@ -13,6 +13,10 @@ const formatTime=(date:Date)=>new Intl.DateTimeFormat('pt-BR',{timeZone:TZ,hour:
 export default function DashboardOverview({cash,receivable,proposals,upcoming,calendarBookings,agendaAvailable,reminders,remindersAvailable,businessReady,notifications,onNavigate,onAgendaDate,onOpenOperation}:Props){
  const [month,setMonth]=useState(()=>{const d=new Date();return new Date(d.getFullYear(),d.getMonth(),1)});
  const [checklist,setChecklist]=useState<boolean[]>([false,false,false,false]);
+ // Privacidade por padrão: ao atualizar a página, os valores voltam a ficar ocultos.
+ const [showFinancialValues,setShowFinancialValues]=useState(false);
+ const moneyForDisplay=(value:string)=>showFinancialValues?value:(value==='—'?'—':'R$ •••••');
+ const safePriorityDetail=(value:string)=>showFinancialValues?value:value.replace(/R\$\s*[\d.,]+/g,'R$ •••••');
  const nextBooking=upcoming[0];
  const eventId=nextBooking?.crmDateOnly?nextBooking.id.replace(/^crm-/,''):nextBooking?.linked_event_id;
  const eventHref=eventId&&/^[a-f0-9]{8}(?:-[a-f0-9]{4}){3}-[a-f0-9]{12}$/i.test(eventId)?'/eventos/'+eventId:null;
@@ -39,17 +43,27 @@ export default function DashboardOverview({cash,receivable,proposals,upcoming,ca
  return <div className="owner-overview">
   <div className="owner-kpis" aria-label="Indicadores do negócio">
    {[
-    {label:'Saldo realizado',value:cash,icon:Wallet,href:'/financeiro',hint:'Abrir Financeiro'},
-    {label:'A receber',value:receivable,icon:ArrowUpRight,href:'/financeiro/receber',hint:'Abrir contas a receber'},
+    {label:'Saldo realizado',value:moneyForDisplay(cash),icon:Wallet,href:'/financeiro',hint:'Abrir Financeiro'},
+    {label:'A receber',value:moneyForDisplay(receivable),icon:ArrowUpRight,href:'/financeiro/receber',hint:'Abrir contas a receber'},
     {label:'Propostas abertas',value:proposals,icon:FileText,href:'/operacoes?area=comercial',hint:'Consultar propostas'},
     {label:'Oportunidades da Vitrine',value:inboxAvailable?String(notifications?.opportunitiesCount??0):'—',icon:BriefcaseBusiness,href:'/vitrine/inbox',hint:'Abrir solicitações recebidas pela Vitrine'}
    ].map(k=>{
     const body=<><span className="owner-kpi-icon"><k.icon size={20}/></span>
      <div className="owner-kpi-details"><span>{k.label}</span><strong>{k.value}</strong></div>
      <ChevronRight className="owner-kpi-arrow" size={17} aria-hidden="true"/></>;
-    return k.href
-     ?<Link href={k.href} className="owner-kpi owner-kpi-action" key={k.label} aria-label={k.hint}>{body}</Link>
-     :<button type="button" onClick={()=>onNavigate('agenda')} className="owner-kpi owner-kpi-action" key={k.label} aria-label={k.hint}>{body}</button>;
+    if(k.label==='Saldo realizado'){
+     return <div className="owner-kpi owner-kpi-action owner-kpi-private" key={k.label}>
+      <Link href={k.href} className="owner-kpi-main-link" aria-label={k.hint}>{body}</Link>
+      <button type="button" className="owner-kpi-visibility"
+       aria-label={showFinancialValues?'Ocultar saldos e valores a receber':'Mostrar saldos e valores a receber'}
+       aria-pressed={showFinancialValues}
+       title={showFinancialValues?'Ocultar valores':'Mostrar valores'}
+       onClick={()=>setShowFinancialValues(v=>!v)}>
+       {showFinancialValues?<EyeOff size={16} aria-hidden="true"/>:<Eye size={16} aria-hidden="true"/>}
+      </button>
+     </div>;
+    }
+    return <Link href={k.href} className="owner-kpi owner-kpi-action" key={k.label} aria-label={k.hint}>{body}</Link>;
    })}
   </div>
   <div className="owner-main-grid">
@@ -84,9 +98,9 @@ export default function DashboardOverview({cash,receivable,proposals,upcoming,ca
      {!notifications&&<p className="owner-priorities-empty">Consultando as pendências...</p>}
      {notifications&&priorities.length===0&&<div className="owner-priorities-empty owner-priorities-clear"><CheckCircle2 size={18}/><span>Sem pendências nos módulos disponíveis.</span></div>}
      {priorities.map(n=>
-      <Link className="owner-priority" key={n.id} href={n.href} aria-label={'Abrir '+n.title+' de '+n.detail}>
+      <Link className="owner-priority" key={n.id} href={n.href} aria-label={'Abrir '+n.title+' de '+safePriorityDetail(n.detail)}>
        <span className={'owner-priority-mark'+(n.priority==='high'?' is-high':'')} aria-hidden="true"/>
-       <span className="owner-priority-info"><small>{priorityCategory[n.category]}</small><strong>{n.title}</strong><span>{n.detail}</span></span>
+       <span className="owner-priority-info"><small>{priorityCategory[n.category]}</small><strong>{n.title}</strong><span>{safePriorityDetail(n.detail)}</span></span>
        <ChevronRight size={16} aria-hidden="true"/>
       </Link>
      )}
@@ -98,7 +112,6 @@ export default function DashboardOverview({cash,receivable,proposals,upcoming,ca
     <section className="owner-tile owner-summary"><div className="owner-tile-head"><span className="owner-tile-icon"><BarChart3 size={20}/></span><div><h2>Resumo operacional</h2><p>Visão geral do planetário</p></div></div>
     <button type="button" className="owner-summary-row owner-summary-action" onClick={()=>onOpenOperation('cupulas')} aria-label="Abrir cúpulas cadastradas"><span>Cúpulas cadastradas</span><strong>{operational?.domes??'—'}</strong><ChevronRight size={15}/></button>
     <button type="button" className="owner-summary-row owner-summary-action" onClick={()=>onOpenOperation('reservas')} aria-label="Abrir reservas vinculadas"><span>Reservas vinculadas</span><strong>{operational?.booked??'—'}</strong><ChevronRight size={15}/></button>
-    <Link className="owner-summary-row owner-summary-action" href="/operacoes?area=comercial" aria-label="Abrir propostas comerciais"><span>Propostas abertas</span><strong>{businessReady?proposals:'—'}</strong><ChevronRight size={15}/></Link>
     </section>
     <Link className="owner-vitrine" href="/vitrine"><span><strong>Vitrine Kids</strong><small>Apresente o universo a mais escolas e crianças.</small></span><span className="owner-vitrine-action">Acessar vitrine <ArrowUpRight size={15}/></span><span className="owner-vitrine-planet" aria-hidden="true">🪐</span></Link>
    </div>
