@@ -38,7 +38,7 @@ DECLARE
 BEGIN
   SELECT count(*) INTO owner_matches
     FROM public.team_members AS m
-   WHERE m.auth_subject = p_auth_subject
+   WHERE m.auth_subject::text = p_auth_subject
      AND m.organization_id = p_organization_id
      AND m.active = true
      AND m.role = 'owner';
