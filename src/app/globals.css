@@ -3460,3 +3460,11 @@
  .content:has(.owner-overview) .owner-kpi-main-link{gap:4px}
  .content:has(.owner-overview) .owner-kpi-visibility{width:25px;height:25px}
 }
+
+/* Página Início: padronização tipográfica dos seis títulos dos cards. */
+.content:has(.owner-overview) .owner-tile-head h2{
+ font-family:Arial,Helvetica,sans-serif;
+ font-weight:700;
+ font-style:normal;
+ letter-spacing:normal;
+}
