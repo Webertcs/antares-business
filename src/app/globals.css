@@ -2582,3 +2582,93 @@
    transform:none!important;
  }
 }
+
+
+/* ANTARES Premium V5 - titulares uniformes das quatro abas */
+/* O mesmo cabeçalho interno nas abas Reservas, Cúpulas, Checklist e Histórico. */
+.antares-operation-premium .operation-premium-reservas .booking-section-heading,
+.antares-operation-premium .operation-premium-cupulas .operation-domes-heading{
+  display:flex!important;
+  align-items:center!important;
+  justify-content:space-between!important;
+  min-height:53px;
+  gap:10px!important;
+  flex-wrap:wrap;
+  margin:-14px -14px 12px!important;
+  padding:10px 14px!important;
+  border:0!important;
+  border-radius:11px 11px 0 0!important;
+  background:linear-gradient(112deg,#0c3878,#1b61b6 74%,#287cd3)!important;
+  color:#fff!important;
+  box-shadow:0 4px 10px #17478c29!important;
+}
+.antares-operation-premium .operation-premium-cupulas .operation-domes-heading{
+  margin:-13px -13px 12px!important;
+}
+.antares-operation-premium .operation-premium-reservas .booking-section-heading h2,
+.antares-operation-premium .operation-premium-cupulas .operation-domes-heading h2{
+  margin:0!important;
+  padding:0!important;
+  color:#fff!important;
+  font-size:15px!important;
+  font-weight:850!important;
+}
+.antares-operation-premium .operation-premium-reservas .booking-new-button,
+.antares-operation-premium .operation-premium-cupulas .dome-create-toggle{
+  background:linear-gradient(110deg,#318eea,#1c68c8)!important;
+  border:1px solid #7ab8ff!important;
+  box-shadow:0 3px 10px #071f5a40!important;
+}
+.antares-operation-premium .operation-premium-checklist h2{
+  margin:-14px -14px 12px!important;
+  padding:13px 14px!important;
+  border:0!important;
+  border-radius:11px 11px 0 0!important;
+  background:linear-gradient(112deg,#0c3878,#1b61b6 74%,#287cd3)!important;
+  color:#fff!important;
+  font-size:15px!important;
+  font-weight:850!important;
+  box-shadow:0 4px 10px #17478c29!important;
+}
+.antares-operation-premium .operation-premium-cupulas .dome-create-form,
+.antares-operation-premium .operation-premium-cupulas .dome-manage-modal{
+  background:linear-gradient(145deg,#fbfdff,#e4f0ff)!important;
+  border:1px solid #99c0f4!important;
+  box-shadow:0 21px 60px #082c6b49!important;
+}
+.antares-operation-premium .operation-premium-cupulas .dome-create-title{
+  padding:11px 13px!important;
+  margin:-15px -15px 2px!important;
+  background:linear-gradient(110deg,#0c3878,#1b68bd)!important;
+  border-radius:11px 11px 0 0!important;
+  color:#fff!important;
+}
+.antares-operation-premium .operation-premium-cupulas .dome-create-title strong{
+  color:#fff!important;
+}
+.antares-operation-premium .operation-premium-cupulas .dome-create-actions button,
+.antares-operation-premium .operation-premium-cupulas .dome-manage-actions button{
+  border:1px solid #225baa!important;
+  background:linear-gradient(110deg,#2777d3,#0c438b)!important;
+  color:white!important;
+  box-shadow:0 3px 9px #184a962c!important;
+}
+.antares-operation-premium .operation-premium-cupulas .dome-manage-danger>button{
+  border:1px solid #a8324d!important;
+  background:linear-gradient(120deg,#c24a62,#8f2b45)!important;
+  color:#fff!important;
+}
+.antares-operation-premium .operation-premium-cupulas .dome-create-title button{
+  background:#e7f1ff!important;
+  border:1px solid #b9d9ff!important;
+  color:#174e97!important;
+  box-shadow:none!important;
+}
+@media(max-width:560px){
+ .antares-operation-premium .operation-premium-reservas .booking-section-heading{
+   margin:-14px -14px 12px!important;
+ }
+ .antares-operation-premium .operation-premium-cupulas .operation-domes-heading{
+   margin:-13px -13px 12px!important;
+ }
+}
