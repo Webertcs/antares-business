@@ -16,7 +16,7 @@ const quickLinks=[
  {title:'Recebimentos',href:'/financeiro/receber',icon:HandCoins},
  {title:'Relatórios',href:'/intelligence',icon:BarChart3}, 
  {title:'Leads da vitrine',href:'/vitrine/inbox',icon:ContactRound},
-];
+] as const;
 export default function DashboardOverview({cash,receivable,proposals,upcoming,calendarBookings,agendaAvailable,reminders,remindersAvailable,businessReady,onNavigate,onAgendaDate,onOpenOperation}:Props){
  const [month,setMonth]=useState(()=>{const d=new Date();return new Date(d.getFullYear(),d.getMonth(),1)});
  const [checklist,setChecklist]=useState<boolean[]>([false,false,false,false]);
@@ -79,9 +79,9 @@ export default function DashboardOverview({cash,receivable,proposals,upcoming,ca
     <p className="owner-calendar-hint"><span className="owner-calendar-dot" aria-hidden="true"/> Dias com apresentação · selecione uma data para abrir a Agenda</p>
   </section>
    <section className="owner-tile owner-quick"><div className="owner-tile-head"><span className="owner-tile-icon"><ArrowUpRight size={20}/></span><div><h2>Acesso rápido</h2><p>Funcionalidades do ANTARES</p></div></div>
-     <div className="owner-quick-grid">{quickLinks.map(q=>'panel' in q&&q.panel
-       ?<button type="button" className="owner-quick-link" onClick={()=>onOpenOperation('cupulas')} key={q.title}><q.icon size={20}/><span>{q.title}</span></button>
-       :<Link className="owner-quick-link" href={'href' in q&&q.href?q.href:'/'} key={q.title}><q.icon size={20}/><span>{q.title}</span></Link>)}</div>
+     <div className="owner-quick-grid">{quickLinks.map(q=>'panel' in q
+       ?<button type="button" className="owner-quick-link" onClick={()=>onOpenOperation(q.panel)} key={q.title}><q.icon size={20}/><span>{q.title}</span></button>
+       :<Link className="owner-quick-link" href={q.href} key={q.title}><q.icon size={20}/><span>{q.title}</span></Link>)}</div>
    </section>
    <div className="owner-right-column">
     <section className="owner-tile owner-summary"><div className="owner-tile-head"><span className="owner-tile-icon"><BarChart3 size={20}/></span><div><h2>Resumo operacional</h2><p>Visão geral do planetário</p></div></div>
