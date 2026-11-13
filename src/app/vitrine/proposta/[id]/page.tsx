@@ -3,7 +3,7 @@ import Editor from '../Editor';
 import Premium from '../Premium';
 import {redirect} from 'next/navigation';
 import {requireOwner,getDb} from '@/lib/equipe/auth';
-import {ArrowLeft,Building2,CalendarDays,CheckCircle2,ClipboardList,FileText,Info,Receipt,Users,Wallet} from 'lucide-react';
+import {ArrowLeft,Building2,CheckCircle2,ClipboardList,FileText,Info,Receipt,Users,Wallet} from 'lucide-react';
 import styles from '../proposta.module.css';
 export const dynamic='force-dynamic';
 export default async function Proposta({params}:{params:Promise<{id:string}>}){
