@@ -1,5 +1,6 @@
 'use client';
 import {useState} from 'react';
+import styles from './proposta.module.css';
 type Item={id:string;status:string;valid_until:string|null;payment_terms:string|null;title:string;client_name:string;expected_attendees:number;total:number;deposit:number};
 type Change={id:string;changed_at:string;before_values:Record<string,unknown>;after_values:Record<string,unknown>};
 export default function Premium({proposal:p,history}:{proposal:Item;history:Change[]}){
@@ -17,7 +18,7 @@ export default function Premium({proposal:p,history}:{proposal:Item;history:Chan
   }catch(e){setNotice(e instanceof Error?e.message:'Erro ao salvar')}
   finally{setBusy(false)}
  }
- return <div className="premium-root" style={{marginTop:20}}>
+ return <div className={"premium-root "+styles.premiumFrame}>
  <section className="print-document" aria-label="Proposta comercial">
  <div className="proposal-letterhead">
   <div><div className="proposal-brand">✦ ANTARES</div><div className="proposal-subbrand">PLANETÁRIO KIDS</div></div>
@@ -91,6 +92,9 @@ export default function Premium({proposal:p,history}:{proposal:Item;history:Chan
 .proposal-footer strong{color:#12305d;letter-spacing:.8px}
 @media print{
  @page{size:A4 portrait;margin:0}
+ .shell,.shell>.main,.content{width:100%!important;max-width:none!important;margin:0!important;padding:0!important;min-width:0!important}
+ .content>:not(main){display:none!important}
+ .sidebar,.topbar{display:none!important}
  html,body{margin:0!important;padding:0!important;background:white!important;-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}
  header,nav,aside{display:none!important}
  main{max-width:none!important;margin:0!important;padding:0!important}
