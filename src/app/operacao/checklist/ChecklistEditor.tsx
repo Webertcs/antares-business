@@ -42,29 +42,29 @@ export default function ChecklistEditor(){
   finally{setSaving(false);}
  }
  const button:React.CSSProperties={border:'1px solid #b8d0f4',borderRadius:8,padding:'5px 9px',color:'#174987',background:'#fff',cursor:'pointer'};
- return <section style={{background:'#eef5ff',border:'1px solid #c9dcf7',borderRadius:14,padding:18,marginTop:12}}>
+ return <section className="operation-premium-checklist" style={{background:'#eef5ff',border:'1px solid #c9dcf7',borderRadius:14,padding:18,marginTop:12}}>
   <h2 style={{fontSize:19,fontWeight:750,margin:'0 0 8px'}}>Modelo padrão do planetário</h2>
   {loading?<p>Carregando modelo...</p>:<>
    {items.length===0&&<p style={{padding:14,background:'#fff',borderRadius:8}}>Nenhum item cadastrado. Comece adicionando a primeira tarefa.</p>}
    <div style={{display:'grid',gap:6}}>
-    {items.map((item,index)=><div key={index} style={{display:'flex',alignItems:'center',gap:8,background:'#fff',border:'1px solid #d4e2f5',borderRadius:10,padding:5}}>
+    {items.map((item,index)=><div className="operation-premium-checklist-row" key={index} style={{display:'flex',alignItems:'center',gap:8,background:'#fff',border:'1px solid #d4e2f5',borderRadius:10,padding:5}}>
      <span style={{minWidth:22,fontWeight:700,color:'#5276a3'}}>{index+1}.</span>
      <input aria-label={`Item ${index+1}`} value={item} disabled={!canEdit} maxLength={160} onChange={e=>setItems(previous=>previous.map((v,i)=>i===index?e.target.value:v))} style={{flex:1,minWidth:0,padding:6,border:'1px solid #c8d8ef',borderRadius:7,color:'#163d73',background:'#fff'}}/>
      {canEdit&&<>
-      <button type="button" style={button} title="Mover para cima" disabled={index===0} onClick={()=>move(index,-1)}>↑</button>
-      <button type="button" style={button} title="Mover para baixo" disabled={index===items.length-1} onClick={()=>move(index,1)}>↓</button>
-      <button type="button" style={{...button,color:'#a32929'}} title="Remover item" onClick={()=>setItems(previous=>previous.filter((_,i)=>i!==index))}>×</button>
+      <button type="button" className="operation-premium-move-button" aria-label={`Mover item ${index+1} para cima`} style={button} title="Mover para cima" disabled={index===0} onClick={()=>move(index,-1)}>↑</button>
+      <button type="button" className="operation-premium-move-button" aria-label={`Mover item ${index+1} para baixo`} style={button} title="Mover para baixo" disabled={index===items.length-1} onClick={()=>move(index,1)}>↓</button>
+      <button type="button" className="operation-premium-remove-button" aria-label={`Remover item ${index+1}`} style={{...button,color:'#a32929'}} title="Remover item" onClick={()=>setItems(previous=>previous.filter((_,i)=>i!==index))}>×</button>
      </>}
     </div>)}
    </div>
    <p style={{fontSize:13,margin:'10px 0 0',color:'#42658f'}}>{items.length} de 80 itens{changed?' · Alterações não salvas':''}</p>
    {canEdit&&<><div style={{display:'flex',gap:8,marginTop:16,flexWrap:'wrap'}}>
     <input aria-label="Nova tarefa" placeholder="Ex.: Conferir projetor e cabos" maxLength={160} value={newItem} onChange={e=>setNewItem(e.target.value)} onKeyDown={e=>{if(e.key==='Enter'){e.preventDefault();add();}}} style={{flex:'1 1 240px',padding:12,border:'1px solid #b8d0f4',borderRadius:9,color:'#163d73',background:'#fff'}}/>
-    <button type="button" onClick={add} style={{...button,background:'#dceafe',fontWeight:700}}>+ Adicionar item</button>
+    <button className="operation-premium-add-button" type="button" onClick={add} style={{...button,background:'#dceafe',fontWeight:700}}>+ Adicionar item</button>
    </div>
    <div style={{display:'flex',gap:10,marginTop:20,alignItems:'center'}}>
-    <button type="button" disabled={saving||!changed||items.some(v=>v.trim().length<2)} onClick={()=>void save()} style={{border:0,borderRadius:9,padding:'12px 20px',fontWeight:700,color:'#fff',background:'#1759bd',opacity:saving||!changed?0.6:1,cursor:'pointer'}}>{saving?'Salvando...':'Salvar modelo padrão'}</button>
-    {changed&&<button type="button" style={button} onClick={()=>{setItems([...saved]);setMessage('');}}>Descartar alterações</button>}
+    <button className="operation-premium-save-button" type="button" disabled={saving||!changed||items.some(v=>v.trim().length<2)} onClick={()=>void save()} style={{border:0,borderRadius:9,padding:'12px 20px',fontWeight:700,color:'#fff',background:'#1759bd',opacity:saving||!changed?0.6:1,cursor:'pointer'}}>{saving?'Salvando...':'Salvar modelo padrão'}</button>
+    {changed&&<button className="operation-premium-discard-button" type="button" style={button} onClick={()=>{setItems([...saved]);setMessage('');}}>Descartar alterações</button>}
    </div></>}
    {message&&<p role="status" style={{fontWeight:650,margin:'14px 0 0'}}>{message}</p>}
   </>}
