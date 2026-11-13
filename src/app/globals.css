@@ -2672,3 +2672,251 @@
    margin:-13px -13px 12px!important;
  }
 }
+
+
+/* ANTARES Premium V5 — visão inicial da Operação */
+.antares-operation-premium .operation-home{
+  margin-top:12px;
+  overflow:hidden;
+  border:1px solid #bad5fa;
+  border-top:3px solid #3181e6;
+  border-radius:13px;
+  background:linear-gradient(135deg,#f8fbff 0%,#e9f3ff 100%);
+  box-shadow:0 10px 24px #0d44891c,inset 0 1px #fff;
+}
+.antares-operation-premium .operation-home-head{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:14px;
+  padding:15px 17px;
+  background:radial-gradient(circle at 95% 0,#4d9eff55 0,transparent 38%),linear-gradient(115deg,#0c3375,#1556a5 65%,#247bce);
+  color:#fff;
+}
+.antares-operation-premium .operation-home-eyebrow{
+  display:block;
+  margin-bottom:5px;
+  font-size:9px;
+  font-weight:850;
+  letter-spacing:1.2px;
+  color:#c6e6ff;
+}
+.antares-operation-premium .operation-home-head h3{
+  margin:0;
+  font-size:17px;
+  line-height:1.25;
+  font-weight:850;
+  color:#fff;
+}
+.antares-operation-premium .operation-home-head-icon{
+  display:grid;
+  flex:0 0 36px;
+  place-items:center;
+  width:36px;
+  height:36px;
+  border:1px solid #ffffff50;
+  border-radius:10px;
+  background:#ffffff1d;
+  color:#fff;
+}
+.antares-operation-premium .operation-home-layout{
+  display:grid;
+  grid-template-columns:minmax(0,1.35fr) minmax(0,1fr);
+  gap:12px;
+  padding:13px;
+}
+.antares-operation-premium .operation-home-feature{
+  display:flex;
+  flex-direction:column;
+  align-items:flex-start;
+  gap:11px;
+  min-width:0;
+  min-height:222px;
+  padding:17px;
+  border:1px solid #bed6fa;
+  border-left:4px solid #287fdb;
+  border-radius:11px;
+  background:linear-gradient(145deg,#fff,#e8f2ff);
+  box-shadow:0 5px 14px #174f9b1a;
+}
+.antares-operation-premium .operation-home-feature-label{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  font-size:11px;
+  font-weight:800;
+  color:#285b9a;
+}
+.antares-operation-premium .operation-home-event-title{
+  display:block;
+  max-width:100%;
+  color:#0c3b80;
+  font-size:20px;
+  line-height:1.2;
+  font-weight:850;
+  overflow-wrap:anywhere;
+}
+.antares-operation-premium .operation-home-event-details{
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px 16px;
+  max-width:100%;
+}
+.antares-operation-premium .operation-home-event-details>span{
+  display:flex;
+  align-items:center;
+  gap:6px;
+  color:#406895;
+  font-size:11px;
+  font-weight:700;
+  overflow-wrap:anywhere;
+}
+.antares-operation-premium .operation-home-event-details svg{
+  flex:none;
+  color:#397dd0;
+}
+.antares-operation-premium .operation-home-status{
+  padding:5px 9px;
+  border:1px solid #a8d8c9;
+  border-radius:999px;
+  background:linear-gradient(125deg,#e2f8ee,#d3f1e6);
+  color:#127356;
+  font-size:10px;
+  font-weight:850;
+}
+.antares-operation-premium .operation-home-empty{
+  color:#52749d;
+  font-size:12px;
+  font-weight:650;
+  line-height:1.5;
+}
+.antares-operation-premium .operation-home-main-action,
+.antares-operation-premium .operation-home-ready>button{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:7px;
+  min-height:33px;
+  padding:8px 12px;
+  border:1px solid #1d65c2;
+  border-radius:8px;
+  background:linear-gradient(115deg,#2072d0,#0d458f);
+  color:white;
+  font-size:11px;
+  font-weight:850;
+  cursor:pointer;
+  box-shadow:0 4px 10px #174f9b37;
+  transition:transform .15s,filter .15s;
+}
+.antares-operation-premium .operation-home-main-action{
+  margin-top:auto;
+}
+.antares-operation-premium .operation-home-main-action:hover,
+.antares-operation-premium .operation-home-ready>button:hover{
+  transform:translateY(-1px);
+  filter:brightness(1.1);
+}
+.antares-operation-premium .operation-home-side{
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+  min-width:0;
+}
+.antares-operation-premium .operation-home-metrics{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:10px;
+}
+.antares-operation-premium .operation-home-metric{
+  position:relative;
+  display:flex;
+  flex-direction:column;
+  justify-content:space-between;
+  gap:8px;
+  min-width:0;
+  min-height:100px;
+  padding:12px;
+  border:1px solid #c1d7f8;
+  border-top:3px solid #2678d6;
+  border-radius:11px;
+  background:linear-gradient(145deg,#fff,#e4efff);
+  box-shadow:0 4px 12px #154b931b;
+}
+.antares-operation-premium .operation-home-metric:nth-child(2){
+  border-top-color:#20aa90;
+}
+.antares-operation-premium .operation-home-metric>span{
+  color:#436d9e;
+  font-size:10px;
+  font-weight:800;
+}
+.antares-operation-premium .operation-home-metric>strong{
+  color:#0e448b;
+  font-size:25px;
+  font-weight:850;
+}
+.antares-operation-premium .operation-home-metric>svg{
+  position:absolute;
+  right:11px;
+  bottom:12px;
+  color:#4488d8;
+}
+.antares-operation-premium .operation-home-metric:nth-child(2)>svg{
+  color:#16a38a;
+}
+.antares-operation-premium .operation-home-ready{
+  display:flex;
+  flex:1;
+  flex-direction:column;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:10px;
+  padding:13px;
+  border:1px solid #bfd7f9;
+  border-radius:11px;
+  background:linear-gradient(140deg,#e4f0ff,#d7e9ff);
+  box-shadow:0 4px 12px #1553a020;
+}
+.antares-operation-premium .operation-home-ready>div{
+  display:flex;
+  align-items:flex-start;
+  gap:10px;
+}
+.antares-operation-premium .operation-home-ready>div>svg{
+  flex:none;
+  color:#2475d6;
+}
+.antares-operation-premium .operation-home-ready>div>div{
+  display:flex;
+  flex-direction:column;
+  gap:4px;
+  min-width:0;
+}
+.antares-operation-premium .operation-home-ready strong{
+  font-size:12px;
+  font-weight:850;
+  color:#153f80;
+}
+.antares-operation-premium .operation-home-ready span{
+  font-size:10px;
+  line-height:1.4;
+  color:#4a719e;
+}
+@media(max-width:760px){
+  .antares-operation-premium .operation-home-layout{
+    grid-template-columns:1fr;
+  }
+  .antares-operation-premium .operation-home-feature{
+    min-height:190px;
+  }
+}
+@media(prefers-reduced-motion:reduce){
+  .antares-operation-premium .operation-home-main-action,
+  .antares-operation-premium .operation-home-ready>button{
+    transition:none;
+  }
+  .antares-operation-premium .operation-home-main-action:hover,
+  .antares-operation-premium .operation-home-ready>button:hover{
+    transform:none;
+  }
+}
