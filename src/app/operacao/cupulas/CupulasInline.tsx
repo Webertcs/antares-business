@@ -47,7 +47,7 @@ export default function CupulasInline(){
    <GerenciarCupula dome={d} enabled={enabled}/>
   </article>)}</div>}
  </section>
- <div style={{textAlign:'right',marginTop:12}}><button type="button" onClick={()=>void load()} style={{background:'#e5f0ff',color:'#174e91',border:'1px solid #bad3f5',padding:'8px 14px',borderRadius:9,cursor:'pointer'}}>Atualizar cúpulas</button></div>
+ <div style={{textAlign:'right',marginTop:12}}><button className="operation-premium-refresh-button" type="button" onClick={()=>void load()} style={{background:'#e5f0ff',color:'#174e91',border:'1px solid #bad3f5',padding:'8px 14px',borderRadius:9,cursor:'pointer'}}>Atualizar cúpulas</button></div>
  </>}
  </div></div>;
 }
