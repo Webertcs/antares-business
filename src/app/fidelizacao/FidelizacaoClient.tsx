@@ -484,6 +484,17 @@ export default function FidelizacaoClient(){
   .fidelizacao-page.fidelizacao-premium .fidelizacao-history-button:hover{
     background:linear-gradient(120deg,#d5e8ff,#b8d6ff)!important;
   }
+
+  .fidelizacao-page.fidelizacao-premium .fidelizacao-reminder-open a.fidelizacao-button{
+    background:linear-gradient(120deg,#189c70,#08784f)!important;
+    border-color:#12845d!important;color:#fff!important;
+    box-shadow:0 3px 9px #0d86513b!important;
+  }
+  .fidelizacao-page.fidelizacao-premium .fidelizacao-reminder-open button:nth-last-child(2){
+    border-color:#56b99d!important;
+    background:linear-gradient(120deg,#e0f8ed,#c7efdf)!important;
+    color:#126d4e!important;
+  }
   .fidelizacao-page.fidelizacao-premium .fidelizacao-reminder-open button:last-child{
     border-color:#dba3b2!important;background:linear-gradient(120deg,#fce9ed,#f7dce4)!important;color:#983e57!important;
   }
