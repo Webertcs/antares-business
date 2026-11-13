@@ -2921,72 +2921,83 @@
   }
 }
 
+/* Configurações — atalho único junto ao sino na base do perfil. */
+.sidebar-bottom .sidebar-notifications{display:flex;align-items:center;gap:8px;min-height:40px}
+.sidebar-bottom .sidebar-notifications>.icon-button{
+ display:inline-flex;flex:0 0 38px;width:38px;min-height:34px;
+ align-items:center;justify-content:center;border-radius:9px;
+}
+.sidebar-settings-shortcut{
+ display:inline-flex;flex:0 0 38px;width:38px;height:34px;
+ align-items:center;justify-content:center;
+ color:#d7e5ff;border-radius:9px;text-decoration:none;
+}
+.sidebar-settings-shortcut:hover,.sidebar-settings-shortcut.active{
+ color:#fff;background:#284b80;
+}
+.sidebar-settings-shortcut:focus-visible{outline:2px solid #7cb5ff;outline-offset:2px}
 
-/* Configurações: apenas dados da empresa e ajustes da página. */
-.antares-settings-panel{
- border:1px solid #c8dcfa;
- background:linear-gradient(170deg,#f7fbff,#edf5ff);
- border-radius:14px;
- overflow:hidden;
- padding:0 0 17px;
- box-shadow:0 7px 20px #1c59a014;
+/* Dados da empresa — tela direta, sem cards de navegação intermediários. */
+.antares-provider-page{width:100%;max-width:1120px;margin:0 auto;padding:0 0 24px;color:#164174}
+.antares-provider-hero{
+ display:flex;align-items:center;gap:16px;
+ min-height:120px;margin:0 0 14px;padding:22px 25px;
+ color:white;border:1px solid #387cce;border-radius:14px;
+ background:linear-gradient(112deg,#143c7c,#1d5ba9 58%,#2b85d9);
+ box-shadow:0 7px 18px #1c4b911e;
 }
-.antares-settings-panel>.panel-head{
- display:flex;
- justify-content:space-between;
- align-items:center;
- margin:0 0 16px;
- padding:17px 20px;
- color:#fff;
- background:linear-gradient(110deg,#153d79,#2582d9);
+.antares-provider-hero-icon{display:grid;place-items:center;flex:0 0 50px;width:50px;height:50px;border:1px solid #ffffff40;border-radius:12px;background:#ffffff1c}
+.antares-provider-eyebrow{font-size:10px;font-weight:850;letter-spacing:1.5px;color:#d7ebff}
+.antares-provider-hero h1{font-size:27px;font-weight:850;line-height:1.2;margin:6px 0}
+.antares-provider-hero p{color:#e2efff;font-size:12px;margin:0}
+.antares-provider-card{
+ border:1px solid #c1d7f5;border-radius:14px;
+ background:#f2f7ff;overflow:hidden;
+ box-shadow:0 7px 21px #194c8f19;
 }
-.antares-settings-panel>.panel-head h2{margin:0;font-size:17px;font-weight:800}
-.antares-settings-panel>.panel-head svg{color:#fff}
-.antares-settings-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;padding:0 16px}
-.antares-settings-card{
- width:100%;
- display:flex;
- align-items:center;
- text-align:left;
- gap:14px;
- min-width:0;
- min-height:110px;
- padding:20px 16px;
- color:#14447f;
- border:1px solid #bdd6f7;
- border-radius:12px;
- background:linear-gradient(135deg,#fff,#eaf3ff);
- box-shadow:0 4px 12px #194e9014;
- text-decoration:none;
- font:inherit;
-}
-.antares-settings-card:hover,.antares-settings-card--selected{
- border-color:#2c82e3;
- background:linear-gradient(135deg,#f7fbff,#dcecff);
- box-shadow:0 7px 18px #1557a027;
-}
-.antares-settings-card-icon{
- width:48px;height:48px;flex-shrink:0;display:grid;place-items:center;
- color:#2678d1;background:#d9eafe;border-radius:12px;
-}
-.antares-settings-card-body{display:flex;flex:1;flex-direction:column;gap:7px;min-width:0}
-.antares-settings-card-body strong{font-size:15px;font-weight:850}
-.antares-settings-card-body small{font-size:12px;line-height:1.5;color:#547399}
-.antares-settings-card>svg:last-child{flex-shrink:0;color:#367ece;transition:transform .2s ease}
-.antares-settings-chevron--open{transform:rotate(90deg)}
-.antares-settings-details{display:grid;gap:10px;margin:14px 16px 0;padding:16px;background:#e6f0ff;border:1px solid #c7dbf8;border-radius:12px}
-.antares-settings-brand,.antares-settings-detail-link{
+.antares-provider-card-header{
  display:flex;align-items:center;justify-content:space-between;gap:12px;
- border:1px solid #cadbf3;background:#f7fbff;border-radius:10px;padding:13px 15px;
- color:#15477f;
+ padding:15px 22px;color:white;
+ background:linear-gradient(100deg,#153d7b,#257fd5);
 }
-.antares-settings-brand{align-items:flex-start;flex-direction:column}
-.antares-settings-brand span{font-size:12px;line-height:1.5;color:#53749c}
-.antares-settings-detail-link span{display:flex;flex-direction:column;gap:4px}
-.antares-settings-detail-link strong,.antares-settings-brand strong{font-size:13px}
-.antares-settings-detail-link small{font-size:11px;color:#56749a}
-.antares-settings-detail-link:hover{border-color:#2f81d9;background:#edf6ff}
+.antares-provider-card-header h2{font-size:16px;font-weight:800;line-height:1.2;margin:0}
+.antares-provider-card-header p{font-size:11px;color:#e0eeff;margin:5px 0 0}
+.antares-provider-card-header svg{color:#e1edff}
+.antares-provider-form{
+ display:grid;grid-template-columns:repeat(2,minmax(0,1fr));
+ column-gap:16px;row-gap:18px;padding:20px 22px 22px;
+}
+.antares-provider-field{display:flex;flex-direction:column;min-width:0;gap:7px;font-size:12px;font-weight:750;color:#204e89}
+.antares-provider-field--wide{grid-column:1/-1}
+.antares-provider-field input{
+ width:100%;min-height:43px;padding:11px 12px;border:1px solid #b7cfed;
+ border-radius:9px;background:#fff;color:#163f76;font-size:13px;font-weight:500;
+}
+.antares-provider-field input:focus{outline:2px solid #71aaf2;outline-offset:1px;border-color:#267bd3}
+.antares-provider-field input:disabled{background:#ebf1f8;color:#71869f}
+.antares-provider-actions{grid-column:1/-1;display:flex;justify-content:flex-end;padding-top:5px;border-top:1px solid #d7e5f7}
+.antares-provider-save{
+ display:inline-flex;align-items:center;justify-content:center;gap:9px;
+ min-height:42px;padding:11px 20px;color:#fff;background:linear-gradient(100deg,#17509d,#267bd9);
+ border:1px solid #2263b8;border-radius:9px;font-size:12px;font-weight:800;
+ box-shadow:0 4px 11px #1a56a52a;
+}
+.antares-provider-save:hover:not(:disabled){filter:brightness(1.07)}
+.antares-provider-save:disabled{opacity:.65;cursor:wait}
+.antares-provider-status{
+ display:flex;align-items:center;gap:7px;
+ padding:11px 13px;margin:14px 22px 0;border-radius:9px;
+ font-size:12px;line-height:1.5;
+}
+.antares-provider-status--info{background:#e1edff;color:#204d89;border:1px solid #c2d9fa}
+.antares-provider-status--success{background:#e4f7ec;color:#167044;border:1px solid #a8e0bf}
+.antares-provider-status--error{background:#fff0f1;color:#973b49;border:1px solid #e9bbc3}
 @media(max-width:760px){
- .antares-settings-grid{grid-template-columns:1fr}
- .antares-settings-card{min-height:88px;padding:15px 13px}
+ .antares-provider-hero{padding:18px 15px;min-height:100px}
+ .antares-provider-hero h1{font-size:22px}
+ .antares-provider-form{grid-template-columns:1fr;padding:17px 14px}
+ .antares-provider-field--wide,.antares-provider-actions{grid-column:auto}
+ .antares-provider-card-header{padding:14px}
+ .antares-provider-status{margin:12px 14px 0}
+ .antares-provider-save{width:100%}
 }
