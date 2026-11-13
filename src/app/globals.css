@@ -1916,3 +1916,669 @@
  .antares-public-filters>.antares-public-action{transition:none}
  .antares-public-filters>.antares-public-action:hover{transform:none}
 }
+
+
+/* ANTARES Premium V5 - Central Operacional - 4 abas */
+/* Escopo restrito à Central Operacional; não afeta Clientes, Financeiro nem regras de negócio. */
+.antares-operation-premium{
+  width:100%;
+  min-width:0;
+  padding:14px!important;
+  border:1px solid #bbd5fa!important;
+  border-radius:17px!important;
+  background:linear-gradient(140deg,#f1f7ff 0%,#e6f0ff 65%,#edf5ff 100%)!important;
+  box-shadow:0 10px 25px #1649861b,inset 0 1px #fff!important;
+}
+.antares-operation-premium>.commercial-hub-head{
+  position:relative;
+  overflow:hidden;
+  margin-bottom:12px!important;
+  padding:16px 18px!important;
+  min-height:79px;
+  border:1px solid #2f87ed!important;
+  border-radius:13px!important;
+  background:radial-gradient(circle at 89% -50%,#2e9dff60 0,transparent 48%),linear-gradient(112deg,#082e6c 0%,#124d9e 55%,#1776d5 100%)!important;
+  box-shadow:0 9px 18px #143f7e35,inset 0 1px #ffffff25!important;
+}
+.antares-operation-premium>.commercial-hub-head h2{
+  margin:0 0 3px!important;
+  font-size:18px!important;
+  font-weight:850!important;
+  color:white!important;
+  letter-spacing:-.2px;
+}
+.antares-operation-premium>.commercial-hub-head p{
+  font-size:11px!important;
+  color:#dcecff!important;
+}
+.antares-operation-premium>.commercial-hub-head .commercial-hub-symbol{
+  border:1px solid #ffffff43!important;
+  background:#ffffff1b!important;
+  color:white!important;
+  box-shadow:inset 0 1px #ffffff33;
+}
+.antares-operation-premium>.commercial-hub-grid{
+  display:grid!important;
+  grid-template-columns:repeat(4,minmax(0,1fr))!important;
+  gap:9px!important;
+  width:100%;
+  min-width:0;
+}
+.antares-operation-premium>.commercial-hub-grid>.commercial-hub-card{
+  display:flex!important;
+  align-items:center!important;
+  justify-content:flex-start!important;
+  min-width:0!important;
+  width:100%!important;
+  min-height:62px!important;
+  gap:10px!important;
+  padding:9px 11px!important;
+  border:1px solid #b6d2f6!important;
+  border-radius:11px!important;
+  background:linear-gradient(150deg,#ffffff,#e7f1ff)!important;
+  box-shadow:0 4px 12px #11478218,inset 0 1px white!important;
+  color:#17467f!important;
+  transition:transform .16s,background .16s,box-shadow .16s,border-color .16s;
+}
+.antares-operation-premium>.commercial-hub-grid>.commercial-hub-card strong{
+  min-width:0;
+  overflow-wrap:anywhere;
+  font-size:12px!important;
+  font-weight:800!important;
+  line-height:1.25!important;
+  color:inherit!important;
+}
+.antares-operation-premium>.commercial-hub-grid>.commercial-hub-card .commercial-hub-icon{
+  flex-shrink:0;
+  width:36px!important;
+  height:36px!important;
+  border-radius:9px!important;
+  background:#d9eaff!important;
+  color:#1b64bf!important;
+}
+.antares-operation-premium>.commercial-hub-grid>.commercial-hub-card:hover{
+  transform:translateY(-2px)!important;
+  background:linear-gradient(145deg,#e4f1ff,#d8e9ff)!important;
+  box-shadow:0 7px 15px #16509d32!important;
+}
+.antares-operation-premium>.commercial-hub-grid>.commercial-hub-card[aria-expanded="true"]{
+  border-color:#286fd1!important;
+  background:linear-gradient(115deg,#0c3777,#1c67ba 78%,#2584e1)!important;
+  color:#fff!important;
+  box-shadow:0 5px 13px #15519a4f,inset 0 1px #ffffff2a!important;
+}
+.antares-operation-premium>.commercial-hub-grid>.commercial-hub-card[aria-expanded="true"] .commercial-hub-icon{
+  color:white!important;
+  background:#ffffff2e!important;
+  border:1px solid #ffffff3c!important;
+}
+.antares-operation-premium>.commercial-hub-grid>.commercial-hub-card[aria-expanded="true"]:hover{
+  background:linear-gradient(115deg,#0c3777,#1c67ba 78%,#2584e1)!important;
+}
+.antares-operation-premium>.operation-premium-body{
+  width:100%;
+  min-width:0;
+  margin-top:12px!important;
+  padding:13px!important;
+  border:1px solid #bad4f9!important;
+  border-top:3px solid #2e7ce4!important;
+  border-radius:13px!important;
+  background:linear-gradient(145deg,#fbfdff 0%,#e8f2ff 100%)!important;
+  box-shadow:0 8px 18px #1e5aaf17,inset 0 1px #fff!important;
+}
+/* Reservas: indicadores iguais, filtros em uma linha e ações destacadas. */
+.antares-operation-premium .operation-premium-reservas .booking-refined{
+  width:100%!important;
+  max-width:none!important;
+  margin:0!important;
+  padding:0!important;
+  min-width:0;
+  color:#153e77;
+}
+.antares-operation-premium .operation-premium-reservas .booking-panel{
+  width:100%;
+  min-width:0;
+  margin:0!important;
+  padding:14px!important;
+  gap:12px!important;
+  border:1px solid #c0d7f8!important;
+  border-radius:12px!important;
+  background:linear-gradient(135deg,#f7fbff 0%,#e4f0ff 100%)!important;
+  box-shadow:0 5px 15px #1c53961a!important;
+}
+.antares-operation-premium .booking-section-heading{
+  min-height:38px;
+  padding-bottom:10px;
+  border-bottom:1px solid #c5dbf9;
+}
+.antares-operation-premium .booking-section-heading h2{
+  font-size:16px!important;
+  font-weight:850!important;
+  color:#12498f!important;
+}
+.antares-operation-premium .booking-new-button,
+.antares-operation-premium .booking-history-button,
+.antares-operation-premium .operation-premium-details-button{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  min-height:35px;
+  padding:8px 12px!important;
+  border:1px solid #1f66c4!important;
+  border-radius:9px!important;
+  background:linear-gradient(115deg,#1e70d3,#10458f)!important;
+  color:white!important;
+  font-size:12px!important;
+  font-weight:800!important;
+  white-space:nowrap;
+  box-shadow:0 4px 10px #1551a63b!important;
+}
+.antares-operation-premium .booking-new-button:hover,
+.antares-operation-premium .booking-history-button:hover,
+.antares-operation-premium .operation-premium-details-button:hover{
+  filter:brightness(1.11);
+  transform:translateY(-1px);
+  box-shadow:0 7px 15px #1551a650!important;
+}
+.antares-operation-premium .booking-metrics{
+  display:grid!important;
+  grid-template-columns:repeat(4,minmax(0,1fr))!important;
+  gap:9px!important;
+  width:100%;
+}
+.antares-operation-premium .booking-metrics>div{
+  min-width:0;
+  min-height:75px;
+  padding:12px!important;
+  border:1px solid #c1d8f6!important;
+  border-top:3px solid #277be0!important;
+  border-radius:11px!important;
+  background:linear-gradient(140deg,#fff,#e7f1ff)!important;
+  box-shadow:0 4px 11px #2057a120!important;
+}
+.antares-operation-premium .booking-metrics>div:nth-child(2){border-top-color:#1baf9a!important}
+.antares-operation-premium .booking-metrics>div:nth-child(3){border-top-color:#9470d8!important}
+.antares-operation-premium .booking-metrics>div:nth-child(4){border-top-color:#e9a23c!important}
+.antares-operation-premium .booking-metrics span{
+  color:#3d699b!important;
+  font-size:10px!important;
+  font-weight:750!important;
+}
+.antares-operation-premium .booking-metrics strong{
+  margin-top:auto;
+  color:#14478d!important;
+  font-size:22px!important;
+  font-weight:850!important;
+}
+.antares-operation-premium .operation-premium-booking-filters{
+  display:grid!important;
+  grid-template-columns:minmax(170px,2fr) repeat(4,minmax(86px,1fr));
+  align-items:stretch;
+  gap:8px!important;
+  width:100%;
+  padding:10px!important;
+  margin:0!important;
+  border:1px solid #bdd3f6!important;
+  border-radius:10px!important;
+  background:linear-gradient(140deg,#eaf4ff,#daeaff);
+}
+.antares-operation-premium .operation-premium-booking-filters input,
+.antares-operation-premium .operation-premium-booking-filters select{
+  flex:unset!important;
+  width:100%!important;
+  min-width:0!important;
+  min-height:38px;
+  padding:8px 9px!important;
+  border:1px solid #aac9f1!important;
+  border-radius:8px!important;
+  background:linear-gradient(180deg,#fff,#f3f8ff)!important;
+  color:#184782!important;
+  font-size:11px;
+  font-weight:650;
+}
+.antares-operation-premium .booking-readiness-list{
+  gap:7px!important;
+}
+.antares-operation-premium .booking-readiness-row{
+  display:flex;
+  min-width:0;
+  min-height:57px;
+  padding:9px 11px!important;
+  border:1px solid #c4dafa!important;
+  border-left:3px solid #3485e9!important;
+  border-radius:10px!important;
+  background:linear-gradient(145deg,#fafdff,#e4f0ff)!important;
+  box-shadow:0 3px 8px #215ea616!important;
+}
+.antares-operation-premium .booking-readiness-row:nth-child(even){
+  background:linear-gradient(145deg,#f2f8ff,#dcecff)!important;
+}
+.antares-operation-premium .booking-readiness-row strong{
+  color:#144886!important;
+  font-weight:800!important;
+}
+.antares-operation-premium .booking-readiness-row>div:last-child{display:flex;align-items:center;gap:8px}
+.antares-operation-premium .booking-pagination-button,
+.antares-operation-premium .operation-audit-open{
+  min-height:31px;
+  border:1px solid #90b8ec!important;
+  border-radius:8px!important;
+  background:linear-gradient(135deg,#e6f1ff,#cfe3ff)!important;
+  color:#194f99!important;
+  font-size:11px!important;
+  font-weight:800!important;
+  box-shadow:0 2px 7px #2259a01b;
+}
+.antares-operation-premium .booking-pagination-button:not(:disabled):hover,
+.antares-operation-premium .operation-audit-open:not(:disabled):hover{
+  background:linear-gradient(115deg,#155bb6,#0b3e8a)!important;
+  border-color:#2156a2!important;
+  color:white!important;
+}
+.antares-operation-premium :is(button,input,select,textarea):focus-visible{
+  outline:3px solid #65b6ff;
+  outline-offset:2px;
+}
+.antares-operation-premium button:disabled{cursor:not-allowed;opacity:.5}
+/* Cúpulas: três equipamentos proporcionais, sem último card isolado na linha. */
+.antares-operation-premium .operation-premium-cupulas .operation-detail{
+  max-width:none!important;
+  width:100%;
+  min-width:0;
+  padding:0!important;
+  margin:0!important;
+}
+.antares-operation-premium .operation-premium-cupulas .operation-detail-metrics{
+  display:grid!important;
+  grid-template-columns:repeat(3,minmax(0,1fr))!important;
+  gap:9px!important;
+  margin-bottom:13px!important;
+}
+.antares-operation-premium .operation-premium-cupulas .operation-detail-metrics>div{
+  min-width:0;
+  min-height:100px;
+  padding:13px!important;
+  gap:5px!important;
+  border:1px solid #bdd5f7!important;
+  border-top:3px solid #2e7bda!important;
+  background:linear-gradient(145deg,#fbfdff,#e3efff)!important;
+  border-radius:11px!important;
+  box-shadow:0 5px 12px #18509b1c!important;
+}
+.antares-operation-premium .operation-premium-cupulas .operation-detail-metrics>div:nth-child(2){border-top-color:#13a98b!important}
+.antares-operation-premium .operation-premium-cupulas .operation-detail-metrics>div:nth-child(3){border-top-color:#8f75d6!important}
+.antares-operation-premium .operation-premium-cupulas .operation-detail-metrics span{
+  color:#3a699c!important;font-size:11px!important;font-weight:700!important;
+}
+.antares-operation-premium .operation-premium-cupulas .operation-detail-metrics strong{
+  color:#10437f!important;font-size:24px!important;font-weight:850!important;
+}
+.antares-operation-premium .operation-premium-cupulas .operation-metric-names{
+  overflow-wrap:anywhere;
+  font-size:10px!important;
+  color:#346caa!important;
+}
+.antares-operation-premium .operation-premium-cupulas .operation-dome-unified{
+  width:100%;
+  min-width:0;
+  padding:13px!important;
+  border:1px solid #bfd7f9!important;
+  border-radius:12px!important;
+  background:linear-gradient(145deg,#f7fbff,#e4f0ff)!important;
+  box-shadow:0 6px 16px #16499c1b!important;
+}
+.antares-operation-premium .operation-premium-cupulas .operation-domes-heading{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  flex-wrap:wrap;
+  margin:0 0 10px!important;
+  padding:0 0 10px!important;
+  border-bottom:1px solid #b5d2f9!important;
+}
+.antares-operation-premium .operation-premium-cupulas .operation-domes-heading h2{
+  margin:0!important;
+  font-size:16px!important;
+  font-weight:850!important;
+  color:#134889!important;
+}
+.antares-operation-premium .operation-premium-cupulas .operation-dome-grid{
+  display:grid!important;
+  grid-template-columns:repeat(auto-fit,minmax(min(100%,170px),1fr))!important;
+  gap:10px!important;
+  align-items:stretch;
+  width:100%;
+}
+.antares-operation-premium .operation-premium-cupulas .operation-dome-card{
+  min-width:0;
+  height:100%;
+  padding:12px!important;
+  border:1px solid #bad4f7!important;
+  border-left:3px solid #3086dc!important;
+  border-radius:11px!important;
+  background:linear-gradient(150deg,#fff,#e5f1ff)!important;
+  box-shadow:0 5px 11px #1a54a01d!important;
+}
+.antares-operation-premium .operation-premium-cupulas .operation-dome-card h3{
+  font-size:14px!important;font-weight:850!important;overflow-wrap:anywhere;
+}
+.antares-operation-premium .operation-premium-cupulas .operation-dome-card dl{
+  display:grid!important;
+  gap:7px!important;
+}
+.antares-operation-premium .operation-premium-cupulas .operation-dome-card dl>div{
+  min-width:0;
+  flex-wrap:wrap;
+  align-items:baseline;
+  gap:3px 6px;
+  padding-top:8px!important;
+  font-size:10px!important;
+}
+.antares-operation-premium .operation-premium-cupulas .operation-dome-card dt{
+  color:#537aa8;
+}
+.antares-operation-premium .operation-premium-cupulas .operation-dome-card dd{
+  color:#174782!important;
+  overflow-wrap:anywhere;
+}
+.antares-operation-premium .operation-premium-cupulas .dome-create-toggle,
+.antares-operation-premium .operation-premium-cupulas .dome-manage-trigger,
+.antares-operation-premium .operation-premium-refresh-button{
+  border:1px solid #1e65c0!important;
+  border-radius:8px!important;
+  background:linear-gradient(115deg,#1c70cd,#0d408d)!important;
+  color:white!important;
+  min-height:33px;
+  padding:7px 11px!important;
+  font-weight:800!important;
+  font-size:11px!important;
+  box-shadow:0 4px 9px #14519b35!important;
+}
+.antares-operation-premium .operation-premium-cupulas .dome-create-toggle:hover,
+.antares-operation-premium .operation-premium-cupulas .dome-manage-trigger:hover,
+.antares-operation-premium .operation-premium-refresh-button:hover{
+  filter:brightness(1.11);
+  transform:translateY(-1px);
+}
+/* Checklist: linhas em azul leve, controles com cor e sem botões brancos. */
+.antares-operation-premium .operation-premium-checklist{
+  width:100%;
+  min-width:0;
+  margin:0!important;
+  padding:14px!important;
+  border:1px solid #c1d8f7!important;
+  border-radius:12px!important;
+  background:linear-gradient(145deg,#f8fbff,#e7f1ff)!important;
+  box-shadow:0 5px 13px #1b519a1b!important;
+}
+.antares-operation-premium .operation-premium-checklist h2{
+  margin:0 0 13px!important;
+  padding:0 0 11px!important;
+  border-bottom:1px solid #c0d8f9;
+  font-size:16px!important;
+  font-weight:850!important;
+  color:#144985!important;
+}
+.antares-operation-premium .operation-premium-checklist-row{
+  min-width:0;
+  min-height:43px;
+  padding:5px 8px!important;
+  border:1px solid #c4daf8!important;
+  border-left:3px solid #3285dd!important;
+  border-radius:9px!important;
+  background:linear-gradient(145deg,#fff,#e8f2ff)!important;
+  box-shadow:0 2px 7px #1551a213!important;
+}
+.antares-operation-premium .operation-premium-checklist-row:nth-child(even){
+  background:linear-gradient(145deg,#f1f7ff,#e0eeff)!important;
+}
+.antares-operation-premium .operation-premium-checklist-row>span{
+  display:grid;
+  flex:0 0 25px;
+  place-items:center;
+  color:#2860a5!important;
+  font-weight:850!important;
+}
+.antares-operation-premium .operation-premium-checklist :is(input,textarea){
+  min-width:0!important;
+  background:#fff!important;
+  border:1px solid #b3ccee!important;
+  border-radius:8px!important;
+  color:#173f75!important;
+}
+.antares-operation-premium .operation-premium-checklist-row>input{
+  flex:1 1 0!important;
+  font-size:12px!important;
+  min-height:30px;
+}
+.antares-operation-premium .operation-premium-move-button,
+.antares-operation-premium .operation-premium-add-button,
+.antares-operation-premium .operation-premium-discard-button{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  min-height:31px;
+  border:1px solid #2c69b9!important;
+  border-radius:8px!important;
+  background:linear-gradient(115deg,#337ed3,#164e9a)!important;
+  color:white!important;
+  font-size:12px!important;
+  font-weight:800!important;
+  box-shadow:0 3px 8px #1c4d9530!important;
+}
+.antares-operation-premium .operation-premium-move-button{
+  width:30px;
+  min-width:30px;
+  padding:4px!important;
+  font-size:16px!important;
+}
+.antares-operation-premium .operation-premium-remove-button{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  min-height:31px;
+  width:30px;
+  min-width:30px;
+  padding:4px!important;
+  border:1px solid #b94458!important;
+  border-radius:8px!important;
+  background:linear-gradient(125deg,#bf4963,#913044)!important;
+  color:white!important;
+  font-size:16px!important;
+  box-shadow:0 3px 9px #a23a5530!important;
+}
+.antares-operation-premium .operation-premium-save-button{
+  min-height:37px;
+  border:1px solid #1956ae!important;
+  border-radius:9px!important;
+  background:linear-gradient(110deg,#1d72d3,#0b428e)!important;
+  color:white!important;
+  box-shadow:0 5px 12px #184ca03b!important;
+}
+.antares-operation-premium .operation-premium-checklist button:not(:disabled):hover{
+  filter:brightness(1.08);
+  transform:translateY(-1px);
+}
+.antares-operation-premium .operation-premium-checklist button:disabled{
+  opacity:.42!important;cursor:not-allowed;
+}
+/* Histórico: tabela azul, colunas organizadas e paginação sem botões brancos. */
+.antares-operation-premium .operation-premium-historico .operation-detail{
+  width:100%;
+  max-width:none!important;
+  min-width:0;
+  padding:0!important;
+  margin:0!important;
+}
+.antares-operation-premium .operation-premium-historico .operation-detail-panel{
+  width:100%;
+  min-width:0;
+  padding:13px!important;
+  border:1px solid #c2d8f9!important;
+  border-radius:12px!important;
+  background:linear-gradient(140deg,#f8fbff,#e7f1ff)!important;
+  box-shadow:0 5px 14px #1b4c941a!important;
+}
+.antares-operation-premium .operation-premium-historico .operation-history-heading{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  flex-wrap:wrap;
+  gap:9px;
+  min-height:45px;
+  padding:9px 12px!important;
+  margin:-13px -13px 12px!important;
+  border-radius:11px 11px 0 0!important;
+  background:linear-gradient(110deg,#103b7a,#216abc)!important;
+  color:white!important;
+  box-shadow:0 4px 10px #16458726;
+}
+.antares-operation-premium .operation-premium-historico .operation-history-heading h2{
+  margin:0!important;
+  color:white!important;
+  font-size:15px!important;
+  font-weight:850!important;
+}
+.antares-operation-premium .operation-premium-historico .operation-history-heading>span{
+  border:1px solid #ffffff41;
+  border-radius:9px;
+  padding:5px 9px;
+  background:#ffffff1b!important;
+  color:white!important;
+  font-size:11px!important;
+  font-weight:750!important;
+}
+.antares-operation-premium .operation-premium-historico .operation-detail-table-scroll{
+  overflow-x:auto!important;
+  border:1px solid #bdd4f5;
+  border-radius:10px;
+  background:#f9fcff;
+}
+.antares-operation-premium .operation-premium-historico .operation-detail-table-scroll table{
+  width:100%;
+  min-width:520px;
+  border-collapse:separate!important;
+  border-spacing:0!important;
+  font-size:11px!important;
+}
+.antares-operation-premium .operation-premium-historico table thead th{
+  position:sticky;
+  top:0;
+  padding:10px 11px!important;
+  border-bottom:2px solid #a9c8f2!important;
+  background:#dceaff!important;
+  color:#1a4d88!important;
+  font-weight:850!important;
+  white-space:nowrap;
+}
+.antares-operation-premium .operation-premium-historico table tbody td{
+  padding:9px 11px!important;
+  border-bottom:1px solid #d3e1f6!important;
+  vertical-align:middle;
+  color:#27558f;
+  line-height:1.4;
+}
+.antares-operation-premium .operation-premium-historico table tbody tr:nth-child(odd){
+  background:#f8fbff!important;
+}
+.antares-operation-premium .operation-premium-historico table tbody tr:nth-child(even){
+  background:#e8f2ff!important;
+}
+.antares-operation-premium .operation-premium-historico table tbody tr:hover{
+  background:#d9eaff!important;
+}
+.antares-operation-premium .operation-premium-historico .operation-history-area{
+  border-radius:8px;
+  background:#d5e7ff!important;
+  color:#1f59a5!important;
+  font-weight:750!important;
+}
+.antares-operation-premium .operation-premium-historico .operation-audit-open{
+  min-height:30px;
+  padding:6px 10px;
+  border-radius:8px!important;
+  border:1px solid #276cbd!important;
+  background:linear-gradient(110deg,#337bd0,#14519a)!important;
+  color:white!important;
+  font-weight:800!important;
+  box-shadow:0 3px 8px #1b53a02c!important;
+}
+.antares-operation-premium .operation-premium-historico .operation-audit-open:disabled{
+  opacity:.4!important;
+}
+.antares-operation-premium .operation-premium-historico .operation-audit-open:not(:disabled):hover{
+  filter:brightness(1.12);
+  transform:translateY(-1px);
+}
+@media(max-width:1100px){
+  .antares-operation-premium .operation-premium-booking-filters{
+    grid-template-columns:repeat(4,minmax(0,1fr));
+  }
+  .antares-operation-premium .operation-premium-booking-filters>input{
+    grid-column:span 4;
+  }
+}
+@media(max-width:800px){
+  .antares-operation-premium>.commercial-hub-grid{
+    grid-template-columns:repeat(2,minmax(0,1fr))!important;
+  }
+  .antares-operation-premium .booking-metrics{
+    grid-template-columns:repeat(2,minmax(0,1fr))!important;
+  }
+  .antares-operation-premium .operation-premium-booking-filters{
+    grid-template-columns:repeat(2,minmax(0,1fr));
+  }
+  .antares-operation-premium .operation-premium-booking-filters>input{
+    grid-column:span 2;
+  }
+}
+@media(max-width:560px){
+  .antares-operation-premium{
+    padding:10px!important;
+  }
+  .antares-operation-premium>.commercial-hub-head{
+    padding:13px 14px!important;
+  }
+  .antares-operation-premium>.commercial-hub-grid>.commercial-hub-card{
+    padding:9px!important;
+    gap:7px!important;
+  }
+  .antares-operation-premium>.commercial-hub-grid>.commercial-hub-card .commercial-hub-icon{
+    width:30px!important;height:30px!important;
+  }
+  .antares-operation-premium>.operation-premium-body{
+    padding:9px!important;
+  }
+  .antares-operation-premium .operation-premium-cupulas .operation-detail-metrics{
+    grid-template-columns:1fr!important;
+  }
+  .antares-operation-premium .operation-premium-cupulas .operation-dome-grid{
+    grid-template-columns:1fr!important;
+  }
+  .antares-operation-premium .booking-readiness-row{
+    flex-wrap:wrap;
+  }
+  .antares-operation-premium .booking-metrics strong{
+    font-size:19px!important;
+  }
+  .antares-operation-premium .operation-premium-checklist-row{
+    gap:4px!important;
+    padding:5px!important;
+  }
+  .antares-operation-premium .operation-premium-move-button,
+  .antares-operation-premium .operation-premium-remove-button{
+    min-width:27px;
+    width:27px;
+  }
+}
+@media(prefers-reduced-motion:reduce){
+ .antares-operation-premium>.commercial-hub-grid>.commercial-hub-card,
+ .antares-operation-premium button{
+   transition:none!important;
+ }
+ .antares-operation-premium button:hover,
+ .antares-operation-premium>.commercial-hub-grid>.commercial-hub-card:hover{
+   transform:none!important;
+ }
+}
