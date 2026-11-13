@@ -511,3 +511,45 @@
  .premium-kids .premium-ecosystem-grid article:hover,
  .premium-kids .premium-hero-cta a:hover{transform:none}
 }
+
+
+/* VITRINE V2 — Pacote fotográfico: imagens de referência com SVG de reserva. */
+.premium-kids .premium-showcase-photo{
+ display:block;width:100%;height:auto;aspect-ratio:7/5;
+ object-fit:cover;object-position:center;
+ filter:saturate(1.08) contrast(1.045);
+ background:#122453;
+}
+.premium-kids .premium-showcase-grid article{isolation:isolate}
+.premium-kids .premium-showcase-grid article:has(.premium-showcase-photo)::before{
+ content:"";position:absolute;inset:0 0 auto;height:60%;
+ pointer-events:none;z-index:1;
+ background:linear-gradient(180deg,#102a5900 63%,#14275050 100%);
+}
+.premium-kids .premium-photo-credits{
+ display:block;max-width:890px;margin:9px auto 0;
+ font-size:10px;line-height:1.65;color:#a8c6ea;
+}
+.premium-kids .premium-showcase-disclaimer a,
+.premium-kids .premium-school-credit a{
+ color:#d7eaff;text-decoration:underline;text-decoration-thickness:1px;
+ text-underline-offset:3px;
+}
+.premium-kids .premium-showcase-disclaimer a:hover,
+.premium-kids .premium-school-credit a:hover{color:#ffda8e}
+.premium-kids .premium-school-picture .premium-school-photo{
+ display:block;width:100%;height:auto;
+ aspect-ratio:7/5;object-fit:cover;object-position:center;
+ filter:contrast(1.055) saturate(1.08);
+ border:2px solid #a0d8ff9f;border-radius:20px;
+ box-shadow:0 16px 36px #09134670;
+}
+.premium-kids .premium-school-credit{
+ display:block;text-align:center;
+ font-size:10px;line-height:1.45;color:#d9e8ff;
+ margin-top:7px;
+}
+@media(max-width:620px){
+ .premium-kids .premium-photo-credits{font-size:9px;padding-inline:2px}
+ .premium-kids .premium-school-picture .premium-school-photo{border-radius:14px}
+}
