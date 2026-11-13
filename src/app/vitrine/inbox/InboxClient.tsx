@@ -130,7 +130,7 @@ export default function Inbox({conversionEnabled}:{conversionEnabled:boolean}){
        className={styles.actionPrimary}><FileText size={16}/>Converter em cliente + proposta rascunho</button>}
      {lead.status==='converted'&&lead.converted_proposal_id&&
       <Link href={'/vitrine/proposta/'+lead.converted_proposal_id} className={styles.actionPrimary}>
-       <FileText size={16}/>Abrir proposta em rascunho</Link>}
+       <FileText size={16}/>Abrir proposta comercial</Link>}
      <Link href="/clientes" className={styles.actionSecondary}><Users size={16}/>Abrir cadastro de clientes</Link>
     </div>
    </article>)}
