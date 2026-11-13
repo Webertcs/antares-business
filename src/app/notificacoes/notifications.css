@@ -52,3 +52,10 @@
 .notificacoes-footer a{display:flex;align-items:center;gap:7px;color:#1760bb;font-size:12px;font-weight:800}
 @media(max-width:960px){.notificacoes-overview{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:640px){.notificacoes-hero{padding:19px;align-items:flex-start;flex-direction:column}.notificacoes-hero h1{font-size:21px}.notificacoes-hero-icon{width:45px;height:45px}.notificacoes-refresh{align-self:flex-end}.notificacoes-overview{gap:9px}.notificacoes-summary{padding:11px;grid-template-columns:33px 1fr}.notificacoes-summary-icon{width:32px;height:32px}.notificacoes-summary strong{font-size:20px}.notificacoes-toolbar{padding:12px}.notificacoes-list{padding:0 12px}.notificacoes-item{align-items:flex-start;gap:10px;flex-wrap:wrap}.notificacoes-item-icon{width:34px;height:34px}.notificacoes-open{margin-left:44px}.notificacoes-item-meta time{margin-left:0}}
+
+/* Leitura independente da resolução da pendência */
+.notificacoes-item--new{background:linear-gradient(90deg,#f4f9ff,#fff 75%)}
+.notificacoes-unread-label{color:#ab332b;background:#ffe9e6;border-radius:15px;padding:3px 8px;font-size:10px;font-weight:800}
+.notificacoes-mark-read{border:1px solid #bdd7f4;color:#1f5baa;background:#fff;border-radius:9px;padding:9px 10px;font-size:12px;font-weight:750;white-space:nowrap}
+.notificacoes-mark-read:hover{background:#eaf3ff}
+@media(max-width:640px){.notificacoes-mark-read{margin-left:44px}.notificacoes-open{margin-left:0}}
