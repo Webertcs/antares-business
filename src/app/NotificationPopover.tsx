@@ -12,6 +12,7 @@ type Props={
  feed:NotificationFeed|null;
  error:string;
  loading:boolean;
+ onRead:(keys:string[])=>Promise<void>;
 };
 type Placement={left:number;width:number;bottom:number|null;maxHeight:number};
 const categoryName={opportunities:'Oportunidades',loyalty:'Fidelização',agenda:'Agenda interna',finance:'Financeiro'};
@@ -23,9 +24,20 @@ const iconFor=(category:AntaresNotification['category'])=>{
   case 'finance':return <Wallet size={16}/>;
  }
 };
-export default function NotificationPopover({open,anchorRef,onClose,feed,error,loading}:Props){
+export default function NotificationPopover({open,anchorRef,onClose,feed,error,loading,onRead}:Props){
  const panelRef=useRef<HTMLDivElement>(null);
  const [placement,setPlacement]=useState<Placement|null>(null);
+ const [readError,setReadError]=useState('');
+ const attempted=useRef(new Set<string>());
+ // Abrir o sino marca como lidos somente os avisos realmente exibidos (até cinco).
+ useEffect(()=>{
+  if(!open){attempted.current.clear();setReadError('');return;}
+  if(!feed?.readPersistenceAvailable)return;
+  const visible=feed.items.slice(0,5).filter(n=>!n.read&&!attempted.current.has(n.readKey)).map(n=>n.readKey);
+  if(visible.length===0)return;
+  visible.forEach(key=>attempted.current.add(key));
+  void onRead(visible).then(()=>setReadError('')).catch(()=>setReadError('Não foi possível registrar a leitura. O aviso continuará não lido.'));
+ },[open,feed,onRead]);
  useEffect(()=>{
   if(!open)return;
   const updatePosition=()=>{
@@ -64,6 +76,7 @@ export default function NotificationPopover({open,anchorRef,onClose,feed,error,l
  },[open,anchorRef,onClose]);
  if(!open||!placement)return null;
  const count=feed?.count??0;
+ const unread=feed?.unreadCount??0;
  return createPortal(
   <section ref={panelRef} id="antares-notification-panel" role="region" aria-labelledby="antares-notification-heading"
    style={{position:'fixed',zIndex:1100,left:placement.left,width:placement.width,
@@ -75,13 +88,15 @@ export default function NotificationPopover({open,anchorRef,onClose,feed,error,l
     <span style={{display:'flex',alignItems:'center',gap:8}}>
      <Bell size={18} color="#1d60bc"/>
      <strong id="antares-notification-heading" style={{fontSize:15}}>Notificações</strong>
-     {count>0&&<span style={{borderRadius:20,padding:'2px 7px',background:'#e9f1ff',fontSize:11,fontWeight:800}}>{count>99?'99+':count}</span>}
+     {count>0&&<span style={{borderRadius:20,padding:'2px 7px',background:'#e9f1ff',fontSize:11,fontWeight:800}}>{count>99?'99+':count} pendente{count===1?'':'s'}</span>}
+     {unread>0&&<span style={{borderRadius:20,padding:'2px 7px',background:'#ffe4e1',color:'#b12e29',fontSize:11,fontWeight:800}}>{unread>99?'99+':unread} nova{unread===1?'':'s'}</span>}
     </span>
     <button type="button" onClick={onClose} aria-label="Fechar notificações" style={{background:'#e8f1ff',border:'1px solid #c6dcfa',borderRadius:8,padding:5,color:'#174780'}}><X size={16}/></button>
    </header>
    {loading&&!feed&&<p role="status" style={{fontSize:13}}>Consultando avisos...</p>}
-   {error&&<p role="status" style={{fontSize:12,color:'#a3392c',background:'#fff0ed',padding:10,borderRadius:8}}>{error}</p>}
+   {(error||readError)&&<p role="status" style={{fontSize:12,color:'#a3392c',background:'#fff0ed',padding:10,borderRadius:8}}>{error||readError}</p>}
    {feed&&<>
+    {!feed.readPersistenceAvailable&&<p role="status" style={{fontSize:12,color:'#985911',background:'#fff7e6',padding:9,borderRadius:8}}>Para memorizar avisos lidos após o F5, execute a migração de notificações no Neon.</p>}
     {feed.unavailable.length>0&&<p role="status" style={{fontSize:12,color:'#985911'}}>Alguns módulos estão indisponíveis no momento.</p>}
     {feed.items.length===0&&<p style={{fontSize:13,padding:'9px 2px'}}>Nenhuma pendência registrada nos módulos disponíveis.</p>}
     {feed.items.slice(0,5).map(n=>
@@ -89,7 +104,7 @@ export default function NotificationPopover({open,anchorRef,onClose,feed,error,l
       style={{display:'block',padding:'10px',marginBottom:7,borderRadius:10,
        background:n.priority==='high'?'#eef5ff':'#f7faff',border:'1px solid #d9e7fa',color:'#143968'}}>
       <span style={{display:'flex',alignItems:'center',gap:7,fontSize:11,color:'#4773ab',fontWeight:700}}>{iconFor(n.category)}{categoryName[n.category]}</span>
-      <strong style={{display:'block',fontSize:13,marginTop:5}}>{n.title}</strong>
+      <strong style={{display:'flex',justifyContent:'space-between',alignItems:'center',fontSize:13,marginTop:5}}>{n.title}{!n.read&&<small style={{fontSize:10,color:'#bd3c30'}}>Novo</small>}</strong>
       <span style={{display:'block',fontSize:12,marginTop:3,overflowWrap:'anywhere'}}>{n.detail}</span>
      </Link>
     )}
