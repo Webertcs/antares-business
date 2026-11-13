@@ -1,23 +1,16 @@
 'use client';
 import {useEffect,useMemo,useState} from 'react';
 import Link from 'next/link';
-import {ArrowUpRight,Bell,CalendarDays,ChevronLeft,ChevronRight,ClipboardCheck,FileText,GraduationCap,Orbit,Users,Wallet,BarChart3,HandCoins,Clock3,BriefcaseBusiness,ContactRound,CheckCircle2} from 'lucide-react';
+import {ArrowUpRight,Bell,CalendarDays,ChevronLeft,ChevronRight,ClipboardCheck,FileText,Users,Wallet,BarChart3,Clock3,BriefcaseBusiness,CheckCircle2} from 'lucide-react';
+import type {NotificationFeed} from '@/lib/notificacoes/types';
 type Booking={id:string;event_title:string;dome_name:string;starts_at:string;status:string;crmDateOnly?:boolean;start_time?:string|null;linked_event_id?:string|null};
 type Reminder={id:string;client_name:string;due_date:string|null;priority:string;status:string;note:string};
-type Props={cash:string;receivable:string;proposals:string;upcoming:Booking[];calendarBookings:Booking[];agendaAvailable:boolean;reminders:Reminder[];remindersAvailable:boolean;businessReady:boolean;onNavigate:(section:string)=>void;onAgendaDate:(date:string)=>void;onOpenOperation:(panel:'cupulas'|'reservas'|'checklist')=>void};
+type Props={cash:string;receivable:string;proposals:string;upcoming:Booking[];calendarBookings:Booking[];agendaAvailable:boolean;reminders:Reminder[];remindersAvailable:boolean;businessReady:boolean;notifications:NotificationFeed|null;onNavigate:(section:string)=>void;onAgendaDate:(date:string)=>void;onOpenOperation:(panel:'cupulas'|'reservas'|'checklist')=>void};
 const TZ='America/Sao_Paulo';
 const dateKey=(date:Date)=>new Intl.DateTimeFormat('en-CA',{timeZone:TZ,year:'numeric',month:'2-digit',day:'2-digit'}).format(date);
 const formatDate=(date:Date)=>new Intl.DateTimeFormat('pt-BR',{timeZone:TZ,day:'2-digit',month:'short'}).format(date).replace('.','');
 const formatTime=(date:Date)=>new Intl.DateTimeFormat('pt-BR',{timeZone:TZ,hour:'2-digit',minute:'2-digit'}).format(date);
-const quickLinks=[
- {title:'Cúpulas',panel:'cupulas',icon:Orbit}, 
- {title:'Propostas',href:'/operacoes?area=comercial',icon:FileText},
- {title:'Contratos',href:'/operacoes?area=contratos',icon:BriefcaseBusiness},
- {title:'Recebimentos',href:'/financeiro/receber',icon:HandCoins},
- {title:'Relatórios',href:'/intelligence',icon:BarChart3}, 
- {title:'Leads da vitrine',href:'/vitrine/inbox',icon:ContactRound},
-] as const;
-export default function DashboardOverview({cash,receivable,proposals,upcoming,calendarBookings,agendaAvailable,reminders,remindersAvailable,businessReady,onNavigate,onAgendaDate,onOpenOperation}:Props){
+export default function DashboardOverview({cash,receivable,proposals,upcoming,calendarBookings,agendaAvailable,reminders,remindersAvailable,businessReady,notifications,onNavigate,onAgendaDate,onOpenOperation}:Props){
  const [month,setMonth]=useState(()=>{const d=new Date();return new Date(d.getFullYear(),d.getMonth(),1)});
  const [checklist,setChecklist]=useState<boolean[]>([false,false,false,false]);
  const nextBooking=upcoming[0];
@@ -28,6 +21,9 @@ export default function DashboardOverview({cash,receivable,proposals,upcoming,ca
  const [operational,setOperational]=useState<{domes:number;booked:number}|null>(null);
  useEffect(()=>{const ctrl=new AbortController();fetch('/api/agenda/reservas',{signal:ctrl.signal,cache:'no-store'}).then(r=>r.ok?r.json():null).then(d=>{if(d&&!ctrl.signal.aborted){setOperational({domes:Array.isArray(d.domes)?d.domes.length:0,booked:Array.isArray(d.links)?d.links.length:0});}}).catch(()=>{});return()=>ctrl.abort()},[]);
  const now=dateKey(new Date());
+ const priorities=(notifications?.items||[]).slice(0,2);
+ const inboxAvailable=Boolean(notifications&&!notifications.unavailable.includes('opportunities'));
+ const priorityCategory:Record<string,string>={opportunities:'Oportunidades',loyalty:'Fidelização',agenda:'Agenda interna',finance:'Financeiro'};
  const pending=reminders.filter(r=>r.status==='open');
  const overdue=pending.filter(r=>r.due_date&&String(r.due_date).slice(0,10)<now).length;
  const today=pending.filter(r=>r.due_date&&String(r.due_date).slice(0,10)===now).length;
@@ -46,7 +42,7 @@ export default function DashboardOverview({cash,receivable,proposals,upcoming,ca
     {label:'Saldo realizado',value:cash,icon:Wallet,href:'/financeiro',hint:'Abrir Financeiro'},
     {label:'A receber',value:receivable,icon:ArrowUpRight,href:'/financeiro/receber',hint:'Abrir contas a receber'},
     {label:'Propostas abertas',value:proposals,icon:FileText,href:'/operacoes?area=comercial',hint:'Consultar propostas'},
-    {label:'Próximas sessões',value:agendaAvailable?String(upcoming.length):'—',icon:CalendarDays,href:'',hint:'Abrir agenda'}
+    {label:'Oportunidades da Vitrine',value:inboxAvailable?String(notifications?.opportunitiesCount??0):'—',icon:BriefcaseBusiness,href:'/vitrine/inbox',hint:'Abrir solicitações recebidas pela Vitrine'}
    ].map(k=>{
     const body=<><span className="owner-kpi-icon"><k.icon size={20}/></span>
      <div className="owner-kpi-details"><span>{k.label}</span><strong>{k.value}</strong></div>
@@ -78,16 +74,30 @@ export default function DashboardOverview({cash,receivable,proposals,upcoming,ca
     <div className="owner-calendar-grid">{['D','S','T','Q','Q','S','S'].map((d,i)=><span className="owner-weekday" key={i}>{d}</span>)}{calendar.map((d,i)=>d?<button onClick={()=>onAgendaDate(month.getFullYear()+'-'+String(month.getMonth()+1).padStart(2,'0')+'-'+String(d).padStart(2,'0'))} aria-label={d+' de '+monthLabel} key={i} className={agendaDays.has(dateKey(new Date(month.getFullYear(),month.getMonth(),d,12)))?'has-session':''}>{d}</button>:<span key={i}/>)}</div>
     <p className="owner-calendar-hint"><span className="owner-calendar-dot" aria-hidden="true"/> Dias com apresentação · selecione uma data para abrir a Agenda</p>
   </section>
-   <section className="owner-tile owner-quick"><div className="owner-tile-head"><span className="owner-tile-icon"><ArrowUpRight size={20}/></span><div><h2>Acesso rápido</h2><p>Funcionalidades do ANTARES</p></div></div>
-     <div className="owner-quick-grid">{quickLinks.map(q=>'panel' in q
-       ?<button type="button" className="owner-quick-link" onClick={()=>onOpenOperation(q.panel)} key={q.title}><q.icon size={20}/><span>{q.title}</span></button>
-       :<Link className="owner-quick-link" href={q.href} key={q.title}><q.icon size={20}/><span>{q.title}</span></Link>)}</div>
+   <section className="owner-tile owner-priorities">
+    <div className="owner-tile-head">
+     <span className="owner-tile-icon"><Bell size={20}/></span>
+     <div><h2>Prioridades do dia</h2><p>Pendências que precisam de atenção</p></div>
+     <Link href="/notificacoes" className="owner-inline" aria-label="Ver todas as notificações">Ver todas <ArrowUpRight size={15}/></Link>
+    </div>
+    <div className="owner-priorities-list">
+     {!notifications&&<p className="owner-priorities-empty">Consultando as pendências...</p>}
+     {notifications&&priorities.length===0&&<div className="owner-priorities-empty owner-priorities-clear"><CheckCircle2 size={18}/><span>Sem pendências nos módulos disponíveis.</span></div>}
+     {priorities.map(n=>
+      <Link className="owner-priority" key={n.id} href={n.href} aria-label={'Abrir '+n.title+' de '+n.detail}>
+       <span className={'owner-priority-mark'+(n.priority==='high'?' is-high':'')} aria-hidden="true"/>
+       <span className="owner-priority-info"><small>{priorityCategory[n.category]}</small><strong>{n.title}</strong><span>{n.detail}</span></span>
+       <ChevronRight size={16} aria-hidden="true"/>
+      </Link>
+     )}
+    </div>
+    {notifications&&notifications.count>2&&<Link className="owner-priorities-more" href="/notificacoes">Mais {notifications.count-2} pendências na Central <ChevronRight size={14}/></Link>}
+    {notifications&&notifications.unavailable.length>0&&<p className="owner-priorities-warning">Alguns módulos estão temporariamente indisponíveis.</p>}
    </section>
    <div className="owner-right-column">
     <section className="owner-tile owner-summary"><div className="owner-tile-head"><span className="owner-tile-icon"><BarChart3 size={20}/></span><div><h2>Resumo operacional</h2><p>Visão geral do planetário</p></div></div>
     <button type="button" className="owner-summary-row owner-summary-action" onClick={()=>onOpenOperation('cupulas')} aria-label="Abrir cúpulas cadastradas"><span>Cúpulas cadastradas</span><strong>{operational?.domes??'—'}</strong><ChevronRight size={15}/></button>
     <button type="button" className="owner-summary-row owner-summary-action" onClick={()=>onOpenOperation('reservas')} aria-label="Abrir reservas vinculadas"><span>Reservas vinculadas</span><strong>{operational?.booked??'—'}</strong><ChevronRight size={15}/></button>
-    <button type="button" className="owner-summary-row owner-summary-action" onClick={()=>onNavigate('agenda')} aria-label="Abrir próximas sessões na agenda"><span>Próximas sessões</span><strong>{agendaAvailable?upcoming.length:'—'}</strong><ChevronRight size={15}/></button>
     <Link className="owner-summary-row owner-summary-action" href="/operacoes?area=comercial" aria-label="Abrir propostas comerciais"><span>Propostas abertas</span><strong>{businessReady?proposals:'—'}</strong><ChevronRight size={15}/></Link>
     </section>
     <Link className="owner-vitrine" href="/vitrine"><span><strong>Vitrine Kids</strong><small>Apresente o universo a mais escolas e crianças.</small></span><span className="owner-vitrine-action">Acessar vitrine <ArrowUpRight size={15}/></span><span className="owner-vitrine-planet" aria-hidden="true">🪐</span></Link>
