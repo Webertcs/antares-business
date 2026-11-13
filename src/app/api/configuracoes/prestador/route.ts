@@ -36,8 +36,12 @@ export async function POST(req:NextRequest){
  try{x=await req.json();}
  catch{return fail('JSON inválido',400);}
  const fields=['name','document','address','representative','phone'] as const;
- if(!x||typeof x!=='object'||fields.some(k=>typeof x[k]!=='string'||(x[k] as string).trim().length<2||(x[k] as string).length>300))
-    ||(x.address as string).trim().length<5)return fail('Preencha os dados obrigatórios.',400);
+ if (
+  !x ||
+  typeof x !== 'object' ||
+  fields.some(k => typeof x[k] !== 'string' || (x[k] as string).trim().length < 2 || (x[k] as string).length > 300) ||
+  (x.address as string).trim().length < 5
+ ) return fail('Preencha os dados obrigatórios.',400);
 
  const doc=onlyDigits(x.document as string);
  const phone=onlyDigits(x.phone as string);
