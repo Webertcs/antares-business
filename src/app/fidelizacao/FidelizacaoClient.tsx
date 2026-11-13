@@ -270,16 +270,285 @@ export default function FidelizacaoClient(){
  .fidelizacao-page .fidelizacao-agenda-panel h3,.fidelizacao-page .fidelizacao-agenda-panel p{color:var(--fidelizacao-text)}
  .fidelizacao-page button:focus-visible,.fidelizacao-page input:focus-visible,.fidelizacao-page select:focus-visible,.fidelizacao-page textarea:focus-visible{outline:2px solid #2477d8;outline-offset:2px}
  @media(max-width:760px){.fidelizacao-page .fidelizacao-history-row{gap:8px}.fidelizacao-page .fidelizacao-history-note{font-size:13px}}
-`}</style><main className="fidelizacao-page" style={{maxWidth:1180,margin:'0 auto',padding:'16px 18px 32px',fontFamily:'system-ui',color:'#142b4f'}}>
+
+  /* ANTARES Premium V5 — Fidelização completa (somente visual) */
+  .fidelizacao-page.fidelizacao-premium{
+    --fp-ink:#164477;--fp-border:#bdd5f6;--fp-shadow:0 8px 22px #164d981a;
+    background:linear-gradient(162deg,#f7faff 0%,#f0f6ff 56%,#f7faff 100%);
+    border-radius:18px;
+  }
+  .fidelizacao-page.fidelizacao-premium .fidelizacao-hero{
+    position:relative;isolation:isolate;overflow:hidden;
+    min-height:105px;
+    display:flex;flex-direction:column;justify-content:center;
+    border:1px solid #4a9bec55;
+    border-radius:14px;
+    background:radial-gradient(circle at 100% 10%,#67b8ff54 0,transparent 34%),
+      linear-gradient(112deg,#102f68 0%,#1550a2 55%,#287ed5 100%);
+    box-shadow:0 10px 25px #0d397a33;
+  }
+  .fidelizacao-page.fidelizacao-premium .fidelizacao-hero:after{
+    content:"";position:absolute;z-index:-1;right:-45px;bottom:-130px;
+    width:260px;height:260px;border:26px solid #ffffff0b;border-radius:50%;
+  }
+  .fidelizacao-page.fidelizacao-premium .fidelizacao-hero h1{
+    font-size:clamp(22px,2.2vw,29px);line-height:1.15;letter-spacing:-.35px;
+  }
+  .fidelizacao-page.fidelizacao-premium .fidelizacao-kpi-grid{gap:10px;}
+  .fidelizacao-page.fidelizacao-premium .fidelizacao-kpi-compact{
+    position:relative;min-height:77px!important;padding:12px 14px!important;
+    border:1px solid var(--fp-border)!important;
+    border-top:3px solid #3786e5!important;
+    background:linear-gradient(145deg,#fff,#e6f1ff)!important;
+    border-radius:11px!important;
+    box-shadow:0 5px 13px #1d54a117!important;
+    overflow:hidden;
+  }
+  .fidelizacao-page.fidelizacao-premium .fidelizacao-kpi-compact:nth-child(2){border-top-color:#55b0eb!important}
+  .fidelizacao-page.fidelizacao-premium .fidelizacao-kpi-compact:nth-child(3){border-top-color:#d2a332!important}
+  .fidelizacao-page.fidelizacao-premium .fidelizacao-kpi-compact:nth-child(4){border-top-color:#9daac0!important}
+  .fidelizacao-page.fidelizacao-premium .fidelizacao-kpi-compact:nth-child(5){border-top-color:#ba835d!important}
+  .fidelizacao-page.fidelizacao-premium .fidelizacao-kpi-compact:nth-child(6){border-top-color:#dc8051!important}
+  .fidelizacao-page.fidelizacao-premium .fidelizacao-kpi-compact small,
+  .fidelizacao-page.fidelizacao-premium .fidelizacao-radar-kpi small{
+    color:#426895!important;font-size:11px!important;font-weight:750!important;
+  }
+  .fidelizacao-page.fidelizacao-premium .fidelizacao-kpi-compact>div{
+    font-size:23px!important;font-weight:850!important;color:#0f478f!important;
+  }
+  .fidelizacao-page.fidelizacao-premium .fidelizacao-programa-panel,
+  .fidelizacao-page.fidelizacao-premium .fidelizacao-radar-panel,
+  .fidelizacao-page.fidelizacao-premium .fidelizacao-attention-panel,
+  .fidelizacao-page.fidelizacao-premium .fidelizacao-agenda-panel{
+    padding:13px!important;
+    margin-top:15px!important;
+    border:1px solid var(--fp-border)!important;
+    border-radius:13px!important;
+    background:linear-gradient(148deg,#f9fbff,#eaf3ff 78%,#f7faff)!important;
+    box-shadow:var(--fp-shadow);
+    overflow:hidden;
+  }
+  .fidelizacao-page.fidelizacao-premium .fidelizacao-section-heading,
+  .fidelizacao-page.fidelizacao-premium .fidelizacao-agenda-panel .fidelizacao-section-heading{
+    display:flex;align-items:center;
+    min-height:46px;
+    padding:11px 15px!important;
+    margin:-13px -13px 14px!important;
+    border:0!important;border-radius:12px 12px 0 0!important;
+    background:linear-gradient(108deg,#133c7e,#1558af 62%,#2a86dc)!important;
+    box-shadow:0 3px 10px #124c9c30;
+    color:#fff!important;
+    font-size:16px!important;line-height:1.25!important;
+    font-weight:850!important;letter-spacing:.03px;
+  }
+  .fidelizacao-page.fidelizacao-premium .fidelizacao-tier-grid{
+    display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr))!important;
+    gap:10px!important;margin:0!important;align-items:stretch;
+  }
+  .fidelizacao-page.fidelizacao-premium .fidelizacao-tier{
+    display:flex;flex-direction:column;gap:7px;
+    min-width:0;min-height:182px;padding:14px!important;
+    border:1px solid #c2d8f5!important;border-top:4px solid #69a8ed!important;
+    border-radius:11px!important;
+    background:linear-gradient(153deg,#fff,#edf5ff)!important;
+    box-shadow:0 5px 13px #1b57a218;
+    transition:transform .18s ease,box-shadow .18s ease;
+  }
+  .fidelizacao-page.fidelizacao-premium .fidelizacao-tier strong{
+    font-size:15px!important;color:#124884!important;font-weight:850!important;
+  }
+  .fidelizacao-page.fidelizacao-premium .fidelizacao-tier>div{
+    margin:0!important;min-height:17px;color:#305d94;font-weight:750;font-size:11px!important;
+  }
+  .fidelizacao-page.fidelizacao-premium .fidelizacao-tier p{
+    margin:0!important;color:#3d5e85;font-size:11px!important;line-height:1.5;
+  }
+  .fidelizacao-page.fidelizacao-premium .fidelizacao-tier-diamante{border-top-color:#4baceb!important;background:linear-gradient(160deg,#f6fcff,#dff1ff)!important}
+  .fidelizacao-page.fidelizacao-premium .fidelizacao-tier-ouro{border-top-color:#d5a22d!important;background:linear-gradient(160deg,#fffefa,#fff1d2)!important}
+  .fidelizacao-page.fidelizacao-premium .fidelizacao-tier-prata{border-top-color:#9cadc4!important;background:linear-gradient(160deg,#fff,#e7edf7)!important}
+  .fidelizacao-page.fidelizacao-premium .fidelizacao-tier-bronze{border-top-color:#bc8052!important;background:linear-gradient(160deg,#fffdfb,#f7e6da)!important}
+  .fidelizacao-page.fidelizacao-premium .fidelizacao-tier:hover{
+    transform:translateY(-2px);box-shadow:0 9px 20px #17488d25;
+  }
+  .fidelizacao-page.fidelizacao-premium .fidelizacao-radar-kpi-grid{
+    grid-template-columns:repeat(5,minmax(0,1fr));gap:10px!important;
+    margin-bottom:13px!important;
+  }
+  .fidelizacao-page.fidelizacao-premium .fidelizacao-radar-kpi{
+    position:relative;min-width:0;min-height:83px!important;
+    padding:13px!important;
+    border:1px solid var(--fp-border)!important;
+    border-top:3px solid #428ded!important;
+    border-radius:10px!important;
+    background:linear-gradient(145deg,#fff,#e5f0ff)!important;
+    box-shadow:0 4px 12px #1b55a316;
+  }
+  .fidelizacao-page.fidelizacao-premium .fidelizacao-radar-kpi:nth-child(2){border-top-color:#d9a331!important}
+  .fidelizacao-page.fidelizacao-premium .fidelizacao-radar-kpi:nth-child(3){border-top-color:#61a5e8!important}
+  .fidelizacao-page.fidelizacao-premium .fidelizacao-radar-kpi:nth-child(4){border-top-color:#20ad92!important}
+  .fidelizacao-page.fidelizacao-premium .fidelizacao-radar-kpi:nth-child(5){border-top-color:#d17b69!important}
+  .fidelizacao-page.fidelizacao-premium .fidelizacao-radar-kpi>div{
+    margin-top:7px;font-size:23px!important;color:#10478c!important;
+    font-weight:850!important;
+  }
+  .fidelizacao-page.fidelizacao-premium .fidelizacao-radar-subtitle,
+  .fidelizacao-page.fidelizacao-premium .fidelizacao-reminder-heading{
+    margin:12px 0!important;color:#104783!important;font-size:13px!important;font-weight:850!important;
+  }
+  .fidelizacao-page.fidelizacao-premium .fidelizacao-radar-list{gap:6px!important;}
+  .fidelizacao-page.fidelizacao-premium .fidelizacao-opportunity-compact{
+    min-height:37px!important;padding:6px 10px!important;gap:8px!important;
+    border:1px solid #c9ddf8!important;border-left:3px solid #398be7!important;
+    border-radius:8px!important;
+    background:linear-gradient(110deg,#f9fbff,#e7f2ff)!important;
+  }
+  .fidelizacao-page.fidelizacao-premium .fidelizacao-opportunity-compact:nth-child(even){background:#f8fbff!important}
+  .fidelizacao-page.fidelizacao-premium .fidelizacao-opportunity-compact:hover{background:#dfedff!important}
+  .fidelizacao-page.fidelizacao-premium .fidelizacao-opportunity-compact strong{
+    font-size:12px!important;color:#154887!important;
+  }
+  .fidelizacao-page.fidelizacao-premium .fidelizacao-button{
+    min-height:30px;padding:7px 11px!important;
+    border:1px solid #2375d6!important;border-radius:7px!important;
+    background:linear-gradient(120deg,#247cdb,#0f4d9e)!important;
+    color:white!important;font-size:11px!important;font-weight:800!important;
+    box-shadow:0 3px 9px #1652a535!important;
+  }
+  .fidelizacao-page.fidelizacao-premium .fidelizacao-opportunity-compact .fidelizacao-button{
+    min-height:28px!important;white-space:nowrap;
+  }
+  .fidelizacao-page.fidelizacao-premium .fidelizacao-attention-filters{
+    display:flex;align-items:center;gap:10px!important;margin:7px 0 13px!important;
+  }
+  .fidelizacao-page.fidelizacao-premium .fidelizacao-attention-filters label{
+    display:flex;align-items:center;gap:8px;font-size:12px;font-weight:750;color:#24538b;
+  }
+  .fidelizacao-page.fidelizacao-premium .fidelizacao-attention-filters select{
+    min-height:35px;margin-left:0!important;padding:6px 30px 6px 10px!important;
+    border:1px solid #92bcea!important;border-radius:8px!important;
+    background:#e1eeff!important;color:#164c93!important;
+    font-size:12px;font-weight:750;box-shadow:0 3px 9px #2465ba1b;
+  }
+  .fidelizacao-page.fidelizacao-premium .fidelizacao-attention-filters>span{
+    color:#6481a5!important;font-size:11px!important;
+  }
+  .fidelizacao-page.fidelizacao-premium .fidelizacao-attention-table{
+    border:1px solid #c4daf7;border-radius:9px;overflow:hidden;
+    color:#1c4a83;font-size:12px;
+  }
+  .fidelizacao-page.fidelizacao-premium .fidelizacao-attention-table thead{
+    background:#dceafd!important;color:#17447e!important;
+  }
+  .fidelizacao-page.fidelizacao-premium .fidelizacao-attention-table th{
+    padding:12px 10px!important;
+    border-bottom:2px solid #a7c8f3!important;font-size:11px!important;font-weight:850!important;
+  }
+  .fidelizacao-page.fidelizacao-premium .fidelizacao-attention-table td{
+    padding:9px 10px!important;border-bottom:1px solid #dce8f8;
+  }
+  .fidelizacao-page.fidelizacao-premium .fidelizacao-attention-table tbody tr:nth-child(odd){background:#f7fbff!important}
+  .fidelizacao-page.fidelizacao-premium .fidelizacao-attention-table tbody tr:nth-child(even){background:#e5f0ff!important}
+  .fidelizacao-page.fidelizacao-premium .fidelizacao-attention-table tbody tr:hover{background:#d9eaff!important}
+  .fidelizacao-page.fidelizacao-premium .fidelizacao-attention-buttons .fidelizacao-button{
+    min-height:28px;padding:5px 9px!important;
+  }
+  .fidelizacao-page.fidelizacao-premium .fidelizacao-pagination button{
+    min-height:34px;padding:7px 13px!important;
+    border:1px solid #84b4ec!important;border-radius:8px!important;
+    background:linear-gradient(120deg,#e6f1ff,#cfe3ff)!important;
+    color:#164e91!important;font-size:11px!important;font-weight:800!important;
+    box-shadow:0 3px 8px #1552a41b;
+  }
+  .fidelizacao-page.fidelizacao-premium .fidelizacao-pagination button:not(:disabled):hover{
+    background:linear-gradient(120deg,#d2e6ff,#b8d6fc)!important;
+  }
+  .fidelizacao-page.fidelizacao-premium .fidelizacao-agenda-panel .fidelizacao-reminder{
+    padding:12px!important;border:1px solid #c0d9fa!important;
+    border-left:3px solid #3e8fec!important;border-radius:9px!important;
+    background:linear-gradient(110deg,#f9fcff,#e2efff)!important;
+    box-shadow:0 4px 11px #1759a21a;
+  }
+  .fidelizacao-page.fidelizacao-premium .fidelizacao-agenda-panel .fidelizacao-reminder-closed{
+    border-left-color:#26aa8b!important;
+  }
+  .fidelizacao-page.fidelizacao-premium .fidelizacao-history-button,
+  .fidelizacao-page.fidelizacao-premium .fidelizacao-reminder button{
+    display:inline-flex;align-items:center;justify-content:center;
+    min-height:34px;padding:8px 12px!important;
+    border:1px solid #87b5e9!important;border-radius:8px!important;
+    background:linear-gradient(120deg,#e1efff,#c9e0ff)!important;
+    color:#15539f!important;font-size:11px!important;font-weight:850!important;
+    box-shadow:0 3px 9px #174c9a1c;
+  }
+  .fidelizacao-page.fidelizacao-premium .fidelizacao-reminder button:not(:disabled):hover,
+  .fidelizacao-page.fidelizacao-premium .fidelizacao-history-button:hover{
+    background:linear-gradient(120deg,#d5e8ff,#b8d6ff)!important;
+  }
+  .fidelizacao-page.fidelizacao-premium .fidelizacao-reminder-open button:last-child{
+    border-color:#dba3b2!important;background:linear-gradient(120deg,#fce9ed,#f7dce4)!important;color:#983e57!important;
+  }
+  .fidelizacao-page.fidelizacao-premium .fidelizacao-agenda-panel .fidelizacao-history-row{
+    grid-template-columns:minmax(140px,1.15fr) minmax(160px,2fr) auto auto;
+  }
+  .fidelizacao-modal{
+    border-color:#9dc4f5!important;
+    background:linear-gradient(155deg,#f8fbff,#e9f3ff)!important;
+    box-shadow:0 25px 70px #071c4073!important;
+  }
+  .fidelizacao-modal-header{
+    background:linear-gradient(110deg,#123a7d,#237bd7)!important;
+    box-shadow:0 4px 14px #15488b25;
+  }
+  .fidelizacao-modal input,.fidelizacao-modal select{
+    min-height:39px;border:1px solid #9ac2f3!important;
+    border-radius:8px!important;background:#fff!important;
+    box-shadow:inset 0 1px 3px #174b890b;
+  }
+  .fidelizacao-modal .fidelizacao-button{
+    border:1px solid #1d61ba;background:linear-gradient(115deg,#277cdb,#124e9d);
+    box-shadow:0 4px 10px #13498940;color:#fff;font-weight:800;
+  }
+  .fidelizacao-modal .fidelizacao-modal-cancel{
+    border-color:#9bbce6;background:#e0edff;color:#1a4e91;font-weight:750;
+  }
+  @media(max-width:940px){
+    .fidelizacao-page.fidelizacao-premium .fidelizacao-tier-grid{
+      grid-template-columns:repeat(2,minmax(0,1fr))!important;
+    }
+    .fidelizacao-page.fidelizacao-premium .fidelizacao-radar-kpi-grid{
+      grid-template-columns:repeat(3,minmax(0,1fr));
+    }
+  }
+  @media(max-width:650px){
+    .fidelizacao-page.fidelizacao-premium .fidelizacao-kpi-grid{
+      grid-template-columns:repeat(2,minmax(0,1fr));
+    }
+    .fidelizacao-page.fidelizacao-premium .fidelizacao-radar-kpi-grid{
+      grid-template-columns:repeat(2,minmax(0,1fr));
+    }
+    .fidelizacao-page.fidelizacao-premium .fidelizacao-tier-grid{
+      grid-template-columns:1fr!important;
+    }
+    .fidelizacao-page.fidelizacao-premium .fidelizacao-tier{min-height:0}
+    .fidelizacao-page.fidelizacao-premium .fidelizacao-hero{padding:20px}
+    .fidelizacao-page.fidelizacao-premium .fidelizacao-agenda-panel .fidelizacao-history-row{
+      grid-template-columns:minmax(0,1fr) auto;
+    }
+  }
+  @media(prefers-reduced-motion:reduce){
+    .fidelizacao-page.fidelizacao-premium .fidelizacao-tier{transition:none}
+    .fidelizacao-page.fidelizacao-premium .fidelizacao-tier:hover{transform:none}
+  }
+`}</style><main className="fidelizacao-page fidelizacao-premium" style={{maxWidth:1180,margin:'0 auto',padding:'16px 18px 32px',fontFamily:'system-ui',color:'#142b4f'}}>
 
  <header className="fidelizacao-hero"><div className="fidelizacao-eyebrow">ANTARES BUSINESS · RELACIONAMENTO</div><h1>Fidelização e Relacionamento</h1></header>
  <div className="fidelizacao-kpi-grid">
  {([['Instituições',items.length],['Diamante',count('Diamante')],['Ouro',count('Ouro')],['Prata',count('Prata')],['Bronze',count('Bronze')],['Precisam de atenção',items.filter(i=>i.priority<=2).length]] as [string,number][]).map(([k,v])=>
  <div key={k} className="fidelizacao-kpi fidelizacao-kpi-compact"><small>{k}</small><div style={{fontSize:22,fontWeight:800}}>{v}</div></div>)}
  </div>
- <section style={{border:'1px solid #b6c7de',borderRadius:14,padding:19,marginTop:20}}>
+ <section className="fidelizacao-programa-panel" style={{border:'1px solid #b6c7de',borderRadius:14,padding:19,marginTop:20}}>
  <h2 className="fidelizacao-section-heading">Programa de Fidelização</h2>
- <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(210px,1fr))',gap:12,marginTop:14}}>
+ <div className="fidelizacao-tier-grid" style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(210px,1fr))',gap:12,marginTop:14}}>
  {[
  {name:'Diamante',count:'8 ou mais visitas concluídas',ideas:'Sugestões para negociação: até 20% de desconto, sessão gratuita anual e selo Escola Parceira, conforme aprovação do proprietário.'},
  {name:'Ouro',count:'4 a 7 visitas concluídas',ideas:'Sugestões para negociação: até 15% de desconto, sessão extra a cada cinco visitas e materiais exclusivos.'},
@@ -305,7 +574,7 @@ export default function FidelizacaoClient(){
  <h2 className="fidelizacao-section-heading">Central de Alertas</h2>
   {feedback&&<p role="status" style={{padding:"8px 12px",background:"#eaf3ff",borderRadius:8,color:"#17467f"}}>{feedback}</p>}
  
- <div style={{display:'flex',flexWrap:'wrap',gap:12,margin:'15px 0'}}>
+ <div className="fidelizacao-attention-filters" style={{display:'flex',flexWrap:'wrap',gap:12,margin:'15px 0'}}>
  <label>Mostrar <select value={filter} onChange={e=>(setFilter(e.target.value),setAttentionPage(0))} style={{marginLeft:8,padding:8,border:'1px solid #9db1cd',borderRadius:8,background:'white',color:'#142b4f'}}>
  <option value="all">Todas</option><option value="attention">Precisam de atenção</option><option value="Diamante">Diamante</option><option value="Ouro">Ouro</option><option value="Prata">Prata</option><option value="Bronze">Bronze</option></select></label>
  <span style={{alignSelf:'center',fontSize:13,color:'#315b90'}}>Aviso preventivo: 60 dias · Prioritário: 90 dias</span>
@@ -325,7 +594,7 @@ export default function FidelizacaoClient(){
  {feedback&&<p role="status" style={{marginTop:10}}>{feedback}</p>}
  {actionsError&&<p role="alert" style={{marginTop:10,color:'#a83232',fontWeight:700}}>Não foi possível atualizar a agenda: {actionsError}. Os registros não foram apagados.</p>}
  {!actionsLoaded&&!actionsError&&<p role="status">Carregando histórico e lembretes...</p>}
- <h3 style={{marginTop:22,fontWeight:700}}>Lembretes registrados ({actions.filter(a=>a.status==='open').length} em aberto)</h3>
+ <h3 className="fidelizacao-reminder-heading" style={{marginTop:22,fontWeight:700}}>Lembretes registrados ({actions.filter(a=>a.status==='open').length} em aberto)</h3>
  <div style={{display:'grid',gap:10,marginTop:10}}>
  {actions.filter(a=>a.status==='open').length===0?<p>Nenhum lembrete cadastrado.</p>:actions.filter(a=>a.status==='open').map(a=><div key={a.id} className={'fidelizacao-reminder '+(a.status==='open'?'fidelizacao-reminder-open':'fidelizacao-reminder-closed')}>
  <div><strong>{a.client_name}</strong> <span className={'fidelizacao-status '+(a.status==='open'?'is-open':'is-closed')}>{a.status==='open'?'Em aberto':a.status==='done'?'Concluído':'Dispensado'}</span><div style={{fontSize:13}}>Prazo: {a.due_date?String(a.due_date).slice(0,10).split('-').reverse().join('/'):'Sem data'}</div><div>{a.note}</div></div>
