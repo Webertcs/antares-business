@@ -52,7 +52,15 @@ export async function POST(req:NextRequest){
    EXISTS(SELECT 1 FROM pg_catalog.pg_attribute a
      WHERE a.attrelid='public.antares_provider_profiles'::regclass
        AND a.attname='contact_phone' AND NOT a.attisdropped) AS has_column,
-   to_regprocedure('public.antares_save_provider_phone(text,uuid,text)') IS NOT NULL AS has_function`;
+   EXISTS(SELECT 1 FROM pg_catalog.pg_proc p
+     WHERE p.oid=to_regprocedure('public.antares_save_provider_phone(text,uuid,text)')
+       AND p.prosecdef
+       AND pg_catalog.pg_get_userbyid(p.proowner)='neondb_owner'
+       AND pg_catalog.has_function_privilege(current_user,p.oid,'EXECUTE')
+       AND NOT EXISTS(
+         SELECT 1 FROM pg_catalog.aclexplode(
+           coalesce(p.proacl,pg_catalog.acldefault('f',p.proowner))) a
+         WHERE a.grantee=0 AND a.privilege_type='EXECUTE')) AS has_function`;
   if(!check[0]?.has_column||!check[0]?.has_function)
    return fail('Telefone ainda não habilitado no Neon. Execute a migração 20261113-provider-contact-phone.sql.',503);
 
