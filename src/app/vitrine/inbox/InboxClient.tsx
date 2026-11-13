@@ -18,6 +18,7 @@ export default function Inbox({conversionEnabled}:{conversionEnabled:boolean}){
   try{const r=await fetch('/api/vitrine/inbox',{cache:'no-store'});const data=await r.json();
    if(!r.ok)throw Error(data.error||'Não foi possível carregar.');
    setLeads(data.leads||[]);setError('');
+   window.dispatchEvent(new Event('antares:opportunities-updated'));
   }catch(e){setError(e instanceof Error?e.message:'Erro ao consultar');}
   finally{setLoading(false);}
  },[]);
