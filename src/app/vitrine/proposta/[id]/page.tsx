@@ -48,7 +48,6 @@ export default async function Proposta({params}:{params:Promise<{id:string}>}){
     <div>
      <span className={styles.eyebrow}>ANTARES BUSINESS · PROPOSTA COMERCIAL</span>
      <h1>{t(proposal.title)}</h1>
-     <p>Consulta interna · Informações vinculadas à solicitação de orçamento</p>
     </div>
    </div>
    <span className={[styles.status,proposalStatus==='draft'?styles.statusDraft:proposalStatus==='accepted'?styles.statusAccepted:''].filter(Boolean).join(' ')}>
@@ -76,18 +75,16 @@ export default async function Proposta({params}:{params:Promise<{id:string}>}){
      <div className={styles.identityCard}>
       <small>Cliente vinculado ao cadastro</small><strong>{client}</strong>
       <span>Tipo de cadastro: {kind}</span>
-      <span>Solicitação vinculada: {linked?'Sim':'Não identificada'}</span>
      </div>
     </div>
-    <div className={[styles.connection,different?styles.connectionWarn:''].join(' ')}>
-     {different?<Info size={16}/>:<CheckCircle2 size={16}/>}
-     <span>{different?'A instituição solicitante e o cliente vinculado têm nomes diferentes. Confirme essa associação antes de emitir a proposta definitiva.':linked?'Solicitação da vitrine identificada e associada a esta proposta.':'Esta proposta não possui uma solicitação da vitrine identificada.'}</span>
-    </div>
+    {(different||!linked)&&<div className={[styles.connection,different?styles.connectionWarn:''].join(' ')}>
+     <Info size={16}/>
+     <span>{different?'Atenção: solicitante e cliente vinculado são diferentes. Confirme antes do envio.':'Proposta sem solicitação da vitrine vinculada.'}</span>
+    </div>}
     {linked&&<div className={styles.commercialRows} style={{marginTop:12}}>
      <div className={styles.commercialRow}><span>Público informado na vitrine</span><strong>{t(proposal.origin_audience)}</strong></div>
      <div className={styles.commercialRow}><span>Participantes solicitados</span><strong>{t(proposal.origin_attendees)}</strong></div>
      <div className={styles.commercialRow}><span>Data desejada</span><strong>{sourceDate}</strong></div>
-     <div className={styles.commercialRow}><span>Proposta comercial</span><strong>{status}</strong></div>
     </div>}
    </div>
   </section>
@@ -112,15 +109,14 @@ export default async function Proposta({params}:{params:Promise<{id:string}>}){
    </div>
   </section>
 
-  <div className={styles.editorFrame}>
+  {proposalStatus==='draft'&&<div className={styles.editorFrame}>
    <Editor proposal={{id:String(proposal.id),status:String(proposal.status),pricing_model:String(proposal.pricing_model),expected_attendees:Number(proposal.expected_attendees??0),unit_price:Number(proposal.unit_price),fixed_price:Number(proposal.fixed_price),discount:Number(proposal.discount),deposit:Number(proposal.deposit)}}/>
-  </div>
-  <Premium proposal={{id:String(proposal.id),status:String(proposal.status),valid_until:proposal.valid_until?String(proposal.valid_until):null,payment_terms:proposal.payment_terms?String(proposal.payment_terms):null,title:String(proposal.title),client_name:String(proposal.client_name),expected_attendees:Number(proposal.expected_attendees??0),total:Number(proposal.total),deposit:Number(proposal.deposit)}} history={history}/>
+  </div>}
+  <Premium proposal={{id:String(proposal.id),status:String(proposal.status),valid_until:proposal.valid_until?String(proposal.valid_until):null,payment_terms:proposal.payment_terms?String(proposal.payment_terms):null,title:String(proposal.title),client_name:String(proposal.client_name),origin_institution:linked?origin:null,institution_mismatch:different,expected_attendees:Number(proposal.expected_attendees??0),total:Number(proposal.total),deposit:Number(proposal.deposit)}} history={history}/>
 
   <section className={styles.section}>
    <div className={styles.sectionHead}><h2><Info size={17}/>Observações da proposta</h2></div>
    <div className={styles.sectionBody}><p className={styles.observation}>{t(proposal.notes)}</p></div>
   </section>
-  <p className={styles.footer}>A edição de valores está disponível apenas para rascunhos. Após salvar, confirme os dados apresentados. Não há envio automático de mensagens, contratos, pagamentos ou reservas.</p>
  </main>;
 }
