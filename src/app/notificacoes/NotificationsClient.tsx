@@ -2,7 +2,7 @@
 import {useMemo,useState} from 'react';
 import Link from 'next/link';
 import {Bell,BriefcaseBusiness,CalendarDays,CheckCircle2,ChevronRight,HeartHandshake,History,RefreshCw,Wallet} from 'lucide-react';
-import type {AntaresNotification,NotificationCategory} from '@/lib/notificacoes/types';
+import type {AntaresNotification,NotificationCategory,TrackedNotification} from '@/lib/notificacoes/types';
 import {useNotificationFeed} from '../useNotificationFeed';
 
 type Filter='all'|NotificationCategory;
@@ -24,25 +24,35 @@ function showDate(value:string|null){
  const date=value.length===10?new Date(value+'T12:00:00'):new Date(value);
  return Number.isNaN(date.getTime())?'':date.toLocaleDateString('pt-BR');
 }
-function Item({data}:{data:AntaresNotification}){
- return <article className="notificacoes-item">
+function Item({data,onRead,readEnabled}:{data:AntaresNotification|TrackedNotification;onRead:(key:string)=>Promise<void>;readEnabled:boolean}){
+ const tracked='readKey' in data?data as TrackedNotification:null;
+ const unread=Boolean(tracked&&!tracked.read);
+ return <article className={'notificacoes-item'+(unread?' notificacoes-item--new':'')}>
   <div className={'notificacoes-item-icon notificacoes-item-icon--'+data.category}><Icon category={data.category}/></div>
   <div className="notificacoes-item-main">
    <div className="notificacoes-item-meta">
     <span>{categoryNames[data.category]}</span>
     <span className={'notificacoes-state notificacoes-state--'+data.status}>{statusNames[data.status]||data.status}</span>
+    {unread&&<span className="notificacoes-unread-label">Nova</span>}
     {data.date&&<time>{showDate(data.date)}</time>}
    </div>
    <h3>{data.title}</h3>
    <p>{data.detail}</p>
   </div>
-  <Link className="notificacoes-open" href={data.href} aria-label={'Abrir '+data.title+' em '+categoryNames[data.category]}>
+  {unread&&readEnabled&&tracked&&<button type="button" className="notificacoes-mark-read" onClick={()=>void onRead(tracked.readKey)}>Marcar como lida</button>}
+  <Link className="notificacoes-open" href={data.href} onClick={()=>{if(unread&&readEnabled&&tracked)void onRead(tracked.readKey).catch(()=>{});}} aria-label={'Abrir '+data.title+' em '+categoryNames[data.category]}>
    Abrir <ChevronRight size={17}/>
   </Link>
  </article>;
 }
 export default function NotificationsClient(){
- const {feed,loading,error,refresh}=useNotificationFeed(true);
+ const {feed,loading,error,refresh,markRead}=useNotificationFeed(true);
+ const [readError,setReadError]=useState('');
+ async function confirmRead(key:string){
+  setReadError('');
+  try{await markRead([key]);}
+  catch(e){setReadError(e instanceof Error?e.message:'Não foi possível registrar a leitura.');}
+ }
  const [filter,setFilter]=useState<Filter>('all');
  const [view,setView]=useState<'pending'|'history'>('pending');
  const counts=useMemo(()=>Object.fromEntries(
@@ -79,7 +89,7 @@ export default function NotificationsClient(){
    <div className="notificacoes-toolbar">
     <div className="notificacoes-tabs" role="group" aria-label="Tipo de visualização">
      <button type="button" className={view==='pending'?'active':''} aria-pressed={view==='pending'} onClick={()=>setView('pending')}>
-      <Bell size={16}/> Pendentes <span>{feed?.count??'—'}</span>
+      <Bell size={16}/> Pendentes <span>{feed?.count??'—'} · {feed?.unreadCount??'—'} novas</span>
      </button>
      <button type="button" className={view==='history'?'active':''} aria-pressed={view==='history'} onClick={()=>{setView('history');setFilter('all')}}>
       <History size={16}/> Histórico da Vitrine
@@ -94,7 +104,8 @@ export default function NotificationsClient(){
     </label>
    </div>
 
-   {error&&<p className="notificacoes-message notificacoes-message--error" role="status">{error}</p>}
+   {(error||readError)&&<p className="notificacoes-message notificacoes-message--error" role="status">{error||readError}</p>}
+   {feed&&!feed.readPersistenceAvailable&&<p className="notificacoes-message" role="status">Leitura permanente ainda não habilitada no Neon. Execute a migração de notificações para apagar os contadores de novos avisos após a leitura.</p>}
    {feed&&feed.unavailable.length>0&&
     <p className="notificacoes-message" role="status">
      Não foi possível consultar: {feed.unavailable.map(x=>categoryNames[x]).join(', ')}. As demais pendências continuam disponíveis.
@@ -106,9 +117,9 @@ export default function NotificationsClient(){
     <h2>{view==='history'?'Sem solicitações finalizadas ou em análise':'Nenhuma pendência nesta seleção'}</h2>
     <p>{view==='history'?'O histórico exibirá solicitações da Vitrine em análise, convertidas ou arquivadas.':'Quando surgir uma pendência, ela aparecerá aqui e no sininho.'}</p>
    </div>}
-   {shown.length>0&&<div className="notificacoes-list">{shown.map(n=><Item key={n.id} data={n}/>)}</div>}
+   {shown.length>0&&<div className="notificacoes-list">{shown.map(n=><Item key={n.id} data={n} onRead={confirmRead} readEnabled={Boolean(feed?.readPersistenceAvailable)}/>)}</div>}
    <footer className="notificacoes-footer">
-    <p>Consultar uma notificação não conclui a tarefa. Uma oportunidade só deixa de ser nova após iniciar sua análise.</p>
+    <p>Ler o aviso remove o indicador vermelho do sino, mas a pendência continua até ser resolvida. Oportunidades permanece pendente até iniciar a análise.</p>
     <Link href="/vitrine/inbox"><BriefcaseBusiness size={16}/> Abrir Oportunidades</Link>
    </footer>
   </section>
