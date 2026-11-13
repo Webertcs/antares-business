@@ -47,7 +47,7 @@ BEGIN
     RAISE EXCEPTION 'Proprietario nao autorizado para esta organizacao.';
   END IF;
 
-  IF p_phone IS NULL OR p_phone !~ '^\\([0-9]{2}\\) [0-9]{4,5}-[0-9]{4}$' THEN
+  IF p_phone IS NULL OR p_phone !~ '^[(][0-9]{2}[)] [0-9]{4,5}-[0-9]{4}$' THEN
     RAISE EXCEPTION 'Telefone deve estar em formato brasileiro com DDD.';
   END IF;
 
