@@ -78,5 +78,4 @@
  .page{max-width:none!important;width:100%!important;padding:0!important;margin:0!important}
  .back,.hero,.kpis,.section,.editorFrame,.footer{display:none!important}
  .premiumFrame{margin:0!important;padding:0!important}
- :global(.shell),:global(.main),:global(.content){width:100%!important;max-width:none!important;margin:0!important;padding:0!important;min-width:0!important}
 }
