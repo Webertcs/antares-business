@@ -3312,10 +3312,6 @@
 .content:has(.owner-overview) .owner-summary-action{padding:5px 3px;font-size:10px;gap:6px}
 .content:has(.owner-overview) .owner-summary-action svg{height:13px;width:13px}
 .content:has(.owner-overview) .owner-summary-action strong{font-size:11px}
-.content:has(.owner-overview) .owner-vitrine{min-height:66px;padding:10px 12px}
-.content:has(.owner-overview) .owner-vitrine strong{font-size:16px}
-.content:has(.owner-overview) .owner-vitrine small{font-size:9px}
-.content:has(.owner-overview) .owner-vitrine-action{font-size:9px;padding:6px}
 .content:has(.owner-overview) .owner-priorities-list{display:flex;flex-direction:column;gap:5px}
 .content:has(.owner-overview) .owner-priority{
  display:flex;align-items:center;gap:8px;min-width:0;
