@@ -18,7 +18,7 @@ CREATE TABLE IF NOT EXISTS public.antares_notification_reads (
  read_at timestamptz NOT NULL DEFAULT now(),
  PRIMARY KEY (organization_id, auth_subject, notification_key),
  CONSTRAINT antares_notification_key_format
-  CHECK (notification_key ~ '^(opportunities|loyalty|agenda|finance):[0-9a-f]{8}(-[0-9a-f]{4}){3}-[0-9a-f]{12}:(pending|warning|critical|today|overdue)$')
+  CHECK (notification_key ~ '^(opportunities|loyalty|agenda|finance):[0-9a-f]{8}(-[0-9a-f]{4}){3}-[0-9a-f]{12}:(pending|warning|critical|today|overdue)(:[0-9]{4}-[0-9]{2}-[0-9]{2})?$')
 );
 ALTER TABLE public.antares_notification_reads ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.antares_notification_reads FORCE ROW LEVEL SECURITY;
@@ -47,7 +47,7 @@ BEGIN
  IF EXISTS (
   SELECT 1 FROM unnest(p_keys) AS k(key)
   WHERE k.key IS NULL OR k.key !~
-   '^(opportunities|loyalty|agenda|finance):[0-9a-f]{8}(-[0-9a-f]{4}){3}-[0-9a-f]{12}:(pending|warning|critical|today|overdue)$'
+   '^(opportunities|loyalty|agenda|finance):[0-9a-f]{8}(-[0-9a-f]{4}){3}-[0-9a-f]{12}:(pending|warning|critical|today|overdue)(:[0-9]{4}-[0-9]{2}-[0-9]{2})?$'
  ) THEN RAISE EXCEPTION 'Identificador de notificacao invalido.'; END IF;
 
  INSERT INTO public.antares_notification_reads
