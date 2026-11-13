@@ -286,3 +286,228 @@
 
 /* Campo invisível contra preenchimento automatizado; não pode ocupar área clicável. */
 .premium-kids .premium-honeypot{position:absolute!important;left:-10000px!important;width:1px!important;height:1px!important;opacity:0!important;pointer-events:none!important}
+
+
+/* VITRINE V2 | Pacote 1: o universo ANTARES Kids (sem tocar nas vozes ou no sistema solar). */
+.premium-kids #jogo,.premium-kids #experiencia,.premium-kids #orcamento,.premium-kids #escolas{scroll-margin-top:24px}
+.premium-kids .premium-hero-cta{
+ display:flex;align-items:center;justify-content:center;gap:12px;flex-wrap:wrap;
+ margin:22px 0 12px;
+}
+.premium-kids .premium-hero-cta a{
+ min-height:46px;padding:12px 20px;border-radius:999px;
+ display:inline-flex;align-items:center;justify-content:center;gap:10px;
+ font-size:14px;font-weight:850;letter-spacing:0;
+ transition:transform .22s ease,box-shadow .22s ease,border-color .22s ease;
+}
+.premium-kids .premium-hero-primary{
+ background:linear-gradient(110deg,#ffd15f,#ffe790);
+ color:#162548;
+ box-shadow:0 9px 27px #ffca5966,inset 0 1px #fff8cb;
+ border:1px solid #fff0b8;
+}
+.premium-kids .premium-hero-secondary{
+ border:1px solid #afcfff99;
+ color:#f3f7ff;
+ background:#193a71a8;
+ box-shadow:inset 0 1px #ffffff17;
+}
+.premium-kids .premium-hero-cta a:hover{
+ transform:translateY(-2px);
+ box-shadow:0 12px 32px #0a143f8c;
+}
+.premium-kids .premium-trust{gap:9px;justify-content:center;flex-wrap:wrap}
+.premium-kids .premium-trust span{
+ background:#1c37648c;
+ border:1px solid #c3ddff42;
+ color:#dcecff;
+ border-radius:999px;
+ padding:6px 11px;
+ font-size:11px;font-weight:750;
+}
+.premium-kids .premium-header nav a[href="#jogo"]{color:#ffda8b}
+.premium-kids .premium-ecosystem{
+ position:relative;
+ max-width:1250px;
+ margin:0 auto 36px;
+ padding:18px 22px 30px;
+ color:#f4f7ff;
+}
+.premium-kids .premium-ecosystem-heading{text-align:center;max-width:790px;margin:0 auto 26px}
+.premium-kids .premium-ecosystem-heading>span{
+ font-size:11px;font-weight:850;letter-spacing:.18em;color:#ffda8c;
+}
+.premium-kids .premium-ecosystem-heading h2{
+ margin:10px 0 0;font-weight:900;letter-spacing:-.035em;
+ font-size:clamp(25px,3vw,39px);line-height:1.14;color:#fff;
+}
+.premium-kids .premium-ecosystem-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}
+.premium-kids .premium-ecosystem-grid article{
+ min-width:0;min-height:180px;padding:21px 19px;
+ border-radius:20px;
+ border:1px solid #9bb9ff55;
+ background:linear-gradient(155deg,#1d396bb8,#102451b0);
+ box-shadow:inset 0 1px #ffffff16,0 12px 28px #030c2f2b;
+ transition:transform .2s ease,border-color .2s ease;
+}
+.premium-kids .premium-ecosystem-grid article:hover{transform:translateY(-4px);border-color:#bbdcffb8}
+.premium-kids .premium-ecosystem-icon{
+ display:grid;place-items:center;
+ width:43px;height:43px;border-radius:13px;
+ background:#294c84b9;font-size:23px;margin-bottom:14px;
+ border:1px solid #a1cfff44;
+}
+.premium-kids .premium-ecosystem-grid h3{font-size:16px;color:#fff;font-weight:850;margin:0 0 9px}
+.premium-kids .premium-ecosystem-grid p{font-size:13px;color:#d2e1fb;line-height:1.6;margin:0}
+.premium-kids .premium-game-reveal{
+ position:relative;
+ isolation:isolate;
+ max-width:1260px;
+ margin:32px auto 95px;
+ padding:37px;
+ display:grid;
+ grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);
+ align-items:center;gap:26px;
+ border:1px solid #8abaff8a;border-radius:32px;
+ background:radial-gradient(ellipse at 85% 12%,#7359b05e,transparent 57%),
+  linear-gradient(135deg,#10234d,#182e62 52%,#29245f);
+ box-shadow:inset 0 1px #e4f0ff38,0 25px 65px #050a2699;
+ overflow:hidden;
+}
+.premium-kids .premium-game-reveal:before{
+ content:"";position:absolute;inset:0;pointer-events:none;z-index:-1;
+ background-image:radial-gradient(#fcfdffb0 .8px,transparent 1px);
+ background-size:57px 45px;opacity:.45;
+}
+.premium-kids .premium-game-content{color:#fff;position:relative;z-index:2}
+.premium-kids .premium-game-eyebrow{font-size:11px;letter-spacing:.15em;font-weight:900;color:#ffda8c}
+.premium-kids .premium-game-content h2{
+ color:#fff;line-height:1.08;letter-spacing:-.045em;
+ font-size:clamp(32px,3.9vw,53px);font-weight:950;margin:17px 0;
+}
+.premium-kids .premium-game-content h2 em{
+ font-style:normal;
+ background:linear-gradient(92deg,#67d4ff,#caa5ff,#ffdb92);
+ background-clip:text;-webkit-background-clip:text;-webkit-text-fill-color:transparent;
+}
+.premium-kids .premium-game-content p{font-size:15px;line-height:1.75;color:#d6e6fc;max-width:480px;margin:0 0 18px}
+.premium-kids .premium-game-soon{
+ display:inline-flex;align-items:center;justify-content:center;
+ padding:11px 22px;min-height:43px;border:1px solid #ffecae;
+ background:#ffdb7e;color:#162751;box-shadow:0 0 27px #ffc64d48;
+ border-radius:999px;font-weight:950;letter-spacing:.12em;font-size:13px;
+}
+.premium-kids .premium-game-content>small{display:block;margin-top:14px;max-width:490px;font-size:11px;line-height:1.6;color:#a9c6ed}
+.premium-kids .premium-game-art{
+ position:relative;isolation:isolate;
+ width:100%;min-height:330px;margin:0;
+ display:flex;flex-direction:column;justify-content:flex-end;align-items:center;
+ overflow:hidden;border-radius:25px;
+ background:
+  radial-gradient(ellipse at 22% 14%,#d58dff70,transparent 32%),
+  radial-gradient(ellipse at 80% 74%,#5bcdfb4a,transparent 39%),
+  radial-gradient(ellipse at 52% 105%,#5988e7,transparent 56%),
+  linear-gradient(145deg,#121c50,#0a1b43 55%,#1d2b6c);
+ border:1px solid #9dcfff77;
+ box-shadow:inset 0 0 40px #537adb45,0 15px 33px #020a2c7d;
+}
+.premium-kids .premium-game-art:before{
+ content:"";position:absolute;inset:0;pointer-events:none;
+ background-image:radial-gradient(#fff9 .9px,transparent 1.2px);
+ background-size:37px 29px;opacity:.54;
+}
+.premium-kids .premium-game-art:after{
+ content:"";position:absolute;left:-18%;right:-18%;bottom:-59%;height:94%;
+ border-radius:50%;
+ background:linear-gradient(180deg,#568ee8a8,#244a9b,#14234b);
+ border-top:3px solid #99ccffb2;
+ box-shadow:0 -15px 55px #4699ff99;
+ z-index:0;
+}
+.premium-kids .premium-game-planet{
+ position:absolute;z-index:1;border-radius:50%;
+ box-shadow:inset -12px -13px 19px #0b164d99,0 0 22px #74aaff4c;
+}
+.premium-kids .premium-game-planet-a{
+ width:85px;height:85px;top:27px;right:13%;
+ background:repeating-linear-gradient(12deg,#c8a071 0 13px,#f5c98c 13px 22px,#d48f66 22px 26px);
+ transform:rotate(-18deg);
+}
+.premium-kids .premium-game-planet-b{
+ width:50px;height:50px;top:18px;left:12%;
+ background:radial-gradient(circle at 30% 27%,#7aece1,#278acc 60%,#19508a);
+}
+.premium-kids .premium-game-planet-c{
+ width:28px;height:28px;right:28%;top:30px;
+ background:radial-gradient(circle at 30% 26%,#ffd9a8,#e57a44 58%,#923a3f);
+}
+.premium-kids .premium-game-orbit{
+ position:absolute;z-index:0;
+ border-radius:50%;border:1px dashed #d9e3ff60;
+ transform:rotate(-16deg);
+}
+.premium-kids .premium-game-orbit-one{width:440px;height:120px;top:25px;left:5%}
+.premium-kids .premium-game-orbit-two{width:360px;height:90px;top:64px;left:25%;transform:rotate(13deg)}
+.premium-kids .premium-game-cast{
+ position:relative;z-index:2;
+ display:flex;align-items:flex-end;justify-content:center;
+ gap:clamp(1px,1.4vw,17px);
+ padding-top:100px;
+ width:100%;
+}
+.premium-kids .premium-game-figure{
+ width:auto;height:auto;max-width:32%;max-height:220px;object-fit:contain;
+ filter:drop-shadow(0 10px 9px #050b2ea8) drop-shadow(0 0 11px #6fa7ff66);
+}
+.premium-kids .premium-game-lunna{max-height:187px;transform:rotate(-5deg)}
+.premium-kids .premium-game-astro{max-height:235px}
+.premium-kids .premium-game-pixel{max-height:140px;transform:rotate(7deg)}
+.premium-kids .premium-game-art figcaption{
+ position:relative;z-index:3;
+ display:flex;align-items:center;justify-content:space-between;gap:10px;
+ padding:12px 16px;
+ width:100%;min-height:52px;
+ background:#0b173ecf;
+ border-top:1px solid #adc5ff75;
+ font-size:11px;font-weight:800;letter-spacing:.06em;color:#e7efff;
+}
+.premium-kids .premium-game-art figcaption strong{
+ color:#16315c;background:#ffda76;
+ border-radius:999px;padding:6px 10px;font-size:10px;letter-spacing:.08em;white-space:nowrap;
+}
+@media(max-width:1050px){
+ .premium-kids .premium-ecosystem-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .premium-kids .premium-ecosystem-grid article{min-height:150px}
+ .premium-kids .premium-game-reveal{grid-template-columns:1fr;gap:28px;margin-inline:20px}
+ .premium-kids .premium-game-content p{max-width:700px}
+ .premium-kids .premium-game-art{max-width:680px;margin:auto}
+}
+@media(max-width:720px){
+ .premium-kids .premium-header nav a[href="#jogo"]{display:none}
+ .premium-kids .premium-hero-cta{gap:9px}
+ .premium-kids .premium-hero-cta a{font-size:12px;padding:11px 15px}
+ .premium-kids .premium-trust span{font-size:10px}
+ .premium-kids .premium-ecosystem{padding:18px 16px 28px}
+ .premium-kids .premium-ecosystem-heading h2{font-size:29px}
+ .premium-kids .premium-ecosystem-grid{gap:10px}
+ .premium-kids .premium-ecosystem-grid article{min-height:160px;padding:15px;border-radius:15px}
+ .premium-kids .premium-ecosystem-grid h3{font-size:13px}
+ .premium-kids .premium-ecosystem-grid p{font-size:12px}
+ .premium-kids .premium-game-reveal{padding:21px;margin:23px 12px 66px;border-radius:23px}
+ .premium-kids .premium-game-content h2{font-size:clamp(29px,8vw,42px)}
+ .premium-kids .premium-game-content p{font-size:13px}
+ .premium-kids .premium-game-art{min-height:300px}
+ .premium-kids .premium-game-cast{padding-top:86px}
+ .premium-kids .premium-game-art figcaption{font-size:9px;padding:10px;min-height:49px}
+}
+@media(max-width:390px){
+ .premium-kids .premium-ecosystem-grid{grid-template-columns:1fr}
+ .premium-kids .premium-ecosystem-grid article{min-height:0}
+ .premium-kids .premium-game-art figcaption{flex-direction:column}
+}
+@media(prefers-reduced-motion:reduce){
+ .premium-kids .premium-ecosystem-grid article,
+ .premium-kids .premium-hero-cta a{transition:none}
+ .premium-kids .premium-ecosystem-grid article:hover,
+ .premium-kids .premium-hero-cta a:hover{transform:none}
+}
