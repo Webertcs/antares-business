@@ -19,7 +19,7 @@ export default async function Proposta({params}:{params:Promise<{id:string}>}){
   c.name AS client_name,c.kind AS client_kind,
   l.institution AS origin_institution,l.id AS lead_id,
   l.responsible_name AS origin_responsible,l.city AS origin_city,l.phone AS origin_phone,
-  l.audience AS origin_audience,l.attendees AS origin_attendees,l.desired_date AS origin_desired_date
+  l.audience AS origin_audience,l.attendees AS origin_attendees,to_char(l.desired_date::date,'YYYY-MM-DD') AS origin_desired_date
   FROM public.business_proposals p
   JOIN public.crm_clients c ON c.id=p.client_id AND c.organization_id=p.organization_id
   LEFT JOIN public.vitrine_leads l ON l.converted_proposal_id=p.id AND l.organization_id=p.organization_id
@@ -33,10 +33,12 @@ export default async function Proposta({params}:{params:Promise<{id:string}>}){
  const proposalStatus=String(proposal.status);
  const statusLabel:Record<string,string>={draft:'Rascunho',accepted:'Aceita',approved:'Aprovada',sent:'Enviada',rejected:'Recusada',archived:'Arquivada'};
  const status=statusLabel[proposalStatus]||proposalStatus;
- const sourceDate=proposal.origin_desired_date?String(proposal.origin_desired_date).slice(0,10).split('-').reverse().join('/'):'A combinar';
+ const sourceDate=proposal.origin_desired_date?String(proposal.origin_desired_date).split('-').reverse().join('/'):'A combinar';
  const linked=Boolean(proposal.lead_id);
  const origin=proposal.origin_institution?String(proposal.origin_institution):'Não identificada';
  const client=String(proposal.client_name);
+ const clientKindLabel:Record<string,string>={school:'Escola',company:'Empresa',association:'Associação',institution:'Instituição',other:'Outro'};
+ const kind=clientKindLabel[String(proposal.client_kind)]||String(proposal.client_kind||'—');
  const different=linked&&origin.localeCompare(client,'pt-BR',{sensitivity:'base'})!==0;
  return <main className={styles.page}>
   <Link href="/vitrine/inbox" className={styles.back}><ArrowLeft size={15}/>Voltar às solicitações</Link>
@@ -73,7 +75,7 @@ export default async function Proposta({params}:{params:Promise<{id:string}>}){
      </div>
      <div className={styles.identityCard}>
       <small>Cliente vinculado ao cadastro</small><strong>{client}</strong>
-      <span>Tipo de cadastro: {t(proposal.client_kind)}</span>
+      <span>Tipo de cadastro: {kind}</span>
       <span>Solicitação vinculada: {linked?'Sim':'Não identificada'}</span>
      </div>
     </div>
