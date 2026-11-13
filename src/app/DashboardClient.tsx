@@ -36,6 +36,8 @@ export default function Home({accountLabel,role='owner',ownerPreview=false,profi
  const [relationshipAlerts,setRelationshipAlerts]=useState<{client_id:string;client_name:string;days:number;severity:string}[]>([]);
  const [alertsAvailable,setAlertsAvailable]=useState(false);
  const [notificationOpen,setNotificationOpen]=useState(false);
+ const notificationBellRef=useRef<HTMLButtonElement>(null);
+ const closeNotifications=useCallback(()=>setNotificationOpen(false),[]);
  useEffect(()=>{if(role!=='owner')return;let active=true;const load=async()=>{try{const response=await fetch('/api/fidelizacao/alertas',{cache:'no-store'});if(!response.ok)throw Error('unavailable');const data=await response.json();if(active){setRelationshipAlerts(Array.isArray(data.alerts)?data.alerts:[]);setAlertsAvailable(true);}}catch{if(active)setAlertsAvailable(false);}};void load();const onFocus=()=>void load();window.addEventListener('focus',onFocus);const onVisible=()=>{if(document.visibilityState==='visible')void load();};document.addEventListener('visibilitychange',onVisible);const interval=window.setInterval(()=>{if(document.visibilityState==='visible')void load();},60*1000);return()=>{active=false;window.clearInterval(interval);window.removeEventListener('focus',onFocus);document.removeEventListener('visibilitychange',onVisible)};},[role]);
  useEffect(()=>{const controller=new AbortController();
  (role==='owner'?fetch('/api/fidelizacao/acoes',{cache:'no-store',signal:controller.signal}):Promise.reject(Error('restricted')))
