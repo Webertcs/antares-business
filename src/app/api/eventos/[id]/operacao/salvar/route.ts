@@ -34,7 +34,7 @@ export async function POST(req:NextRequest,{params}:{params:Promise<{id:string}>
         WHERE acl.grantee=0 AND acl.privilege_type='EXECUTE')) AS safe_functions
     FROM pg_roles r WHERE r.rolname=current_user`;
   if(!safety[0]?.safe_role||!safety[0]?.safe_tables||!safety[0]?.safe_functions)
-    return NextResponse.json({error:'Isolamento operacional não verificado.'},{status:503});
+    return NextResponse.json({error:'Não foi possível confirmar a autorização para alterar esta operação.'},{status:503});
   if(body.action==='infrastructure'){
    const access=clean(body.access,2000),parking=clean(body.parking,2000),power=clean(body.power,2000),setup=clean(body.setup,4000);
    await sql`SELECT public.antares_save_event_operation(${ctx.user.id},${id}::uuid,${access},${parking},${power},${setup})`;
