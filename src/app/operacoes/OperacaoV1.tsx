@@ -116,7 +116,7 @@ export default function OperacaoV1({writesEnabled,contractWritesEnabled}:{writes
  {tab!=='agenda'&&<Link href="/clientes" style={{background:'#2563eb',color:'white',padding:'8px 11px',fontSize:12,borderRadius:8,textDecoration:'none'}}>Abrir cadastro de clientes</Link>}</div>
  {loading&&<p role="status">Carregando informações do planetário...</p>}
  {error&&<div role="alert" style={{...base,borderColor:'#b45309',marginTop:20}}>Não foi possível consultar todas as informações. {error} Consulte os dados disponíveis antes de realizar novas operações.</div>}
- {!loading&&!error&&unavailable.length>0&&<div role="status" style={{...base,borderColor:'#f59e0b',marginTop:16}}>Algumas áreas estão em implantação: {unavailable.join(', ')}. Os demais dados estão disponíveis para consulta. Gravações permanecem bloqueadas.</div>}
+ {!loading&&!error&&unavailable.length>0&&<div role="status" style={{...base,borderColor:'#f59e0b',marginTop:16}}>Algumas informações não estão disponíveis: {unavailable.join(', ')}. Os demais dados podem ser consultados.</div>}
  {!loading&&!error&&<>
  {tab!=='agenda'&&<div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(145px,1fr))',gap:8,margin:'12px 0'}}>
   {([['Clientes',data.clients.length],['Propostas',data.proposals.length],['Valor proposto',money(forecast)],['Saldo realizado',money(cash)],['Fluxo previsto',money(pending)],['Reservas',data.bookings.length]] as [string,string|number][]).map(([t,v])=><div key={t} style={base}><small>{t}</small><div style={{fontSize:17,fontWeight:750}}>{v}</div></div>)}
