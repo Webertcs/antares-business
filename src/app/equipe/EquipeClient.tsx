@@ -66,7 +66,7 @@ export default function EquipeClient({ writesEnabled }: { writesEnabled: boolean
       const data = await response.json();
       if (!response.ok) throw new Error(data.error || 'Falha ao suspender');
       setMembers(previous => previous.map(item => item.id === member.id ? { ...item, active: false } : item));
-      setFeedback('Acesso suspenso. A conta permanece registrada para auditoria.');
+      setFeedback('Acesso suspenso. O cadastro continua disponível para consulta.');
     } catch (error) { setFeedback(error instanceof Error ? error.message : 'Falha ao suspender acesso'); }
   }
   async function invite(event: React.FormEvent<HTMLFormElement>) {
@@ -99,7 +99,7 @@ export default function EquipeClient({ writesEnabled }: { writesEnabled: boolean
     </table>}
     <section className="team-panel team-premium-panel">
       <h2>Convidar colaborador</h2>
-      {!canWrite && <p role="status" style={{color:'#92400e',fontWeight:700}}>{checkingSecurity ? 'Verificando permissões de segurança...' : 'Convites aguardam ativação segura no servidor.'}</p>}
+      {!canWrite && <p role="status" style={{color:'#92400e',fontWeight:700}}>{checkingSecurity ? 'Verificando permissões de segurança...' : 'Não é possível enviar convites neste momento.'}</p>}
       <p>O convidado precisa entrar com o mesmo e-mail e confirmar a conta. Não é possível convidar outro proprietário.</p>
       <form onSubmit={invite} className="team-invite-form">
         <label>Nome completo<input disabled={!canWrite} required minLength={2} maxLength={160} value={name} onChange={e=>setName(e.target.value)} style={{display:'block',width:'100%',padding:10,color:'#111',background:'#fff'}}/></label>
