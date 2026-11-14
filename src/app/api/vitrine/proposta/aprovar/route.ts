@@ -16,7 +16,7 @@ export async function POST(req:NextRequest){
   const safe=await db`SELECT current_user='antares_team_runtime' AND NOT r.rolsuper AND NOT r.rolbypassrls AS role_ok,
   NOT has_table_privilege(current_user,'public.business_proposals','UPDATE') AS table_ok,
   has_function_privilege(current_user,'public.business_manage_draft(text,uuid,date,text,boolean)','EXECUTE') AS fn_ok FROM pg_roles r WHERE r.rolname=current_user`;
-  if(!safe[0]?.role_ok||!safe[0]?.table_ok||!safe[0]?.fn_ok)return response({error:'Permissões não homologadas'},503);
+  if(!safe[0]?.role_ok||!safe[0]?.table_ok||!safe[0]?.fn_ok)return response({error:'Não foi possível confirmar a autorização para aprovar esta proposta'},503);
   const result=await db`SELECT public.business_manage_draft(${owner.user.id},${b.id}::uuid,${b.valid}::date,${b.terms},${b.approve}) AS status`;
   return response({ok:true,status:result[0]?.status},200);
  }catch{return response({error:'Não foi possível concluir. Confira validade, condições e situação do rascunho.'},409);}
