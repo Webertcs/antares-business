@@ -90,7 +90,8 @@ export default function PremiumVitrine(){
  }
  async function submit(e:React.FormEvent<HTMLFormElement>){
   e.preventDefault();
-  const form=new FormData(e.currentTarget);
+  const formElement=e.currentTarget;
+  const form=new FormData(formElement);
   const get=(name:string)=>String(form.get(name)||'').trim();
   const phone=get('telefone').replace(/\D/g,'');
   const gameUpdatesOptIn=form.get('gameUpdatesOptIn')==='on';
@@ -119,6 +120,8 @@ export default function PremiumVitrine(){
     })
    });
    if(response.ok){
+    formElement.reset();
+    setGameInterested(false);
     setQuoteDraft('');
     setFormStatus(gameUpdatesOptIn?'✅ Pedido recebido no CRM! Seu interesse nas novidades do jogo também foi registrado junto à solicitação. Nenhuma mensagem automática foi enviada.':'✅ Pedido recebido no CRM! A equipe avaliará sua solicitação e poderá entrar em contato.');
     return;
@@ -245,7 +248,7 @@ export default function PremiumVitrine(){
       <button className="premium-button premium-form-submit" type="submit" disabled={leadSending}>{leadSending?"Registrando pedido...":"Solicitar minha proposta"} <Send size={17}/></button>
       {formStatus&&<p role="status" aria-live="polite" className="premium-form-status">{formStatus}</p>}
       {quoteDraft&&<div className="premium-quote-preview"><label>Mensagem preparada<textarea readOnly rows={7} value={quoteDraft} aria-label="Mensagem de orçamento pronta para copiar"/></label><button type="button" onClick={copyQuote} className="premium-copy-quote">Copiar mensagem</button></div>}
-      <small className="premium-form-disclaimer">Quando a integração estiver ativa, seu pedido será registrado como pendente no CRM. Se não for possível registrar, você poderá enviá-lo pelo WhatsApp ou copiar a mensagem. Nenhum contrato ou evento será criado automaticamente.</small>
+      <small className="premium-form-disclaimer">Seu pedido será encaminhado à equipe como uma solicitação pendente. Se o registro não for possível, você poderá enviar pelo WhatsApp ou copiar a mensagem. Nenhum contrato ou evento será criado automaticamente.</small>
      </form>
     </section>
    <section className="premium-section premium-faq"><div className="premium-section-title"><span>DÚVIDAS FREQUENTES</span><h2>Perguntas de quem vai viajar</h2></div><details><summary>O planetário vai até a escola?</summary><p>Sim. A equipe leva a estrutura móvel e combina previamente o espaço necessário.</p></details><details><summary>Quantas crianças participam?</summary><p>A capacidade depende da cúpula utilizada. As turmas são organizadas em sessões.</p></details><details><summary>Também atende eventos e associações?</summary><p>Sim. Basta informar o formato do evento no pedido de orçamento.</p></details><details><summary>É indicado para quais idades?</summary><p>As experiências podem ser planejadas para diferentes faixas etárias. Conte a idade aproximada da turma nas observações para que a equipe avalie os conteúdos adequados.</p></details><details><summary>O jogo ANTARES já está disponível?</summary><p>Ainda não. O jogo educativo ANTARES Kids está em desenvolvimento, sem data de lançamento anunciada. Se quiser registrar interesse nas novidades, marque a opção específica no formulário de orçamento.</p></details></section>
