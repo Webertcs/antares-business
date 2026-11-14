@@ -119,7 +119,7 @@ export default function Inbox({conversionEnabled}:{conversionEnabled:boolean}){
       <button type="button" disabled={Boolean(busy)} onClick={()=>void review(lead.id,'pending')}
        className={styles.actionPrimary}><Archive size={16}/>Reabrir solicitação</button>}
      <a className={styles.actionWhatsApp}
-      href={'https://wa.me/'+lead.phone.replace(/\\D/g,'')+'?text='+encodeURIComponent('Olá, '+lead.responsible_name+'! Recebemos seu pedido de orçamento do planetário para '+lead.institution+'. Podemos conversar?')}
+      href={'https://wa.me/'+lead.phone.replace(/\D/g,'')+'?text='+encodeURIComponent('Olá, '+lead.responsible_name+'! Recebemos seu pedido de orçamento do planetário para '+lead.institution+'. Podemos conversar?')}
       target="_blank" rel="noopener noreferrer"><MessageCircle size={16}/>WhatsApp</a>
      <details className={styles.more}>
       <summary className={styles.moreSummary} aria-label={'Mais opções para '+lead.institution}>
