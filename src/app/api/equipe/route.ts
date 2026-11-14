@@ -23,5 +23,5 @@ export async function GET() {
 // Importante: não criar usuários nem conceder papéis via POST arbitrário.
 // Um convite deverá ser aceito com uma sessão verificada e validação de token no servidor.
 export async function POST(_request: NextRequest) {
-  return NextResponse.json({ error: 'Convites ainda não habilitados: exige fluxo seguro de aceite' }, { status: 501 });
+  return NextResponse.json({ error: 'Não é possível enviar convites neste momento.' }, { status: 501 });
 }
