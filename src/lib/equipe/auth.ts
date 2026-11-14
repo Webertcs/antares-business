@@ -49,3 +49,15 @@ export async function requireOwner() {
   const context = await requireMember();
   return context?.role === 'owner' ? context : null;
 }
+
+/** Acesso técnico restrito ao subject autenticado configurado no servidor. */
+export function isDeveloperSubject(subject: string) {
+  const configured = process.env.ANTARES_DEVELOPER_SUBJECT;
+  return Boolean(configured) && configured === subject;
+}
+
+/** Não basta ser proprietário: a oficina é exclusiva do desenvolvedor. */
+export async function requireDeveloper() {
+  const owner = await requireOwner();
+  return owner && isDeveloperSubject(owner.user.id) ? owner : null;
+}
