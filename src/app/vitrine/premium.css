@@ -919,3 +919,45 @@
     flex:none;
   }
 }
+
+/* Refinamento de legibilidade para celulares estreitos (330–360px). */
+@media (max-width:360px){
+  .premium-kids .premium-header{
+    padding:14px 10px;
+    gap:6px;
+  }
+  .premium-kids .premium-logo{
+    font-size:16px;
+    letter-spacing:.2px;
+    flex:0 0 auto;
+    white-space:nowrap;
+  }
+  .premium-kids .premium-logo small{
+    font-size:8px;
+    letter-spacing:1px;
+    white-space:nowrap;
+    margin-top:5px;
+  }
+  .premium-kids .premium-header nav{
+    gap:0;
+    flex:0 0 auto;
+  }
+  .premium-kids .premium-header nav .premium-nav-cta{
+    padding:8px 9px;
+    gap:4px;
+    font-size:10px;
+    white-space:nowrap;
+    flex-wrap:nowrap;
+  }
+  .premium-kids .premium-header nav .premium-nav-cta svg{
+    width:13px;
+    height:13px;
+    flex:0 0 auto;
+  }
+  .premium-kids .premium-theme{
+    width:35px;
+    height:35px;
+    flex:0 0 35px;
+    font-size:17px;
+  }
+}
