@@ -27,12 +27,20 @@ export async function POST(request:NextRequest){
  const name=str(body.name,120),institution=str(body.institution,150),city=str(body.city,100);
  const phone=str(body.phone,30).replace(/\D/g,''),audience=str(body.audience,40);
  const notes=str(body.notes,800),date=str(body.date,10);
+ // Interesse opcional em novidades do futuro jogo — separado da autorização do orçamento.
+ // Guardado apenas junto à solicitação já existente; nenhuma campanha é disparada aqui.
+ if(body.gameUpdatesOptIn!==undefined && typeof body.gameUpdatesOptIn!=='boolean')return fail('Preferência de contato inválida.',400);
+ const gameUpdatesOptIn=body.gameUpdatesOptIn===true;
+ const gameInterestEntry=gameUpdatesOptIn
+  ?'[ANTARES KIDS — interesse opcional em novidades do jogo autorizado em '+new Date().toISOString()+']'
+  :'';
+ const notesForCrm=gameInterestEntry?(notes?notes+'\n\n':'')+gameInterestEntry:notes;
  const attendees=body.attendees==null||body.attendees===''?null:Number(body.attendees);
  if(name.length<2||name.length>120||institution.length<2||institution.length>150||
  city.length<2||city.length>100||phone.length<10||phone.length>13||
  !['Escola','Associação','Empresa','Evento particular'].includes(audience)||
- notes.length>800||(attendees!==null&&(!Number.isInteger(attendees)||attendees<1||attendees>100000))||
- (date!==''&&!/^\d{4}-\d{2}-\d{2}$/.test(date)))return fail('Confira os campos do formulário.',400);
+ notesForCrm.length>800||(attendees!==null&&(!Number.isInteger(attendees)||attendees<1||attendees>100000))||
+ (date!==''&&!/^\d{4}-\d{2}-\d{2}$/.test(date)))return fail('Confira os campos do formulário (observações: até 800 caracteres, incluindo preferências).',400);
  const ip=request.headers.get('x-forwarded-for')?.split(',')[0]?.trim()||'unknown';
  const abuseKey=createHmac('sha256',secret).update(ip).digest('hex');
  try {
@@ -51,7 +59,7 @@ export async function POST(request:NextRequest){
     !audit[0]?.safe_role||!audit[0]?.safe_table||!audit[0]?.safe_function)
     return fail('Credencial pública sem isolamento aprovado.',503);
   const rows=await db`SELECT public.vitrine_receive_lead(${org}::uuid,${name},${institution},
-   ${city},${phone},${audience},${attendees},${date||null}::date,${notes},${abuseKey}) AS id`;
+   ${city},${phone},${audience},${attendees},${date||null}::date,${notesForCrm},${abuseKey}) AS id`;
   return NextResponse.json({ok:true,id:rows[0]?.id,message:'Solicitação recebida para análise.'},{status:201,headers:{'Cache-Control':'no-store'}});
  }catch{
   return fail('Não foi possível registrar o pedido agora. Use o WhatsApp ou copie a mensagem.',503);
