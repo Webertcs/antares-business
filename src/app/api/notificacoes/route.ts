@@ -204,7 +204,7 @@ export async function POST(request:Request){
  try{
   const feed=await buildFeed(ctx);
   if(!feed.readPersistenceAvailable)
-   return NextResponse.json({error:'Ative a migração de leitura de notificações no Neon.'},{status:503,headers:noStore});
+   return NextResponse.json({error:'Não foi possível confirmar a leitura deste aviso no momento.'},{status:503,headers:noStore});
   // O cliente só pode reconhecer pendências ATUAIS de sua própria organização.
   const permitted=new Set(feed.items.map(item=>item.readKey));
   if(keys.some(key=>!permitted.has(key)))
@@ -222,6 +222,6 @@ export async function POST(request:Request){
    ARRAY(SELECT jsonb_array_elements_text(${JSON.stringify(keys)}::jsonb)))`;
   return NextResponse.json({ok:true},{headers:noStore});
  }catch{
-  return NextResponse.json({error:'Não foi possível registrar a leitura. Confira a migração.'},{status:503,headers:noStore});
+  return NextResponse.json({error:'Não foi possível registrar a leitura. Tente novamente.'},{status:503,headers:noStore});
  }
 }
