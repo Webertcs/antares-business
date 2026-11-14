@@ -527,7 +527,7 @@ export default function ClientDetails({id,writesEnabled,proposalWritesEnabled,co
  <button type="button" disabled={documentBusy||documentDraft.title.trim().length<3||documentDraft.institution.trim().length<2||documentDraft.terms.slice(customContractPrefix.length).trim().length===0} style={{...actionLink,background:'#16803c'}} onClick={()=>void saveDocument(contractId)}>{documentBusy?'Salvando…':'Salvar contrato livre'}</button>
  <button type="button" disabled={documentBusy||!savedDrafts.some(d=>d.id===documentSavedId&&!d.archived_at)} style={{...actionLink,background:'#145ac3'}} onClick={printSavedContract}>Visualizar / PDF salvo</button>
  </div><p style={{margin:0,fontSize:12,color:'#42658d'}}>O título, a instituição e os dados jurídicos continuam editáveis abaixo. Após salvar, visualize o PDF.</p></section>}
- <p style={{margin:0,fontSize:12}}>Edite os campos e clique em Salvar rascunho. Documentos arquivados permanecem disponíveis para reativação. O envio ao cliente ainda não está habilitado.</p>
+ <p style={{margin:0,fontSize:12}}>Edite os campos e clique em Salvar rascunho. Documentos arquivados permanecem disponíveis para reativação. O envio direto do documento ainda não está disponível.</p>
  {savedDrafts.length>0&&<div style={{display:'grid',gap:8,padding:12,background:'#f7fbff',border:'1px solid #b4d1f4',borderRadius:10}}>
  <strong style={{color:'#174987'}}>Minutas salvas ({savedDrafts.length})</strong>
  {savedDrafts.map(d=><div key={d.id} style={{display:'flex',alignItems:'center',justifyContent:'space-between',flexWrap:'wrap',gap:8,padding:9,borderRadius:8,background:d.archived_at?'#edf1f7':'#e5f0ff'}}>
