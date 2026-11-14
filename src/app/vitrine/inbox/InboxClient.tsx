@@ -1,8 +1,7 @@
 'use client';
 import {useCallback,useEffect,useMemo,useState} from 'react';
 import Link from 'next/link';
-import {useRouter} from 'next/navigation';
-import {Archive,ArrowLeft,Building2,CalendarDays,CheckCircle2,Clock3,FileText,Info,Layers,MapPin,MessageCircle,Phone,RefreshCw,Search,ShieldCheck,UserRound,Users,X} from 'lucide-react';
+import {Archive,ArrowLeft,Building2,CalendarDays,CheckCircle2,Clock3,FileText,Info,Layers,MapPin,MessageCircle,Phone,RefreshCw,Search,UserRound,Users} from 'lucide-react';
 import styles from './inbox.module.css';
 import ProposalComposer from './ProposalComposer';
 type Lead={id:string;responsible_name:string;institution:string;city:string;phone:string;
@@ -10,7 +9,6 @@ type Lead={id:string;responsible_name:string;institution:string;city:string;phon
 const label:Record<string,string>={pending:'Pendente',reviewing:'Em análise',converted:'Convertido',archived:'Arquivado'};
 const date=(value:string|null)=>value?new Date(value.slice(0,10)+'T12:00:00').toLocaleDateString('pt-BR'):'A combinar';
 export default function Inbox({conversionEnabled}:{conversionEnabled:boolean}){
- const router=useRouter();
  const [leads,setLeads]=useState<Lead[]>([]);
  const [clients,setClients]=useState<{id:string;name:string;kind:string}[]>([]);
  const [chosen,setChosen]=useState<Record<string,string>>({});
