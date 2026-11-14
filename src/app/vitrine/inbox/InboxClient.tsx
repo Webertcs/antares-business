@@ -1,9 +1,10 @@
 'use client';
-import {useCallback,useEffect,useMemo,useRef,useState} from 'react';
+import {useCallback,useEffect,useMemo,useState} from 'react';
 import Link from 'next/link';
 import {useRouter} from 'next/navigation';
 import {Archive,ArrowLeft,Building2,CalendarDays,CheckCircle2,Clock3,FileText,Info,Layers,MapPin,MessageCircle,Phone,RefreshCw,Search,ShieldCheck,UserRound,Users,X} from 'lucide-react';
 import styles from './inbox.module.css';
+import ProposalComposer from './ProposalComposer';
 type Lead={id:string;responsible_name:string;institution:string;city:string;phone:string;
  audience:string;attendees:number|null;desired_date:string|null;notes:string;status:string;created_at:string;converted_client_id:string|null;converted_proposal_id:string|null};
 const label:Record<string,string>={pending:'Pendente',reviewing:'Em análise',converted:'Convertido',archived:'Arquivado'};
@@ -16,19 +17,8 @@ export default function Inbox({conversionEnabled}:{conversionEnabled:boolean}){
  const kindOf=(audience:string)=>({Escola:'school',Empresa:'company',Associação:'association','Evento particular':'private'} as Record<string,string>)[audience]||'private';
  const [error,setError]=useState('');const [busy,setBusy]=useState('');const [filter,setFilter]=useState('all');
  const [loading,setLoading]=useState(true);const [notice,setNotice]=useState('');
- const [pendingConversion,setPendingConversion]=useState<{id:string;existingClientId:string|null}|null>(null);
- const confirmDialogRef=useRef<HTMLDialogElement>(null);
- const cancelButtonRef=useRef<HTMLButtonElement>(null);
- useEffect(()=>{
-  const dialog=confirmDialogRef.current;
-  if(!dialog)return;
-  if(pendingConversion){
-   if(!dialog.open)dialog.showModal();
-   cancelButtonRef.current?.focus();
-  }else if(dialog.open)dialog.close();
- },[pendingConversion]);
- const confirmingLead=pendingConversion?leads.find(x=>x.id===pendingConversion.id):undefined;
- const selectedClient=pendingConversion?.existingClientId?clients.find(c=>c.id===pendingConversion.existingClientId):undefined;
+ const [composerLeadId,setComposerLeadId]=useState<string|null>(null);
+ const activeLead=composerLeadId?leads.find(l=>l.id===composerLeadId):undefined;
  const load=useCallback(async()=>{setLoading(true);
   try{const r=await fetch('/api/vitrine/inbox',{cache:'no-store'});const data=await r.json();
    if(!r.ok)throw Error(data.error||'Não foi possível carregar.');
@@ -39,26 +29,9 @@ export default function Inbox({conversionEnabled}:{conversionEnabled:boolean}){
  },[]);
  useEffect(()=>{void load();if(conversionEnabled){fetch('/api/crm/clientes',{cache:'no-store'}).then(r=>r.json()).then(d=>setClients(d.clients||[])).catch(()=>setNotice('Lista de clientes indisponível.'));}},[load,conversionEnabled]);
  const shown=useMemo(()=>leads.filter(x=>filter==='all'||x.status===filter),[leads,filter]);
- function requestConversion(id:string){
+ function openComposer(id:string){
   if(busy||!conversionEnabled)return;
-  setPendingConversion({id,existingClientId:chosen[id]||null});
- }
- async function convert(){
-  if(!pendingConversion||busy)return;
-  const {id,existingClientId}=pendingConversion;
-  setPendingConversion(null);
-  setBusy(id);setNotice('');
-  try{const r=await fetch('/api/vitrine/convert',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({id,existingClientId})});
-   const data=await r.json();if(!r.ok)throw Error(data.error||'Falha ao converter');
-   const proposalId=typeof data.proposalId==='string'&&/^[0-9a-f]{8}(-[0-9a-f]{4}){3}-[0-9a-f]{12}$/i.test(data.proposalId)?data.proposalId:null;
-   if(proposalId){
-    router.push('/vitrine/proposta/'+proposalId);
-   }else{
-    setNotice('Conversão concluída. Abra a proposta comercial pelo botão da solicitação convertida.');
-    await load();
-   }
-  }catch(e){setNotice(e instanceof Error?e.message:'Falha ao converter');}
-  finally{setBusy('');}
+  setComposerLeadId(id);
  }
  async function review(id:string,status:string){
   setBusy(id);setNotice('');
@@ -153,52 +126,25 @@ export default function Inbox({conversionEnabled}:{conversionEnabled:boolean}){
        </select>
       </label>}
      {conversionEnabled&&lead.status!=='converted'&&lead.status!=='archived'&&
-      <button type="button" disabled={Boolean(busy)} onClick={()=>requestConversion(lead.id)}
-       className={styles.actionPrimary}><FileText size={16}/>Converter em cliente + proposta rascunho</button>}
-     {lead.status==='converted'&&lead.converted_proposal_id&&
-      <Link href={'/vitrine/proposta/'+lead.converted_proposal_id} className={styles.actionPrimary}>
-       <FileText size={16}/>Abrir proposta comercial</Link>}
+      <button type="button" disabled={Boolean(busy)} onClick={()=>openComposer(lead.id)}
+       className={styles.actionPrimary}><FileText size={16}/>Preparar proposta</button>}
+     {lead.status==='converted'&&lead.converted_proposal_id&&<>
+      {conversionEnabled&&<button type="button" disabled={Boolean(busy)} onClick={()=>openComposer(lead.id)}
+       className={styles.actionPrimary}><FileText size={16}/>Editar proposta</button>}
+      <Link href={'/vitrine/proposta/'+lead.converted_proposal_id} className={styles.actionSecondary}>
+       <FileText size={16}/>Ver documento / PDF</Link>
+     </>}
      <Link href="/clientes" className={styles.actionSecondary}><Users size={16}/>Abrir cadastro de clientes</Link>
     </div>
    </article>)}
   </div>
-  <dialog ref={confirmDialogRef} className={styles.confirmDialog}
-   aria-labelledby="confirm-conversion-title" aria-describedby="confirm-conversion-description"
-   onCancel={event=>{event.preventDefault();setPendingConversion(null);}}>
-   <div className={styles.confirmHeading}>
-    <span className={styles.confirmIcon}><FileText size={22} aria-hidden="true"/></span>
-    <div><span className={styles.confirmEyebrow}>ANTARES BUSINESS · CONFIRMAÇÃO</span>
-     <h2 id="confirm-conversion-title">Confirmar conversão</h2>
-    </div>
-    <button type="button" className={styles.confirmClose} aria-label="Fechar confirmação"
-     onClick={()=>setPendingConversion(null)}><X size={19}/></button>
-   </div>
-   <div className={styles.confirmBody}>
-    <p id="confirm-conversion-description" className={styles.confirmIntro}>
-     Confira os dados antes de converter esta solicitação em uma proposta comercial.
-    </p>
-    <div className={styles.confirmDetails}>
-     <span className={styles.confirmLabel}>Solicitação</span>
-     <strong>{confirmingLead?.institution||'Instituição'}</strong>
-     <span className={styles.confirmLabel}>Destino</span>
-     <strong>{pendingConversion?.existingClientId?'Vincular ao cliente: '+(selectedClient?.name||'cliente selecionado'):'Cadastrar novo cliente'}</strong>
-     <span className={styles.confirmLabel}>Proposta</span>
-     <strong>Rascunho sem valor definido</strong>
-    </div>
-    <p className={styles.confirmSafety}><ShieldCheck size={18} aria-hidden="true"/>
-     Nenhum contrato, cobrança ou reserva será criado. Você poderá conferir e completar a proposta antes de utilizá-la.
-    </p>
-   </div>
-   <div className={styles.confirmActions}>
-    <button type="button" ref={cancelButtonRef} className={styles.confirmCancel}
-     onClick={()=>setPendingConversion(null)}>Cancelar</button>
-    <button type="button" className={styles.confirmAccept}
-     disabled={!pendingConversion||Boolean(busy)} onClick={()=>void convert()}>
-     <CheckCircle2 size={17} aria-hidden="true"/>
-     {pendingConversion?.existingClientId?'Vincular e criar rascunho':'Criar cliente e rascunho'}
-    </button>
-   </div>
-  </dialog>
+  {activeLead&&<ProposalComposer
+    key={activeLead.id}
+    lead={activeLead}
+    existingClientId={chosen[activeLead.id]||null}
+    onClose={()=>setComposerLeadId(null)}
+    onSaved={()=>{void load();}}
+  />}
   <p className={styles.foot}><Info size={16} aria-hidden="true"/>
    <span>A conversão exige confirmação do proprietário e não cria contratos ou cobranças automaticamente. As mensagens pelo WhatsApp são abertas manualmente.</span>
   </p>
