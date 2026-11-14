@@ -8,10 +8,14 @@ export async function GET(){
   const owner=await requireOwner();
   if(!owner)return respond({error:'Somente o proprietário pode acessar solicitações.'},403);
   const db=getDb();
-  const rows=await db`SELECT id,responsible_name,institution,city,phone,audience,attendees,
-    desired_date,notes,status,created_at,converted_client_id,converted_proposal_id FROM public.vitrine_leads
-    WHERE organization_id=${owner.organizationId}
-    ORDER BY created_at DESC LIMIT 300`;
+  const rows=await db`SELECT l.id,l.responsible_name,l.institution,l.city,l.phone,l.audience,l.attendees,
+    l.desired_date,l.notes,l.status,l.created_at,l.converted_client_id,l.converted_proposal_id,
+    p.status AS proposal_status
+    FROM public.vitrine_leads l
+    LEFT JOIN public.business_proposals p
+      ON p.id=l.converted_proposal_id AND p.organization_id=l.organization_id
+    WHERE l.organization_id=${owner.organizationId}
+    ORDER BY l.created_at DESC LIMIT 300`;
   return respond({leads:rows});
  }catch{return respond({error:'Caixa de entrada indisponível. Verifique a implantação da migração 05.'},503);}
 }
