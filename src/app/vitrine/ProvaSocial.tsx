@@ -38,8 +38,8 @@ export default function ProvaSocial(){
   </div>
   <div className="premium-proof-bottom">
    <div className="premium-proof-verification"><span className="premium-proof-shield"><ShieldCheck size={23}/></span>
-    <div><strong>Histórias reais, com transparência.</strong>
-     <p>Indicadores de atendimentos e depoimentos de instituições serão publicados aqui somente após confirmação e autorização. Sem números ou avaliações inventados.</p>
+    <div><strong>Sua próxima aventura começa aqui.</strong>
+     <p>Cada escola tem sua própria história. Conte para a nossa equipe o que você imagina para sua turma e vamos planejar a experiência juntos.</p>
     </div>
    </div>
    <a href="#orcamento" className="premium-proof-cta">Planejar a visita da minha escola <ArrowRight size={18}/></a>
