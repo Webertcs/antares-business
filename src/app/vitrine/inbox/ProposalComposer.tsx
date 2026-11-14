@@ -145,6 +145,7 @@ export default function ProposalComposer({lead,existingClientId,onClose,onSaved}
     <div className={styles.schoolAside}><small>Público</small><strong>{lead.audience}</strong></div>
    </section>
 
+   {!proposalId&&<p className={styles.note}>Ao salvar pela primeira vez, {existingClientId?'o pedido será vinculado ao cliente selecionado':'será criado um cadastro para esta instituição'} e uma proposta em rascunho.</p>}
    {loading&&<p role="status" className={styles.note}>Carregando dados da proposta...</p>}
    {status!=='draft'&&!loading&&<p className={styles.note}>Esta proposta já saiu do rascunho. Para proteger os dados comerciais e reservas, a edição está bloqueada. Consulte o documento original.</p>}
    {loadError&&<p role="alert" className={styles.error}>{loadError}</p>}
