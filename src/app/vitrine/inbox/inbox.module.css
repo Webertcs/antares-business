@@ -228,3 +228,37 @@
   .confirmActions button{transition:none}
   .confirmActions button:hover{transform:none}
 }
+
+/* Oportunidades: uma ação principal, WhatsApp e menu de ações complementares. */
+.more{position:relative;flex:0 0 auto;min-width:0;z-index:1}
+.more[open]{z-index:30}
+.moreSummary{
+ display:inline-flex;align-items:center;justify-content:center;gap:6px;
+ min-height:35px;padding:8px 11px;border:1px solid #afc7e9;border-radius:8px;
+ background:linear-gradient(140deg,#f5f9ff,#e6effe);color:#275994;
+ font-size:11px;font-weight:800;box-shadow:0 3px 9px #133d801e;
+ cursor:pointer;list-style:none;user-select:none;
+}
+.moreSummary::-webkit-details-marker{display:none}
+.moreSummary::marker{content:''}
+.moreSummary:focus-visible{outline:3px solid #79bcff;outline-offset:2px}
+.more[open] .moreSummary{background:#dbeaff;border-color:#8ab8f1}
+.moreChevron{transition:transform .16s}
+.more[open] .moreChevron{transform:rotate(180deg)}
+.morePanel{
+ position:absolute;top:calc(100% + 7px);right:0;z-index:40;
+ display:flex;flex-direction:column;align-items:stretch;gap:9px;
+ width:min(290px,calc(100vw - 44px));padding:12px;
+ border:1px solid #a9c9ee;border-radius:11px;background:#fafdff;
+ box-shadow:0 12px 28px #0e2c6250;
+}
+.morePanel a,.morePanel button{width:100%;justify-content:flex-start;text-align:left}
+.morePanel .selectLabel{width:100%;min-width:0}
+.morePanel .selectLabel select{width:100%}
+.moreHint{font-size:11px;color:#557094;line-height:1.4}
+@media(max-width:650px){
+ .more{flex:0 0 auto}
+ .moreSummary{width:100%}
+ .morePanel{right:0;max-width:calc(100vw - 44px)}
+ .morePanel a,.morePanel button{flex:none}
+}
