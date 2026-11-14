@@ -105,7 +105,7 @@ export default function NotificationsClient(){
    </div>
 
    {(error||readError)&&<p className="notificacoes-message notificacoes-message--error" role="status">{error||readError}</p>}
-   {feed&&!feed.readPersistenceAvailable&&<p className="notificacoes-message" role="status">Leitura permanente ainda não habilitada no Neon. Execute a migração de notificações para apagar os contadores de novos avisos após a leitura.</p>}
+   {feed&&!feed.readPersistenceAvailable&&<p className="notificacoes-message" role="status">No momento, a confirmação de leitura não fica salva depois que a página é recarregada. Os avisos continuam disponíveis.</p>}
    {feed&&feed.unavailable.length>0&&
     <p className="notificacoes-message" role="status">
      Não foi possível consultar: {feed.unavailable.map(x=>categoryNames[x]).join(', ')}. As demais pendências continuam disponíveis.
