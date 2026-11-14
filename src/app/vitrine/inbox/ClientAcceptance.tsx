@@ -46,7 +46,7 @@ export default function ClientAcceptance({proposalId,institution,onClose,onSaved
   </header>
   <div className={styles.content}>
    <section className={styles.school}><div><small>Instituição</small><strong>{institution}</strong></div></section>
-   <p className={styles.note}>Use esta etapa somente quando a instituição já tiver respondido e aceitado a proposta. Aprovação interna e envio pelo WhatsApp não são aceite do cliente.</p>
+   <p className={styles.note}>Registre somente após a confirmação da instituição. A aprovação interna ou o envio pelo WhatsApp não equivalem ao aceite.</p>
    {error&&<p className={styles.error} role="alert">{error}</p>}
    <div className={styles.field}>
     <label htmlFor="accept-channel">Por onde a escola confirmou?</label>
@@ -57,7 +57,7 @@ export default function ClientAcceptance({proposalId,institution,onClose,onSaved
     </select>
    </div>
    <div className={styles.field} style={{marginTop:14}}>
-    <label htmlFor="accept-evidence">Referência do aceite recebido</label>
+    <label htmlFor="accept-evidence">Detalhes da confirmação</label>
     <textarea id="accept-evidence" rows={3} maxLength={500} disabled={busy}
      placeholder="Ex.: direção confirmou a proposta por WhatsApp em 14/11/2026"
      value={evidence} onChange={e=>setEvidence(e.target.value)}/>
@@ -67,7 +67,7 @@ export default function ClientAcceptance({proposalId,institution,onClose,onSaved
     <input type="checkbox" checked={confirmed} disabled={busy} onChange={e=>setConfirmed(e.target.checked)} style={{marginTop:3,flexShrink:0}}/>
     Confirmo que a instituição realmente aceitou este orçamento.
    </label>
-   <p className={styles.safe}><ShieldCheck size={17}/>Esta confirmação fica registrada na auditoria. Não envia mensagem, não cria contrato, cobrança ou reserva automaticamente.</p>
+   <p className={styles.safe}><ShieldCheck size={17}/>A confirmação ficará registrada. Nenhuma mensagem ou reserva será criada automaticamente.</p>
   </div>
   <footer className={styles.footer}>
    <button type="button" className={styles.secondary} disabled={busy} onClick={onClose}>Cancelar</button>
