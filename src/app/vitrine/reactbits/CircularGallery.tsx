@@ -554,6 +554,12 @@ const CircularGallery = ({
         entry.loaded = true;
         wake();
       };
+      // Falhas de rede nunca deixam um cartão preto na prévia.
+      image.onerror = () => {
+        if (!textures.has(url)) return;
+        image.onerror = null;
+        image.src = '/vitrine/cupula-escola-antares.webp';
+      };
       image.src = url;
       return entry;
     };

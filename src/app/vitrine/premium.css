@@ -1029,3 +1029,12 @@
 .premium-kids .premium-reactbits-gallery-credit{margin:13px auto 0;max-width:900px;text-align:center;color:#bfd6f2;font-size:11px;line-height:1.55}
 .premium-kids .premium-reactbits-gallery-frame .circular-gallery{height:100%;width:100%}
 @media(max-width:620px){.premium-kids .premium-reactbits-gallery-frame{height:320px;border-radius:19px}.premium-kids .premium-reactbits-gallery-hint{padding:0 8px;font-size:12px}.premium-kids .premium-reactbits-gallery-credit{padding:0 6px;font-size:10px}}
+
+/* Refinamento React Bits: céu da arte do login + legendas e créditos acessíveis. */
+.premium-kids .premium-reactbits-gallery-frame{
+ background-image:linear-gradient(125deg,#081637aa,#182a5d84),url('/antares-login-sky.svg');
+ background-size:cover,cover;
+ background-position:center,center;
+}
+.premium-kids .premium-reactbits-gallery-credit a{color:#dceaff;text-decoration:underline;text-underline-offset:3px}
+.premium-kids .premium-reactbits-gallery-credit a:hover{color:#ffda8e}
