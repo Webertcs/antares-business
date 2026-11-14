@@ -82,7 +82,7 @@ export default function ClientsPage({ writesEnabled }: { writesEnabled: boolean 
   const editId=params.get('editId');const newEventFor=params.get('newEventFor');
   const target=clients.find(c=>c.id===(editId||newEventFor));
   if(!target)return;
-  if(!writesEnabled){setFeedback('Edição indisponível: a gravação de clientes está desabilitada.');return;}
+  if(!writesEnabled){setFeedback('Não é possível editar clientes neste momento.');return;}
   if(editId)openForm('client',target);
   else if(newEventFor){setSelected(target.id);openForm('event');}
   window.history.replaceState(null,'',window.location.pathname);
