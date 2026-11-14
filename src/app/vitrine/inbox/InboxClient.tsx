@@ -113,8 +113,8 @@ export default function Inbox({conversionEnabled}:{conversionEnabled:boolean}){
       (lead.proposal_status==='draft'
        ? <button type="button" disabled={Boolean(busy)||!conversionEnabled} onClick={()=>openComposer(lead.id)}
          className={styles.actionPrimary}><FileText size={16}/>Editar proposta</button>
-       : <Link href={'/vitrine/proposta/'+lead.converted_proposal_id} className={styles.actionPrimary}>
-         <FileText size={16}/>Ver proposta / PDF</Link>)}
+       : <Link href={'/vitrine/proposta/'+lead.converted_proposal_id+'?visualizar=1'} className={styles.actionPrimary}>
+         <FileText size={16}/>Visualizar / Salvar PDF</Link>)}
      {lead.status==='archived'&&
       <button type="button" disabled={Boolean(busy)} onClick={()=>void review(lead.id,'pending')}
        className={styles.actionPrimary}><Archive size={16}/>Reabrir solicitação</button>}
@@ -141,8 +141,8 @@ export default function Inbox({conversionEnabled}:{conversionEnabled:boolean}){
          </select>
         </label>}
        {lead.status==='converted'&&lead.converted_proposal_id&&lead.proposal_status==='draft'&&
-        <Link href={'/vitrine/proposta/'+lead.converted_proposal_id} className={styles.actionSecondary}>
-         <FileText size={16}/>Ver documento / PDF</Link>}
+        <Link href={'/vitrine/proposta/'+lead.converted_proposal_id+'?visualizar=1'} className={styles.actionSecondary}>
+         <FileText size={16}/>Visualizar / Salvar PDF</Link>}
        {lead.status==='converted'&&lead.converted_proposal_id&&lead.proposal_status!=='draft'&&
         <span className={styles.moreHint}>Proposta protegida contra alterações.</span>}
        <Link href="/clientes" className={styles.actionSecondary}><Users size={16}/>Abrir cadastro de clientes</Link>
