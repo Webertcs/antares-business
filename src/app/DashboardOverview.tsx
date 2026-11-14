@@ -77,7 +77,7 @@ export default function DashboardOverview({cash,receivable,proposals,upcoming,ca
    </section>
    <section className="owner-tile"><div className="owner-tile-head"><span className="owner-tile-icon"><ClipboardCheck size={20}/></span><div><h2>Preparação da próxima sessão</h2><p>{nextBooking?nextBooking.event_title:'Aguardando sessão agendada'}</p></div></div>
     {['Conferir estrutura da cúpula','Separar projetor e cabos','Verificar ar-condicionado','Confirmar horário com a escola'].map((item,i)=><label className="owner-check" key={item}><input type="checkbox" disabled={!nextBooking} checked={Boolean(nextBooking&&checklist[i])} onChange={()=>setChecklist(v=>v.map((old,j)=>j===i?!old:old))}/>{item}</label>)}
-    <p className="owner-check-note">{nextBooking?'Marcações temporárias desta tela; não comprovam execução e não são gravadas no CRM.':'Sem próxima sessão. Checklist indisponível até existir uma reserva futura.'}</p>
+    <p className="owner-check-note">{nextBooking?'As marcações deste quadro são apenas para organização e não ficam salvas.':'O checklist ficará disponível quando houver uma próxima apresentação.'}</p>
     {eventHref
       ?<Link className="owner-check-action" href={eventHref}><ClipboardCheck size={15}/>Abrir checklist do evento <ChevronRight size={15}/></Link>
       :<button type="button" className="owner-check-action" onClick={()=>onOpenOperation('checklist')}><ClipboardCheck size={15}/>Abrir modelo do checklist <ChevronRight size={15}/></button>}
