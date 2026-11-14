@@ -126,7 +126,7 @@ export default function Inbox({conversionEnabled}:{conversionEnabled:boolean}){
        <MoreHorizontal size={16}/>Mais opções<ChevronDown size={14} className={styles.moreChevron}/>
       </summary>
       <div className={styles.morePanel}>
-       {lead.status!=='converted'&&(['pending','reviewing','archived'] as const).filter(s=>s!==lead.status).map(s=>
+       {lead.status!=='converted'&&(['pending','reviewing','archived'] as const).filter(s=>s!==lead.status&&!(lead.status==='archived'&&s==='pending')).map(s=>
         <button type="button" key={s} disabled={Boolean(busy)} onClick={()=>void review(lead.id,s)}
          className={s==='archived'?styles.actionMuted:styles.actionSecondary}>
          {s==='reviewing'?'Iniciar análise':s==='pending'?'Marcar como pendente':'Arquivar'}
