@@ -9,6 +9,22 @@ type Lead={id:string;responsible_name:string;institution:string;city:string;phon
  audience:string;attendees:number|null;desired_date:string|null;notes:string;status:string;created_at:string;converted_client_id:string|null;converted_proposal_id:string|null;proposal_status:string|null};
 const label:Record<string,string>={pending:'Pendente',reviewing:'Em análise',converted:'Convertido',archived:'Arquivado'};
 const date=(value:string|null)=>value?new Date(value.slice(0,10)+'T12:00:00').toLocaleDateString('pt-BR'):'A combinar';
+
+function LeadObservations({notes}:{notes:string|null}){
+ const raw=notes||'';
+ const interestTag=/\\[ANTARES KIDS\\s*[—–-]\\s*interesse opcional em novidades do jogo autorizado em\\s+([^\\]]+)\\]/gi;
+ const matches=[...raw.matchAll(interestTag)];
+ const observation=raw.replace(interestTag,'').trim();
+ const lastDate=matches.length?new Date(matches[matches.length-1][1]):null;
+ const dateLabel=lastDate&&!Number.isNaN(lastDate.getTime())
+  ?lastDate.toLocaleDateString('pt-BR',{timeZone:'America/Sao_Paulo'}):null;
+ if(!observation&&matches.length===0)return null;
+ return <>
+  {observation&&<div className={styles.detail}><MessageCircle size={16}/><span><b>Observações:</b> <span style={{whiteSpace:'pre-wrap'}}>{observation}</span></span></div>}
+  {matches.length>0&&<div className={styles.detail}><CheckCircle2 size={16}/><span><b>Novidades do ANTARES Kids:</b> contato autorizado{dateLabel?' em '+dateLabel:''}.</span></div>}
+ </>;
+}
+
 export default function Inbox({conversionEnabled}:{conversionEnabled:boolean}){
  const [leads,setLeads]=useState<Lead[]>([]);
  const [clients,setClients]=useState<{id:string;name:string;kind:string}[]>([]);
@@ -105,7 +121,7 @@ export default function Inbox({conversionEnabled}:{conversionEnabled:boolean}){
       <div className={styles.detail}><CalendarDays size={16}/><span><b>Data desejada:</b> {date(lead.desired_date)}</span></div>
       <div className={styles.detail}><Phone size={16}/><span><b>WhatsApp:</b> {lead.phone}</span></div>
       <div className={styles.detail}><Clock3 size={16}/><span><b>Recebido:</b> {new Date(lead.created_at).toLocaleString('pt-BR')}</span></div>
-      {lead.notes&&<div className={styles.detail}><MessageCircle size={16}/><span><b>Observações:</b> <span style={{whiteSpace:'pre-wrap'}}>{lead.notes}</span></span></div>}
+      <LeadObservations notes={lead.notes}/>
      </div>
     </div>
     <div className={styles.actions}>
