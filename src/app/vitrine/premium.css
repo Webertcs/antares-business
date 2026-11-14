@@ -961,3 +961,35 @@
     font-size:17px;
   }
 }
+
+/* Teste opt-in: React Bits SpotlightCard, sem alterar a vitrine normal. */
+.premium-kids .premium-reactbits-preview-label{
+ margin:0 0 16px;
+ text-align:center;
+ font-size:12px;
+ font-weight:750;
+ letter-spacing:.02em;
+ color:#bfdcff;
+}
+.premium-kids .premium-ecosystem-grid article.premium-reactbits-preview-card{
+ position:relative;
+ isolation:isolate;
+ overflow:hidden;
+}
+.premium-kids .premium-ecosystem-grid article.premium-reactbits-preview-card>.premium-ecosystem-icon,
+.premium-kids .premium-ecosystem-grid article.premium-reactbits-preview-card>h3,
+.premium-kids .premium-ecosystem-grid article.premium-reactbits-preview-card>p{
+ position:relative;
+ z-index:2;
+}
+.premium-kids .premium-ecosystem-grid article.premium-reactbits-preview-card .spotlight-card__light,
+.premium-kids .premium-ecosystem-grid article.premium-reactbits-preview-card .spotlight-card__grain{
+ z-index:1;
+ mix-blend-mode:screen;
+}
+@media(prefers-reduced-motion:reduce){
+ .premium-kids .premium-ecosystem-grid article.premium-reactbits-preview-card .spotlight-card__light,
+ .premium-kids .premium-ecosystem-grid article.premium-reactbits-preview-card .spotlight-card__edge{
+  opacity:0!important;
+ }
+}
