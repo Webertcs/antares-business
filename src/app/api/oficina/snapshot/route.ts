@@ -1,11 +1,11 @@
 import {NextResponse} from 'next/server';
-import {requireOwner,getDb} from '@/lib/equipe/auth';
+import {requireDeveloper,getDb} from '@/lib/equipe/auth';
 export const runtime='nodejs';
 export const dynamic='force-dynamic';
 const headers={'Cache-Control':'private, no-store'};
 export async function GET(){
- const owner=await requireOwner();
- if(!owner)return NextResponse.json({error:'Somente proprietário.'},{status:403,headers});
+ const owner=await requireDeveloper();
+ if(!owner)return NextResponse.json({error:'Acesso restrito ao administrador técnico.'},{status:403,headers});
  try{
   const db=getDb();
   const [clients,contacts,events]=await Promise.all([
