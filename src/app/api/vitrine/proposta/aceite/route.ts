@@ -43,7 +43,7 @@ export async function POST(req:NextRequest){
    has_function_privilege(current_user,'public.business_confirm_client_acceptance(text,uuid,text,text)','EXECUTE') AS safe_function
    FROM pg_roles r WHERE r.rolname=current_user`;
   if(!security[0]?.safe_role||!security[0]?.no_direct_write||!security[0]?.safe_function)
-   return reply({error:'Função de aceite ainda não homologada no Neon.'},503);
+   return reply({error:'Não é possível registrar o aceite neste momento.'},503);
   const result=await sql`SELECT public.business_confirm_client_acceptance(
    ${owner.user.id},${id}::uuid,${String(channel)},${evidence}) AS status`;
   return reply({ok:true,status:result[0]?.status},200);
