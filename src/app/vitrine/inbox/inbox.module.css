@@ -123,3 +123,108 @@
   .lead,.filter,.actions a,.actions button{transition:none!important}
   .filter:hover,.actions a:hover,.actions button:hover{transform:none!important}
 }
+
+
+/* ANTARES · Confirmação de conversão — modal centralizado, sem confirm() do navegador. */
+.confirmDialog{
+  width:min(550px,calc(100vw - 28px));
+  max-width:min(550px,calc(100vw - 28px));
+  max-height:calc(100dvh - 36px);
+  margin:auto;
+  padding:0;
+  border-radius:19px;
+  border:1px solid #8bbcf6;
+  background:#f7faff;
+  color:#163665;
+  overflow:auto;
+  box-shadow:0 28px 92px #041a3c90,0 9px 25px #07224f59;
+  font-family:Arial,Helvetica,sans-serif;
+}
+.confirmDialog::backdrop{
+  background:#061735b8;
+  backdrop-filter:blur(4px);
+}
+.confirmHeading{
+  display:flex;align-items:center;gap:13px;
+  padding:20px 22px;
+  background:linear-gradient(118deg,#133777,#1958aa 62%,#2e82df);
+  color:#fff;
+  border-bottom:1px solid #a3c8fa66;
+}
+.confirmIcon{
+  flex:0 0 45px;display:grid;place-items:center;
+  width:45px;height:45px;border-radius:13px;
+  border:1px solid #c9e0ff6b;background:#e8f3ff27;
+}
+.confirmHeading>div{min-width:0;flex:1}
+.confirmEyebrow{
+  display:block;letter-spacing:1.2px;font-size:9px;
+  color:#d4e7ff;font-weight:850;
+}
+.confirmHeading h2{
+  margin:5px 0 0;color:#fff;font-size:21px;line-height:1.2;font-weight:850;
+}
+.confirmClose{
+  flex:0 0 33px;display:grid;place-items:center;
+  width:33px;height:33px;min-height:33px;padding:0;
+  border:1px solid #bcd9ff99;border-radius:9px;
+  background:#e5f0ff24;color:#fff;cursor:pointer;
+}
+.confirmClose:hover{background:#e5f0ff40}
+.confirmBody{padding:21px 23px 14px}
+.confirmIntro{margin:0 0 17px;color:#3b597e;font-size:13px;line-height:1.65}
+.confirmDetails{
+  display:grid;grid-template-columns:112px minmax(0,1fr);
+  gap:13px 12px;align-items:start;
+  background:linear-gradient(135deg,#edf5ff,#e5effd);
+  border:1px solid #c4daf7;border-radius:12px;
+  padding:16px;
+}
+.confirmLabel{color:#50719c;font-size:12px;line-height:1.45;font-weight:700}
+.confirmDetails strong{
+  display:block;color:#143b75;font-size:13px;
+  font-weight:850;line-height:1.45;overflow-wrap:anywhere;
+}
+.confirmSafety{
+  display:flex;align-items:flex-start;gap:10px;
+  margin:17px 0 2px;padding:12px 13px;
+  color:#285a65;background:#e9f7f5;
+  border:1px solid #b2ddd6;border-radius:11px;
+  font-size:12px;line-height:1.6;
+}
+.confirmSafety svg{flex:0 0 18px;color:#19806c;margin-top:1px}
+.confirmActions{
+  display:flex;justify-content:flex-end;flex-wrap:wrap;
+  gap:10px;padding:15px 23px 22px;
+  border-top:1px solid #d5e2f4;
+}
+.confirmActions button{
+  min-height:42px;border-radius:10px;
+  padding:10px 17px;font-size:13px;font-weight:850;
+  display:inline-flex;align-items:center;justify-content:center;gap:8px;
+  cursor:pointer;transition:filter .15s,transform .15s;
+}
+.confirmActions button:hover{filter:brightness(1.035);transform:translateY(-1px)}
+.confirmCancel{
+  color:#28558a;background:#edf4ff;border:1px solid #b6cfed;
+}
+.confirmAccept{
+  color:#fff;background:linear-gradient(115deg,#17448f,#2674d9);
+  border:1px solid #2b74cf;
+  box-shadow:0 5px 14px #2569bf4d;
+}
+.confirmActions button:disabled{opacity:.5;cursor:wait;transform:none}
+.confirmDialog button:focus-visible{outline:3px solid #ffcb60;outline-offset:2px}
+@media(max-width:520px){
+  .confirmHeading{padding:16px;gap:10px}
+  .confirmHeading h2{font-size:19px}
+  .confirmBody{padding:18px 15px 12px}
+  .confirmDetails{grid-template-columns:1fr;gap:5px;padding:14px}
+  .confirmDetails strong{margin-bottom:8px}
+  .confirmActions{padding:13px 15px 17px}
+  .confirmActions button{flex:1 1 auto;font-size:12px}
+}
+@media(prefers-reduced-motion:reduce){
+  .confirmActions button{transition:none}
+  .confirmActions button:hover{transform:none}
+}
