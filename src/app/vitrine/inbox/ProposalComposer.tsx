@@ -32,6 +32,7 @@ export default function ProposalComposer({lead,existingClientId,onClose,onSaved}
  const [busy,setBusy]=useState(false);
  const [notice,setNotice]=useState('');
  const [error,setError]=useState('');
+ const [loadError,setLoadError]=useState('');
  const [dirty,setDirty]=useState(false);
  const [saved,setSaved]=useState(false);
  const [confirmDiscard,setConfirmDiscard]=useState(false);
@@ -69,7 +70,7 @@ export default function ProposalComposer({lead,existingClientId,onClose,onSaved}
     setDeposit(Number(p.deposit)||0);
     setValidUntil(p.valid_until||'');
     setTerms(p.payment_terms||'');
-   }catch(e){if(live)setError(e instanceof Error?e.message:'Não foi possível carregar.');}
+   }catch(e){if(live)setLoadError(e instanceof Error?e.message:'Não foi possível carregar.');}
    finally{if(live)setLoading(false);}
   }
   void load();
@@ -82,7 +83,7 @@ export default function ProposalComposer({lead,existingClientId,onClose,onSaved}
   [unit,fixed,discount,deposit].every(positive)&&positive(gross)&&
   discount<=gross&&deposit<=total&&terms.length<=2000;
  const mark=()=>{setDirty(true);setSaved(false);setNotice('');};
- const blocked=loading||busy||Boolean(error)||status!=='draft';
+ const blocked=loading||busy||Boolean(loadError)||status!=='draft';
  const requestClose=()=>{if(busy)return;if(dirty&&!saved){setConfirmDiscard(true);return;}onClose();};
 
  async function post(url:string,body:object){
@@ -146,6 +147,7 @@ export default function ProposalComposer({lead,existingClientId,onClose,onSaved}
 
    {loading&&<p role="status" className={styles.note}>Carregando dados da proposta...</p>}
    {status!=='draft'&&!loading&&<p className={styles.note}>Esta proposta já saiu do rascunho. Para proteger os dados comerciais e reservas, a edição está bloqueada. Consulte o documento original.</p>}
+   {loadError&&<p role="alert" className={styles.error}>{loadError}</p>}
    {error&&<p role="alert" className={styles.error}>{error}</p>}
    {notice&&<p role="status" className={styles.success}><CheckCircle2 size={17}/>{notice}</p>}
 
@@ -196,7 +198,7 @@ export default function ProposalComposer({lead,existingClientId,onClose,onSaved}
 
   <footer className={styles.footer}>
    <button type="button" className={styles.secondary} onClick={requestClose} disabled={busy}>Fechar</button>
-   {proposalId&&<Link className={styles.secondary} href={'/vitrine/proposta/'+proposalId}>Ver documento / PDF</Link>}
+   {proposalId&&!dirty&&<Link className={styles.secondary} href={'/vitrine/proposta/'+proposalId}>Ver documento / PDF</Link>}
    {status==='draft'&&<button type="button" className={styles.primary}
     disabled={blocked||!valid||(!dirty&&saved)} onClick={()=>void save()}>
     <Save size={17}/>{busy?'Salvando...':'Salvar rascunho'}</button>}
