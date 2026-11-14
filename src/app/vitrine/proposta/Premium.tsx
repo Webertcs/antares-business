@@ -3,7 +3,7 @@ import {useState} from 'react';
 import styles from './proposta.module.css';
 type Item={id:string;status:string;valid_until:string|null;payment_terms:string|null;title:string;client_name:string;origin_institution:string|null;institution_mismatch:boolean;expected_attendees:number;total:number;deposit:number};
 type Change={id:string;changed_at:string;before_values:Record<string,unknown>;after_values:Record<string,unknown>};
-export default function Premium({proposal:p,history}:{proposal:Item;history:Change[]}){
+export default function Premium({proposal:p,history,documentOnly=false}:{proposal:Item;history:Change[];documentOnly?:boolean}){
  const [valid,setValid]=useState(p.valid_until?.slice(0,10)||'');
  const [terms,setTerms]=useState(p.payment_terms||'');
  const [busy,setBusy]=useState(false),[notice,setNotice]=useState('');
@@ -44,7 +44,7 @@ export default function Premium({proposal:p,history}:{proposal:Item;history:Chan
   <div className="proposal-footer"><strong>ANTARES BUSINESS</strong><span>PLANETÁRIO MÓVEL DIGITAL</span></div>
  </section>
  <div className="no-print proposal-actions"><button type="button" onClick={()=>window.print()}>Imprimir / Salvar PDF</button></div>
- {p.status==='draft'&&<section className="no-print proposal-admin-panel">
+ {!documentOnly&&p.status==='draft'&&<section className="no-print proposal-admin-panel">
   <h2>Validade e aprovação</h2>
   <div className="proposal-admin-fields">
    <label>Validade da proposta<input type="date" value={valid} onChange={e=>setValid(e.target.value)}/></label>
@@ -56,7 +56,7 @@ export default function Premium({proposal:p,history}:{proposal:Item;history:Chan
   </div>
   {notice&&<p role="status">{notice}</p>}
  </section>}
- <section className="no-print proposal-admin-panel proposal-history">
+ {!documentOnly&&<section className="no-print proposal-admin-panel proposal-history">
   <h2>Histórico financeiro</h2>
   {history.length===0?<p>Sem alterações registradas.</p>:<div className="proposal-history-list">
    {history.map(h=><div className="proposal-history-entry" key={h.id}>
@@ -65,7 +65,7 @@ export default function Premium({proposal:p,history}:{proposal:Item;history:Chan
     <small>Desconto: {String(h.before_values.discount??'—')} → {String(h.after_values.discount??'—')} · Sinal: {String(h.before_values.deposit??'—')} → {String(h.after_values.deposit??'—')}</small>
    </div>)}
   </div>}
- </section>
+ </section>}
  <style>{`
 .print-document{background:#fff;color:#143563;border:1px solid #c5d9f5;border-radius:13px;overflow:hidden;font-family:Arial,Helvetica,sans-serif;display:flex;flex-direction:column;min-height:730px}
 .proposal-letterhead{background:linear-gradient(112deg,#102d68 0%,#164c95 56%,#287bd2 100%);color:white;display:flex;justify-content:space-between;align-items:center;padding:24px 28px;gap:20px}
