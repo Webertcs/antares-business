@@ -12,7 +12,7 @@ const date=(value:string|null)=>value?new Date(value.slice(0,10)+'T12:00:00').to
 
 function LeadObservations({notes}:{notes:string|null}){
  const raw=notes||'';
- const interestTag=/\\[ANTARES KIDS\\s*[—–-]\\s*interesse opcional em novidades do jogo autorizado em\\s+([^\\]]+)\\]/gi;
+ const interestTag=/\[ANTARES KIDS\s*[—–-]\s*interesse opcional em novidades do jogo autorizado em\s+([^\]]+)\]/gi;
  const matches=[...raw.matchAll(interestTag)];
  const observation=raw.replace(interestTag,'').trim();
  const lastDate=matches.length?new Date(matches[matches.length-1][1]):null;
