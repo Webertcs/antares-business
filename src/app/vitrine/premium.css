@@ -703,3 +703,156 @@
  .premium-kids .premium-proof-grid article:hover,
  .premium-kids .premium-proof-cta:hover{transform:none}
 }
+
+
+/* ANTARES Kids V2 — Pacote 3: formulário de conversão e interesse opcional no jogo. */
+.premium-kids .premium-contact-v2{
+ gap:clamp(24px,3vw,40px);
+ grid-template-columns:minmax(0,.84fr) minmax(0,1.16fr);
+ align-items:start;
+ scroll-margin-top:25px;
+}
+.premium-kids .premium-contact-v2>div>h2{
+ color:#fff;
+ font-size:clamp(32px,3.6vw,45px);
+ letter-spacing:-.04em;
+}
+.premium-kids .premium-contact-v2>div>p{
+ color:#d7e4fc;font-size:15px;line-height:1.75;
+}
+.premium-kids .premium-contact-highlights{
+ display:flex;flex-wrap:wrap;gap:9px;
+ margin:22px 0 8px;
+}
+.premium-kids .premium-contact-v2 .premium-contact-highlights>span{
+ display:inline-flex;align-items:center;gap:7px;
+ padding:9px 11px;border:1px solid #89b4f666;
+ border-radius:10px;
+ background:#23417a70;
+ color:#dceaff;font-size:12px;letter-spacing:0;font-weight:700;
+}
+.premium-kids .premium-contact-highlights svg{color:#f7d783;flex:none}
+.premium-kids .premium-contact-v2 .premium-robot{margin:20px 0 14px}
+.premium-kids .premium-contact-v2 form{
+ padding:clamp(19px,2vw,28px);
+ gap:15px;
+ border-color:#87b5f47a;
+ box-shadow:0 20px 58px #020a2f5f,inset 0 1px #fff2;
+}
+.premium-kids .premium-form-heading{
+ display:flex;justify-content:space-between;align-items:center;
+ flex-wrap:wrap;gap:9px;
+ border-bottom:1px solid #89acf044;
+ padding-bottom:14px;
+}
+.premium-kids .premium-form-heading strong{
+ color:#fff;font-size:17px;font-weight:850;
+}
+.premium-kids .premium-form-heading>span{
+ font-size:11px;letter-spacing:0;color:#b8cced;font-weight:600;
+}
+.premium-kids .premium-form-grid{gap:13px}
+.premium-kids .premium-contact-v2 label{
+ font-size:13px;line-height:1.45;
+}
+.premium-kids .premium-form-grid label>span[aria-hidden="true"]{
+ font-size:13px;color:#f8d785;
+}
+.premium-kids .premium-optional-label{
+ font-size:11px;color:#b9c9ed;font-weight:500;
+}
+.premium-kids .premium-contact-v2 input:not([type=checkbox]),
+.premium-kids .premium-contact-v2 select,
+.premium-kids .premium-contact-v2 textarea{
+ border:1px solid #7497d4;
+ background:#0d1c3b;
+ color:#f8fbff;
+ border-radius:10px;
+}
+.premium-kids .premium-contact-v2 input::placeholder,
+.premium-kids .premium-contact-v2 textarea::placeholder{
+ color:#aabddd;opacity:1;font-size:13px;
+}
+.premium-kids .premium-contact-v2 input:focus,
+.premium-kids .premium-contact-v2 select:focus,
+.premium-kids .premium-contact-v2 textarea:focus{
+ border-color:#ffde88;
+}
+.premium-kids .premium-contact-v2 .premium-game-interest{
+ display:flex;align-items:flex-start;gap:12px;
+ padding:16px;
+ color:#eaf3ff;
+ border-radius:14px;
+ border:1px solid #c7b8ff7d;
+ background:linear-gradient(115deg,#263b77d1,#393073b0);
+ cursor:pointer;
+}
+.premium-kids .premium-contact-v2 .premium-game-interest:focus-within{
+ outline:2px solid #ffd879;outline-offset:2px;
+}
+.premium-kids .premium-contact-v2 .premium-game-interest input,
+.premium-kids .premium-contact-v2 .premium-consent input{
+ width:18px;height:18px;min-width:18px;
+ accent-color:#ffd873;
+ margin:2px 0 0;
+ flex:none;
+ cursor:pointer;
+}
+.premium-kids .premium-game-interest>span{display:block;min-width:0}
+.premium-kids .premium-game-interest strong{
+ display:block;font-size:13px;line-height:1.5;color:#fff;
+}
+.premium-kids .premium-game-interest em{
+ display:inline-block;font-style:normal;
+ margin-left:5px;
+ border:1px solid #e9d0ff85;border-radius:99px;
+ padding:2px 7px;
+ font-size:9px;color:#eed7ff;
+ vertical-align:1px;
+}
+.premium-kids .premium-game-interest small{
+ display:block;margin-top:6px;
+ font-size:11px;line-height:1.65;
+ font-weight:400;color:#cad9f4;
+}
+.premium-kids .premium-contact-v2 .premium-consent{
+ font-size:12px;
+ font-weight:500;
+ gap:10px;
+ color:#e1ebff;
+}
+.premium-kids .premium-form-submit{
+ min-height:49px;
+ width:100%;
+ font-size:15px;
+}
+.premium-kids .premium-form-submit:disabled{
+ opacity:.66;cursor:wait;transform:none;
+}
+.premium-kids .premium-form-disclaimer{
+ color:#aebfe2;
+ line-height:1.65;
+ font-size:11px;
+}
+.premium-kids .premium-contact-v2 .premium-form-status{
+ padding:11px 13px;
+ border:1px solid #8ce0c596;
+ border-radius:10px;
+ color:#d4f9ec;
+ background:#145d4a36;
+ line-height:1.55;
+ margin:0;
+}
+@media(max-width:980px){
+ .premium-kids .premium-contact-v2{grid-template-columns:1fr;max-width:790px}
+ .premium-kids .premium-contact-v2>div>p{max-width:700px}
+ .premium-kids .premium-contact-highlights{gap:7px}
+}
+@media(max-width:620px){
+ .premium-kids .premium-contact-v2 form{padding:17px;gap:13px}
+ .premium-kids .premium-form-heading strong{font-size:16px}
+ .premium-kids .premium-form-heading>span{font-size:10px}
+ .premium-kids .premium-contact-v2 .premium-game-interest{padding:13px}
+ .premium-kids .premium-contact-v2 .premium-contact-highlights>span{font-size:11px}
+ .premium-kids .premium-contact-v2>div>h2{font-size:32px}
+}
