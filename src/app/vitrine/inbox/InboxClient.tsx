@@ -1,11 +1,11 @@
 'use client';
 import {useCallback,useEffect,useMemo,useState} from 'react';
 import Link from 'next/link';
-import {Archive,ArrowLeft,Building2,CalendarDays,CheckCircle2,Clock3,FileText,Info,Layers,MapPin,MessageCircle,Phone,RefreshCw,Search,UserRound,Users} from 'lucide-react';
+import {Archive,ArrowLeft,Building2,CalendarDays,CheckCircle2,ChevronDown,Clock3,FileText,Info,Layers,MapPin,MessageCircle,MoreHorizontal,Phone,RefreshCw,Search,UserRound,Users} from 'lucide-react';
 import styles from './inbox.module.css';
 import ProposalComposer from './ProposalComposer';
 type Lead={id:string;responsible_name:string;institution:string;city:string;phone:string;
- audience:string;attendees:number|null;desired_date:string|null;notes:string;status:string;created_at:string;converted_client_id:string|null;converted_proposal_id:string|null};
+ audience:string;attendees:number|null;desired_date:string|null;notes:string;status:string;created_at:string;converted_client_id:string|null;converted_proposal_id:string|null;proposal_status:string|null};
 const label:Record<string,string>={pending:'Pendente',reviewing:'Em análise',converted:'Convertido',archived:'Arquivado'};
 const date=(value:string|null)=>value?new Date(value.slice(0,10)+'T12:00:00').toLocaleDateString('pt-BR'):'A combinar';
 export default function Inbox({conversionEnabled}:{conversionEnabled:boolean}){
@@ -106,33 +106,48 @@ export default function Inbox({conversionEnabled}:{conversionEnabled:boolean}){
      </div>
     </div>
     <div className={styles.actions}>
-     <a className={styles.actionWhatsApp}
-      href={'https://wa.me/'+lead.phone.replace(/\D/g,'')+'?text='+encodeURIComponent('Olá, '+lead.responsible_name+'! Recebemos seu pedido de orçamento do planetário para '+lead.institution+'. Podemos conversar?')}
-      target="_blank" rel="noopener noreferrer"><MessageCircle size={16}/>Conversar no WhatsApp</a>
-     {lead.status!=='converted'&&(['pending','reviewing','archived'] as const).filter(s=>s!==lead.status).map(s=>
-      <button type="button" key={s} disabled={busy===lead.id} onClick={()=>void review(lead.id,s)}
-       className={s==='archived'?styles.actionMuted:styles.actionSecondary}>
-       {s==='reviewing'?'Iniciar análise':s==='pending'?'Reabrir':'Arquivar'}
-      </button>)}
-     {conversionEnabled&&lead.status!=='converted'&&lead.status!=='archived'&&
-      <label className={styles.selectLabel}>Destino da conversão
-       <select aria-label={'Cliente para '+lead.institution} value={chosen[lead.id]||''}
-        onChange={e=>setChosen(old=>({...old,[lead.id]:e.target.value}))}>
-        <option value="">Criar novo cliente</option>
-        {clients.filter(c=>c.kind===kindOf(lead.audience)).map(c=>
-         <option key={c.id} value={c.id}>Vincular: {c.name}</option>)}
-       </select>
-      </label>}
-     {conversionEnabled&&lead.status!=='converted'&&lead.status!=='archived'&&
+     {conversionEnabled&&lead.status!=='archived'&&lead.status!=='converted'&&
       <button type="button" disabled={Boolean(busy)} onClick={()=>openComposer(lead.id)}
        className={styles.actionPrimary}><FileText size={16}/>Preparar proposta</button>}
-     {lead.status==='converted'&&lead.converted_proposal_id&&<>
-      {conversionEnabled&&<button type="button" disabled={Boolean(busy)} onClick={()=>openComposer(lead.id)}
-       className={styles.actionPrimary}><FileText size={16}/>Editar proposta</button>}
-      <Link href={'/vitrine/proposta/'+lead.converted_proposal_id} className={styles.actionSecondary}>
-       <FileText size={16}/>Ver documento / PDF</Link>
-     </>}
-     <Link href="/clientes" className={styles.actionSecondary}><Users size={16}/>Abrir cadastro de clientes</Link>
+     {lead.status==='converted'&&lead.converted_proposal_id&&
+      (lead.proposal_status==='draft'
+       ? <button type="button" disabled={Boolean(busy)||!conversionEnabled} onClick={()=>openComposer(lead.id)}
+         className={styles.actionPrimary}><FileText size={16}/>Editar proposta</button>
+       : <Link href={'/vitrine/proposta/'+lead.converted_proposal_id} className={styles.actionPrimary}>
+         <FileText size={16}/>Ver proposta / PDF</Link>)}
+     {lead.status==='archived'&&
+      <button type="button" disabled={Boolean(busy)} onClick={()=>void review(lead.id,'pending')}
+       className={styles.actionPrimary}><Archive size={16}/>Reabrir solicitação</button>}
+     <a className={styles.actionWhatsApp}
+      href={'https://wa.me/'+lead.phone.replace(/\\D/g,'')+'?text='+encodeURIComponent('Olá, '+lead.responsible_name+'! Recebemos seu pedido de orçamento do planetário para '+lead.institution+'. Podemos conversar?')}
+      target="_blank" rel="noopener noreferrer"><MessageCircle size={16}/>WhatsApp</a>
+     <details className={styles.more}>
+      <summary className={styles.moreSummary} aria-label={'Mais opções para '+lead.institution}>
+       <MoreHorizontal size={16}/>Mais opções<ChevronDown size={14} className={styles.moreChevron}/>
+      </summary>
+      <div className={styles.morePanel}>
+       {lead.status!=='converted'&&(['pending','reviewing','archived'] as const).filter(s=>s!==lead.status).map(s=>
+        <button type="button" key={s} disabled={Boolean(busy)} onClick={()=>void review(lead.id,s)}
+         className={s==='archived'?styles.actionMuted:styles.actionSecondary}>
+         {s==='reviewing'?'Iniciar análise':s==='pending'?'Marcar como pendente':'Arquivar'}
+        </button>)}
+       {conversionEnabled&&lead.status!=='converted'&&lead.status!=='archived'&&
+        <label className={styles.selectLabel}>Cliente da proposta
+         <select aria-label={'Cliente para '+lead.institution} value={chosen[lead.id]||''}
+          onChange={e=>setChosen(old=>({...old,[lead.id]:e.target.value}))}>
+          <option value="">Criar novo cliente</option>
+          {clients.filter(c=>c.kind===kindOf(lead.audience)).map(c=>
+           <option key={c.id} value={c.id}>Vincular: {c.name}</option>)}
+         </select>
+        </label>}
+       {lead.status==='converted'&&lead.converted_proposal_id&&lead.proposal_status==='draft'&&
+        <Link href={'/vitrine/proposta/'+lead.converted_proposal_id} className={styles.actionSecondary}>
+         <FileText size={16}/>Ver documento / PDF</Link>}
+       {lead.status==='converted'&&lead.converted_proposal_id&&lead.proposal_status!=='draft'&&
+        <span className={styles.moreHint}>Proposta protegida contra alterações.</span>}
+       <Link href="/clientes" className={styles.actionSecondary}><Users size={16}/>Abrir cadastro de clientes</Link>
+      </div>
+     </details>
     </div>
    </article>)}
   </div>
