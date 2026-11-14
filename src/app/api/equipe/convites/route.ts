@@ -31,7 +31,7 @@ export async function POST(request: NextRequest) {
     const link = '/convite?token=' + encodeURIComponent(token);
     return NextResponse.json({ invitation: created[0], link }, { status: 201, headers: { 'Cache-Control': 'no-store' } });
   } catch {
-    return NextResponse.json({ error: 'Não foi possível emitir o convite. Confirme a migração SQL 02D.' }, { status: 500 });
+    return NextResponse.json({ error: 'Não foi possível enviar o convite. Tente novamente.' }, { status: 500 });
   }
 }
 
