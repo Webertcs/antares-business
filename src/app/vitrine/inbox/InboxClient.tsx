@@ -1,7 +1,7 @@
 'use client';
 import {useCallback,useEffect,useMemo,useState} from 'react';
 import Link from 'next/link';
-import {Archive,ArrowLeft,Building2,CalendarDays,CheckCircle2,ChevronDown,Clock3,FileText,Info,Layers,MapPin,MessageCircle,MoreHorizontal,Phone,RefreshCw,Search,UserRound,Users} from 'lucide-react';
+import {Archive,ArrowLeft,Building2,CalendarDays,CheckCircle2,ChevronDown,Clock3,FileText,Layers,MapPin,MessageCircle,MoreHorizontal,Phone,RefreshCw,Search,UserRound,Users} from 'lucide-react';
 import styles from './inbox.module.css';
 import ProposalComposer from './ProposalComposer';
 import ClientAcceptance from './ClientAcceptance';
@@ -52,7 +52,7 @@ export default function Inbox({conversionEnabled}:{conversionEnabled:boolean}){
     <div>
      <span className={styles.eyebrow}>ANTARES BUSINESS · VITRINE</span>
      <h1>Solicitações de orçamento</h1>
-     <p>Pedidos de escolas e instituições. Nenhum contrato é criado automaticamente.</p>
+     <p>Acompanhe os pedidos recebidos e prepare propostas para cada instituição.</p>
     </div>
    </div>
    <button type="button" className={styles.refresh} disabled={loading} onClick={()=>void load()}>
@@ -83,7 +83,7 @@ export default function Inbox({conversionEnabled}:{conversionEnabled:boolean}){
      <div className={styles.leadIcon}><Building2 size={24} aria-hidden="true"/></div>
      <div className={styles.leadTitle}>
       <h2>{lead.institution}</h2>
-      <div className={styles.leadSubtitle}>Solicitação recebida da vitrine</div>
+      <div className={styles.leadSubtitle}>Pedido recebido pelo site</div>
      </div>
      <span className={[styles.status,
       lead.status==='converted'?styles.statusConverted:
@@ -171,8 +171,5 @@ export default function Inbox({conversionEnabled}:{conversionEnabled:boolean}){
     onClose={()=>setAcceptLeadId(null)}
     onSaved={()=>{setAcceptLeadId(null);setNotice('Aceite da instituição registrado. Agora você pode organizar a reserva.');void load();}}
   />}
-  <p className={styles.foot}><Info size={16} aria-hidden="true"/>
-   <span>A solicitação só vira cliente e rascunho quando o proprietário clica em Salvar rascunho. Aprovar internamente não significa que a escola aceitou. O aceite é registrado após confirmação real; WhatsApp e reservas continuam manuais.</span>
-  </p>
  </main>;
 }
