@@ -11,7 +11,7 @@ export async function GET(req:NextRequest){
   const id=req.nextUrl.searchParams.get('id');
   if(!id||!/^[0-9a-f]{8}(-[0-9a-f]{4}){3}-[0-9a-f]{12}$/i.test(id))return reply({error:'Proposta inválida.'},400);
   const db=getDb();
-  const rows=await db`SELECT p.id,p.status,p.pricing_model,p.expected_attendees,p.unit_price,p.fixed_price,
+  const rows=await db`SELECT p.id,p.status,p.approved_at,p.client_accepted_at,p.pricing_model,p.expected_attendees,p.unit_price,p.fixed_price,
     p.discount,p.deposit,p.total,to_char(p.valid_until,'YYYY-MM-DD') AS valid_until,p.payment_terms
     FROM public.business_proposals p
     WHERE p.id=${id}::uuid AND p.organization_id=${owner.organizationId}
@@ -19,7 +19,7 @@ export async function GET(req:NextRequest){
   const p=rows[0];
   if(!p)return reply({error:'Proposta não encontrada.'},404);
   return reply({proposal:{
-   id:String(p.id),status:String(p.status),pricing_model:String(p.pricing_model),
+   id:String(p.id),status:p.status==='draft'&&p.approved_at?'approved_internal':p.status==='accepted'&&!p.client_accepted_at?'legacy_accepted':String(p.status),pricing_model:String(p.pricing_model),
    expected_attendees:Number(p.expected_attendees??0),unit_price:Number(p.unit_price??0),
    fixed_price:Number(p.fixed_price??0),discount:Number(p.discount??0),
    deposit:Number(p.deposit??0),total:Number(p.total??0),

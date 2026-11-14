@@ -10,7 +10,9 @@ export async function GET(){
   const db=getDb();
   const rows=await db`SELECT l.id,l.responsible_name,l.institution,l.city,l.phone,l.audience,l.attendees,
     l.desired_date,l.notes,l.status,l.created_at,l.converted_client_id,l.converted_proposal_id,
-    p.status AS proposal_status
+    CASE WHEN p.status='draft' AND p.approved_at IS NOT NULL THEN 'approved_internal'
+         WHEN p.status='accepted' AND p.client_accepted_at IS NULL THEN 'legacy_accepted'
+         ELSE p.status END AS proposal_status
     FROM public.vitrine_leads l
     LEFT JOIN public.business_proposals p
       ON p.id=l.converted_proposal_id AND p.organization_id=l.organization_id

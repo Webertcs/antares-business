@@ -89,7 +89,7 @@ export default function ProposalComposer({lead,existingClientId,onClose,onSaved}
  const mark=()=>{setDirty(true);setSaved(false);setNotice('');};
  const blocked=loading||busy||Boolean(loadError)||status!=='draft';
  const canApprove=Boolean(proposalId)&&status==='draft'&&!dirty&&!blocked&&valid&&
-  Boolean(validUntil)&&Boolean(terms.trim())&&(model==='complimentary'||total>0);
+  Boolean(validUntil)&&terms.trim().length>=10&&(model==='complimentary'||total>0);
  const requestClose=()=>{if(busy)return;if(confirmApprove){setConfirmApprove(false);return;}if(dirty&&!saved){setConfirmDiscard(true);return;}onClose();};
 
  async function post(url:string,body:object){
@@ -215,8 +215,8 @@ export default function ProposalComposer({lead,existingClientId,onClose,onSaved}
     </div>
    </fieldset>
    <p className={styles.safe}><ShieldCheck size={17}/>Salvar um rascunho não envia mensagens, não cria contratos, cobranças ou reservas.</p>
-   {proposalId&&status==='draft'&&!loading&&!dirty&&(!validUntil||!terms.trim()||(model!=='complimentary'&&total<=0))&&
-    <p className={styles.approvalHint}>Para aprovar, informe a validade, as condições comerciais e confira os valores. Salve o rascunho após qualquer alteração.</p>}
+   {proposalId&&status==='draft'&&!loading&&!dirty&&(!validUntil||terms.trim().length<10||(model!=='complimentary'&&total<=0))&&
+    <p className={styles.approvalHint}>Para aprovar, informe a validade, pelo menos 10 caracteres nas condições comerciais e confira os valores. Salve o rascunho após qualquer alteração.</p>}
   </div>
 
   {confirmDiscard&&<div className={styles.discard} role="alertdialog" aria-label="Descartar alterações">

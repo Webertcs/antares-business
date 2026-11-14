@@ -14,7 +14,7 @@ export default async function Proposta({params,searchParams}:{params:Promise<{id
  let history:Array<{id:string;changed_at:string;before_values:Record<string,unknown>;after_values:Record<string,unknown>}> = [];
  try {
   const db=getDb();
-  const rows=await db`SELECT p.id,p.title,p.status,p.pricing_model,p.expected_attendees,
+  const rows=await db`SELECT p.id,p.title,p.status,p.approved_at,p.client_accepted_at,p.pricing_model,p.expected_attendees,
   p.unit_price,p.fixed_price,p.discount,p.deposit,p.total,p.notes,p.created_at,to_char(p.valid_until, 'YYYY-MM-DD') AS valid_until,p.payment_terms,
   c.name AS client_name,c.kind AS client_kind,
   l.institution AS origin_institution,l.id AS lead_id,
@@ -30,18 +30,20 @@ export default async function Proposta({params,searchParams}:{params:Promise<{id
  if(!proposal)return <main style={{padding:32}}><Link href="/vitrine/inbox">← Solicitações</Link><p>Proposta não encontrada.</p></main>;
  const t=(v:unknown)=>v==null?'—':String(v);
  const money=(v:unknown)=>Number(v||0).toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
- const proposalStatus=String(proposal.status);
- const statusLabel:Record<string,string>={draft:'Rascunho',accepted:'Aceita',approved:'Aprovada',sent:'Enviada',rejected:'Recusada',archived:'Arquivada'};
+ const rawStatus=String(proposal.status);
+ const linked=Boolean(proposal.lead_id);
+ const proposalStatus=rawStatus==='draft'&&proposal.approved_at?'approved_internal':
+  rawStatus==='accepted'&&linked&&!proposal.client_accepted_at?'legacy_accepted':rawStatus;
+ const statusLabel:Record<string,string>={draft:'Rascunho',approved_internal:'Aprovada internamente',legacy_accepted:'Aceite não verificado',accepted:'Aceita pela escola',approved:'Aprovada',sent:'Enviada',rejected:'Recusada',archived:'Arquivada'};
  const status=statusLabel[proposalStatus]||proposalStatus;
  const sourceDate=proposal.origin_desired_date?String(proposal.origin_desired_date).split('-').reverse().join('/'):'A combinar';
- const linked=Boolean(proposal.lead_id);
  const origin=proposal.origin_institution?String(proposal.origin_institution):'Não identificada';
  const client=String(proposal.client_name);
  const clientKindLabel:Record<string,string>={school:'Escola',company:'Empresa',association:'Associação',institution:'Instituição',other:'Outro'};
  const kind=clientKindLabel[String(proposal.client_kind)]||String(proposal.client_kind||'—');
  const different=linked&&origin.localeCompare(client,'pt-BR',{sensitivity:'base'})!==0;
  const documentOnly=(await searchParams)?.visualizar==='1';
- const preview=<Premium proposal={{id:String(proposal.id),status:String(proposal.status),valid_until:proposal.valid_until?String(proposal.valid_until):null,payment_terms:proposal.payment_terms?String(proposal.payment_terms):null,title:String(proposal.title),client_name:String(proposal.client_name),origin_institution:linked?origin:null,institution_mismatch:different,expected_attendees:Number(proposal.expected_attendees??0),total:Number(proposal.total),deposit:Number(proposal.deposit)}} history={history} documentOnly={documentOnly}/>;
+ const preview=<Premium proposal={{id:String(proposal.id),status:proposalStatus,valid_until:proposal.valid_until?String(proposal.valid_until):null,payment_terms:proposal.payment_terms?String(proposal.payment_terms):null,title:String(proposal.title),client_name:String(proposal.client_name),origin_institution:linked?origin:null,institution_mismatch:different,expected_attendees:Number(proposal.expected_attendees??0),total:Number(proposal.total),deposit:Number(proposal.deposit)}} history={history} documentOnly={documentOnly}/>;
  if(documentOnly)return <main className={styles.page}>
   <Link href="/vitrine/inbox" className={styles.back}><ArrowLeft size={15}/>Voltar às solicitações</Link>
   <header className={styles.hero}>
@@ -53,7 +55,9 @@ export default async function Proposta({params,searchParams}:{params:Promise<{id
     <CheckCircle2 size={15}/>{status}
    </span>
   </header>
-  {proposalStatus==='draft'&&<div className={styles.caution}><Info size={16}/>Documento em rascunho. Confira e aprove a proposta antes de enviá-la ao cliente.</div>}
+  {proposalStatus==='draft'&&<div className={styles.caution}><Info size={16}/>Documento em rascunho. Confira e aprove internamente antes de enviá-lo à escola.</div>}
+  {proposalStatus==='approved_internal'&&<div className={styles.caution}><Info size={16}/>Proposta aprovada internamente. Aguarde o aceite real da escola para liberar reserva.</div>}
+  {proposalStatus==='legacy_accepted'&&<div className={styles.caution}><Info size={16}/>Registro anterior sem confirmação explícita do cliente. Confira o aceite antes de agendar.</div>}
   {preview}
  </main>;
  return <main className={styles.page}>
