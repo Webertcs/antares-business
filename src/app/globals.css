@@ -1247,26 +1247,6 @@
  gap:11px;
  min-width:0;
 }
-.cal-page.antares-agenda-premium .antares-agenda-reservations-shortcut{
- display:inline-flex;
- align-items:center;
- justify-content:center;
- gap:6px;
- flex-shrink:0;
- padding:7px 10px;
- border:1px solid #82c7ff;
- border-radius:9px;
- background:rgba(22,104,193,.85);
- color:#fff;
- font-size:11px;
- font-weight:800;
- cursor:pointer;
-}
-.cal-page.antares-agenda-premium .antares-agenda-reservations-shortcut:hover{background:#257bd3}
-.cal-page.antares-agenda-premium .antares-agenda-reservations-shortcut:focus-visible{
- outline:3px solid #b7efff;
- outline-offset:2px;
-}
 .cal-page.antares-agenda-premium .antares-agenda-title-icon{
  flex-shrink:0;
  width:37px;
