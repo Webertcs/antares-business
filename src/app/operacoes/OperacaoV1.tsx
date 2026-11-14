@@ -78,14 +78,14 @@ export default function OperacaoV1({writesEnabled,contractWritesEnabled}:{writes
   fetch('/api/crm/clientes',{cache:'no-store',signal:controller.signal})
    .then(async r=>{if(!r.ok)throw Error('Não foi possível consultar apresentações.');return r.json();})
    .then(d=>{setDataEvents(Array.isArray(d.events)?d.events:[]);setEventError('');})
-   .catch(e=>{if(e?.name!=='AbortError')setEventError('Apresentações indisponíveis; confira o CRM.');});
+   .catch(e=>{if(e?.name!=='AbortError')setEventError('Não foi possível carregar as apresentações. Tente atualizar a página.');});
   return()=>controller.abort();
  },[revision]);
  useEffect(()=>{const controller=new AbortController();
   fetch('/api/business/balanco',{cache:'no-store',signal:controller.signal})
    .then(async r=>{if(!r.ok)throw Error('Balanço indisponível');return r.json();})
    .then(d=>{setBalance(d);setBalanceError('');})
-   .catch(e=>{if(e?.name!=='AbortError')setBalanceError('Balanço indisponível até implantação da V1.');});
+   .catch(e=>{if(e?.name!=='AbortError')setBalanceError('O balanço está temporariamente indisponível.');});
   return()=>controller.abort();
  },[revision]);
  const filtered=useMemo(()=>data.proposals.filter(x=>(!selectedClientId||String(x.client_id)===selectedClientId)&&(String(x.title||'').toLowerCase().includes(term.toLowerCase())||String(x.client_name||'').toLowerCase().includes(term.toLowerCase()))),[data.proposals,term,selectedClientId]);
@@ -152,7 +152,7 @@ export default function OperacaoV1({writesEnabled,contractWritesEnabled}:{writes
  <h2 style={{fontSize:21,fontWeight:650}}>Contratos e confirmações</h2>
  <p>Vinculados às propostas aprovadas, com modalidades formal, verbal ou WhatsApp.</p>
  <p>Documentos não assinados podem ser consultados na aba Propostas. Uma confirmação registrada exige acordo real com o cliente.</p>
- {!contractWritesEnabled&&<p role="status" style={{padding:12,background:'#fff4df',borderRadius:8}}>Registro de contratos desabilitado durante a homologação. Consultas liberadas.</p>}
+ {!contractWritesEnabled&&<p role="status" style={{padding:12,background:'#fff4df',borderRadius:8}}>Novos contratos estão temporariamente indisponíveis. Você ainda pode consultar os registros.</p>}
  <Rows heads={['Proposta','Modalidade','Situação','Confirmação']}
  rows={visibleContracts.map(c=>[c.proposal_title,c.confirmation_mode,c.status,dateTime(c.confirmed_at)])}/>
  {contractWritesEnabled&&<form onSubmit={saveContract} style={{display:'grid',gap:12,maxWidth:650,marginTop:20}}>
