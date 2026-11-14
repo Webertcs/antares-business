@@ -1030,11 +1030,18 @@
 .premium-kids .premium-reactbits-gallery-frame .circular-gallery{height:100%;width:100%}
 @media(max-width:620px){.premium-kids .premium-reactbits-gallery-frame{height:320px;border-radius:19px}.premium-kids .premium-reactbits-gallery-hint{padding:0 8px;font-size:12px}.premium-kids .premium-reactbits-gallery-credit{padding:0 6px;font-size:10px}}
 
-/* Refinamento React Bits: céu da arte do login + legendas e créditos acessíveis. */
+/* Prévia React Bits: céu estrelado de profundidade, exclusivo da galeria.
+   A sobreposição escura preserva a legibilidade de imagens e legendas. */
 .premium-kids .premium-reactbits-gallery-frame{
- background-image:linear-gradient(125deg,#081637aa,#182a5d84),url('/antares-login-sky.svg');
- background-size:cover,cover;
- background-position:center,center;
+ background-color:#030918;
+ background-image:
+  linear-gradient(90deg,rgba(2,7,22,.40),rgba(2,7,22,.03) 37%,rgba(2,7,22,.18) 75%,rgba(2,7,22,.46)),
+  linear-gradient(180deg,rgba(4,12,34,.16),rgba(5,12,36,.11) 55%,rgba(4,10,30,.41)),
+  url('/vitrine/galeria-ceu-profundo.svg');
+ background-size:cover,cover,cover;
+ background-position:center,center,center;
+ border-color:#9cc9ff6e;
+ box-shadow:inset 0 0 65px rgba(1,5,20,.65),0 16px 40px rgba(2,8,29,.51);
 }
 .premium-kids .premium-reactbits-gallery-credit a{color:#dceaff;text-decoration:underline;text-underline-offset:3px}
 .premium-kids .premium-reactbits-gallery-credit a:hover{color:#ffda8e}
