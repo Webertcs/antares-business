@@ -21,3 +21,18 @@
 .discard{position:sticky;bottom:0;background:#fff7e7;border:1px solid #ecc774;padding:13px 20px;box-shadow:0 -9px 27px #092a4a25;z-index:3;color:#674712}.discard strong{font-size:14px}.discard p{font-size:12px}.discard div{display:flex;gap:9px;flex-wrap:wrap}.discard button{border:1px solid #ba8d3b;color:#5c4114;background:#fffdf7;padding:10px;border-radius:8px;cursor:pointer;font-weight:800}.discard button:last-child{background:#a84f20;border-color:#a84f20;color:#fff}
 @media(max-width:600px){.dialog{width:calc(100vw - 14px);max-width:calc(100vw - 14px);max-height:calc(100dvh - 16px)}.header{padding:15px}.heading h2{font-size:18px}.content{padding:15px 13px 6px}.school{flex-direction:column;gap:7px}.schoolAside{text-align:left}.grid{grid-template-columns:1fr;gap:12px}.total strong{font-size:21px}.footer{padding:13px}.footer a,.footer button{flex:1 1 auto}}
 @media(prefers-reduced-motion:reduce){.dialog::backdrop{backdrop-filter:none}}
+
+.approvalHint{padding:10px 12px;border-radius:9px;border:1px solid #f1d69b;background:#fff8e8;color:#79591e;font-size:12px;line-height:1.5}
+.approveButton{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:41px;background:linear-gradient(110deg,#087b69,#12a386);border:1px solid #0b866d;color:#fff;border-radius:9px;padding:10px 15px;font-size:13px;font-weight:850;cursor:pointer;box-shadow:0 4px 12px #087b6933}
+.approveButton:disabled{opacity:.55;cursor:not-allowed}
+.approveConfirm{position:sticky;bottom:0;z-index:5;margin:0 12px 0;padding:17px 20px;background:#f2fcf9;border:2px solid #3dbaa1;border-radius:12px 12px 0 0;box-shadow:0 -10px 40px #08264c33;color:#173a54}
+.approveConfirm h3{display:flex;align-items:center;gap:8px;margin:0;font-size:17px;color:#096a59}
+.approveConfirm>p{margin:9px 0;font-size:12px;line-height:1.5}
+.approveConfirm dl{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;margin:12px 0}
+.approveConfirm dl div{padding:9px;background:#fff;border:1px solid #beded7;border-radius:8px;min-width:0}
+.approveConfirm dt{font-size:11px;font-weight:800;color:#52786e}
+.approveConfirm dd{margin:4px 0 0;font-size:13px;font-weight:800;overflow-wrap:anywhere}
+.approveNote{display:flex;gap:6px;align-items:center;color:#32655a}
+.approveActions{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:10px;margin-top:12px}
+.approveActions button{border-radius:9px;padding:10px 14px;font-weight:800;cursor:pointer}
+@media(max-width:600px){.approveConfirm{margin:0 6px;padding:13px}.approveConfirm dl{grid-template-columns:1fr}.approveActions button{flex:1 1 100%}}
