@@ -18,7 +18,7 @@ export async function GET(){
 export async function POST(request:NextRequest){
  const ctx=await requireOwner();if(!ctx)return NextResponse.json({error:'Somente proprietário.'},{status:403});
  if(process.env.ANTARES_CRM_WRITES_ENABLED!=='true'||process.env.ANTARES_CRM_SECURITY_APPROVED!=='true')
- return NextResponse.json({error:'Gravações ainda não homologadas.'},{status:503});
+ return NextResponse.json({error:'Não é possível salvar esta ação neste momento.'},{status:503});
  if(request.headers.get('origin')!==new URL(process.env.ANTARES_APP_ORIGIN||'http://localhost:3000').origin||
  request.headers.get('content-type')?.split(';')[0]?.trim()!=='application/json')
  return NextResponse.json({error:'Origem não autorizada.'},{status:403});
@@ -39,5 +39,5 @@ export async function POST(request:NextRequest){
   const rows=await sql`SELECT public.antares_manage_relationship_action(
   ${ctx.user.id},${uuid(b.clientId)}::uuid,${uuid(b.id)}::uuid,${kind},${date}::date,${priority},${note},${cmd}) AS id`;
   return NextResponse.json({id:rows[0]?.id});
- }catch{return NextResponse.json({error:'Não foi possível registrar a ação. Confira a migração 06C.'},{status:409});}
+ }catch{return NextResponse.json({error:'Não foi possível registrar a ação. Tente novamente.'},{status:409});}
 }
