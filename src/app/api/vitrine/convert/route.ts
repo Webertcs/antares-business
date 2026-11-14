@@ -5,7 +5,7 @@ export async function POST(request:NextRequest){
  const answer=(body:object,status:number)=>NextResponse.json(body,{status,headers:{'Cache-Control':'no-store'}});
  if(process.env.ANTARES_CRM_WRITES_ENABLED!=='true'||process.env.ANTARES_CRM_SECURITY_APPROVED!=='true'||
     process.env.ANTARES_VITRINE_CONVERSION_ENABLED!=='true')
-  return answer({error:'Conversão ainda em homologação.'},503);
+  return answer({error:'Não é possível preparar a proposta neste momento.'},503);
  let origin:string;try{origin=new URL(process.env.ANTARES_APP_ORIGIN||'').origin;}
  catch{return answer({error:'Configuração incompleta.'},503);}
  if(request.headers.get('origin')!==origin)return answer({error:'Origem inválida.'},403);
@@ -29,8 +29,8 @@ export async function POST(request:NextRequest){
     has_function_privilege(current_user,'public.vitrine_convert_lead_smart(text,uuid,uuid)','EXECUTE') AS safe_function
     FROM pg_roles r WHERE r.rolname=current_user`;
   if(!security[0]?.safe_role||!security[0]?.safe_table||!security[0]?.safe_function)
-    return answer({error:'Isolamento não homologado.'},503);
+    return answer({error:'Não foi possível confirmar a autorização para esta operação.'},503);
   const result=await sql`SELECT * FROM public.vitrine_convert_lead_smart(${owner.user.id},${id}::uuid,${existing}::uuid)`;
   return answer({ok:true,clientId:result[0]?.client_id,proposalId:result[0]?.proposal_id},200);
- }catch{return answer({error:'Conversão não concluída. Confira duplicidade, migração e permissões.'},409);}
+ }catch{return answer({error:'Não foi possível preparar a proposta. Confira se a instituição já está cadastrada e tente novamente.'},409);}
 }
