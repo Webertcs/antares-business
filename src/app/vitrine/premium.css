@@ -553,3 +553,153 @@
  .premium-kids .premium-photo-credits{font-size:9px;padding-inline:2px}
  .premium-kids .premium-school-picture .premium-school-photo{border-radius:14px}
 }
+
+
+/* ANTARES Kids V2 · Pacote 2: confiança e prova social verificável.
+   Não exibir depoimentos ou números de origem não confirmada. */
+.premium-kids .premium-proof{
+ position:relative;isolation:isolate;
+ max-width:1260px;margin:12px auto 84px;padding:38px;
+ overflow:hidden;border-radius:30px;
+ border:1px solid #8baaff68;
+ background:radial-gradient(ellipse at 7% 5%,#4c79d34a,transparent 40%),
+  radial-gradient(ellipse at 95% 96%,#7954c244,transparent 36%),
+  linear-gradient(136deg,#122553f0,#1b2d5df0 55%,#1a2657f0);
+ box-shadow:0 20px 54px #040a2869,inset 0 1px #fff3;
+ color:#f5f8ff;
+}
+.premium-kids .premium-proof:before{
+ content:"";position:absolute;inset:0;
+ pointer-events:none;z-index:-1;
+ background-image:radial-gradient(#d9e9ffb0 0.75px,transparent 1px);
+ background-size:53px 61px;opacity:.26;
+}
+.premium-kids .premium-proof-heading{
+ max-width:840px;margin:0 auto 28px;text-align:center;
+}
+.premium-kids .premium-proof-heading>span{
+ display:block;color:#ffe099;font-size:11px;
+ font-weight:900;letter-spacing:.17em;
+}
+.premium-kids .premium-proof-heading h2{
+ font-size:clamp(27px,3.05vw,40px);
+ line-height:1.14;letter-spacing:-.035em;
+ font-weight:900;color:#fff;margin:13px 0 12px;
+}
+.premium-kids .premium-proof-heading p{
+ margin:0 auto;max-width:720px;
+ color:#d2e3ff;font-size:14px;line-height:1.7;
+}
+.premium-kids .premium-proof-grid{
+ display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:15px;
+}
+.premium-kids .premium-proof-grid article{
+ position:relative;min-width:0;min-height:183px;
+ padding:22px 20px 19px;
+ border:1px solid #9fc3f76b;border-radius:20px;
+ background:linear-gradient(150deg,#244679c7,#122c5dbb);
+ box-shadow:inset 0 1px #e4eeff24,0 12px 22px #080e2935;
+ transition:transform .2s ease,border-color .2s ease;
+}
+.premium-kids .premium-proof-grid article:hover{
+ transform:translateY(-3px);border-color:#b7d8ffce;
+}
+.premium-kids .premium-proof-icon{
+ width:43px;height:43px;border:1px solid #adcfff6e;
+ display:grid;place-items:center;border-radius:14px;
+ color:#bfe0ff;background:linear-gradient(145deg,#315fa9,#22387d);
+ margin-bottom:14px;
+}
+.premium-kids .premium-proof-grid article h3{
+ font-size:16px;line-height:1.3;font-weight:850;color:#fff;
+ margin:0 0 9px;
+}
+.premium-kids .premium-proof-grid article p{
+ font-size:13px;line-height:1.65;color:#d6e4fa;margin:0;
+}
+.premium-kids .premium-proof-metrics{
+ display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));
+ gap:12px;margin:0 0 20px;
+}
+.premium-kids .premium-proof-metric{
+ padding:19px 15px;text-align:center;border-radius:17px;
+ background:#111e48a6;border:1px solid #a6caff80;
+ display:grid;gap:6px;
+}
+.premium-kids .premium-proof-metric strong{font-size:30px;font-weight:900;color:#ffda7f;font-variant-numeric:tabular-nums}
+.premium-kids .premium-proof-metric span{font-size:13px;font-weight:800;color:#eaf1ff}
+.premium-kids .premium-proof-metric small{font-size:11px;color:#b4caee}
+.premium-kids .premium-proof-testimonials{
+ display:grid;grid-template-columns:repeat(auto-fit,minmax(235px,1fr));
+ gap:15px;margin:0 0 24px;
+}
+.premium-kids .premium-proof-testimonials figure{
+ margin:0;padding:21px;border:1px solid #b0c5ff70;
+ border-radius:18px;background:#1c2e64c9;
+}
+.premium-kids .premium-proof-testimonials figure>svg{color:#ffd77b;margin-bottom:8px}
+.premium-kids .premium-proof-testimonials blockquote{margin:0;color:#fff;font-size:15px;line-height:1.7}
+.premium-kids .premium-proof-testimonials figcaption{display:grid;gap:4px;margin-top:18px}
+.premium-kids .premium-proof-testimonials figcaption strong{font-size:12px;color:#e8f1ff}
+.premium-kids .premium-proof-testimonials figcaption span{font-size:11px;color:#aec5ec}
+.premium-kids .premium-proof-bottom{
+ display:flex;justify-content:space-between;align-items:center;gap:25px;
+ margin-top:22px;padding:18px 19px;
+ border:1px solid #8fafe266;border-radius:18px;
+ background:linear-gradient(100deg,#101e48bd,#243c6cb8);
+}
+.premium-kids .premium-proof-verification{
+ display:flex;align-items:flex-start;gap:13px;min-width:0;
+}
+.premium-kids .premium-proof-shield{
+ width:38px;height:38px;flex:none;
+ display:grid;place-items:center;color:#9de5c6;
+ background:#1e6b6c59;border:1px solid #8ee5cd60;
+ border-radius:12px;
+}
+.premium-kids .premium-proof-verification strong{
+ display:block;font-size:13px;color:#fff;font-weight:850;margin:0 0 5px;
+}
+.premium-kids .premium-proof-verification p{
+ margin:0;font-size:11px;color:#b7c9e8;max-width:610px;line-height:1.65;
+}
+.premium-kids .premium-proof-cta{
+ display:inline-flex;align-items:center;justify-content:center;gap:9px;
+ flex:none;min-height:43px;
+ padding:11px 18px;border-radius:999px;
+ background:linear-gradient(110deg,#ffd05d,#ffe38b);
+ color:#14284e!important;
+ font-size:12px;font-weight:900;text-decoration:none!important;
+ box-shadow:0 9px 25px #f4bb4e40;
+ transition:transform .2s ease,box-shadow .2s ease;
+}
+.premium-kids .premium-proof-cta:hover,
+.premium-kids .premium-proof-cta:focus-visible{
+ transform:translateY(-2px);box-shadow:0 12px 28px #ffc34b6b;
+}
+.premium-kids .premium-proof-sparkle{
+ position:absolute;right:19px;top:18px;color:#ffda8b;opacity:.6;
+}
+@media(max-width:1050px){
+ .premium-kids .premium-proof{margin:12px 20px 70px;padding:28px}
+ .premium-kids .premium-proof-bottom{flex-direction:column;align-items:stretch;gap:15px}
+ .premium-kids .premium-proof-cta{align-self:flex-start}
+}
+@media(max-width:720px){
+ .premium-kids .premium-proof{margin:12px 12px 56px;padding:25px 18px;border-radius:22px}
+ .premium-kids .premium-proof-heading h2{font-size:clamp(26px,7vw,34px)}
+ .premium-kids .premium-proof-heading p{font-size:13px}
+ .premium-kids .premium-proof-grid{grid-template-columns:1fr;gap:10px}
+ .premium-kids .premium-proof-grid article{min-height:0;padding:17px}
+ .premium-kids .premium-proof-icon{margin-bottom:10px;width:38px;height:38px}
+ .premium-kids .premium-proof-grid article h3{font-size:15px}
+ .premium-kids .premium-proof-grid article p{font-size:12.5px}
+ .premium-kids .premium-proof-bottom{padding:14px}
+ .premium-kids .premium-proof-cta{align-self:stretch;text-align:center}
+}
+@media(prefers-reduced-motion:reduce){
+ .premium-kids .premium-proof-grid article,
+ .premium-kids .premium-proof-cta{transition:none}
+ .premium-kids .premium-proof-grid article:hover,
+ .premium-kids .premium-proof-cta:hover{transform:none}
+}
