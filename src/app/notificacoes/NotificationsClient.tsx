@@ -66,7 +66,7 @@ export default function NotificationsClient(){
     <span className="notificacoes-hero-icon"><Bell size={26}/></span>
     <div><span className="notificacoes-eyebrow">ANTARES BUSINESS · NOTIFICAÇÕES</span>
      <h1>Central de Notificações</h1>
-     <p>Avisos e pendências dos módulos, sem perder o controle do atendimento.</p>
+     <p>Acompanhe os avisos e resolva suas pendências em um só lugar.</p>
     </div>
    </div>
    <button type="button" className="notificacoes-refresh" onClick={()=>void refresh()} disabled={loading}>
@@ -92,7 +92,7 @@ export default function NotificationsClient(){
       <Bell size={16}/> Pendentes <span>{feed?.count??'—'} · {feed?.unreadCount??'—'} novas</span>
      </button>
      <button type="button" className={view==='history'?'active':''} aria-pressed={view==='history'} onClick={()=>{setView('history');setFilter('all')}}>
-      <History size={16}/> Histórico da Vitrine
+      <History size={16}/> Histórico de solicitações
      </button>
     </div>
     <label className="notificacoes-filter">Módulo
@@ -119,7 +119,7 @@ export default function NotificationsClient(){
    </div>}
    {shown.length>0&&<div className="notificacoes-list">{shown.map(n=><Item key={n.id} data={n} onRead={confirmRead} readEnabled={Boolean(feed?.readPersistenceAvailable)}/>)}</div>}
    <footer className="notificacoes-footer">
-    <p>Ler o aviso remove o indicador vermelho do sino, mas a pendência continua até ser resolvida. Oportunidades permanece pendente até iniciar a análise.</p>
+    <p>Marcar um aviso como lido retira o destaque, mas a pendência continua até ser resolvida.</p>
     <Link href="/vitrine/inbox"><BriefcaseBusiness size={16}/> Abrir Oportunidades</Link>
    </footer>
   </section>
