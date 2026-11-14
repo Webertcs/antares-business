@@ -39,7 +39,7 @@ export default function BookingClient({enabled}:{enabled:boolean}){
  const years=Array.from(new Set((data?.links||[]).map(b=>String(new Date(b.starts_at).getFullYear())))).sort((a,b)=>b.localeCompare(a));
  const pageCount=Math.max(1,Math.ceil(bookings.length/10));const currentPage=Math.min(page,pageCount);
  const localInput=(value:string)=>{const d=new Date(value);const p=(n:number)=>String(n).padStart(2,'0');return `${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())}T${p(d.getHours())}:${p(d.getMinutes())}`;};
- async function openHistory(){setShowHistory(true);setHistoryStatus('Carregando histórico...');try{const r=await fetch('/api/agenda/reservas/historico',{cache:'no-store'});const v=await r.json();if(!r.ok)throw Error(v.error||'Histórico indisponível');setHistory(v.entries||[]);setHistoryStatus(v.ready?'':'Histórico aguardando implantação no Neon.');}catch(e){setHistoryStatus(e instanceof Error?e.message:'Histórico indisponível');}}
+ async function openHistory(){setShowHistory(true);setHistoryStatus('Carregando histórico...');try{const r=await fetch('/api/agenda/reservas/historico',{cache:'no-store'});const v=await r.json();if(!r.ok)throw Error(v.error||'Histórico indisponível');setHistory(v.entries||[]);setHistoryStatus(v.ready?'':'O histórico de alterações ainda não está disponível.');}catch(e){setHistoryStatus(e instanceof Error?e.message:'Histórico indisponível');}}
  function openDetails(id:string){setDetailId(id);setEditMode(false);setModalError('');const b=data?.links.find(x=>x.presentation_id===id);if(b){setEditStart(localInput(b.starts_at));setEditEnd(localInput(b.ends_at));setEditDome(b.dome_id||'');}}
  async function changeBooking(action:'edit'|'cancel'){
   if(!selectedBooking||busy||!enabled)return;
