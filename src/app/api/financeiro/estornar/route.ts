@@ -8,7 +8,7 @@ export async function POST(request:Request){
  if(!origin||!host||new URL(origin).host!==host)return NextResponse.json({error:'Origem inválida.'},{status:403});
  if(process.env.ANTARES_FINANCE_WRITES_ENABLED!=='true')return NextResponse.json({error:'Gravação bloqueada.'},{status:503});
  const secret=process.env.ANTARES_FINANCE_CAPABILITY;
- if(!secret||!/^[a-f0-9]{64}$/i.test(secret))return NextResponse.json({error:'Integração financeira incompleta.'},{status:503});
+ if(!secret||!/^[a-f0-9]{64}$/i.test(secret))return NextResponse.json({error:'Não é possível realizar o estorno neste momento.'},{status:503});
  let body;
  try{body=await request.json();}catch{return NextResponse.json({error:'Dados inválidos.'},{status:400});}
  if(typeof body.original_id!=='string'||!/^[a-f0-9-]{36}$/i.test(body.original_id)
