@@ -1,6 +1,7 @@
 'use client';
 import {useCallback,useEffect,useMemo,useRef,useState} from 'react';
 import Link from 'next/link';
+import {useRouter} from 'next/navigation';
 import {Archive,ArrowLeft,Building2,CalendarDays,CheckCircle2,Clock3,FileText,Info,Layers,MapPin,MessageCircle,Phone,RefreshCw,Search,ShieldCheck,UserRound,Users,X} from 'lucide-react';
 import styles from './inbox.module.css';
 type Lead={id:string;responsible_name:string;institution:string;city:string;phone:string;
@@ -8,6 +9,7 @@ type Lead={id:string;responsible_name:string;institution:string;city:string;phon
 const label:Record<string,string>={pending:'Pendente',reviewing:'Em análise',converted:'Convertido',archived:'Arquivado'};
 const date=(value:string|null)=>value?new Date(value.slice(0,10)+'T12:00:00').toLocaleDateString('pt-BR'):'A combinar';
 export default function Inbox({conversionEnabled}:{conversionEnabled:boolean}){
+ const router=useRouter();
  const [leads,setLeads]=useState<Lead[]>([]);
  const [clients,setClients]=useState<{id:string;name:string;kind:string}[]>([]);
  const [chosen,setChosen]=useState<Record<string,string>>({});
@@ -48,7 +50,13 @@ export default function Inbox({conversionEnabled}:{conversionEnabled:boolean}){
   setBusy(id);setNotice('');
   try{const r=await fetch('/api/vitrine/convert',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({id,existingClientId})});
    const data=await r.json();if(!r.ok)throw Error(data.error||'Falha ao converter');
-   setNotice('Conversão concluída. Abra a proposta para conferir os dados antes de definir valores.');await load();
+   const proposalId=typeof data.proposalId==='string'&&/^[0-9a-f]{8}(-[0-9a-f]{4}){3}-[0-9a-f]{12}$/i.test(data.proposalId)?data.proposalId:null;
+   if(proposalId){
+    router.push('/vitrine/proposta/'+proposalId);
+   }else{
+    setNotice('Conversão concluída. Abra a proposta comercial pelo botão da solicitação convertida.');
+    await load();
+   }
   }catch(e){setNotice(e instanceof Error?e.message:'Falha ao converter');}
   finally{setBusy('');}
  }
