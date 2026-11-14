@@ -54,7 +54,7 @@ export async function POST(request:Request){
     return NextResponse.json({error:'Revise os dados do lançamento.'},{status:400});
 
   const capability=process.env.ANTARES_FINANCE_CAPABILITY;
-  if(!capability||!/^[0-9a-f]{64}$/i.test(capability))return NextResponse.json({error:'Capacidade financeira ainda não configurada.'},{status:503});
+  if(!capability||!/^[0-9a-f]{64}$/i.test(capability))return NextResponse.json({error:'Os lançamentos financeiros estão temporariamente indisponíveis.'},{status:503});
   const db=getTeamWriteDb();
   const rows=await db`SELECT entry_id,already_exists FROM public.antares_post_ledger_entry(
    ${capability},${String(ctx.user.id)},${ctx.organizationId},${id},${entryType},${amount},
