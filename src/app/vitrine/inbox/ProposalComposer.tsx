@@ -199,7 +199,7 @@ export default function ProposalComposer({lead,existingClientId,onClose,onSaved}
 
   <footer className={styles.footer}>
    <button type="button" className={styles.secondary} onClick={requestClose} disabled={busy}>Fechar</button>
-   {proposalId&&!dirty&&<Link className={styles.secondary} href={'/vitrine/proposta/'+proposalId}>Ver documento / PDF</Link>}
+   {proposalId&&!dirty&&<Link className={styles.secondary} href={'/vitrine/proposta/'+proposalId+'?visualizar=1'}>Visualizar / Salvar PDF</Link>}
    {status==='draft'&&<button type="button" className={styles.primary}
     disabled={blocked||!valid||(!dirty&&saved)} onClick={()=>void save()}>
     <Save size={17}/>{busy?'Salvando...':'Salvar rascunho'}</button>}
