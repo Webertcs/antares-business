@@ -3,7 +3,7 @@ import {requireMember,requireOwner,getDb,getTeamWriteDb} from '@/lib/equipe/auth
 export const runtime='nodejs';
 export const dynamic='force-dynamic';
 const uuid=/^[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}$/i;
-const unavailable=()=>NextResponse.json({error:'Encerramento aguardando implantação e homologação da função protegida no Neon.'},{status:503,headers:{'Cache-Control':'no-store'}});
+const unavailable=()=>NextResponse.json({error:'Não é possível encerrar este evento neste momento.'},{status:503,headers:{'Cache-Control':'no-store'}});
 export async function GET(_req:NextRequest,{params}:{params:Promise<{id:string}>}){
  const ctx=await requireMember();if(!ctx)return NextResponse.json({error:'Acesso negado'},{status:403});
  const {id}=await params;if(!uuid.test(id))return NextResponse.json({error:'Evento inválido'},{status:400});
