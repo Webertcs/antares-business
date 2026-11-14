@@ -36,13 +36,13 @@ export async function GET(){
       ORDER BY l.occurred_on DESC,l.created_at DESC LIMIT 1000`
   ]);
   return NextResponse.json({titles,clients,payments,writesEnabled:process.env.ANTARES_FINANCE_WRITES_ENABLED==='true'&&/^[a-f0-9]{64}$/i.test(process.env.ANTARES_FINANCE_CAPABILITY||'')},{headers:noStore});
- }catch{return NextResponse.json({error:'Contas a receber ainda não implantadas.'},{status:503,headers:noStore});}
+ }catch{return NextResponse.json({error:'Contas a receber está temporariamente indisponível.'},{status:503,headers:noStore});}
 }
 export async function POST(req:Request){
  const owner=await requireOwner();
  if(!owner)return NextResponse.json({error:'Acesso exclusivo do proprietário.'},{status:403});
  if(process.env.ANTARES_FINANCE_WRITES_ENABLED!=='true')
-  return NextResponse.json({error:'Gravações financeiras desabilitadas.'},{status:503});
+  return NextResponse.json({error:'Não é possível registrar lançamentos financeiros neste momento.'},{status:503});
  const origin=req.headers.get('origin');
  const host=req.headers.get('host');
  let sameOrigin=false;
@@ -56,7 +56,7 @@ export async function POST(req:Request){
   return NextResponse.json({error:'Conteúdo inválido.'},{status:415});
  const secret=process.env.ANTARES_FINANCE_CAPABILITY;
  if(!secret||!/^[a-f0-9]{64}$/i.test(secret))
-  return NextResponse.json({error:'Integração ainda não configurada.'},{status:503});
+  return NextResponse.json({error:'Não foi possível concluir o lançamento financeiro neste momento.'},{status:503});
  let p:Record<string,unknown>;
  try{p=await req.json()}catch{return NextResponse.json({error:'JSON inválido.'},{status:400});}
  try{
