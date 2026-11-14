@@ -886,3 +886,36 @@
   gap:12px;
  }
 }
+
+/* Homologação mobile 390px: controles sem sobreposição e CTA discreto. */
+@media (max-width:620px){
+  /* Os botões de órbita ficam abaixo do desenho, antes do título do seletor. */
+  .premium-kids .premium-universe-controls{
+    right:3%;
+    bottom:-35px;
+  }
+  .premium-kids .premium-planet-picker{
+    margin-top:64px;
+  }
+
+  /* O atalho fixo não deve cobrir textos e campos da vitrine. */
+  .premium-kids .premium-floating{
+    width:46px;
+    height:46px;
+    min-height:46px;
+    padding:0;
+    right:12px;
+    bottom:16px;
+    border-radius:50%;
+    justify-content:center;
+    gap:0;
+    font-size:0;
+    line-height:0;
+    white-space:nowrap;
+  }
+  .premium-kids .premium-floating svg{
+    width:21px;
+    height:21px;
+    flex:none;
+  }
+}
