@@ -1,7 +1,7 @@
 'use client';
 import Image from 'next/image';
 import {useEffect,useRef,useState} from 'react';
-import {ArrowRight,Volume2,VolumeX,Pause,Play,Send,ShieldCheck,MessageCircle} from 'lucide-react';
+import {ArrowRight,Volume2,VolumeX,Pause,Play,Send,ShieldCheck,MessageCircle,CalendarDays} from 'lucide-react';
 import './premium.css';
 import ProvaSocial from './ProvaSocial';
 const spaceStars=Array.from({length:165},(_,i)=>({x:(i*73+Math.floor(i*i*0.37))%900,y:(i*137+Math.floor(i*i*.19))%510,r:i%11===0?2.1:i%4===0?1.25:.68,opacity:.24+(i%8)*.087}));
