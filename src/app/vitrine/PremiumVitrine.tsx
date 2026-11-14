@@ -47,6 +47,7 @@ export default function PremiumVitrine(){
  const presenterTurn=useRef(0);
  const [formStatus,setFormStatus]=useState('');
  const [leadSending,setLeadSending]=useState(false);
+ const [gameInterested,setGameInterested]=useState(false);
  const [quoteDraft,setQuoteDraft]=useState('');
  const [today,setToday]=useState('');
  const [dark,setDark]=useState(false);
@@ -92,6 +93,8 @@ export default function PremiumVitrine(){
   const form=new FormData(e.currentTarget);
   const get=(name:string)=>String(form.get(name)||'').trim();
   const phone=get('telefone').replace(/\D/g,'');
+  const gameUpdatesOptIn=form.get('gameUpdatesOptIn')==='on';
+  if(gameUpdatesOptIn&&get('mensagem').length>690){setFormStatus('Para registrar também seu interesse no jogo, reduza as observações para até 690 caracteres.');return;}
   if(phone.length<10||phone.length>13){setFormStatus('Confira o WhatsApp: informe DDD e número válido.');return;}
   const people=Number(get('alunos'));
   if(get('alunos')&&(!Number.isInteger(people)||people<1||people>100000)){setFormStatus('Informe uma quantidade de participantes válida.');return;}
@@ -101,7 +104,8 @@ export default function PremiumVitrine(){
    'Cidade: '+get('cidade'),'WhatsApp: '+get('telefone'),
    'Público: '+get('publico'),'Participantes: '+(get('alunos')||'a combinar'),
    'Data desejada: '+(get('data')||'a combinar'),
-   'Mensagem: '+(get('mensagem')||'sem observações')].join('\n');
+   'Mensagem: '+(get('mensagem')||'sem observações'),
+   ...(gameUpdatesOptIn?['Interesse opcional: autorizo contato sobre novidades do futuro jogo ANTARES Kids.']:[])].join('\n');
   setQuoteDraft(text);
   setLeadSending(true);
   try{
@@ -110,11 +114,13 @@ export default function PremiumVitrine(){
     body:JSON.stringify({
      name:get('nome'),institution:get('instituicao'),city:get('cidade'),phone:get('telefone'),
      audience:get('publico'),attendees:get('alunos')||null,date:get('data'),notes:get('mensagem'),
+     gameUpdatesOptIn,
      website:get('website')
     })
    });
    if(response.ok){
-    setFormStatus('✅ Solicitação registrada no CRM como pendente. A equipe poderá avaliar e entrar em contato.');
+    setQuoteDraft('');
+    setFormStatus(gameUpdatesOptIn?'✅ Pedido recebido no CRM! Seu interesse nas novidades do jogo também foi registrado junto à solicitação. Nenhuma mensagem automática foi enviada.':'✅ Pedido recebido no CRM! A equipe avaliará sua solicitação e poderá entrar em contato.');
     return;
    }
    // Em implantação: nunca afirmar que o pedido foi salvo se a API não confirmar.
@@ -203,8 +209,46 @@ export default function PremiumVitrine(){
    </section>
    <ProvaSocial/>
    <section id="escolas" className="premium-school"><div><span>ESCOLAS E INSTITUIÇÕES</span><h2>O universo pode voltar todos os anos.</h2><p>Planeje visitas recorrentes com turmas diferentes. Pacotes e condições especiais são definidos em proposta personalizada.</p><a className="premium-button" href="#orcamento">Conhecer as possibilidades <ArrowRight size={17}/></a></div><div className="premium-school-art premium-school-picture"><Image src="/vitrine/cupula-escola-antares.webp" alt="Imagem conceitual de cúpula inflável de planetário móvel, sem pessoas, em pátio escolar" width={533} height={400} className="premium-school-photo"/><small className="premium-school-credit">Imagem ilustrativa gerada digitalmente. Não representa uma instalação real do ANTARES.</small></div></section>
-   <section id="orcamento" className="premium-section premium-contact"><div><span>PRONTOS PARA DECOLAR?</span><h2>Leve essa experiência para sua escola!</h2><p>Conte sobre sua instituição. A equipe poderá preparar uma proposta conforme o número de participantes e o formato da visita.</p><div className="premium-robot"><Image src="/mascotes/pixel.png" width={105} height={110} alt="PIXEL, o robô companheiro do ANTARES"/><small>BIP! BIP! SUA AVENTURA COMEÇA AQUI!</small></div><p className="premium-privacy"><ShieldCheck size={17}/> Formulário destinado a adultos responsáveis. Não solicitamos dados pessoais de crianças.</p></div><form onSubmit={submit}><div className="premium-form-grid"><label>Seu nome<input required name="nome" maxLength={120} autoComplete="name"/></label><label>Escola ou instituição<input required name="instituicao" maxLength={150}/></label><label>Cidade<input required name="cidade" maxLength={100}/></label><label>WhatsApp<input required name="telefone" type="tel" maxLength={22} autoComplete="tel"/></label><label>Público<select name="publico" defaultValue="Escola"><option>Escola</option><option>Associação</option><option>Empresa</option><option>Evento particular</option></select></label><label>Participantes estimados<input name="alunos" type="number" min="1" max="100000"/></label><label>Data desejada<input name="data" type="date" min={today||undefined}/></label></div><label>Observações<textarea name="mensagem" rows={3} maxLength={800}/></label><label className="premium-consent"><input required type="checkbox"/> Autorizo o contato em resposta a este pedido de orçamento. Entendo que os dados serão usados para esse atendimento.</label><input className="premium-honeypot" type="text" name="website" tabIndex={-1} autoComplete="off" aria-hidden="true"/><button className="premium-button" type="submit" disabled={leadSending}>{leadSending?"Registrando pedido...":"Solicitar orçamento"} <Send size={17}/></button>{formStatus&&<p role="status" className="premium-form-status">{formStatus}</p>}{quoteDraft&&<div className="premium-quote-preview"><label>Mensagem preparada<textarea readOnly rows={7} value={quoteDraft} aria-label="Mensagem de orçamento pronta para copiar"/></label><button type="button" onClick={copyQuote} className="premium-copy-quote">Copiar mensagem</button></div>}<small>Quando a integração estiver ativa, o pedido será registrado como pendente no CRM. Caso contrário, use o WhatsApp ou copie a mensagem. Não criamos contratos ou eventos automaticamente.</small></form></section>
-   <section className="premium-section premium-faq"><div className="premium-section-title"><span>DÚVIDAS FREQUENTES</span><h2>Perguntas de quem vai viajar</h2></div><details><summary>O planetário vai até a escola?</summary><p>Sim. A equipe leva a estrutura móvel e combina previamente o espaço necessário.</p></details><details><summary>Quantas crianças participam?</summary><p>A capacidade depende da cúpula utilizada. As turmas são organizadas em sessões.</p></details><details><summary>Também atende eventos e associações?</summary><p>Sim. Basta informar o formato do evento no pedido de orçamento.</p></details></section>
+    <section id="orcamento" className="premium-section premium-contact premium-contact-v2">
+     <div>
+      <span>PRONTOS PARA DECOLAR?</span>
+      <h2>Peça sua proposta personalizada.</h2>
+      <p>Conte sobre sua escola ou instituição. Nossa equipe poderá organizar uma proposta conforme a quantidade de participantes, a data e o tipo de experiência.</p>
+      <div className="premium-contact-highlights">
+       <span><ShieldCheck size={16}/> Atendimento personalizado</span>
+       <span><CalendarDays size={16}/> Data combinada com a escola</span>
+       <span><MessageCircle size={16}/> Retorno pelo WhatsApp</span>
+      </div>
+      <div className="premium-robot"><Image src="/mascotes/pixel.png" width={105} height={110} alt="PIXEL, o robô companheiro do ANTARES"/><small>BIP! BIP! SUA AVENTURA COMEÇA AQUI!</small></div>
+      <p className="premium-privacy"><ShieldCheck size={17}/> Formulário destinado a adultos responsáveis. Não solicitamos dados pessoais de crianças.</p>
+     </div>
+     <form onSubmit={submit}>
+      <div className="premium-form-heading"><strong>Vamos planejar essa aventura?</strong><span>* Campos obrigatórios</span></div>
+      <div className="premium-form-grid">
+       <label>Seu nome <span aria-hidden="true">*</span><input required name="nome" maxLength={120} autoComplete="name" placeholder="Nome do responsável"/></label>
+       <label>Escola ou instituição <span aria-hidden="true">*</span><input required name="instituicao" maxLength={150} placeholder="Nome da instituição"/></label>
+       <label>Cidade <span aria-hidden="true">*</span><input required name="cidade" maxLength={100} autoComplete="address-level2" placeholder="Cidade do atendimento"/></label>
+       <label>WhatsApp <span aria-hidden="true">*</span><input required name="telefone" type="tel" inputMode="tel" maxLength={22} autoComplete="tel" placeholder="(61) 99999-9999"/></label>
+       <label>Público<select name="publico" defaultValue="Escola"><option>Escola</option><option>Associação</option><option>Empresa</option><option>Evento particular</option></select></label>
+       <label>Participantes estimados<input name="alunos" type="number" min="1" max="100000" placeholder="A combinar"/></label>
+       <label>Data desejada<input name="data" type="date" min={today||undefined}/></label>
+      </div>
+      <label>Observações <span className="premium-optional-label">(opcional)</span><textarea name="mensagem" rows={3} maxLength={gameInterested?690:800} placeholder="Conte sobre a turma, horários ou necessidades especiais da instituição (sem dados pessoais de crianças)."/></label>
+      <label className="premium-game-interest">
+       <input type="checkbox" name="gameUpdatesOptIn" checked={gameInterested} onChange={e=>setGameInterested(e.target.checked)}/>
+       <span><strong>Também quero receber novidades do futuro jogo ANTARES Kids <em>Opcional</em></strong>
+        <small>Se marcar, essa preferência será registrada junto ao pedido de orçamento. Não há envio automático de notícias nesta fase; a equipe poderá entrar em contato quando houver novidades. Você pode pedir para deixar de receber esse contato.</small>
+       </span>
+      </label>
+      <label className="premium-consent"><input required type="checkbox"/> Autorizo o contato em resposta a este pedido de orçamento. Entendo que os dados serão usados para esse atendimento.</label>
+      <input className="premium-honeypot" type="text" name="website" tabIndex={-1} autoComplete="off" aria-hidden="true"/>
+      <button className="premium-button premium-form-submit" type="submit" disabled={leadSending}>{leadSending?"Registrando pedido...":"Solicitar minha proposta"} <Send size={17}/></button>
+      {formStatus&&<p role="status" aria-live="polite" className="premium-form-status">{formStatus}</p>}
+      {quoteDraft&&<div className="premium-quote-preview"><label>Mensagem preparada<textarea readOnly rows={7} value={quoteDraft} aria-label="Mensagem de orçamento pronta para copiar"/></label><button type="button" onClick={copyQuote} className="premium-copy-quote">Copiar mensagem</button></div>}
+      <small className="premium-form-disclaimer">Quando a integração estiver ativa, seu pedido será registrado como pendente no CRM. Se não for possível registrar, você poderá enviá-lo pelo WhatsApp ou copiar a mensagem. Nenhum contrato ou evento será criado automaticamente.</small>
+     </form>
+    </section>
+   <section className="premium-section premium-faq"><div className="premium-section-title"><span>DÚVIDAS FREQUENTES</span><h2>Perguntas de quem vai viajar</h2></div><details><summary>O planetário vai até a escola?</summary><p>Sim. A equipe leva a estrutura móvel e combina previamente o espaço necessário.</p></details><details><summary>Quantas crianças participam?</summary><p>A capacidade depende da cúpula utilizada. As turmas são organizadas em sessões.</p></details><details><summary>Também atende eventos e associações?</summary><p>Sim. Basta informar o formato do evento no pedido de orçamento.</p></details><details><summary>É indicado para quais idades?</summary><p>As experiências podem ser planejadas para diferentes faixas etárias. Conte a idade aproximada da turma nas observações para que a equipe avalie os conteúdos adequados.</p></details><details><summary>O jogo ANTARES já está disponível?</summary><p>Ainda não. O jogo educativo ANTARES Kids está em desenvolvimento, sem data de lançamento anunciada. Se quiser registrar interesse nas novidades, marque a opção específica no formulário de orçamento.</p></details></section>
   </main><footer className="premium-footer"><div><strong>✦ ANTARES · PLANETÁRIO KIDS</strong><p>Descobrindo o universo, uma escola de cada vez.</p></div><a href="#inicio">Voltar ao início ↑</a></footer>
   <a href="#orcamento" className="premium-floating" aria-label="Solicitar orçamento"><MessageCircle size={20}/> Orçamento</a>
  </div>;
