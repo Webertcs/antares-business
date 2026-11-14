@@ -203,3 +203,4 @@ export default function ProposalComposer({lead,existingClientId,onClose,onSaved}
    {status!=='draft'&&<span className={styles.locked}><Info size={15}/>Documento protegido</span>}
   </footer>
  </dialog>;
+}
