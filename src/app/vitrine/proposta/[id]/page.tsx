@@ -6,7 +6,7 @@ import {requireOwner,getDb} from '@/lib/equipe/auth';
 import {ArrowLeft,Building2,CheckCircle2,ClipboardList,FileText,Info,Receipt,Users,Wallet} from 'lucide-react';
 import styles from '../proposta.module.css';
 export const dynamic='force-dynamic';
-export default async function Proposta({params}:{params:Promise<{id:string}>}){
+export default async function Proposta({params,searchParams}:{params:Promise<{id:string}>;searchParams:Promise<{visualizar?:string}>}){
  const owner=await requireOwner();if(!owner)redirect('/sem-acesso');
  const {id}=await params;
  if(!/^[a-f0-9]{8}(-[a-f0-9]{4}){3}-[a-f0-9]{12}$/i.test(id))return <main style={{padding:32}}>Proposta inválida. <Link href="/vitrine/inbox">Voltar</Link></main>;
@@ -40,6 +40,22 @@ export default async function Proposta({params}:{params:Promise<{id:string}>}){
  const clientKindLabel:Record<string,string>={school:'Escola',company:'Empresa',association:'Associação',institution:'Instituição',other:'Outro'};
  const kind=clientKindLabel[String(proposal.client_kind)]||String(proposal.client_kind||'—');
  const different=linked&&origin.localeCompare(client,'pt-BR',{sensitivity:'base'})!==0;
+ const documentOnly=(await searchParams)?.visualizar==='1';
+ const preview=<Premium proposal={{id:String(proposal.id),status:String(proposal.status),valid_until:proposal.valid_until?String(proposal.valid_until):null,payment_terms:proposal.payment_terms?String(proposal.payment_terms):null,title:String(proposal.title),client_name:String(proposal.client_name),origin_institution:linked?origin:null,institution_mismatch:different,expected_attendees:Number(proposal.expected_attendees??0),total:Number(proposal.total),deposit:Number(proposal.deposit)}} history={history} documentOnly={documentOnly}/>;
+ if(documentOnly)return <main className={styles.page}>
+  <Link href="/vitrine/inbox" className={styles.back}><ArrowLeft size={15}/>Voltar às solicitações</Link>
+  <header className={styles.hero}>
+   <div className={styles.heroLeft}><div className={styles.heroIcon}><FileText size={26}/></div>
+    <div><span className={styles.eyebrow}>ANTARES BUSINESS · DOCUMENTO</span>
+     <h1>Visualizar proposta — {client}</h1></div>
+   </div>
+   <span className={[styles.status,proposalStatus==='draft'?styles.statusDraft:proposalStatus==='accepted'?styles.statusAccepted:''].filter(Boolean).join(' ')}>
+    <CheckCircle2 size={15}/>{status}
+   </span>
+  </header>
+  {proposalStatus==='draft'&&<div className={styles.caution}><Info size={16}/>Documento em rascunho. Confira e aprove a proposta antes de enviá-la ao cliente.</div>}
+  {preview}
+ </main>;
  return <main className={styles.page}>
   <Link href="/vitrine/inbox" className={styles.back}><ArrowLeft size={15}/>Voltar às solicitações</Link>
   <header className={styles.hero}>
@@ -112,7 +128,7 @@ export default async function Proposta({params}:{params:Promise<{id:string}>}){
   {proposalStatus==='draft'&&<div className={styles.editorFrame}>
    <Editor proposal={{id:String(proposal.id),status:String(proposal.status),pricing_model:String(proposal.pricing_model),expected_attendees:Number(proposal.expected_attendees??0),unit_price:Number(proposal.unit_price),fixed_price:Number(proposal.fixed_price),discount:Number(proposal.discount),deposit:Number(proposal.deposit)}}/>
   </div>}
-  <Premium proposal={{id:String(proposal.id),status:String(proposal.status),valid_until:proposal.valid_until?String(proposal.valid_until):null,payment_terms:proposal.payment_terms?String(proposal.payment_terms):null,title:String(proposal.title),client_name:String(proposal.client_name),origin_institution:linked?origin:null,institution_mismatch:different,expected_attendees:Number(proposal.expected_attendees??0),total:Number(proposal.total),deposit:Number(proposal.deposit)}} history={history}/>
+  {preview}
 
   <section className={styles.section}>
    <div className={styles.sectionHead}><h2><Info size={17}/>Observações da proposta</h2></div>
