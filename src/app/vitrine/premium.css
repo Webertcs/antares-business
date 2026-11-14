@@ -993,3 +993,30 @@
   opacity:0!important;
  }
 }
+
+/* Prévia experimental React Bits: identificação clara no topo da vitrine. */
+.premium-kids .premium-reactbits-hero-note{
+ display:table;
+ margin:13px auto -8px;
+ padding:6px 13px;
+ border:1px solid #8cdcf3a1;
+ border-radius:999px;
+ background:#173a72b8;
+ box-shadow:0 0 18px #5be5ff37;
+ color:#e4fbff;
+ font-size:10px;
+ font-weight:900;
+ letter-spacing:.11em;
+}
+.premium-kids .premium-copy h1 em:has(>.gradient-text){
+ background:none;
+ -webkit-text-fill-color:initial;
+}
+.premium-kids .premium-copy h1 em>.gradient-text{
+ max-width:100%;
+ line-height:inherit;
+ vertical-align:baseline;
+}
+@media(prefers-reduced-motion:reduce){
+ .premium-kids .premium-reactbits-hero-note{box-shadow:none}
+}
