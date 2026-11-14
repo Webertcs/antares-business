@@ -51,5 +51,5 @@ export async function POST(req:NextRequest){
  if(!safe[0]?.role_ok||!safe[0]?.table_ok||!safe[0]?.function_ok)return reply({error:'Permissões de edição não homologadas.'},503);
  const result=await sql`SELECT * FROM public.business_update_draft_prices(${owner.user.id},${b.id}::uuid,${b.model},${b.attendees},${vals[0]},${vals[1]},${vals[2]},${vals[3]})`;
  return reply({ok:true,total:result[0]?.total},200);
- }catch{return reply({error:'Não foi possível salvar o rascunho. Verifique migração, limites e permissões.'},409);}
+ }catch{return reply({error:'Não foi possível salvar o rascunho. Confira os dados e tente novamente.'},409);}
 }
