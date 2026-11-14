@@ -21,7 +21,7 @@ export async function GET() {
     ]);
     return NextResponse.json({ clients,contacts,events },{headers:{'Cache-Control':'no-store'}});
   } catch {
-    return NextResponse.json({ error:'Módulo CRM ainda não implantado no banco. Execute a migração 03 após backup.' },
+    return NextResponse.json({ error:'Não foi possível carregar o cadastro de clientes neste momento.' },
       {status:503,headers:{'Cache-Control':'no-store'}});
   }
 }
@@ -29,7 +29,7 @@ export async function POST(request: import('next/server').NextRequest) {
   // Habilitar separadamente dos convites do Bloco 02, após homologação.
   if (process.env.ANTARES_CRM_WRITES_ENABLED !== 'true' ||
       process.env.ANTARES_CRM_SECURITY_APPROVED !== 'true')
-    return NextResponse.json({ error: 'Cadastro ainda em homologação.' }, {status:503});
+    return NextResponse.json({ error: 'O cadastro de clientes está temporariamente indisponível.' }, {status:503});
   const origin = process.env.ANTARES_APP_ORIGIN;
   let expectedOrigin: string;
   try { expectedOrigin = new URL(origin || '').origin; }
@@ -67,7 +67,7 @@ export async function POST(request: import('next/server').NextRequest) {
           )) AS safe_functions
       FROM pg_roles r WHERE r.rolname=current_user`;
     if (!safety[0]?.safe_role || !safety[0]?.safe_tables || !safety[0]?.safe_functions)
-      return NextResponse.json({error:'Isolamento do CRM não verificado.'},{status:503});
+      return NextResponse.json({error:'Não foi possível confirmar a autorização para esta operação.'},{status:503});
     const body = await request.json();
     const str=(v:unknown,max=4000)=>typeof v==='string'?v.trim().slice(0,max):'';
     const uuid=(v:unknown)=>typeof v==='string' && /^[a-f0-9]{8}(-[a-f0-9]{4}){3}-[a-f0-9]{12}$/i.test(v)?v:null;
