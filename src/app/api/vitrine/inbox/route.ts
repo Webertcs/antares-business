@@ -19,12 +19,12 @@ export async function GET(){
     WHERE l.organization_id=${owner.organizationId}
     ORDER BY l.created_at DESC LIMIT 300`;
   return respond({leads:rows});
- }catch{return respond({error:'Caixa de entrada indisponível. Verifique a implantação da migração 05.'},503);}
+ }catch{return respond({error:'Não foi possível carregar as solicitações. Tente novamente mais tarde.'},503);}
 }
 export async function POST(request:NextRequest){
  if(process.env.ANTARES_CRM_WRITES_ENABLED!=='true' ||
     process.env.ANTARES_CRM_SECURITY_APPROVED!=='true')
-   return respond({error:'Revisão de solicitações em homologação.'},503);
+   return respond({error:'A revisão de solicitações está temporariamente indisponível.'},503);
  let origin:string;
  try{origin=new URL(process.env.ANTARES_APP_ORIGIN||'').origin;}
  catch{return respond({error:'Origem não configurada.'},503);}
