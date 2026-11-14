@@ -1,7 +1,34 @@
 import {NextRequest,NextResponse} from 'next/server';
-import {requireOwner,getTeamWriteDb} from '@/lib/equipe/auth';
+import {requireOwner,getDb,getTeamWriteDb} from '@/lib/equipe/auth';
 export const runtime='nodejs';
 const reply=(data:object,status:number)=>NextResponse.json(data,{status,headers:{'Cache-Control':'private, no-store'}});
+
+/** Consulta exclusiva do proprietário para reabrir um rascunho na Central de Oportunidades. */
+export async function GET(req:NextRequest){
+ try{
+  const owner=await requireOwner();
+  if(!owner)return reply({error:'Somente proprietário.'},403);
+  const id=req.nextUrl.searchParams.get('id');
+  if(!id||!/^[0-9a-f]{8}(-[0-9a-f]{4}){3}-[0-9a-f]{12}$/i.test(id))return reply({error:'Proposta inválida.'},400);
+  const db=getDb();
+  const rows=await db`SELECT p.id,p.status,p.pricing_model,p.expected_attendees,p.unit_price,p.fixed_price,
+    p.discount,p.deposit,p.total,to_char(p.valid_until,'YYYY-MM-DD') AS valid_until,p.payment_terms
+    FROM public.business_proposals p
+    WHERE p.id=${id}::uuid AND p.organization_id=${owner.organizationId}
+    LIMIT 1`;
+  const p=rows[0];
+  if(!p)return reply({error:'Proposta não encontrada.'},404);
+  return reply({proposal:{
+   id:String(p.id),status:String(p.status),pricing_model:String(p.pricing_model),
+   expected_attendees:Number(p.expected_attendees??0),unit_price:Number(p.unit_price??0),
+   fixed_price:Number(p.fixed_price??0),discount:Number(p.discount??0),
+   deposit:Number(p.deposit??0),total:Number(p.total??0),
+   valid_until:p.valid_until?String(p.valid_until):null,
+   payment_terms:p.payment_terms?String(p.payment_terms):''
+  }},200);
+ }catch{return reply({error:'Não foi possível carregar a proposta.'},500);}
+}
+
 export async function POST(req:NextRequest){
  if(process.env.ANTARES_CRM_WRITES_ENABLED!=='true'||process.env.ANTARES_CRM_SECURITY_APPROVED!=='true')
  return reply({error:'Edição indisponível.'},503);
