@@ -24,6 +24,6 @@ export async function POST(request: NextRequest) {
     if (!result[0]?.member_id) return NextResponse.json({ error: 'Convite expirado, revogado, utilizado ou vinculado a outro e-mail.' }, { status: 409 });
     return NextResponse.json({ success: true }, { headers: { 'Cache-Control': 'no-store' } });
   } catch {
-    return NextResponse.json({ error: 'Não foi possível aceitar o convite. Confira a migração SQL.' }, { status: 500 });
+    return NextResponse.json({ error: 'Não foi possível aceitar o convite. Solicite um novo convite se o problema continuar.' }, { status: 500 });
   }
 }
