@@ -40,7 +40,7 @@ export default function DocumentoClient({doc}:{doc:D}){
  </div>
  </header>
  <h1 style={{fontSize:22,marginTop:28,marginBottom:14,color:'#123f83'}}>{mode==='proposal'?'Proposta de experiência educacional':'Minuta de prestação de serviços'}</h1>
- {mode==='contract'&&<p style={{padding:10,background:'#fff5df',fontWeight:700}}>MINUTA NÃO ASSINADA — sem registro de formalização no CRM</p>}
+ {mode==='contract'&&<p style={{padding:10,background:'#fff5df',fontWeight:700}}>MINUTA NÃO ASSINADA — documento ainda não formalizado</p>}
  <p style={{fontSize:15,padding:'12px 14px',background:'#eff6ff',borderLeft:'4px solid #2169c9',borderRadius:6}}><strong>Instituição contratante:</strong> {doc.clientName}</p>
  <p><strong>Prestador:</strong> {provider.name||'NÃO INFORMADO — preencher antes de emitir'}</p>
  <p><strong>Documento do prestador:</strong> {provider.document||'Não informado'}</p>
