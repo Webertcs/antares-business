@@ -144,7 +144,7 @@ export default function ProposalComposer({lead,existingClientId,onClose,onSaved}
     throw Error('A aprovação ainda não foi confirmada. Atualize as solicitações antes de tentar novamente.');
    setStatus(String(data.proposal.status));
    setConfirmApprove(false);
-   setNotice('Proposta aprovada internamente! Confira o PDF antes de compartilhar com o cliente.');
+   setNotice('Proposta aprovada! Confira o documento antes de enviá-lo à instituição.');
    onSaved();
   }catch(e){
    setConfirmApprove(false);
@@ -172,9 +172,9 @@ export default function ProposalComposer({lead,existingClientId,onClose,onSaved}
     <div className={styles.schoolAside}><small>Público</small><strong>{lead.audience}</strong></div>
    </section>
 
-   {!proposalId&&<p className={styles.note}>Ao salvar pela primeira vez, {existingClientId?'o pedido será vinculado ao cliente selecionado':'será criado um cadastro para esta instituição'} e uma proposta em rascunho.</p>}
+   {!proposalId&&<p className={styles.note}>{existingClientId?'A proposta será vinculada ao cliente selecionado.':'A instituição será cadastrada.'} Você poderá voltar e editar o rascunho depois.</p>}
    {loading&&<p role="status" className={styles.note}>Carregando dados da proposta...</p>}
-   {status!=='draft'&&!loading&&<p className={styles.note}>Esta proposta já saiu do rascunho. Para proteger os dados comerciais e reservas, a edição está bloqueada. Consulte o documento original.</p>}
+   {status!=='draft'&&!loading&&<p className={styles.note}>Esta proposta já foi concluída e não pode ser editada. Consulte o documento para visualizar ou imprimir.</p>}
    {loadError&&<p role="alert" className={styles.error}>{loadError}</p>}
    {error&&<p role="alert" className={styles.error}>{error}</p>}
    {notice&&<p role="status" className={styles.success}><CheckCircle2 size={17}/>{notice}</p>}
@@ -214,9 +214,9 @@ export default function ProposalComposer({lead,existingClientId,onClose,onSaved}
        onChange={e=>{setTerms(e.target.value);mark();}}/></div>
     </div>
    </fieldset>
-   <p className={styles.safe}><ShieldCheck size={17}/>Salvar um rascunho não envia mensagens, não cria contratos, cobranças ou reservas.</p>
+   <p className={styles.safe}><ShieldCheck size={17}/>O rascunho fica salvo para revisão. Nada é enviado à instituição nesta etapa.</p>
    {proposalId&&status==='draft'&&!loading&&!dirty&&(!validUntil||terms.trim().length<10||(model!=='complimentary'&&total<=0))&&
-    <p className={styles.approvalHint}>Para aprovar, informe a validade, pelo menos 10 caracteres nas condições comerciais e confira os valores. Salve o rascunho após qualquer alteração.</p>}
+    <p className={styles.approvalHint}>Para aprovar, informe a validade e descreva as condições comerciais. Confira os valores e salve as alterações.</p>}
   </div>
 
   {confirmDiscard&&<div className={styles.discard} role="alertdialog" aria-label="Descartar alterações">
@@ -237,7 +237,7 @@ export default function ProposalComposer({lead,existingClientId,onClose,onSaved}
     <div><dt>Validade</dt><dd>{validUntil.split('-').reverse().join('/')}</dd></div>
     <div><dt>Condições</dt><dd>{terms.trim()}</dd></div>
    </dl>
-   <p className={styles.approveNote}><ShieldCheck size={15}/>Aprovar não envia WhatsApp nem cria contrato, cobrança ou reserva.</p>
+   <p className={styles.approveNote}><ShieldCheck size={15}/>A aprovação é interna. Envie a proposta à instituição e registre o aceite somente após a confirmação dela.</p>
    <div className={styles.approveActions}>
     <button type="button" ref={approveCancelRef} className={styles.secondary} disabled={busy}
      onClick={()=>setConfirmApprove(false)}>Voltar e editar</button>
