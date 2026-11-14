@@ -4,6 +4,7 @@ import Link from 'next/link';
 import {Archive,ArrowLeft,Building2,CalendarDays,CheckCircle2,ChevronDown,Clock3,FileText,Info,Layers,MapPin,MessageCircle,MoreHorizontal,Phone,RefreshCw,Search,UserRound,Users} from 'lucide-react';
 import styles from './inbox.module.css';
 import ProposalComposer from './ProposalComposer';
+import ClientAcceptance from './ClientAcceptance';
 type Lead={id:string;responsible_name:string;institution:string;city:string;phone:string;
  audience:string;attendees:number|null;desired_date:string|null;notes:string;status:string;created_at:string;converted_client_id:string|null;converted_proposal_id:string|null;proposal_status:string|null};
 const label:Record<string,string>={pending:'Pendente',reviewing:'Em análise',converted:'Convertido',archived:'Arquivado'};
@@ -16,7 +17,9 @@ export default function Inbox({conversionEnabled}:{conversionEnabled:boolean}){
  const [error,setError]=useState('');const [busy,setBusy]=useState('');const [filter,setFilter]=useState('all');
  const [loading,setLoading]=useState(true);const [notice,setNotice]=useState('');
  const [composerLeadId,setComposerLeadId]=useState<string|null>(null);
+ const [acceptLeadId,setAcceptLeadId]=useState<string|null>(null);
  const activeLead=composerLeadId?leads.find(l=>l.id===composerLeadId):undefined;
+ const acceptedLead=acceptLeadId?leads.find(l=>l.id===acceptLeadId):undefined;
  const load=useCallback(async()=>{setLoading(true);
   try{const r=await fetch('/api/vitrine/inbox',{cache:'no-store'});const data=await r.json();
    if(!r.ok)throw Error(data.error||'Não foi possível carregar.');
@@ -113,6 +116,9 @@ export default function Inbox({conversionEnabled}:{conversionEnabled:boolean}){
       (lead.proposal_status==='draft'
        ? <button type="button" disabled={Boolean(busy)||!conversionEnabled} onClick={()=>openComposer(lead.id)}
          className={styles.actionPrimary}><FileText size={16}/>Editar proposta</button>
+       : lead.proposal_status==='approved_internal'||lead.proposal_status==='legacy_accepted'
+       ? <button type="button" disabled={Boolean(busy)||!conversionEnabled} onClick={()=>setAcceptLeadId(lead.id)}
+         className={styles.actionPrimary}><CheckCircle2 size={16}/>Registrar aceite da escola</button>
        : <Link href={'/vitrine/proposta/'+lead.converted_proposal_id+'?visualizar=1'} className={styles.actionPrimary}>
          <FileText size={16}/>Visualizar / Salvar PDF</Link>)}
      {lead.status==='archived'&&
@@ -140,11 +146,11 @@ export default function Inbox({conversionEnabled}:{conversionEnabled:boolean}){
            <option key={c.id} value={c.id}>Vincular: {c.name}</option>)}
          </select>
         </label>}
-       {lead.status==='converted'&&lead.converted_proposal_id&&lead.proposal_status==='draft'&&
+       {lead.status==='converted'&&lead.converted_proposal_id&&['draft','approved_internal','legacy_accepted'].includes(String(lead.proposal_status))&&
         <Link href={'/vitrine/proposta/'+lead.converted_proposal_id+'?visualizar=1'} className={styles.actionSecondary}>
          <FileText size={16}/>Visualizar / Salvar PDF</Link>}
        {lead.status==='converted'&&lead.converted_proposal_id&&lead.proposal_status!=='draft'&&
-        <span className={styles.moreHint}>Proposta protegida contra alterações.</span>}
+        <span className={styles.moreHint}>{lead.proposal_status==='accepted'?'Aceite registrado. Proposta liberada para agendamento.':'Aprovação interna não equivale ao aceite da escola.'}</span>}
        <Link href="/clientes" className={styles.actionSecondary}><Users size={16}/>Abrir cadastro de clientes</Link>
       </div>
      </details>
@@ -158,8 +164,15 @@ export default function Inbox({conversionEnabled}:{conversionEnabled:boolean}){
     onClose={()=>setComposerLeadId(null)}
     onSaved={()=>{void load();}}
   />}
+  {acceptedLead&&acceptedLead.converted_proposal_id&&<ClientAcceptance
+    key={acceptedLead.id}
+    institution={acceptedLead.institution}
+    proposalId={acceptedLead.converted_proposal_id}
+    onClose={()=>setAcceptLeadId(null)}
+    onSaved={()=>{setAcceptLeadId(null);setNotice('Aceite da instituição registrado. Agora você pode organizar a reserva.');void load();}}
+  />}
   <p className={styles.foot}><Info size={16} aria-hidden="true"/>
-   <span>A solicitação só vira cliente e rascunho quando o proprietário clica em Salvar rascunho. Isso não cria contratos, cobranças ou reservas, e o WhatsApp continua manual.</span>
+   <span>A solicitação só vira cliente e rascunho quando o proprietário clica em Salvar rascunho. Aprovar internamente não significa que a escola aceitou. O aceite é registrado após confirmação real; WhatsApp e reservas continuam manuais.</span>
   </p>
  </main>;
 }
