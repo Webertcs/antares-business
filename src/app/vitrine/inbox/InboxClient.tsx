@@ -144,7 +144,7 @@ export default function Inbox({conversionEnabled}:{conversionEnabled:boolean}){
     onSaved={()=>{void load();}}
   />}
   <p className={styles.foot}><Info size={16} aria-hidden="true"/>
-   <span>A conversão exige confirmação do proprietário e não cria contratos ou cobranças automaticamente. As mensagens pelo WhatsApp são abertas manualmente.</span>
+   <span>A solicitação só vira cliente e rascunho quando o proprietário clica em Salvar rascunho. Isso não cria contratos, cobranças ou reservas, e o WhatsApp continua manual.</span>
   </p>
  </main>;
 }
