@@ -1020,3 +1020,12 @@
 @media(prefers-reduced-motion:reduce){
  .premium-kids .premium-reactbits-hero-note{box-shadow:none}
 }
+
+
+/* Prévia opt-in React Bits: galeria real, sem impactar a vitrine aprovada. */
+.premium-kids .premium-reactbits-gallery-area{max-width:1220px;margin:0 auto}
+.premium-kids .premium-reactbits-gallery-hint{margin:0 auto 15px;max-width:800px;text-align:center;color:#c9e5ff;font-size:13px;line-height:1.6}
+.premium-kids .premium-reactbits-gallery-frame{width:100%;height:425px;overflow:hidden;border:1px solid #a4d9ff58;border-radius:28px;background:radial-gradient(ellipse at 50% 40%,#3a5fbb66,transparent 75%),linear-gradient(135deg,#0a1d49,#1d215e 65%,#0e2147);box-shadow:inset 0 0 55px #0716305c,0 16px 38px #020b2860}
+.premium-kids .premium-reactbits-gallery-credit{margin:13px auto 0;max-width:900px;text-align:center;color:#bfd6f2;font-size:11px;line-height:1.55}
+.premium-kids .premium-reactbits-gallery-frame .circular-gallery{height:100%;width:100%}
+@media(max-width:620px){.premium-kids .premium-reactbits-gallery-frame{height:320px;border-radius:19px}.premium-kids .premium-reactbits-gallery-hint{padding:0 8px;font-size:12px}.premium-kids .premium-reactbits-gallery-credit{padding:0 6px;font-size:10px}}
