@@ -96,7 +96,7 @@ export default function NotificationPopover({open,anchorRef,onClose,feed,error,l
    {loading&&!feed&&<p role="status" style={{fontSize:13}}>Consultando avisos...</p>}
    {(error||readError)&&<p role="status" style={{fontSize:12,color:'#a3392c',background:'#fff0ed',padding:10,borderRadius:8}}>{error||readError}</p>}
    {feed&&<>
-    {!feed.readPersistenceAvailable&&<p role="status" style={{fontSize:12,color:'#985911',background:'#fff7e6',padding:9,borderRadius:8}}>Para memorizar avisos lidos após o F5, execute a migração de notificações no Neon.</p>}
+    {!feed.readPersistenceAvailable&&<p role="status" style={{fontSize:12,color:'#985911',background:'#fff7e6',padding:9,borderRadius:8}}>Os avisos lidos podem voltar a aparecer depois de atualizar a página. Eles continuam disponíveis para consulta.</p>}
     {feed.unavailable.length>0&&<p role="status" style={{fontSize:12,color:'#985911'}}>Alguns módulos estão indisponíveis no momento.</p>}
     {feed.items.length===0&&<p style={{fontSize:13,padding:'9px 2px'}}>Nenhuma pendência registrada nos módulos disponíveis.</p>}
     {feed.items.slice(0,5).map(n=>
