@@ -123,7 +123,7 @@ export default function PremiumVitrine(){
     formElement.reset();
     setGameInterested(false);
     setQuoteDraft('');
-    setFormStatus(gameUpdatesOptIn?'✅ Pedido recebido no CRM! Seu interesse nas novidades do jogo também foi registrado junto à solicitação. Nenhuma mensagem automática foi enviada.':'✅ Pedido recebido no CRM! A equipe avaliará sua solicitação e poderá entrar em contato.');
+    setFormStatus(gameUpdatesOptIn?'✅ Recebemos seu pedido! Seu interesse nas novidades do jogo também foi anotado. Nossa equipe poderá entrar em contato.':'✅ Recebemos seu pedido! Nossa equipe avaliará sua solicitação e poderá entrar em contato.');
     return;
    }
    // Em implantação: nunca afirmar que o pedido foi salvo se a API não confirmar.
@@ -132,12 +132,12 @@ export default function PremiumVitrine(){
   }finally{setLeadSending(false);}
   const number=process.env.NEXT_PUBLIC_ANTARES_WHATSAPP?.replace(/\D/g,'');
   if(!number||number.length<11||number.length>13){
-   setFormStatus('Pedido preparado, mas o WhatsApp oficial ainda não está configurado. Você pode copiar a mensagem abaixo. Nenhum dado foi enviado ou salvo.');
+   setFormStatus('Não foi possível enviar seu pedido neste momento. Copie a mensagem abaixo para encaminhá-la à nossa equipe.');
    return;
   }
   const href='https://wa.me/'+number+'?text='+encodeURIComponent(text);
   window.open(href,'_blank','noopener,noreferrer');
-  setFormStatus('Solicitamos a abertura do WhatsApp. Confirme o envio na conversa; se não abriu, copie a mensagem abaixo. Nada foi registrado no CRM.');
+  setFormStatus('Abrimos o WhatsApp para você confirmar o envio. Se a conversa não aparecer, copie a mensagem abaixo para encaminhá-la à nossa equipe.');
  }
  async function copyQuote(){
   try{await navigator.clipboard.writeText(quoteDraft);setFormStatus('Mensagem copiada. Você pode enviá-la ao atendimento do planetário.');}
@@ -186,7 +186,7 @@ export default function PremiumVitrine(){
     </div>
    </section>
    <section id="experiencia" className="premium-section"><div className="premium-section-title"><span>✦ COMO FUNCIONA</span><h2>A escola vira um portal para o espaço!</h2><p>A aventura acontece em três passos simples.</p></div><div className="premium-three"><article><div>🚚</div><b>01</b><h3>Chegamos e montamos</h3><p>Levamos a estrutura do planetário móvel até o local combinado.</p></article><article><div>🪐</div><b>02</b><h3>A turma entra na cúpula</h3><p>As crianças mergulham em uma experiência imersiva.</p></article><article><div>🚀</div><b>03</b><h3>Exploramos juntos</h3><p>Uma viagem guiada cheia de descobertas e perguntas.</p></article></div></section>
-   <section className="premium-showcase" aria-label="Experiências ilustradas do planetário"><div className="premium-section-title"><span>✦ CONHEÇA NOSSO UNIVERSO</span><h2>Uma experiência para lembrar</h2><p>Da cúpula às estrelas: conheça possibilidades de visitas, jornadas e eventos.</p></div><div className="premium-showcase-grid">{showcasePhotos.map(card=><article key={card.title}><MarketingPhoto src={card.src} fallback={card.fallback} alt={card.alt} width={700} height={450} className="premium-showcase-photo"/><div><h3>{card.title}</h3><p>{card.desc}</p></div></article>)}</div><p className="premium-showcase-disclaimer">Fotografias ilustrativas de outras experiências e do espaço. Não representam eventos realizados pelo ANTARES. <span className="premium-photo-credits">Créditos: <a href="https://www.eso.org/public/images/upr_IMG_6184-CC/" target="_blank" rel="noopener noreferrer">ESO / P. Horálek</a> · <a href="https://unsplash.com/photos/photography-of-astronaut-beside-satellite-OLlj17tUZnU" target="_blank" rel="noopener noreferrer">NASA / Unsplash</a> · <a href="https://commons.wikimedia.org/wiki/File:SPB-MobilesPlanetariumINTENSE%C2%A9SPB_FotoF.-M_(9).jpg" target="_blank" rel="noopener noreferrer">SPB Kommunikation</a> (<a href="https://creativecommons.org/licenses/by-sa/4.0/" target="_blank" rel="noopener noreferrer">CC BY-SA 4.0</a>) · <a href="https://unsplash.com/photos/night-sky-with-milky-way-observatory-and-people-stargazing-dU4dX1l0UFM" target="_blank" rel="noopener noreferrer">Scott Goodwill / Unsplash</a>. Imagens ajustadas ao enquadramento dos cards.</span></p></section>
+   <section className="premium-showcase" aria-label="Experiências ilustradas do planetário"><div className="premium-section-title"><span>✦ CONHEÇA NOSSO UNIVERSO</span><h2>Uma experiência para lembrar</h2><p>Da cúpula às estrelas: conheça possibilidades de visitas, jornadas e eventos.</p></div><div className="premium-showcase-grid">{showcasePhotos.map(card=><article key={card.title}><MarketingPhoto src={card.src} fallback={card.fallback} alt={card.alt} width={700} height={450} className="premium-showcase-photo"/><div><h3>{card.title}</h3><p>{card.desc}</p></div></article>)}</div><p className="premium-showcase-disclaimer">Fotografias ilustrativas de outras experiências e do espaço. Não representam eventos realizados pelo ANTARES. <span className="premium-photo-credits">Créditos: <a href="https://www.eso.org/public/images/upr_IMG_6184-CC/" target="_blank" rel="noopener noreferrer">ESO / P. Horálek</a> · <a href="https://unsplash.com/photos/photography-of-astronaut-beside-satellite-OLlj17tUZnU" target="_blank" rel="noopener noreferrer">NASA / Unsplash</a> · <a href="https://commons.wikimedia.org/wiki/File:SPB-MobilesPlanetariumINTENSE%C2%A9SPB_FotoF.-M_(9).jpg" target="_blank" rel="noopener noreferrer">SPB Kommunikation</a> (<a href="https://creativecommons.org/licenses/by-sa/4.0/" target="_blank" rel="noopener noreferrer">CC BY-SA 4.0</a>) · <a href="https://unsplash.com/photos/night-sky-with-milky-way-observatory-and-people-stargazing-dU4dX1l0UFM" target="_blank" rel="noopener noreferrer">Scott Goodwill / Unsplash</a>. </span></p></section>
    <section id="viagens" className="premium-section premium-journeys"><div className="premium-section-title"><span>PARA CADA TURMA</span><h2>Uma aventura para cada idade</h2><p>Escolha uma faixa etária para conhecer algumas possibilidades de conteúdo.</p></div><div className="premium-age-tabs" role="tablist" aria-label="Faixas etárias">{(Object.keys(journeys) as Age[]).map(a=><button role="tab" aria-selected={age===a} key={a} onClick={()=>setAge(a)}>{a}</button>)}</div><div className="premium-journey-grid">{journeys[age].map(([emoji,title,description])=><article key={title}><span>{emoji}</span><h3>{title}</h3><p>{description}</p></article>)}</div></section>
    <section id="jogo" className="premium-game-reveal" aria-labelledby="premium-game-title">
     <div className="premium-game-content">
@@ -194,7 +194,7 @@ export default function PremiumVitrine(){
      <h2 id="premium-game-title">A aventura continua <em>além da cúpula.</em></h2>
      <p>Astro, Lunna e Pixel estão se preparando para uma nova jornada educativa. Em breve, as crianças poderão continuar descobrindo o espaço em uma experiência digital ANTARES.</p>
      <div className="premium-game-soon">EM BREVE</div>
-     <small>Ilustração conceitual. O jogo ainda está em desenvolvimento; imagens e recursos finais poderão mudar.</small>
+     <small>Prévia ilustrativa do futuro jogo ANTARES Kids. Lançamento ainda não anunciado.</small>
     </div>
     <figure className="premium-game-art" aria-label="Arte conceitual do futuro jogo ANTARES com Astro, Lunna, Pixel e planetas">
      <div className="premium-game-planet premium-game-planet-a" aria-hidden="true"/>
@@ -211,7 +211,7 @@ export default function PremiumVitrine(){
     </figure>
    </section>
    <ProvaSocial/>
-   <section id="escolas" className="premium-school"><div><span>ESCOLAS E INSTITUIÇÕES</span><h2>O universo pode voltar todos os anos.</h2><p>Planeje visitas recorrentes com turmas diferentes. Pacotes e condições especiais são definidos em proposta personalizada.</p><a className="premium-button" href="#orcamento">Conhecer as possibilidades <ArrowRight size={17}/></a></div><div className="premium-school-art premium-school-picture"><Image src="/vitrine/cupula-escola-antares.webp" alt="Imagem conceitual de cúpula inflável de planetário móvel, sem pessoas, em pátio escolar" width={533} height={400} className="premium-school-photo"/><small className="premium-school-credit">Imagem ilustrativa gerada digitalmente. Não representa uma instalação real do ANTARES.</small></div></section>
+   <section id="escolas" className="premium-school"><div><span>ESCOLAS E INSTITUIÇÕES</span><h2>O universo pode voltar todos os anos.</h2><p>Planeje visitas recorrentes com turmas diferentes. Pacotes e condições especiais são definidos em proposta personalizada.</p><a className="premium-button" href="#orcamento">Conhecer as possibilidades <ArrowRight size={17}/></a></div><div className="premium-school-art premium-school-picture"><Image src="/vitrine/cupula-escola-antares.webp" alt="Imagem conceitual de cúpula inflável de planetário móvel, sem pessoas, em pátio escolar" width={533} height={400} className="premium-school-photo"/><small className="premium-school-credit">Ilustração digital de um planetário móvel. Não é uma foto do ANTARES.</small></div></section>
     <section id="orcamento" className="premium-section premium-contact premium-contact-v2">
      <div>
       <span>PRONTOS PARA DECOLAR?</span>
@@ -240,7 +240,7 @@ export default function PremiumVitrine(){
       <label className="premium-game-interest">
        <input type="checkbox" name="gameUpdatesOptIn" checked={gameInterested} onChange={e=>setGameInterested(e.target.checked)}/>
        <span><strong>Também quero receber novidades do futuro jogo ANTARES Kids <em>Opcional</em></strong>
-        <small>Se marcar, essa preferência será registrada junto ao pedido de orçamento. Não há envio automático de notícias nesta fase; a equipe poderá entrar em contato quando houver novidades. Você pode pedir para deixar de receber esse contato.</small>
+        <small>Ao marcar, você autoriza nossa equipe a entrar em contato sobre novidades do jogo. Você poderá pedir para não receber mais essas mensagens quando quiser.</small>
        </span>
       </label>
       <label className="premium-consent"><input required type="checkbox"/> Autorizo o contato em resposta a este pedido de orçamento. Entendo que os dados serão usados para esse atendimento.</label>
@@ -248,10 +248,10 @@ export default function PremiumVitrine(){
       <button className="premium-button premium-form-submit" type="submit" disabled={leadSending}>{leadSending?"Registrando pedido...":"Solicitar minha proposta"} <Send size={17}/></button>
       {formStatus&&<p role="status" aria-live="polite" className="premium-form-status">{formStatus}</p>}
       {quoteDraft&&<div className="premium-quote-preview"><label>Mensagem preparada<textarea readOnly rows={7} value={quoteDraft} aria-label="Mensagem de orçamento pronta para copiar"/></label><button type="button" onClick={copyQuote} className="premium-copy-quote">Copiar mensagem</button></div>}
-      <small className="premium-form-disclaimer">Seu pedido será encaminhado à equipe como uma solicitação pendente. Se o registro não for possível, você poderá enviar pelo WhatsApp ou copiar a mensagem. Nenhum contrato ou evento será criado automaticamente.</small>
+      <small className="premium-form-disclaimer">Nossa equipe analisará sua solicitação antes de preparar uma proposta. Se não conseguir enviar por aqui, você poderá encaminhar sua mensagem pelo WhatsApp.</small>
      </form>
     </section>
-   <section className="premium-section premium-faq"><div className="premium-section-title"><span>DÚVIDAS FREQUENTES</span><h2>Perguntas de quem vai viajar</h2></div><details><summary>O planetário vai até a escola?</summary><p>Sim. A equipe leva a estrutura móvel e combina previamente o espaço necessário.</p></details><details><summary>Quantas crianças participam?</summary><p>A capacidade depende da cúpula utilizada. As turmas são organizadas em sessões.</p></details><details><summary>Também atende eventos e associações?</summary><p>Sim. Basta informar o formato do evento no pedido de orçamento.</p></details><details><summary>É indicado para quais idades?</summary><p>As experiências podem ser planejadas para diferentes faixas etárias. Conte a idade aproximada da turma nas observações para que a equipe avalie os conteúdos adequados.</p></details><details><summary>O jogo ANTARES já está disponível?</summary><p>Ainda não. O jogo educativo ANTARES Kids está em desenvolvimento, sem data de lançamento anunciada. Se quiser registrar interesse nas novidades, marque a opção específica no formulário de orçamento.</p></details></section>
+   <section className="premium-section premium-faq"><div className="premium-section-title"><span>DÚVIDAS FREQUENTES</span><h2>Perguntas de quem vai viajar</h2></div><details><summary>O planetário vai até a escola?</summary><p>Sim. A equipe leva a estrutura móvel e combina previamente o espaço necessário.</p></details><details><summary>Quantas crianças participam?</summary><p>A capacidade depende da cúpula utilizada. As turmas são organizadas em sessões.</p></details><details><summary>Também atende eventos e associações?</summary><p>Sim. Basta informar o formato do evento no pedido de orçamento.</p></details><details><summary>É indicado para quais idades?</summary><p>As experiências podem ser planejadas para diferentes faixas etárias. Conte a idade aproximada da turma nas observações para que a equipe avalie os conteúdos adequados.</p></details><details><summary>O jogo ANTARES já está disponível?</summary><p>Ainda não! Estamos preparando o jogo educativo ANTARES Kids, sem data de lançamento anunciada. Para saber das novidades, marque a opção de interesse no formulário.</p></details></section>
   </main><footer className="premium-footer"><div><strong>✦ ANTARES · PLANETÁRIO KIDS</strong><p>Descobrindo o universo, uma escola de cada vez.</p></div><a href="#inicio">Voltar ao início ↑</a></footer>
   <a href="#orcamento" className="premium-floating" aria-label="Solicitar orçamento"><MessageCircle size={20}/> Orçamento</a>
  </div>;
