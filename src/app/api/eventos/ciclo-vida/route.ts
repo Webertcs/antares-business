@@ -17,7 +17,7 @@ export async function POST(req:NextRequest){
   const safety=await sql`SELECT current_user='antares_team_runtime' AND NOT r.rolsuper AND NOT r.rolbypassrls AS safe,
   p.prosecdef AND pg_get_userbyid(p.proowner)='neondb_owner' AND has_function_privilege(current_user,p.oid,'EXECUTE') AS allowed
   FROM pg_roles r CROSS JOIN pg_proc p WHERE r.rolname=current_user AND p.oid=to_regprocedure('public.antares_manage_event_lifecycle(text,uuid,text,text)')`;
-  if(!safety[0]?.safe||!safety[0]?.allowed)return NextResponse.json({error:'Gestão de eventos ainda não habilitada no Neon.'},{status:503});
+  if(!safety[0]?.safe||!safety[0]?.allowed)return NextResponse.json({error:'Não é possível alterar este evento neste momento.'},{status:503});
   await sql`SELECT public.antares_manage_event_lifecycle(${ctx.user.id},${body.eventId}::uuid,${body.action},${body.reason})`;
   return NextResponse.json({ok:true});
  }catch{return NextResponse.json({error:'Não foi possível concluir. Verifique vínculos do evento e permissões.'},{status:409});}
