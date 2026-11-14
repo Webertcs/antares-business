@@ -4,6 +4,7 @@ import {useEffect,useRef,useState} from 'react';
 import {ArrowRight,Volume2,VolumeX,Pause,Play,Send,ShieldCheck,MessageCircle,CalendarDays} from 'lucide-react';
 import './premium.css';
 import ProvaSocial from './ProvaSocial';
+import SpotlightCard from './reactbits/SpotlightCard';
 const spaceStars=Array.from({length:165},(_,i)=>({x:(i*73+Math.floor(i*i*0.37))%900,y:(i*137+Math.floor(i*i*.19))%510,r:i%11===0?2.1:i%4===0?1.25:.68,opacity:.24+(i%8)*.087}));
 const worlds=[
  {id:'sol',name:'Sol',icon:'☀️',fact:'O Sol é uma estrela! Sua luz leva cerca de oito minutos para chegar à Terra.',duration:0},
@@ -29,6 +30,12 @@ const showcasePhotos=[
  {src:'https://thumb.wikimedia.org/wikipedia/commons/thumb/7/76/SPB-MobilesPlanetariumINTENSE%C2%A9SPB_FotoF.-M_%289%29.jpg/960px-SPB-MobilesPlanetariumINTENSE%C2%A9SPB_FotoF.-M_%289%29.jpg',fallback:'/vitrine/escolas.svg',title:'Sua escola no universo',desc:'Ciência e curiosidade sem sair da escola.',alt:'Fotografia ilustrativa de cúpula de planetário móvel instalada em auditório escolar'},
  {src:'https://images.unsplash.com/photo-1779314082331-e423cb1cc6ae?auto=format&fit=crop&w=920&q=80',fallback:'/vitrine/eventos.svg',title:'Eventos especiais',desc:'Uma atração educativa para diferentes públicos.',alt:'Fotografia ilustrativa de pessoas observando o céu noturno e as estrelas'}
 ] as const;
+const ecosystemCards=[
+ {icon:'🪐',title:'Experiência imersiva',description:'A curiosidade ganha vida em uma viagem pela ciência.'},
+ {icon:'✨',title:'Ciência com diversão',description:'Descobertas pensadas para inspirar pequenos exploradores.'},
+ {icon:'🏫',title:'Na sua escola',description:'O planetário móvel vai até a instituição, mediante agendamento.'},
+ {icon:'🎮',title:'Universo em expansão',description:'A aventura também chegará ao jogo educativo ANTARES.'}
+] as const;
 function MarketingPhoto({src,fallback,alt,width,height,className}:{src:string;fallback:string;alt:string;width:number;height:number;className?:string}){
  const [broken,setBroken]=useState(false);
  return <Image src={broken?fallback:src} alt={alt} width={width} height={height} className={className}
@@ -52,7 +59,9 @@ export default function PremiumVitrine(){
  const [today,setToday]=useState('');
  const [dark,setDark]=useState(false);
  const [reduce,setReduce]=useState(false);
+ const [reactBitsPreview,setReactBitsPreview]=useState(false);
  const orbitSvg=useRef<SVGSVGElement|null>(null);
+ useEffect(()=>{setReactBitsPreview(new URLSearchParams(window.location.search).get('reactbits')==='1');},[]);
  useEffect(()=>{setReduce(window.matchMedia('(prefers-reduced-motion: reduce)').matches);setVoiceAvailable('speechSynthesis'in window);const d=new Date();setToday([d.getFullYear(),String(d.getMonth()+1).padStart(2,'0'),String(d.getDate()).padStart(2,'0')].join('-'));return()=>{window.speechSynthesis?.cancel();};},[]);
  function speakFact(fact:string,speaker:'Astro'|'Lunna'|'PIXEL',mode:'intro'|'planet'='planet'){
   if(mute||!voiceAvailable)return;
@@ -178,11 +187,14 @@ export default function PremiumVitrine(){
    </div></section>
    <section className="premium-ecosystem" aria-labelledby="premium-ecosystem-title">
     <div className="premium-ecosystem-heading"><span>✦ O ECOSSISTEMA ANTARES</span><h2 id="premium-ecosystem-title">Uma experiência que começa na escola e continua nas descobertas</h2></div>
+    {reactBitsPreview&&<p className="premium-reactbits-preview-label" role="status">✨ Prévia React Bits: passe o mouse nos cartões para ver o efeito.</p>}
     <div className="premium-ecosystem-grid">
-     <article><span className="premium-ecosystem-icon" aria-hidden="true">🪐</span><h3>Experiência imersiva</h3><p>A curiosidade ganha vida em uma viagem pela ciência.</p></article>
-     <article><span className="premium-ecosystem-icon" aria-hidden="true">✨</span><h3>Ciência com diversão</h3><p>Descobertas pensadas para inspirar pequenos exploradores.</p></article>
-     <article><span className="premium-ecosystem-icon" aria-hidden="true">🏫</span><h3>Na sua escola</h3><p>O planetário móvel vai até a instituição, mediante agendamento.</p></article>
-     <article><span className="premium-ecosystem-icon" aria-hidden="true">🎮</span><h3>Universo em expansão</h3><p>A aventura também chegará ao jogo educativo ANTARES.</p></article>
+     {ecosystemCards.map(card=>{
+      const content=<><span className="premium-ecosystem-icon" aria-hidden="true">{card.icon}</span><h3>{card.title}</h3><p>{card.description}</p></>;
+      return reactBitsPreview
+       ? <SpotlightCard key={card.title} className="premium-reactbits-preview-card" spotlightColor="#9ccaff" spotlightSize={200} intensity={0.4} borderGlow={0.8} smoothing={0.2} proximity={55} theme="dark">{content}</SpotlightCard>
+       : <article key={card.title}>{content}</article>;
+     })}
     </div>
    </section>
    <section id="experiencia" className="premium-section"><div className="premium-section-title"><span>✦ COMO FUNCIONA</span><h2>A escola vira um portal para o espaço!</h2><p>A aventura acontece em três passos simples.</p></div><div className="premium-three"><article><div>🚚</div><b>01</b><h3>Chegamos e montamos</h3><p>Levamos a estrutura do planetário móvel até o local combinado.</p></article><article><div>🪐</div><b>02</b><h3>A turma entra na cúpula</h3><p>As crianças mergulham em uma experiência imersiva.</p></article><article><div>🚀</div><b>03</b><h3>Exploramos juntos</h3><p>Uma viagem guiada cheia de descobertas e perguntas.</p></article></div></section>
