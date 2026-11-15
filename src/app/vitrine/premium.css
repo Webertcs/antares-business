@@ -2239,15 +2239,12 @@
 
 
 
-/* ANTARES · escolas — cenário cinematográfico aprovado, apenas na prévia.
-   Arte ilustrativa com Astro, sem legenda técnica abaixo da imagem.
-   O restante da vitrine e o visual oficial ficam preservados. */
+/* ANTARES · Escolas em céu contínuo: nenhuma faixa independente entre
+   Confiança e Cúpula; a ilustração já possui a moldura na própria arte.
+   Alterações exclusivas da vitrine ?reactbits=1. */
 .premium-kids.premium-cinematic-sky .premium-school.premium-school-cinematic{
-  background:
-    radial-gradient(ellipse 46% 74% at 85% 42%,rgba(33,79,136,.14),transparent 75%),
-    linear-gradient(110deg,rgba(4,12,27,.96),rgba(5,14,30,.95));
-  border-top:0;
-  border-bottom:0;
+  background:transparent;
+  border:0;
   box-shadow:none;
   backdrop-filter:none;
 }
@@ -2256,6 +2253,11 @@
   align-items:center;
   justify-content:center;
   min-width:0;
+  background:transparent;
+  border:0;
+  padding:0;
+  box-shadow:none;
+  filter:none;
 }
 .premium-kids.premium-cinematic-sky .premium-school-cinematic .premium-school-photo{
   display:block;
@@ -2264,9 +2266,10 @@
   aspect-ratio:290/191;
   object-fit:cover;
   object-position:center;
-  border:1px solid rgba(131,192,255,.46);
+  /* Uma única moldura: a borda já está desenhada na ilustração. */
+  border:0;
   border-radius:22px;
-  box-shadow:0 20px 44px rgba(0,4,19,.48),0 0 28px rgba(67,141,230,.14);
+  box-shadow:0 18px 35px rgba(0,4,19,.27);
   filter:none;
 }
 @media(max-width:620px){
