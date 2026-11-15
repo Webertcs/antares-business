@@ -5,7 +5,6 @@ import {useEffect,useRef,useState} from 'react';
 import {ArrowRight,Volume2,VolumeX,Pause,Play,Send,ShieldCheck,MessageCircle,CalendarDays} from 'lucide-react';
 import './premium.css';
 import ProvaSocial from './ProvaSocial';
-import SpotlightCard from './reactbits/SpotlightCard';
 import GradientText from './reactbits/GradientText';
 
 // A galeria WebGL é carregada apenas na prévia experimental da vitrine.
@@ -14,6 +13,8 @@ const CircularGallery = dynamic(() => import('./reactbits/CircularGallery'), { s
 const OrbitasCinematograficas = dynamic(() => import('./OrbitasCinematograficas'), { ssr: false });
 // Star Border permanece em um módulo separado e só é renderizado na prévia.
 const StarBorderHeroActions = dynamic(() => import('./StarBorderHeroActions'), { ssr: false });
+// Bento original do React Bits, simplificado sem dependências externas de ícones.
+const MagicBento = dynamic(() => import('./reactbits/MagicBento'), { ssr: false });
 const spaceStars=Array.from({length:165},(_,i)=>({x:(i*73+Math.floor(i*i*0.37))%900,y:(i*137+Math.floor(i*i*.19))%510,r:i%11===0?2.1:i%4===0?1.25:.68,opacity:.24+(i%8)*.087}));
 const worlds=[
  {id:'sol',name:'Sol',icon:'☀️',fact:'O Sol é uma estrela! Sua luz leva cerca de oito minutos para chegar à Terra.',duration:0},
@@ -55,6 +56,15 @@ const ecosystemCards=[
  {icon:'🏫',title:'Na sua escola',description:'O planetário móvel vai até a instituição, mediante agendamento.'},
  {icon:'🎮',title:'Universo em expansão',description:'A aventura também chegará ao jogo educativo ANTARES.'}
 ] as const;
+// Quatro benefícios existentes, sem dados fictícios: organização Bento 2+1 / 1+2.
+const ecosystemBentoItems = ecosystemCards.map((card,index) => ({
+  id: card.title,
+  label: ['IMERSÃO','APRENDIZADO','NA SUA ESCOLA','NOVAS AVENTURAS'][index],
+  icon: <span className="premium-magic-bento-emoji" aria-hidden="true">{card.icon}</span>,
+  title: card.title,
+  description: card.description,
+  colSpan: index === 0 || index === 3 ? 2 : 1
+}));
 function MarketingPhoto({src,fallback,alt,width,height,className}:{src:string;fallback:string;alt:string;width:number;height:number;className?:string}){
  const [broken,setBroken]=useState(false);
  return <Image src={broken?fallback:src} alt={alt} width={width} height={height} className={className}
@@ -219,15 +229,35 @@ export default function PremiumVitrine(){
    {reactBitsPreview && <OrbitasCinematograficas />}
    <section className="premium-ecosystem" aria-labelledby="premium-ecosystem-title">
     <div className="premium-ecosystem-heading"><span>✦ O ECOSSISTEMA ANTARES</span><h2 id="premium-ecosystem-title">Uma experiência que começa na escola e continua nas descobertas</h2></div>
-    {reactBitsPreview&&<p className="premium-reactbits-preview-label" role="status">✨ Prévia React Bits: passe o mouse nos cartões para ver o efeito.</p>}
-    <div className="premium-ecosystem-grid">
-     {ecosystemCards.map(card=>{
-      const content=<><span className="premium-ecosystem-icon" aria-hidden="true">{card.icon}</span><h3>{card.title}</h3><p>{card.description}</p></>;
-      return reactBitsPreview
-       ? <SpotlightCard key={card.title} className="premium-reactbits-preview-card" spotlightColor="#ffffff" spotlightSize={235} intensity={0.62} borderGlow={0.95} smoothing={0.2} proximity={55} theme="dark">{content}</SpotlightCard>
-       : <article key={card.title}>{content}</article>;
-     })}
-    </div>
+    {reactBitsPreview
+      ? <div className="premium-magic-bento-wrap">
+          <MagicBento
+            className="premium-magic-bento-grid"
+            items={ecosystemBentoItems}
+            columns={3}
+            rowHeight={210}
+            gap={14}
+            radius={22}
+            theme="dark"
+            glowColor="#9bd7ff"
+            textAutoHide={false}
+            enableBorderGlow
+            enableSpotlight
+            spotlightRadius={320}
+            enableStars={false}
+            enableTilt
+            enableMagnetism={false}
+            clickEffect={false}
+            intro
+            disableAnimations={reduce}
+          />
+        </div>
+      : <div className="premium-ecosystem-grid">
+          {ecosystemCards.map(card=><article key={card.title}>
+            <span className="premium-ecosystem-icon" aria-hidden="true">{card.icon}</span>
+            <h3>{card.title}</h3><p>{card.description}</p>
+          </article>)}
+        </div>}
    </section>
    <section id="experiencia" className="premium-section"><div className="premium-section-title"><span>✦ COMO FUNCIONA</span><h2>A escola vira um portal para o espaço!</h2><p>A aventura acontece em três passos simples.</p></div><div className="premium-three"><article><div>🚚</div><b>01</b><h3>Chegamos e montamos</h3><p>Levamos a estrutura do planetário móvel até o local combinado.</p></article><article><div>🪐</div><b>02</b><h3>A turma entra na cúpula</h3><p>As crianças mergulham em uma experiência imersiva.</p></article><article><div>🚀</div><b>03</b><h3>Exploramos juntos</h3><p>Uma viagem guiada cheia de descobertas e perguntas.</p></article></div></section>
    <section className="premium-showcase" aria-label="Experiências ilustradas do planetário"><div className="premium-section-title"><span>✦ CONHEÇA NOSSO UNIVERSO</span><h2>Uma experiência para lembrar</h2><p>Da cúpula às estrelas: conheça possibilidades de visitas, jornadas e eventos.</p></div>{reactBitsPreview && !reduce && galleryAvailable ? <div className="premium-reactbits-gallery-area"><p className="premium-reactbits-gallery-hint">A galeria se movimenta sozinha. Arraste ou deslize para explorar; ao interagir, o movimento pausa. Toque em uma imagem para ampliar.</p><div className="premium-reactbits-gallery-frame"><CircularGallery items={reactBitsGalleryItems} bend={1.6} itemSize={0.83} itemAspect={1.1} gap={0.24} wave={0.55} fadeEdges={0.12} shadow={0.32} textColor="#f8fbff" font="bold 25px system-ui" scrollSpeed={1} scrollEase={0.07} autoScroll={0.85} showTitles={true} grayscale={false} openOnClick={true} intro={true} /></div><p className="premium-reactbits-gallery-credit">Imagens astronômicas reais e material ilustrativo; não são registros de eventos realizados pelo ANTARES. Créditos: <a href="https://science.nasa.gov/asset/webb/cosmic-cliffs-in-the-carina-nebula-nircam-and-miri-composite-image/" target="_blank" rel="noopener noreferrer">NASA/ESA/CSA/STScI (Carina)</a> · <a href="https://science.nasa.gov/asset/webb/pillars-of-creation-nircam-image/" target="_blank" rel="noopener noreferrer">NASA/ESA/CSA/STScI (Pilares)</a> · <a href="https://science.nasa.gov/photojournal/jewel-of-the-solar-system/" target="_blank" rel="noopener noreferrer">NASA/JPL-Caltech/SSI/Cornell (Saturno)</a> · <a href="https://science.nasa.gov/resource/blue-marble/" target="_blank" rel="noopener noreferrer">NASA Goddard (Terra)</a>.</p></div> : <>{reactBitsPreview && <p className="premium-reactbits-gallery-hint">Galeria em versão estática para preservar a acessibilidade e a compatibilidade deste dispositivo.</p>}<div className="premium-showcase-grid">{showcasePhotos.map(card=><article key={card.title}><MarketingPhoto src={card.src} fallback={card.fallback} alt={card.alt} width={700} height={450} className="premium-showcase-photo"/><div><h3>{card.title}</h3><p>{card.desc}</p></div></article>)}</div><p className="premium-showcase-disclaimer">Fotografias ilustrativas de outras experiências e do espaço. Não representam eventos realizados pelo ANTARES. <span className="premium-photo-credits">Créditos: <a href="https://www.eso.org/public/images/upr_IMG_6184-CC/" target="_blank" rel="noopener noreferrer">ESO / P. Horálek</a> · <a href="https://unsplash.com/photos/photography-of-astronaut-beside-satellite-OLlj17tUZnU" target="_blank" rel="noopener noreferrer">NASA / Unsplash</a> · <a href="https://commons.wikimedia.org/wiki/File:SPB-MobilesPlanetariumINTENSE%C2%A9SPB_FotoF.-M_(9).jpg" target="_blank" rel="noopener noreferrer">SPB Kommunikation</a> (<a href="https://creativecommons.org/licenses/by-sa/4.0/" target="_blank" rel="noopener noreferrer">CC BY-SA 4.0</a>) · <a href="https://unsplash.com/photos/night-sky-with-milky-way-observatory-and-people-stargazing-dU4dX1l0UFM" target="_blank" rel="noopener noreferrer">Scott Goodwill / Unsplash</a>. </span></p></>}</section>

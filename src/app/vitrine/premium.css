@@ -1249,3 +1249,107 @@
   .premium-kids .premium-preview-header nav a{transition:none}
   .premium-kids .premium-preview-header nav a:hover{transform:none}
 }
+
+
+/* ANTARES Kids · Magic Bento, apenas na vitrine opt-in (?reactbits=1).
+   Responsividade gerenciada pelo componente original do React Bits. */
+.premium-kids .premium-magic-bento-wrap{
+  max-width:1100px;
+  margin:28px auto 0;
+  perspective:1100px;
+}
+.premium-kids .premium-magic-bento-grid{
+  width:100%;
+}
+.premium-kids .premium-magic-bento-grid .magic-bento__card{
+  --mb-edge:rgba(154,202,255,.36);
+  --mb-highlight:rgba(240,249,255,.13);
+  --mb-spot-alpha:.14;
+  --mb-glow-alpha:.9;
+  background:
+    radial-gradient(ellipse at 89% 10%,rgba(69,135,241,.17),transparent 48%),
+    linear-gradient(145deg,#203e78,#101e45 65%,#101937);
+  box-shadow:inset 0 1px rgba(231,246,255,.08),0 16px 34px rgba(0,8,32,.3);
+}
+.premium-kids .premium-magic-bento-grid .magic-bento__card::before{
+  content:"";
+  position:absolute;inset:0;pointer-events:none;
+  background-image:
+    radial-gradient(circle at 14% 18%,rgba(239,248,255,.6) 0 .9px,transparent 1.7px),
+    radial-gradient(circle at 77% 72%,rgba(185,214,255,.46) 0 1px,transparent 2px),
+    radial-gradient(circle at 49% 37%,rgba(228,239,255,.5) 0 .8px,transparent 1.6px);
+  opacity:.35;
+}
+.premium-kids .premium-magic-bento-grid .magic-bento__cell:nth-child(1) .magic-bento__card,
+.premium-kids .premium-magic-bento-grid .magic-bento__cell:nth-child(4) .magic-bento__card{
+  background:
+    radial-gradient(ellipse at 85% 20%,rgba(77,157,255,.23),transparent 55%),
+    radial-gradient(ellipse at 8% 100%,rgba(109,99,214,.17),transparent 58%),
+    linear-gradient(125deg,#213f78,#122b58 55%,#171f4b);
+}
+.premium-kids .premium-magic-bento-grid .magic-bento__content{
+  padding:24px 25px;
+  gap:10px;
+}
+.premium-kids .premium-magic-bento-grid .magic-bento__header{
+  align-items:center;
+  justify-content:space-between;
+  flex-direction:row;
+  gap:12px;
+  color:#bfd9ff;
+  letter-spacing:.11em;
+  font-weight:900;
+  font-size:10px;
+}
+.premium-kids .premium-magic-bento-grid .magic-bento__icon{
+  display:grid;
+  place-items:center;
+  width:56px;
+  height:56px;
+  flex:0 0 56px;
+  background:rgba(72,134,220,.24);
+  border:1px solid rgba(164,213,255,.39);
+  border-radius:17px;
+}
+.premium-kids .premium-magic-bento-grid .premium-magic-bento-emoji{
+  font-size:30px;line-height:1;
+}
+.premium-kids .premium-magic-bento-grid .magic-bento__label{
+  color:#d2e4ff;
+  font-size:10px;
+  text-align:right;
+  line-height:1.5;
+  white-space:normal;
+}
+.premium-kids .premium-magic-bento-grid .magic-bento__text{
+  gap:9px;
+  margin-top:auto;
+}
+.premium-kids .premium-magic-bento-grid .magic-bento__title{
+  font-size:clamp(17px,1.85vw,23px);
+  letter-spacing:-.02em;
+  font-weight:900;
+  line-height:1.22;
+  color:#fff;
+}
+.premium-kids .premium-magic-bento-grid .magic-bento__description{
+  font-size:13px;
+  color:#d1e2fa;
+  line-height:1.6;
+  max-width:550px;
+}
+.premium-kids .premium-magic-bento-grid .magic-bento__cell{
+  min-width:0;
+}
+@media(max-width:720px){
+  .premium-kids .premium-magic-bento-grid .magic-bento__content{padding:20px}
+  .premium-kids .premium-magic-bento-grid .magic-bento__icon{width:47px;height:47px;flex-basis:47px}
+  .premium-kids .premium-magic-bento-grid .premium-magic-bento-emoji{font-size:25px}
+  .premium-kids .premium-magic-bento-grid .magic-bento__title{font-size:17px}
+  .premium-kids .premium-magic-bento-grid .magic-bento__description{font-size:12px}
+}
+@media(prefers-reduced-motion:reduce){
+  .premium-kids .premium-magic-bento-grid .magic-bento__card{transform:none!important}
+  .premium-kids .premium-magic-bento-grid .magic-bento__light,
+  .premium-kids .premium-magic-bento-grid .magic-bento__border{animation:none!important;transition:none!important}
+}
