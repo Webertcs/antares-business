@@ -2701,3 +2701,226 @@
     animation:none!important;
   }
 }
+
+
+/* ANTARES Kids · Faixas etárias cinematográficas — React Bits Spotlight.
+   Apenas na prévia experimental. As 3 faixas, os textos e a versão oficial
+   permanecem iguais; não há outra moldura envolvendo a seção. */
+.premium-kids.premium-cinematic-sky .premium-journeys.premium-journeys-cinematic{
+  width:min(calc(100% - 44px),1220px);
+  max-width:1220px;
+  margin:30px auto 58px;
+  padding:43px 8px 47px;
+  border:0;
+  border-radius:0;
+  background:transparent;
+  box-shadow:none;
+  backdrop-filter:none;
+  overflow:visible;
+}
+.premium-kids.premium-cinematic-sky .premium-journeys-cinematic::before,
+.premium-kids.premium-cinematic-sky .premium-journeys-cinematic::after{
+  display:none;
+}
+.premium-kids.premium-cinematic-sky .premium-journeys-cinematic .premium-section-title{
+  margin-bottom:25px;
+}
+.premium-kids.premium-cinematic-sky .premium-journeys-cinematic .premium-section-title>span{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:16px;
+  color:#ffdf92;
+  letter-spacing:.17em;
+  font-weight:850;
+  font-size:11px;
+}
+.premium-kids.premium-cinematic-sky .premium-journeys-cinematic .premium-section-title>span::before,
+.premium-kids.premium-cinematic-sky .premium-journeys-cinematic .premium-section-title>span::after{
+  content:"";
+  width:45px;
+  height:1px;
+  background:linear-gradient(90deg,transparent,rgba(255,208,105,.66));
+}
+.premium-kids.premium-cinematic-sky .premium-journeys-cinematic .premium-section-title>span::after{
+  transform:rotate(180deg);
+}
+.premium-kids.premium-cinematic-sky .premium-journeys-cinematic .premium-section-title h2{
+  margin:16px 0 10px;
+  color:#f7fbff;
+  text-shadow:0 4px 24px rgba(1,5,25,.49);
+}
+.premium-kids.premium-cinematic-sky .premium-journeys-cinematic .premium-section-title p{
+  color:#c7d9f1;
+  font-size:15px;
+}
+.premium-kids.premium-cinematic-sky .premium-journeys-cinematic .premium-age-tabs{
+  display:flex;
+  justify-content:center;
+  flex-wrap:wrap;
+  gap:13px;
+  margin:0 0 38px;
+}
+.premium-kids.premium-cinematic-sky .premium-journeys-cinematic .premium-age-tabs button{
+  min-width:111px;
+  min-height:45px;
+  border:1px solid rgba(118,164,226,.43);
+  border-radius:999px;
+  background:linear-gradient(155deg,rgba(15,36,70,.92),rgba(4,14,33,.97));
+  box-shadow:inset 0 1px rgba(197,226,255,.07);
+  color:#e6f2ff;
+  font-weight:850;
+  font-size:14px;
+  cursor:pointer;
+  transition:border-color .22s ease,box-shadow .22s ease,transform .22s ease;
+}
+.premium-kids.premium-cinematic-sky .premium-journeys-cinematic .premium-age-tabs button:hover{
+  border-color:rgba(172,209,255,.76);
+  box-shadow:0 0 20px rgba(76,151,244,.17);
+  transform:translateY(-1px);
+}
+.premium-kids.premium-cinematic-sky .premium-journeys-cinematic .premium-age-tabs button[aria-selected=true]{
+  border:1px solid rgba(255,216,119,.94);
+  background:linear-gradient(140deg,#1b60dc,#073d95);
+  box-shadow:0 0 0 1px rgba(254,214,116,.17),0 0 20px rgba(71,140,255,.28),0 1px 13px rgba(255,199,74,.16),inset 0 1px rgba(230,247,255,.29);
+  color:#fff;
+}
+.premium-kids.premium-cinematic-sky .premium-journeys-cinematic .premium-age-tabs button:focus-visible{
+  outline:2px solid #ffe098;
+  outline-offset:4px;
+}
+.premium-kids.premium-cinematic-sky .premium-journeys-cinematic .premium-journey-grid{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:18px;
+}
+.premium-kids.premium-cinematic-sky .premium-journeys-cinematic .premium-journey-grid>article.premium-journey-spotlight.spotlight-card{
+  display:grid;
+  grid-template-columns:minmax(116px,38%) minmax(0,1fr);
+  align-items:center;
+  gap:0;
+  min-width:0;
+  min-height:182px;
+  padding:20px 22px;
+  border:1px solid rgba(113,163,223,.35);
+  border-radius:22px;
+  background:
+    radial-gradient(ellipse 68% 130% at 14% 100%,rgba(31,91,157,.15),transparent 66%),
+    linear-gradient(125deg,#061326,#041023 90%);
+  box-shadow:0 10px 26px rgba(0,7,24,.23),inset 0 1px rgba(219,238,255,.035);
+  overflow:hidden;
+  transform:translateY(0);
+  transition:transform .22s ease,border-color .22s ease,box-shadow .22s ease;
+}
+.premium-kids.premium-cinematic-sky .premium-journeys-cinematic .premium-journey-grid>article.premium-journey-spotlight.spotlight-card::before{
+  display:none;
+}
+.premium-kids.premium-cinematic-sky .premium-journeys-cinematic .premium-journey-grid>article.premium-journey-spotlight.spotlight-card:hover{
+  transform:translateY(-3px);
+  border-color:rgba(136,203,255,.69);
+  box-shadow:0 18px 36px rgba(0,6,27,.34),0 0 22px rgba(60,137,245,.09);
+}
+.premium-kids.premium-cinematic-sky .premium-journeys-cinematic .premium-journey-visual{
+  z-index:2;
+  position:relative;
+  display:grid;
+  align-items:center;
+  justify-items:center;
+  min-width:0;
+  height:125px;
+  padding-right:17px;
+  border-right:1px solid rgba(126,164,222,.18);
+}
+.premium-kids.premium-cinematic-sky .premium-journeys-cinematic .premium-journey-visual::before{
+  content:"";
+  position:absolute;
+  left:4%;
+  right:15%;
+  top:15%;
+  bottom:10%;
+  z-index:-1;
+  border-radius:50%;
+  background:radial-gradient(ellipse,rgba(28,107,222,.17),transparent 72%);
+}
+.premium-kids.premium-cinematic-sky .premium-journeys-cinematic .premium-journey-illustration{
+  display:block;
+  width:min(100%,170px);
+  height:auto;
+  max-height:130px;
+  overflow:visible;
+  filter:drop-shadow(0 0 8px rgba(62,157,255,.35));
+}
+.premium-kids.premium-cinematic-sky .premium-journeys-cinematic .premium-journey-copy{
+  position:relative;
+  z-index:2;
+  min-width:0;
+  padding-left:19px;
+}
+.premium-kids.premium-cinematic-sky .premium-journeys-cinematic .premium-journey-copy h3{
+  color:#fff;
+  font-size:19px;
+  line-height:1.35;
+  font-weight:850;
+  margin:0 0 9px;
+}
+.premium-kids.premium-cinematic-sky .premium-journeys-cinematic .premium-journey-copy p{
+  color:#c5d9f2;
+  font-size:13px;
+  line-height:1.65;
+  margin:0;
+}
+@media(max-width:760px){
+  .premium-kids.premium-cinematic-sky .premium-journeys.premium-journeys-cinematic{
+    width:calc(100% - 28px);
+    margin:17px auto 49px;
+    padding:29px 5px 27px;
+  }
+  .premium-kids.premium-cinematic-sky .premium-journeys-cinematic .premium-journey-grid{
+    grid-template-columns:1fr;
+    gap:12px;
+  }
+  .premium-kids.premium-cinematic-sky .premium-journeys-cinematic .premium-age-tabs{
+    gap:8px;
+    margin-bottom:22px;
+  }
+  .premium-kids.premium-cinematic-sky .premium-journeys-cinematic .premium-age-tabs button{
+    min-width:94px;
+    min-height:43px;
+    padding:10px 12px;
+    font-size:12px;
+  }
+  .premium-kids.premium-cinematic-sky .premium-journeys-cinematic .premium-journey-grid>article.premium-journey-spotlight.spotlight-card{
+    min-height:150px;
+    grid-template-columns:minmax(100px,36%) minmax(0,1fr);
+    padding:14px 15px;
+  }
+  .premium-kids.premium-cinematic-sky .premium-journeys-cinematic .premium-journey-visual{
+    height:112px;
+    padding-right:11px;
+  }
+  .premium-kids.premium-cinematic-sky .premium-journeys-cinematic .premium-journey-copy{
+    padding-left:13px;
+  }
+  .premium-kids.premium-cinematic-sky .premium-journeys-cinematic .premium-journey-copy h3{
+    font-size:17px;
+  }
+}
+@media(max-width:375px){
+  .premium-kids.premium-cinematic-sky .premium-journeys-cinematic .premium-journey-grid>article.premium-journey-spotlight.spotlight-card{
+    grid-template-columns:93px minmax(0,1fr);
+    padding:12px;
+  }
+  .premium-kids.premium-cinematic-sky .premium-journeys-cinematic .premium-journey-copy h3{
+    font-size:15px;
+  }
+  .premium-kids.premium-cinematic-sky .premium-journeys-cinematic .premium-journey-copy p{
+    font-size:12px;
+  }
+}
+@media(prefers-reduced-motion:reduce){
+  .premium-kids.premium-cinematic-sky .premium-journeys-cinematic .premium-age-tabs button,
+  .premium-kids.premium-cinematic-sky .premium-journeys-cinematic .premium-journey-grid>article.premium-journey-spotlight.spotlight-card{
+    transition:none!important;
+    transform:none!important;
+  }
+}

@@ -6,6 +6,7 @@ import {ArrowRight,Volume2,VolumeX,Pause,Play,Send,ShieldCheck,MessageCircle,Cal
 import './premium.css';
 import ProvaSocial from './ProvaSocial';
 import GradientText from './reactbits/GradientText';
+import JourneyArtwork, {type JourneyArtKind} from './JourneyArtwork';
 
 // A galeria WebGL é carregada apenas na prévia experimental da vitrine.
 const CircularGallery = dynamic(() => import('./reactbits/CircularGallery'), { ssr: false });
@@ -44,6 +45,14 @@ const journeys={
  '10–12 anos':[['🌌','Além dos planetas','Estrelas, galáxias e distâncias cósmicas.'],['🔭','Missões da ciência','Sondas, telescópios e grandes descobertas.']]
 };
 type Age=keyof typeof journeys;
+const journeyArtByTitle:Record<string,JourneyArtKind>={
+ 'Olá, Sistema Solar!':'saturn',
+ 'Histórias no céu':'constellation',
+ 'Exploradores espaciais':'rocket',
+ 'Mundos gigantes':'jupiter',
+ 'Além dos planetas':'galaxy',
+ 'Missões da ciência':'telescope'
+};
 const showcasePhotos=[
  {src:'https://cdn.eso.org/images/screen/upr_IMG_6184-CC.jpg',fallback:'/vitrine/cupula.svg',title:'Sessões imersivas',desc:'O céu estrelado ganha vida dentro da cúpula.',alt:'Foto ilustrativa de sessão de planetário com projeção da nebulosa Hélice no teto da cúpula'},
  {src:'https://images.unsplash.com/photo-1447433865958-f402f562b843?auto=format&fit=crop&w=920&q=80',fallback:'/vitrine/espaco.svg',title:'Viagens espaciais',desc:'Exploração e descoberta para cada idade.',alt:'Fotografia real de astronauta da NASA durante atividade espacial'},
@@ -298,7 +307,49 @@ export default function PremiumVitrine(){
    </section>
    <section id="experiencia" className="premium-section"><div className="premium-section-title"><span>✦ COMO FUNCIONA</span><h2>A escola vira um portal para o espaço!</h2><p>A aventura acontece em três passos simples.</p></div><div className="premium-three"><article><div>🚚</div><b>01</b><h3>Chegamos e montamos</h3><p>Levamos a estrutura do planetário móvel até o local combinado.</p></article><article><div>🪐</div><b>02</b><h3>A turma entra na cúpula</h3><p>As crianças mergulham em uma experiência imersiva.</p></article><article><div>🚀</div><b>03</b><h3>Exploramos juntos</h3><p>Uma viagem guiada cheia de descobertas e perguntas.</p></article></div></section>
    <section className="premium-showcase" aria-label="Experiências ilustradas do planetário"><div className="premium-section-title"><span>✦ CONHEÇA NOSSO UNIVERSO</span><h2>Uma experiência para lembrar</h2><p>Da cúpula às estrelas: conheça possibilidades de visitas, jornadas e eventos.</p></div>{reactBitsPreview && !reduce && galleryAvailable ? <div className="premium-reactbits-gallery-area"><p className="premium-reactbits-gallery-hint">A galeria se movimenta sozinha. Arraste ou deslize para explorar; ao interagir, o movimento pausa. Toque em uma imagem para ampliar.</p><div className="premium-reactbits-gallery-frame"><CircularGallery items={reactBitsGalleryItems} bend={1.6} itemSize={0.83} itemAspect={1.1} gap={0.24} wave={0.55} fadeEdges={0.12} shadow={0.32} textColor="#f8fbff" font="bold 25px system-ui" scrollSpeed={1} scrollEase={0.07} autoScroll={0.85} showTitles={true} grayscale={false} openOnClick={true} intro={true} /></div><p className="premium-reactbits-gallery-credit">Imagens astronômicas reais e material ilustrativo; não são registros de eventos realizados pelo ANTARES. Créditos: <a href="https://science.nasa.gov/asset/webb/cosmic-cliffs-in-the-carina-nebula-nircam-and-miri-composite-image/" target="_blank" rel="noopener noreferrer">NASA/ESA/CSA/STScI (Carina)</a> · <a href="https://science.nasa.gov/asset/webb/pillars-of-creation-nircam-image/" target="_blank" rel="noopener noreferrer">NASA/ESA/CSA/STScI (Pilares)</a> · <a href="https://science.nasa.gov/photojournal/jewel-of-the-solar-system/" target="_blank" rel="noopener noreferrer">NASA/JPL-Caltech/SSI/Cornell (Saturno)</a> · <a href="https://science.nasa.gov/resource/blue-marble/" target="_blank" rel="noopener noreferrer">NASA Goddard (Terra)</a>.</p></div> : <>{reactBitsPreview && <p className="premium-reactbits-gallery-hint">Galeria em versão estática para preservar a acessibilidade e a compatibilidade deste dispositivo.</p>}<div className="premium-showcase-grid">{showcasePhotos.map(card=><article key={card.title}><MarketingPhoto src={card.src} fallback={card.fallback} alt={card.alt} width={700} height={450} className="premium-showcase-photo"/><div><h3>{card.title}</h3><p>{card.desc}</p></div></article>)}</div><p className="premium-showcase-disclaimer">Fotografias ilustrativas de outras experiências e do espaço. Não representam eventos realizados pelo ANTARES. <span className="premium-photo-credits">Créditos: <a href="https://www.eso.org/public/images/upr_IMG_6184-CC/" target="_blank" rel="noopener noreferrer">ESO / P. Horálek</a> · <a href="https://unsplash.com/photos/photography-of-astronaut-beside-satellite-OLlj17tUZnU" target="_blank" rel="noopener noreferrer">NASA / Unsplash</a> · <a href="https://commons.wikimedia.org/wiki/File:SPB-MobilesPlanetariumINTENSE%C2%A9SPB_FotoF.-M_(9).jpg" target="_blank" rel="noopener noreferrer">SPB Kommunikation</a> (<a href="https://creativecommons.org/licenses/by-sa/4.0/" target="_blank" rel="noopener noreferrer">CC BY-SA 4.0</a>) · <a href="https://unsplash.com/photos/night-sky-with-milky-way-observatory-and-people-stargazing-dU4dX1l0UFM" target="_blank" rel="noopener noreferrer">Scott Goodwill / Unsplash</a>. </span></p></>}</section>
-   <section id="viagens" className="premium-section premium-journeys"><div className="premium-section-title"><span>PARA CADA TURMA</span><h2>Uma aventura para cada idade</h2><p>Escolha uma faixa etária para conhecer algumas possibilidades de conteúdo.</p></div><div className="premium-age-tabs" role="tablist" aria-label="Faixas etárias">{(Object.keys(journeys) as Age[]).map(a=><button role="tab" aria-selected={age===a} key={a} onClick={()=>setAge(a)}>{a}</button>)}</div><div className="premium-journey-grid">{journeys[age].map(([emoji,title,description])=><article key={title}><span>{emoji}</span><h3>{title}</h3><p>{description}</p></article>)}</div></section>
+   <section id="viagens" className={'premium-section premium-journeys'+(reactBitsPreview?' premium-journeys-cinematic':'')}>
+    <div className="premium-section-title">
+     <span>PARA CADA TURMA</span>
+     <h2>Uma aventura para cada idade</h2>
+     <p>Escolha uma faixa etária para conhecer algumas possibilidades de conteúdo.</p>
+    </div>
+    <div className="premium-age-tabs" role="tablist" aria-label="Faixas etárias">
+     {(Object.keys(journeys) as Age[]).map(a=><button
+       role="tab"
+       aria-selected={age===a}
+       aria-controls="premium-journey-panel"
+       id={`premium-age-tab-${Object.keys(journeys).indexOf(a)}`}
+       key={a}
+       onClick={()=>setAge(a)}
+      >{a}</button>)}
+    </div>
+    <div className="premium-journey-grid" id="premium-journey-panel" role="tabpanel" aria-label={age}>
+     {journeys[age].map(([emoji,title,description])=>reactBitsPreview
+       ? <SpotlightCard
+          key={title}
+          className="premium-journey-spotlight"
+          theme="dark"
+          spotlightColor="#a7e2ff"
+          spotlightSize={260}
+          intensity={0.24}
+          softness={0.8}
+          borderGlow={0.85}
+          proximity={110}
+          smoothing={0.2}
+          ambient={false}
+          flare={false}
+         >
+          <div className="premium-journey-visual">
+           <JourneyArtwork kind={journeyArtByTitle[title]??'saturn'}/>
+          </div>
+          <div className="premium-journey-copy">
+           <h3>{title}</h3>
+           <p>{description}</p>
+          </div>
+         </SpotlightCard>
+       : <article key={title}><span>{emoji}</span><h3>{title}</h3><p>{description}</p></article>)}
+    </div>
+   </section>
    <section id="jogo" className={'premium-game-reveal'+(reactBitsPreview?' premium-game-cinematic':'')} aria-labelledby="premium-game-title">
     <div className="premium-game-content">
      <span className="premium-game-eyebrow">✦ UM NOVO CAPÍTULO DO UNIVERSO ANTARES</span>
