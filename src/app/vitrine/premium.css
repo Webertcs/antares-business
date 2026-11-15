@@ -2189,3 +2189,50 @@
     transform:none;
   }
 }
+
+
+
+/* ANTARES · Contorno orbital do formulário: React Bits StarBorder real,
+   em combinação com o SpotlightCard já aprovado.
+   Não transforma a área em botão; canvas não bloqueia os inputs. */
+.premium-kids.premium-cinematic-sky .premium-contact-cinematic .premium-proposal-star-frame.star-border{
+  position:relative;
+  isolation:isolate;
+  display:block;
+  width:100%;
+  min-width:0;
+  margin:0;
+  padding:0;
+  border:0;
+  border-radius:27px;
+  background:transparent;
+  overflow:visible;
+  color:inherit;
+  box-shadow:none;
+}
+/* A estrela precisa ficar acima da moldura interna opaca, mantendo
+   o interior transparente e todos os controles clicáveis. */
+.premium-kids.premium-cinematic-sky .premium-proposal-star-frame>.star-border__light{
+  z-index:4;
+  pointer-events:none;
+}
+.premium-kids.premium-cinematic-sky .premium-proposal-star-frame>.premium-contact-bento-form.spotlight-card{
+  width:100%;
+  min-width:0;
+  margin:0;
+  border-radius:27px;
+}
+/* Evita clipping do brilho externo em telas estreitas. */
+@media(max-width:620px){
+  .premium-kids.premium-cinematic-sky .premium-proposal-star-frame.star-border{
+    border-radius:24px;
+  }
+  .premium-kids.premium-cinematic-sky .premium-proposal-star-frame>.premium-contact-bento-form.spotlight-card{
+    border-radius:24px;
+  }
+}
+@media(prefers-reduced-motion:reduce){
+  .premium-kids.premium-cinematic-sky .premium-proposal-star-frame{
+    animation:none!important;
+  }
+}

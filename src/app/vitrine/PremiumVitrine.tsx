@@ -21,6 +21,8 @@ const StarBorderBackToTop = dynamic(() => import('./StarBorderBackToTop'), { ssr
 const MagicBento = dynamic(() => import('./reactbits/MagicBento'), { ssr: false });
 // Iluminação React Bits reaproveitada nos benefícios e no painel de proposta.
 const SpotlightCard = dynamic(() => import('./reactbits/SpotlightCard'), { ssr: false });
+// Contorno orbital do orçamento: estrela circunda o painel, sem alterar o Spotlight interior.
+const ProposalStarFrame = dynamic(() => import('./ProposalStarFrame'), { ssr: false });
 // FAQ experimental com entrada inspirada no React Bits Animated List e acordeão nativo.
 const AnimatedFaq = dynamic(() => import('./AnimatedFaq'), { ssr: false });
 const spaceStars=Array.from({length:165},(_,i)=>({x:(i*73+Math.floor(i*i*0.37))%900,y:(i*137+Math.floor(i*i*.19))%510,r:i%11===0?2.1:i%4===0?1.25:.68,opacity:.24+(i%8)*.087}));
@@ -354,19 +356,21 @@ export default function PremiumVitrine(){
       <p className="premium-privacy"><ShieldCheck size={17}/> Formulário destinado a adultos responsáveis. Não solicitamos dados pessoais de crianças.</p>
      </div>
      {reactBitsPreview
-       ? <SpotlightCard
-           className="premium-contact-bento-form"
-           theme="dark"
-           spotlightColor="#98ddff"
-           spotlightSize={390}
-           intensity={0.24}
-           softness={0.76}
-           borderGlow={0.96}
-           proximity={150}
-           smoothing={0.22}
-           ambient
-           flare={false}
-         >{proposalForm}</SpotlightCard>
+       ? <ProposalStarFrame>
+           <SpotlightCard
+             className="premium-contact-bento-form"
+             theme="dark"
+             spotlightColor="#98ddff"
+             spotlightSize={390}
+             intensity={0.24}
+             softness={0.76}
+             borderGlow={0.96}
+             proximity={150}
+             smoothing={0.22}
+             ambient
+             flare={false}
+           >{proposalForm}</SpotlightCard>
+         </ProposalStarFrame>
        : proposalForm}
     </section>
    {reactBitsPreview?<AnimatedFaq/>:<section className="premium-section premium-faq"><div className="premium-section-title"><span>DÚVIDAS FREQUENTES</span><h2>Perguntas de quem vai viajar</h2></div><details><summary>O planetário vai até a escola?</summary><p>Sim. A equipe leva a estrutura móvel e combina previamente o espaço necessário.</p></details><details><summary>Quantas crianças participam?</summary><p>A capacidade depende da cúpula utilizada. As turmas são organizadas em sessões.</p></details><details><summary>Também atende eventos e associações?</summary><p>Sim. Basta informar o formato do evento no pedido de orçamento.</p></details><details><summary>É indicado para quais idades?</summary><p>As experiências podem ser planejadas para diferentes faixas etárias. Conte a idade aproximada da turma nas observações para que a equipe avalie os conteúdos adequados.</p></details><details><summary>O jogo ANTARES já está disponível?</summary><p>Ainda não! Estamos preparando o jogo educativo ANTARES Kids, sem data de lançamento anunciada. Para saber das novidades, marque a opção de interesse no formulário.</p></details></section>}
