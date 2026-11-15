@@ -1969,3 +1969,223 @@
     transition:none!important;
   }
 }
+
+
+
+/* ============================================================
+   ANTARES Kids — PROPOSTA CINEMATOGRÁFICA (somente ?reactbits=1).
+   React Bits SpotlightCard real: brilho na borda do formulário e
+   dos mini-cards, sem interferir nos dados, na validação ou no envio.
+   ============================================================ */
+.premium-kids.premium-cinematic-sky .premium-contact-cinematic{
+  grid-template-columns:minmax(0,.85fr) minmax(0,1.15fr);
+  gap:clamp(22px,3.2vw,44px);
+  align-items:start;
+}
+.premium-kids.premium-cinematic-sky .premium-contact-cinematic>div>h2{
+  color:#f8fbff;
+  text-shadow:0 5px 28px rgba(0,3,16,.62);
+}
+.premium-kids.premium-cinematic-sky .premium-contact-cinematic>div>p{
+  color:#d3e1f6;
+  line-height:1.75;
+}
+/* Benefícios: três pequenos painéis escuros com Spotlight do React Bits. */
+.premium-kids.premium-cinematic-sky .premium-contact-benefits{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:11px;
+  margin:22px 0 20px;
+}
+.premium-kids.premium-cinematic-sky .premium-contact-benefit-card.spotlight-card{
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  gap:9px;
+  min-width:0;
+  min-height:151px;
+  border-radius:18px;
+  padding:17px;
+  border:1px solid rgba(100,147,208,.33);
+  background:
+    radial-gradient(ellipse at 91% 0%,rgba(40,96,167,.12),transparent 72%),
+    linear-gradient(140deg,#0b1a34,#071223);
+  box-shadow:inset 0 1px rgba(225,238,255,.07),0 8px 24px rgba(0,4,18,.26);
+  color:#eef6ff;
+  transition:transform .2s ease,border-color .2s ease;
+}
+.premium-kids.premium-cinematic-sky .premium-contact-benefit-card.spotlight-card:hover{
+  transform:translateY(-2px);
+  border-color:rgba(138,202,255,.59);
+}
+.premium-kids.premium-cinematic-sky .premium-contact-benefit-wide{
+  grid-column:1/-1;
+  min-height:106px!important;
+}
+.premium-kids.premium-cinematic-sky .premium-contact-benefit-icon{
+  position:relative;
+  z-index:2;
+  display:grid;
+  place-items:center;
+  width:37px;height:37px;
+  border:1px solid rgba(133,198,255,.34);
+  border-radius:12px;
+  background:rgba(46,105,188,.19);
+  color:#ffe3a7;
+}
+.premium-kids.premium-cinematic-sky .premium-contact-benefit-card strong{
+  position:relative;z-index:2;
+  font-size:13px;
+  font-weight:850;
+  line-height:1.36;
+  color:#fff;
+}
+.premium-kids.premium-cinematic-sky .premium-contact-benefit-card small{
+  position:relative;z-index:2;
+  font-size:11px;
+  line-height:1.48;
+  color:#c3d7f2;
+}
+.premium-kids.premium-cinematic-sky .premium-contact-cinematic .premium-robot{
+  margin:14px 0 8px;
+  gap:13px;
+}
+.premium-kids.premium-cinematic-sky .premium-contact-cinematic .premium-robot small{
+  max-width:260px;
+  font-size:13px;
+  line-height:1.55;
+  color:#d8eafe;
+  font-weight:800;
+  letter-spacing:0;
+  text-transform:none;
+}
+.premium-kids.premium-cinematic-sky .premium-contact-whatsapp-info{
+  display:flex;
+  align-items:flex-start;
+  gap:9px;
+  margin:4px 0 16px;
+  padding:12px 14px;
+  max-width:460px;
+  border:1px solid rgba(97,148,204,.26);
+  border-radius:14px;
+  background:rgba(8,23,48,.64);
+  color:#c7dcf5;
+  font-size:12px;
+  line-height:1.6;
+}
+.premium-kids.premium-cinematic-sky .premium-contact-whatsapp-info svg{
+  color:#92d0ff;
+  flex:none;
+  margin-top:2px;
+}
+/* O container é o artigo com o Spotlight, não outro form.
+   O form mantém a estrutura e o onSubmit originais. */
+.premium-kids.premium-cinematic-sky .premium-contact-bento-form.spotlight-card{
+  min-width:0;
+  padding:0;
+  border-radius:27px;
+  border:1px solid rgba(110,171,235,.51);
+  background:
+    radial-gradient(ellipse at 92% 0%,rgba(35,93,158,.15),transparent 57%),
+    linear-gradient(148deg,#09172e,#060f21 68%,#081426);
+  box-shadow:
+    0 22px 66px rgba(0,5,24,.54),
+    0 0 28px rgba(49,124,200,.1),
+    inset 0 1px rgba(224,243,255,.065);
+  transition:box-shadow .28s ease,border-color .28s ease;
+}
+.premium-kids.premium-cinematic-sky .premium-contact-bento-form.spotlight-card:hover,
+.premium-kids.premium-cinematic-sky .premium-contact-bento-form.spotlight-card:focus-within{
+  border-color:rgba(146,211,255,.75);
+  box-shadow:0 24px 70px rgba(0,5,24,.59),0 0 29px rgba(70,150,235,.14);
+}
+.premium-kids.premium-cinematic-sky .premium-contact-bento-form .spotlight-card__edge,
+.premium-kids.premium-cinematic-sky .premium-contact-benefit-card .spotlight-card__edge{
+  z-index:2;
+}
+.premium-kids.premium-cinematic-sky .premium-contact-bento-form form{
+  position:relative;
+  z-index:1;
+  display:grid;
+  gap:15px;
+  margin:0;
+  min-width:0;
+  padding:clamp(19px,2vw,28px);
+  border:0;
+  border-radius:26px;
+  background:transparent;
+  box-shadow:none;
+  backdrop-filter:none;
+}
+.premium-kids.premium-cinematic-sky .premium-contact-bento-form .premium-form-heading{
+  border-bottom-color:rgba(123,175,231,.24);
+}
+.premium-kids.premium-cinematic-sky .premium-contact-bento-form .premium-form-grid input,
+.premium-kids.premium-cinematic-sky .premium-contact-bento-form .premium-form-grid select,
+.premium-kids.premium-cinematic-sky .premium-contact-bento-form textarea{
+  background:rgba(6,16,34,.94);
+  border-color:rgba(95,144,199,.55);
+  color:#f5faff;
+}
+.premium-kids.premium-cinematic-sky .premium-contact-bento-form .premium-game-interest{
+  border-color:rgba(105,158,231,.37);
+  background:linear-gradient(115deg,rgba(13,31,61,.93),rgba(18,28,61,.88));
+}
+.premium-kids.premium-cinematic-sky .premium-contact-bento-form .premium-form-disclaimer{
+  color:#c2d5ef;
+  font-size:11px;
+  line-height:1.65;
+}
+.premium-kids.premium-cinematic-sky .premium-contact-bento-form .premium-form-submit{
+  background:linear-gradient(110deg,#ffd05f,#ffe48a);
+  color:#16233e;
+  border-color:#ffe29a;
+  box-shadow:0 7px 24px rgba(232,186,89,.19);
+  font-weight:900;
+}
+.premium-kids.premium-cinematic-sky .premium-contact-bento-form .premium-form-submit:hover{
+  background:linear-gradient(110deg,#ffe084,#fff0b6);
+}
+.premium-kids.premium-cinematic-sky .premium-contact-bento-form .premium-form-submit:disabled{
+  opacity:.67;cursor:progress;
+}
+@media(max-width:980px){
+  .premium-kids.premium-cinematic-sky .premium-contact-cinematic{
+    grid-template-columns:1fr;
+    max-width:790px;
+  }
+  .premium-kids.premium-cinematic-sky .premium-contact-benefits{
+    grid-template-columns:repeat(3,minmax(0,1fr));
+  }
+  .premium-kids.premium-cinematic-sky .premium-contact-benefit-wide{
+    grid-column:auto;
+    min-height:151px!important;
+  }
+}
+@media(max-width:620px){
+  .premium-kids.premium-cinematic-sky .premium-contact-benefits{
+    grid-template-columns:1fr;
+    gap:9px;
+  }
+  .premium-kids.premium-cinematic-sky .premium-contact-benefit-card.spotlight-card,
+  .premium-kids.premium-cinematic-sky .premium-contact-benefit-wide{
+    min-height:0!important;
+    padding:14px 16px;
+  }
+  .premium-kids.premium-cinematic-sky .premium-contact-bento-form form{
+    padding:17px;
+    gap:13px;
+  }
+  .premium-kids.premium-cinematic-sky .premium-contact-cinematic .premium-robot small{
+    font-size:12px;
+  }
+}
+@media(prefers-reduced-motion:reduce){
+  .premium-kids.premium-cinematic-sky .premium-contact-benefit-card.spotlight-card,
+  .premium-kids.premium-cinematic-sky .premium-contact-bento-form.spotlight-card{
+    transition:none!important;
+  }
+  .premium-kids.premium-cinematic-sky .premium-contact-benefit-card.spotlight-card:hover{
+    transform:none;
+  }
+}

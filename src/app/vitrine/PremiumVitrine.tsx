@@ -19,6 +19,8 @@ const StarBorderBudgetAction = dynamic(() => import('./StarBorderBudgetAction'),
 const StarBorderBackToTop = dynamic(() => import('./StarBorderBackToTop'), { ssr: false });
 // Bento original do React Bits, simplificado sem dependências externas de ícones.
 const MagicBento = dynamic(() => import('./reactbits/MagicBento'), { ssr: false });
+// Iluminação React Bits reaproveitada nos benefícios e no painel de proposta.
+const SpotlightCard = dynamic(() => import('./reactbits/SpotlightCard'), { ssr: false });
 // FAQ experimental com entrada inspirada no React Bits Animated List e acordeão nativo.
 const AnimatedFaq = dynamic(() => import('./AnimatedFaq'), { ssr: false });
 const spaceStars=Array.from({length:165},(_,i)=>({x:(i*73+Math.floor(i*i*0.37))%900,y:(i*137+Math.floor(i*i*.19))%510,r:i%11===0?2.1:i%4===0?1.25:.68,opacity:.24+(i%8)*.087}));
@@ -189,6 +191,33 @@ export default function PremiumVitrine(){
   try{await navigator.clipboard.writeText(quoteDraft);setFormStatus('Mensagem copiada. Você pode enviá-la ao atendimento do planetário.');}
   catch{setFormStatus('Selecione e copie a mensagem no campo abaixo.');}
  }
+ const proposalForm = (
+<form onSubmit={submit}>
+      <div className="premium-form-heading"><strong>Vamos planejar essa aventura?</strong><span>* Campos obrigatórios</span></div>
+      <div className="premium-form-grid">
+       <label>Seu nome <span aria-hidden="true">*</span><input required name="nome" maxLength={120} autoComplete="name" placeholder="Nome do responsável"/></label>
+       <label>Escola ou instituição <span aria-hidden="true">*</span><input required name="instituicao" maxLength={150} placeholder="Nome da instituição"/></label>
+       <label>Cidade <span aria-hidden="true">*</span><input required name="cidade" maxLength={100} autoComplete="address-level2" placeholder="Cidade do atendimento"/></label>
+       <label>WhatsApp <span aria-hidden="true">*</span><input required name="telefone" type="tel" inputMode="tel" maxLength={22} autoComplete="tel" placeholder="(61) 99999-9999"/></label>
+       <label>{reactBitsPreview?'Tipo de atendimento':'Público'}<select name="publico" defaultValue="Escola"><option>Escola</option><option>Associação</option><option>Empresa</option><option>Evento particular</option></select></label>
+       <label>Participantes estimados<input name="alunos" type="number" min="1" max="100000" placeholder="A combinar"/></label>
+       <label>Data desejada<input name="data" type="date" min={today||undefined}/></label>
+      </div>
+      <label>Observações <span className="premium-optional-label">(opcional)</span><textarea name="mensagem" rows={3} maxLength={gameInterested?690:800} placeholder="Conte sobre a turma, horários ou necessidades especiais da instituição (sem dados pessoais de crianças)."/></label>
+      <label className="premium-game-interest">
+       <input type="checkbox" name="gameUpdatesOptIn" checked={gameInterested} onChange={e=>setGameInterested(e.target.checked)}/>
+       <span><strong>{reactBitsPreview?'Quero receber novidades do jogo ANTARES Kids':'Também quero receber novidades do futuro jogo ANTARES Kids'} <em>Opcional</em></strong>
+        <small>Ao marcar, você autoriza nossa equipe a entrar em contato sobre novidades do jogo. Você poderá pedir para não receber mais essas mensagens quando quiser.</small>
+       </span>
+      </label>
+      <label className="premium-consent"><input required type="checkbox"/> Autorizo o contato em resposta a este pedido de orçamento. Entendo que os dados serão usados para esse atendimento.</label>
+      <input className="premium-honeypot" type="text" name="website" tabIndex={-1} autoComplete="off" aria-hidden="true"/>
+      <button className="premium-button premium-form-submit" type="submit" disabled={leadSending}>{leadSending?"Registrando pedido...":"Solicitar minha proposta"} <Send size={17}/></button>
+      {formStatus&&<p role="status" aria-live="polite" className="premium-form-status">{formStatus}</p>}
+      {quoteDraft&&<div className="premium-quote-preview"><label>Mensagem preparada<textarea readOnly rows={7} value={quoteDraft} aria-label="Mensagem de orçamento pronta para copiar"/></label><button type="button" onClick={copyQuote} className="premium-copy-quote">Copiar mensagem</button></div>}
+      <small className="premium-form-disclaimer">{reactBitsPreview?'Nossa equipe analisará sua solicitação e poderá entrar em contato pelo WhatsApp informado. Se houver uma falha no envio, você poderá copiar sua mensagem para encaminhá-la ao atendimento.':'Nossa equipe analisará sua solicitação antes de preparar uma proposta. Se não conseguir enviar por aqui, você poderá encaminhar sua mensagem pelo WhatsApp.'}</small>
+     </form>
+ );
  const stopped=paused||reduce;
  useEffect(()=>{const svg=orbitSvg.current;if(!svg)return;if(stopped)svg.pauseAnimations();else svg.unpauseAnimations();},[stopped]);
  return <div className={'premium-kids'+(dark?' premium-night':'')+(reactBitsPreview?' premium-cinematic-sky':'')}>
@@ -292,44 +321,53 @@ export default function PremiumVitrine(){
    </section>
    <ProvaSocial/>
    <section id="escolas" className="premium-school"><div><span>ESCOLAS E INSTITUIÇÕES</span><h2>O universo pode voltar todos os anos.</h2><p>Planeje visitas recorrentes com turmas diferentes. Pacotes e condições especiais são definidos em proposta personalizada.</p><a className="premium-button" href="#orcamento">Conhecer as possibilidades <ArrowRight size={17}/></a></div><div className="premium-school-art premium-school-picture"><Image src="/vitrine/cupula-escola-antares.webp" alt="Imagem conceitual de cúpula inflável de planetário móvel, sem pessoas, em pátio escolar" width={533} height={400} className="premium-school-photo"/><small className="premium-school-credit">Ilustração digital de um planetário móvel. Não é uma foto do ANTARES.</small></div></section>
-    <section id="orcamento" className="premium-section premium-contact premium-contact-v2">
+    <section id="orcamento" className={'premium-section premium-contact premium-contact-v2'+(reactBitsPreview?' premium-contact-cinematic':'')}>
      <div>
       <span>PRONTOS PARA DECOLAR?</span>
       <h2>Peça sua proposta personalizada.</h2>
-      <p>Conte sobre sua escola ou instituição. Nossa equipe poderá organizar uma proposta conforme a quantidade de participantes, a data e o tipo de experiência.</p>
-      <div className="premium-contact-highlights">
+      <p>{reactBitsPreview?'Conte sobre sua escola, evento ou instituição. Nossa equipe analisará suas informações e poderá preparar uma proposta sob medida.':'Conte sobre sua escola ou instituição. Nossa equipe poderá organizar uma proposta conforme a quantidade de participantes, a data e o tipo de experiência.'}</p>
+      {reactBitsPreview
+        ? <div className="premium-contact-benefits" aria-label="Benefícios do atendimento">
+           <SpotlightCard className="premium-contact-benefit-card" theme="dark" spotlightColor="#b0e8ff" spotlightSize={185} intensity={0.32} borderGlow={0.82} softness={0.8} proximity={70} smoothing={0.18} flare={false}>
+             <span className="premium-contact-benefit-icon"><ShieldCheck size={21} aria-hidden="true"/></span>
+             <strong>Atendimento personalizado</strong>
+             <small>Uma proposta pensada para sua instituição.</small>
+           </SpotlightCard>
+           <SpotlightCard className="premium-contact-benefit-card" theme="dark" spotlightColor="#aedaff" spotlightSize={185} intensity={0.32} borderGlow={0.82} softness={0.8} proximity={70} smoothing={0.18} flare={false}>
+             <span className="premium-contact-benefit-icon"><CalendarDays size={21} aria-hidden="true"/></span>
+             <strong>Data combinada</strong>
+             <small>Planejamento conforme a agenda do evento.</small>
+           </SpotlightCard>
+           <SpotlightCard className="premium-contact-benefit-card premium-contact-benefit-wide" theme="dark" spotlightColor="#a9ccff" spotlightSize={185} intensity={0.32} borderGlow={0.82} softness={0.8} proximity={70} smoothing={0.18} flare={false}>
+             <span className="premium-contact-benefit-icon"><Send size={20} aria-hidden="true"/></span>
+             <strong>Proposta sob medida</strong>
+             <small>Para escolas, associações e eventos.</small>
+           </SpotlightCard>
+          </div>
+        : <div className="premium-contact-highlights">
        <span><ShieldCheck size={16}/> Atendimento personalizado</span>
        <span><CalendarDays size={16}/> Data combinada com a escola</span>
        <span><MessageCircle size={16}/> Retorno pelo WhatsApp</span>
-      </div>
-      <div className="premium-robot"><Image src="/mascotes/pixel.png" width={105} height={110} alt="PIXEL, o robô companheiro do ANTARES"/><small>BIP! BIP! SUA AVENTURA COMEÇA AQUI!</small></div>
+      </div>}
+      <div className="premium-robot"><Image src="/mascotes/pixel.png" width={105} height={110} alt="PIXEL, o robô companheiro do ANTARES"/><small>{reactBitsPreview?'Pixel pronto para ajudar a planejar sua próxima aventura espacial!':'BIP! BIP! SUA AVENTURA COMEÇA AQUI!'}</small></div>
+      {reactBitsPreview&&<p className="premium-contact-whatsapp-info"><MessageCircle size={17} aria-hidden="true"/> Após sua solicitação, nossa equipe poderá continuar o atendimento pelo WhatsApp informado.</p>}
       <p className="premium-privacy"><ShieldCheck size={17}/> Formulário destinado a adultos responsáveis. Não solicitamos dados pessoais de crianças.</p>
      </div>
-     <form onSubmit={submit}>
-      <div className="premium-form-heading"><strong>Vamos planejar essa aventura?</strong><span>* Campos obrigatórios</span></div>
-      <div className="premium-form-grid">
-       <label>Seu nome <span aria-hidden="true">*</span><input required name="nome" maxLength={120} autoComplete="name" placeholder="Nome do responsável"/></label>
-       <label>Escola ou instituição <span aria-hidden="true">*</span><input required name="instituicao" maxLength={150} placeholder="Nome da instituição"/></label>
-       <label>Cidade <span aria-hidden="true">*</span><input required name="cidade" maxLength={100} autoComplete="address-level2" placeholder="Cidade do atendimento"/></label>
-       <label>WhatsApp <span aria-hidden="true">*</span><input required name="telefone" type="tel" inputMode="tel" maxLength={22} autoComplete="tel" placeholder="(61) 99999-9999"/></label>
-       <label>Público<select name="publico" defaultValue="Escola"><option>Escola</option><option>Associação</option><option>Empresa</option><option>Evento particular</option></select></label>
-       <label>Participantes estimados<input name="alunos" type="number" min="1" max="100000" placeholder="A combinar"/></label>
-       <label>Data desejada<input name="data" type="date" min={today||undefined}/></label>
-      </div>
-      <label>Observações <span className="premium-optional-label">(opcional)</span><textarea name="mensagem" rows={3} maxLength={gameInterested?690:800} placeholder="Conte sobre a turma, horários ou necessidades especiais da instituição (sem dados pessoais de crianças)."/></label>
-      <label className="premium-game-interest">
-       <input type="checkbox" name="gameUpdatesOptIn" checked={gameInterested} onChange={e=>setGameInterested(e.target.checked)}/>
-       <span><strong>Também quero receber novidades do futuro jogo ANTARES Kids <em>Opcional</em></strong>
-        <small>Ao marcar, você autoriza nossa equipe a entrar em contato sobre novidades do jogo. Você poderá pedir para não receber mais essas mensagens quando quiser.</small>
-       </span>
-      </label>
-      <label className="premium-consent"><input required type="checkbox"/> Autorizo o contato em resposta a este pedido de orçamento. Entendo que os dados serão usados para esse atendimento.</label>
-      <input className="premium-honeypot" type="text" name="website" tabIndex={-1} autoComplete="off" aria-hidden="true"/>
-      <button className="premium-button premium-form-submit" type="submit" disabled={leadSending}>{leadSending?"Registrando pedido...":"Solicitar minha proposta"} <Send size={17}/></button>
-      {formStatus&&<p role="status" aria-live="polite" className="premium-form-status">{formStatus}</p>}
-      {quoteDraft&&<div className="premium-quote-preview"><label>Mensagem preparada<textarea readOnly rows={7} value={quoteDraft} aria-label="Mensagem de orçamento pronta para copiar"/></label><button type="button" onClick={copyQuote} className="premium-copy-quote">Copiar mensagem</button></div>}
-      <small className="premium-form-disclaimer">Nossa equipe analisará sua solicitação antes de preparar uma proposta. Se não conseguir enviar por aqui, você poderá encaminhar sua mensagem pelo WhatsApp.</small>
-     </form>
+     {reactBitsPreview
+       ? <SpotlightCard
+           className="premium-contact-bento-form"
+           theme="dark"
+           spotlightColor="#98ddff"
+           spotlightSize={390}
+           intensity={0.24}
+           softness={0.76}
+           borderGlow={0.96}
+           proximity={150}
+           smoothing={0.22}
+           ambient
+           flare={false}
+         >{proposalForm}</SpotlightCard>
+       : proposalForm}
     </section>
    {reactBitsPreview?<AnimatedFaq/>:<section className="premium-section premium-faq"><div className="premium-section-title"><span>DÚVIDAS FREQUENTES</span><h2>Perguntas de quem vai viajar</h2></div><details><summary>O planetário vai até a escola?</summary><p>Sim. A equipe leva a estrutura móvel e combina previamente o espaço necessário.</p></details><details><summary>Quantas crianças participam?</summary><p>A capacidade depende da cúpula utilizada. As turmas são organizadas em sessões.</p></details><details><summary>Também atende eventos e associações?</summary><p>Sim. Basta informar o formato do evento no pedido de orçamento.</p></details><details><summary>É indicado para quais idades?</summary><p>As experiências podem ser planejadas para diferentes faixas etárias. Conte a idade aproximada da turma nas observações para que a equipe avalie os conteúdos adequados.</p></details><details><summary>O jogo ANTARES já está disponível?</summary><p>Ainda não! Estamos preparando o jogo educativo ANTARES Kids, sem data de lançamento anunciada. Para saber das novidades, marque a opção de interesse no formulário.</p></details></section>}
    {reactBitsPreview&&<div className="premium-endcap" data-vitrine-end>
