@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState, type PointerEvent } from 'react';
+import { useEffect, useRef, useState, type CSSProperties, type PointerEvent } from 'react';
 
 // Perguntas e respostas aprovadas na vitrine — conteúdo preservado literalmente.
 const faqItems = [
@@ -61,7 +61,7 @@ export default function AnimatedFaq() {
           <details
             key={item.question}
             className="premium-faq-animated-item"
-            style={{ '--faq-index': index } as React.CSSProperties}
+            style={{ '--faq-index': index } as CSSProperties}
             onPointerMove={trackLight}
           >
             <summary>
