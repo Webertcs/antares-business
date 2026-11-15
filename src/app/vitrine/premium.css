@@ -1153,3 +1153,99 @@
 @media(prefers-reduced-motion:reduce){
   .premium-kids .premium-hero-cta .premium-star-border-cta{transition:none}
 }
+
+
+/* Vitrine React Bits — menu sobre o mesmo céu estrelado do hero.
+ * Somente ?reactbits=1. A vitrine normal conserva logo, alternância de tema,
+ * cabeçalho e identidade visual anteriores até a homologação. */
+.premium-kids .premium-header.premium-preview-header{
+  background:transparent;
+  border:0;
+  box-shadow:none;
+  backdrop-filter:none;
+  -webkit-backdrop-filter:none;
+  max-width:none;
+  width:100%;
+  margin:0 auto;
+  min-height:80px;
+  padding:18px 18px 12px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+.premium-kids .premium-preview-header nav{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  flex-wrap:wrap;
+  gap:10px;
+  width:100%;
+  max-width:860px;
+  flex:0 1 auto;
+}
+.premium-kids .premium-preview-header nav a,
+.premium-kids .premium-preview-header nav a[href="#jogo"],
+.premium-kids .premium-preview-header nav .premium-nav-cta{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:6px;
+  min-height:40px;
+  padding:10px 19px;
+  margin:0;
+  border-radius:999px;
+  border:1px solid rgba(155,200,255,.3);
+  background:rgba(18,43,89,.28);
+  box-shadow:inset 0 1px rgba(255,255,255,.07);
+  color:#eef6ff;
+  font-size:13px;
+  font-weight:800;
+  line-height:1.2;
+  letter-spacing:.015em;
+  white-space:nowrap;
+  text-decoration:none;
+  transition:background .2s ease,border-color .2s ease,box-shadow .2s ease,transform .2s ease;
+}
+.premium-kids .premium-preview-header nav .premium-nav-cta{
+  border-color:rgba(252,213,136,.65);
+  background:rgba(61,70,129,.5);
+  color:#ffdf97;
+}
+.premium-kids .premium-preview-header nav a:hover,
+.premium-kids .premium-preview-header nav .premium-nav-cta:hover{
+  background:rgba(44,83,155,.58);
+  border-color:rgba(184,220,255,.78);
+  box-shadow:0 0 16px rgba(82,167,255,.2);
+  transform:translateY(-1px);
+  text-decoration:none;
+}
+.premium-kids .premium-preview-header nav .premium-nav-cta:hover{
+  color:#ffebbc;
+  border-color:rgba(255,222,150,.88);
+}
+.premium-kids .premium-preview-header nav a:focus-visible{
+  outline:2px solid #ffe6ad;
+  outline-offset:3px;
+}
+@media(max-width:720px){
+  .premium-kids .premium-header.premium-preview-header{min-height:0;padding:13px 12px 9px}
+  .premium-kids .premium-preview-header nav{gap:7px}
+  .premium-kids .premium-preview-header nav>a:not(.premium-nav-cta),
+  .premium-kids .premium-preview-header nav>a[href="#jogo"]{display:inline-flex}
+  .premium-kids .premium-preview-header nav a,
+  .premium-kids .premium-preview-header nav .premium-nav-cta{
+    min-height:35px;padding:8px 12px;font-size:11px;gap:4px;
+  }
+}
+@media(max-width:360px){
+  .premium-kids .premium-header.premium-preview-header{padding:11px 8px 7px}
+  .premium-kids .premium-preview-header nav{gap:5px}
+  .premium-kids .premium-preview-header nav a,
+  .premium-kids .premium-preview-header nav .premium-nav-cta{
+    min-height:33px;padding:7px 9px;font-size:10px;
+  }
+}
+@media(prefers-reduced-motion:reduce){
+  .premium-kids .premium-preview-header nav a{transition:none}
+  .premium-kids .premium-preview-header nav a:hover{transform:none}
+}
