@@ -2266,16 +2266,31 @@
   aspect-ratio:290/191;
   object-fit:cover;
   object-position:center;
-  /* A arte já tem iluminação própria: sem nova moldura nem sombra retangular. */
+  /* A arte foi exportada com um fundo retangular próprio.
+     A máscara suaviza as extremidades sem mudar a arte nem os mascotes. */
   border:0;
   outline:0;
-  border-radius:22px;
+  border-radius:0;
   box-shadow:none;
   filter:none;
+  -webkit-mask-image:radial-gradient(
+    ellipse 62% 73% at 53% 51%,
+    #000 60%,
+    rgba(0,0,0,.94) 68%,
+    rgba(0,0,0,.37) 86%,
+    transparent 100%
+  );
+  mask-image:radial-gradient(
+    ellipse 62% 73% at 53% 51%,
+    #000 60%,
+    rgba(0,0,0,.94) 68%,
+    rgba(0,0,0,.37) 86%,
+    transparent 100%
+  );
 }
 @media(max-width:620px){
   .premium-kids.premium-cinematic-sky .premium-school-cinematic .premium-school-photo{
-    border-radius:16px;
+    border-radius:0;
   }
 }
 
