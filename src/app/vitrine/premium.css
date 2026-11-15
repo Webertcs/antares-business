@@ -1074,12 +1074,13 @@
  -webkit-mask-image:radial-gradient(circle at center,#000 52%,transparent 72%);
  mask-image:radial-gradient(circle at center,#000 52%,transparent 72%);
 }
-/* Mercúrio: globo da missão MESSENGER, sem o fundo retangular da foto.
-   A ampliação é proporcional e o recorte suave acompanha o disco esférico. */
+/* Mercúrio: a imagem original tem margens pretas em volta do disco.
+   O raio "closest-side" acompanha o planeta, eliminando o quadrado
+   sem afetar a textura ou o movimento dos demais astros. */
 .premium-kids .premium-cinematic-orbit-stage .orbit-item[data-orbit-item="5"] .orbit-image{
  transform:scale(1.52);transform-origin:center center;
- -webkit-mask-image:radial-gradient(circle at center,#000 51%,transparent 73%);
- mask-image:radial-gradient(circle at center,#000 51%,transparent 73%);
+ -webkit-mask-image:radial-gradient(circle closest-side at center,#000 0 55%,rgba(0,0,0,.98) 59%,transparent 70%);
+ mask-image:radial-gradient(circle closest-side at center,#000 0 55%,rgba(0,0,0,.98) 59%,transparent 70%);
  filter:drop-shadow(0 0 8px rgba(168,185,221,.18));
 }
 /* A Terra entra como 7º astro e flutua livre, sem um fundo quadrado. */
