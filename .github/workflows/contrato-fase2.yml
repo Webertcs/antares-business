@@ -1,0 +1,32 @@
+name: ANTARES V1 - contrato da persistencia
+on:
+  push:
+    branches:
+      - feature/bloco-02d-seguranca
+    paths:
+      - 'sql/04_IMPLANTACAO_CONSOLIDADA_V1.sql'
+      - 'src/app/api/business/gravar/route.ts'
+      - 'src/app/api/oficina/snapshot/route.ts'
+      - 'scripts/verificar-contrato-fase2.mjs'
+      - '.github/workflows/contrato-fase2.yml'
+  pull_request:
+    paths:
+      - 'sql/04_IMPLANTACAO_CONSOLIDADA_V1.sql'
+      - 'src/app/api/business/gravar/route.ts'
+      - 'src/app/api/oficina/snapshot/route.ts'
+      - 'scripts/verificar-contrato-fase2.mjs'
+      - '.github/workflows/contrato-fase2.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  contrato-estatico:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verificar relacoes entre SQL e APIs sem credenciais
+        run: node scripts/verificar-contrato-fase2.mjs

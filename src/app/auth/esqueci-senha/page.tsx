@@ -1,26 +1,54 @@
 'use client';
 import { useState, type FormEvent } from 'react';
 import Link from 'next/link';
-export default function EsqueciSenha(){
- const [email,setEmail]=useState(''); const [loading,setLoading]=useState(false); const [message,setMessage]=useState('');
- async function submit(e:FormEvent<HTMLFormElement>){
-  e.preventDefault(); if(loading)return; setLoading(true); setMessage('');
+import { ArrowLeft, KeyRound, Mail, Send } from 'lucide-react';
+import '../sign-in/login.css';
+
+export default function EsqueciSenha() {
+ const [email,setEmail]=useState('');
+ const [loading,setLoading]=useState(false);
+ const [message,setMessage]=useState('');
+ const [error,setError]=useState(false);
+ async function submit(e:FormEvent<HTMLFormElement>) {
+  e.preventDefault();
+  if(loading)return;
+  setLoading(true);setMessage('');setError(false);
   try {
-   const res=await fetch('/api/auth/request-password-reset',{method:'POST',headers:{'Content-Type':'application/json'},credentials:'same-origin',body:JSON.stringify({email,redirectTo:`${window.location.origin}/auth/redefinir-senha`})});
-   // Não revelar se o endereço está cadastrado.
-   if(res.status===404 || res.status===405){setMessage('Recuperação indisponível nesta configuração. Confira a integração do Neon Auth.');}
-   else {setMessage('Se este endereço tiver uma conta com recuperação habilitada, você receberá instruções por e-mail. Confira também o spam.');}
-  } catch {setMessage('Não foi possível contatar o serviço agora. Tente novamente mais tarde.');}
-  finally {setLoading(false)}
+   const res=await fetch('/api/auth/request-password-reset',{
+    method:'POST',headers:{'Content-Type':'application/json'},credentials:'same-origin',
+    body:JSON.stringify({email:email.trim(),redirectTo:`${window.location.origin}/auth/redefinir-senha`})
+   });
+   if(res.ok) {
+    setMessage('Se este e-mail estiver cadastrado, você receberá uma mensagem para recuperar sua senha. Confira também o spam.');
+   } else {
+    setError(true);
+    setMessage('Não foi possível enviar o e-mail agora. Tente novamente mais tarde.');
+   }
+  } catch {
+   setError(true);setMessage('Não foi possível conectar ao serviço. Tente novamente mais tarde.');
+  } finally {setLoading(false);}
  }
- return <main style={{maxWidth:420,margin:'10vh auto',padding:26,border:'1px solid #64748b',borderRadius:16}}>
-  <h1 style={{fontSize:24,fontWeight:700}}>Recuperar acesso</h1>
-  <p style={{margin:'12px 0'}}>Informe o e-mail cadastrado no ANTARES BUSINESS.</p>
-  <form onSubmit={submit} style={{display:'grid',gap:12}}>
-   <label>E-mail<input type="email" autoComplete="email" required value={email} onChange={e=>setEmail(e.target.value)} style={{width:'100%',padding:12,color:'#111'}}/></label>
-   <button disabled={loading} style={{background:'#2563eb',color:'white',padding:12,borderRadius:10}}>{loading?'Enviando…':'Enviar instruções'}</button>
-  </form>
-  {message&&<p role="status" style={{marginTop:16}}>{message}</p>}
-  <p style={{marginTop:16}}><Link href="/auth/sign-in">Voltar ao login</Link></p>
+ return <main className="antares-login-scene">
+  <section className="antares-login-card" aria-labelledby="recovery-title" style={{marginTop:0}}>
+   <div style={{display:'flex',alignItems:'center',justifyContent:'center',gap:10}}>
+    <KeyRound size={24} aria-hidden="true" color="#66d6ff"/>
+    <h1 id="recovery-title" style={{margin:0}}>Esqueceu a senha?</h1>
+   </div>
+   <p style={{color:'#d7e9ff',textAlign:'center',fontSize:15,lineHeight:1.5,margin:'4px 0 8px'}}>
+    Digite seu e-mail para recuperar sua senha.
+   </p>
+   <form onSubmit={submit} style={{display:'flex',flexDirection:'column',gap:15}}>
+    <label className="antares-login-field">
+     <Mail size={20} aria-hidden="true"/>
+     <span className="sr-only">E-mail</span>
+     <input type="email" name="email" autoComplete="email" placeholder="E-mail" required value={email} onChange={e=>setEmail(e.target.value)} disabled={loading}/>
+    </label>
+    <button className="antares-login-submit" type="submit" disabled={loading}>
+     <Send size={20} aria-hidden="true"/>{loading?'ENVIANDO…':'ENVIAR E-MAIL'}
+    </button>
+   </form>
+   {message&&<p role={error?'alert':'status'} style={{border:'1px solid '+(error?'#ff9c9c':'#5bbcff'),borderRadius:10,padding:12,fontSize:14,lineHeight:1.5,color:'#fff',background:error?'#63212a':'#123b6d'}}>{message}</p>}
+   <Link href="/auth/sign-in" className="antares-login-forgot"><ArrowLeft size={18} aria-hidden="true"/>Voltar ao login</Link>
+  </section>
  </main>;
 }

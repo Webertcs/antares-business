@@ -1,0 +1,38 @@
+.antares-setup{width:min(100%,1120px);margin:0 auto;padding:26px 28px 56px;color:#123868;font-family:inherit}
+.antares-setup *{box-sizing:border-box}
+.antares-setup__back{display:inline-flex;align-items:center;gap:8px;color:#2159aa;font-size:13px;font-weight:700;text-decoration:none;margin-bottom:17px}
+.antares-setup__back:hover{text-decoration:underline}
+.antares-setup__hero{position:relative;overflow:hidden;border-radius:15px;padding:27px 30px;color:#fff;background:linear-gradient(110deg,#153669 0%,#1854a0 54%,#2e85df 100%);box-shadow:0 9px 24px rgba(16,67,140,.15)}
+.antares-setup__hero:after{content:'';position:absolute;right:-70px;bottom:-155px;width:340px;height:340px;border:34px solid rgba(255,255,255,.045);border-radius:50%;pointer-events:none}
+.antares-setup__eyebrow{display:block;margin-bottom:8px;letter-spacing:.14em;text-transform:uppercase;color:#cde5ff;font-size:10px;font-weight:800}
+.antares-setup__hero h1{position:relative;margin:0;font-size:29px;line-height:1.2;font-weight:800;letter-spacing:-.02em}
+.antares-setup__hero p{position:relative;margin:8px 0 0;font-size:13px;color:#e8f3ff}
+.antares-setup__readiness{margin-top:17px;border:1px solid #c9ddfc;border-top:3px solid #2d86ea;border-radius:13px;padding:18px 19px;background:linear-gradient(180deg,#f7faff,#edf5ff);box-shadow:0 5px 16px rgba(33,89,171,.07)}
+.antares-setup__sectiontop{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:12px}
+.antares-setup__sectiontop h2,.antares-setup__sectiontitle{font-size:16px;font-weight:800;margin:0;color:#15447d}
+.antares-setup__refresh{appearance:none;border:1px solid #215fb1;border-radius:8px;background:linear-gradient(120deg,#2469c7,#134b94);box-shadow:0 3px 8px rgba(19,75,148,.16);color:white;font-weight:750;font-size:12px;padding:9px 13px;cursor:pointer}
+.antares-setup__refresh:disabled{opacity:.6;cursor:wait}
+.antares-setup__metrics{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:11px}
+.antares-setup__metric{min-width:0;padding:14px 15px;border:1px solid #cbdffc;border-top:3px solid #2876db;border-radius:10px;background:#eef5ff}
+.antares-setup__metric:nth-child(2){border-top-color:#12a68c}
+.antares-setup__metric:nth-child(3){border-top-color:#8863df}
+.antares-setup__metric-label{display:block;color:#56739b;font-size:11px;font-weight:700;margin-bottom:6px}
+.antares-setup__metric-value{font-size:23px;line-height:1.2;font-weight:850;color:#143f7e;overflow-wrap:anywhere}
+.antares-setup__metric-value--text{font-size:18px}
+.antares-setup__metric-hint{margin:5px 0 0;font-size:11px;color:#537099}
+.antares-setup__loading,.antares-setup__error{margin:8px 0;color:#486c9f;font-size:13px}
+.antares-setup__error{color:#9f3b36}
+.antares-setup__sectiontitle{margin:26px 0 13px}
+.antares-setup__steps{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:13px}
+.antares-setup__step{display:flex;flex-direction:column;min-width:0;padding:20px;border:1px solid #c6dbf9;border-top:3px solid #2980dc;border-radius:13px;background:linear-gradient(180deg,#fff,#f0f6ff);box-shadow:0 5px 15px rgba(27,85,164,.09)}
+.antares-setup__step:nth-child(2){border-top-color:#12a68c}
+.antares-setup__step:nth-child(3){border-top-color:#8863df}
+.antares-setup__step-number{display:inline-grid;place-items:center;width:36px;height:36px;border-radius:10px;background:#dfedff;color:#1754a0;font-weight:850;font-size:13px}
+.antares-setup__step h3{margin:15px 0 6px;font-size:17px;color:#124178;font-weight:800}
+.antares-setup__step p{margin:0 0 17px;font-size:12px;line-height:1.55;color:#5a769c;min-height:38px}
+.antares-setup__access{margin-top:auto;margin-bottom:11px;font-size:11px;font-weight:750;color:#16815d}
+.antares-setup__access--locked{color:#a36b20}
+.antares-setup__cta{display:flex;justify-content:center;align-items:center;min-height:39px;padding:9px 12px;border-radius:8px;color:#fff!important;background:linear-gradient(120deg,#2878dc,#154b9b);text-decoration:none;font-size:12px;font-weight:800;box-shadow:0 4px 10px rgba(18,81,170,.18);text-align:center}
+.antares-setup__cta:hover,.antares-setup__refresh:hover{filter:brightness(1.07)}
+@media(max-width:790px){.antares-setup{padding:18px 15px 35px}.antares-setup__steps{grid-template-columns:1fr}.antares-setup__step p{min-height:0}.antares-setup__metrics{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(max-width:510px){.antares-setup__hero{padding:24px 20px}.antares-setup__hero h1{font-size:24px}.antares-setup__metrics{grid-template-columns:1fr}.antares-setup__metric{padding:12px 14px}.antares-setup__sectiontop{flex-wrap:wrap}}
