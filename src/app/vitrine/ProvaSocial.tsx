@@ -2,11 +2,11 @@
 import dynamic from 'next/dynamic';
 import {ArrowRight,CalendarCheck2,GraduationCap,HeartHandshake,Quote,ShieldCheck,Sparkles} from 'lucide-react';
 import {authorizedTestimonials,verifiedMetrics} from './prova-social';
+// Componente original React Bits Shiny Text, aplicado apenas na prévia.
+import ShinyText from './reactbits/ShinyText';
 
 // Cards interativos carregados apenas quando renderizados na vitrine experimental.
 const SpotlightCard = dynamic(() => import('./reactbits/SpotlightCard'), {ssr:false});
-// Componente original React Bits Shiny Text, aplicado apenas na prévia.
-import ShinyText from './reactbits/ShinyText';
 
 const commitments=[
  {title:'A visita é planejada com a escola',description:'Alinhamos a proposta, a data e a organização da experiência com a instituição.',icon:CalendarCheck2},
