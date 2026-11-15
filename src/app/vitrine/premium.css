@@ -1774,3 +1774,198 @@
     transform:none;
   }
 }
+
+
+
+/* ANTARES FAQ · inspiração React Bits Animated List.
+ * Somente na prévia; a vitrine normal conserva os <details> originais.
+ * Cinco itens sempre visíveis; entradas suaves, sem rolagem interna. */
+.premium-kids.premium-cinematic-sky .premium-faq-animated{
+  max-width:840px;
+}
+.premium-kids.premium-cinematic-sky .premium-faq-animated .premium-faq-list{
+  display:grid;
+  gap:11px;
+}
+.premium-kids.premium-cinematic-sky .premium-faq-animated details.premium-faq-animated-item{
+  --faq-x:50%;
+  --faq-y:50%;
+  position:relative;
+  isolation:isolate;
+  margin:0;
+  padding:0;
+  overflow:hidden;
+  border:1px solid rgba(124,167,235,.36);
+  border-radius:17px;
+  background:
+    radial-gradient(ellipse at 85% 0%,rgba(51,100,177,.15),transparent 62%),
+    linear-gradient(120deg,rgba(16,33,69,.96),rgba(12,27,59,.92));
+  box-shadow:0 10px 28px rgba(0,6,22,.22),inset 0 1px rgba(255,255,255,.05);
+  color:#f4f9ff;
+  backdrop-filter:blur(8px);
+  transition:transform .22s ease,border-color .22s ease,
+    box-shadow .22s ease,background .22s ease;
+}
+.premium-kids.premium-cinematic-sky .premium-faq-animated details.premium-faq-animated-item::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  z-index:0;
+  pointer-events:none;
+  background:radial-gradient(220px circle at var(--faq-x) var(--faq-y),
+    rgba(130,194,255,.19),rgba(75,132,234,.06) 44%,transparent 80%);
+  opacity:0;
+  transition:opacity .22s ease;
+}
+.premium-kids.premium-cinematic-sky .premium-faq-animated details.premium-faq-animated-item:hover{
+  transform:translateY(-2px);
+  border-color:rgba(169,215,255,.73);
+  box-shadow:0 14px 31px rgba(0,9,33,.31),0 0 15px rgba(62,140,237,.12);
+}
+.premium-kids.premium-cinematic-sky .premium-faq-animated details.premium-faq-animated-item:hover::before,
+.premium-kids.premium-cinematic-sky .premium-faq-animated details.premium-faq-animated-item[open]::before{
+  opacity:1;
+}
+.premium-kids.premium-cinematic-sky .premium-faq-animated details.premium-faq-animated-item[open]{
+  transform:none;
+  border-color:rgba(152,216,255,.82);
+  background:
+    radial-gradient(ellipse at 84% 0%,rgba(69,131,218,.22),transparent 69%),
+    linear-gradient(120deg,rgba(20,49,94,.97),rgba(12,29,66,.96));
+  box-shadow:inset 3px 0 rgba(139,213,255,.76),0 12px 30px rgba(0,6,28,.32);
+}
+.premium-kids.premium-cinematic-sky .premium-faq-animated summary{
+  position:relative;
+  z-index:1;
+  cursor:pointer;
+  list-style:none;
+  display:flex;
+  align-items:center;
+  gap:15px;
+  min-height:66px;
+  padding:13px 19px;
+  font-weight:800;
+  color:#f5f9ff;
+}
+.premium-kids.premium-cinematic-sky .premium-faq-animated summary::-webkit-details-marker{
+  display:none;
+}
+.premium-kids.premium-cinematic-sky .premium-faq-animated summary::marker{
+  content:"";
+}
+.premium-kids.premium-cinematic-sky .premium-faq-animated summary:focus-visible{
+  outline:2px solid #ffe5a7;
+  outline-offset:-4px;
+  border-radius:15px;
+}
+.premium-kids.premium-cinematic-sky .premium-faq-index{
+  display:grid;
+  place-items:center;
+  flex:0 0 36px;
+  width:36px;
+  height:36px;
+  border-radius:12px;
+  border:1px solid rgba(143,198,255,.29);
+  background:rgba(47,107,195,.21);
+  color:#b8dfff;
+  font-size:12px;
+  font-variant-numeric:tabular-nums;
+  font-weight:900;
+  letter-spacing:.03em;
+}
+.premium-kids.premium-cinematic-sky .premium-faq-animated details[open] .premium-faq-index{
+  color:#fff;
+  background:rgba(53,132,220,.46);
+  border-color:rgba(179,227,255,.68);
+  box-shadow:0 0 13px rgba(87,171,255,.19);
+}
+.premium-kids.premium-cinematic-sky .premium-faq-question{
+  flex:1;
+  min-width:0;
+  font-size:14px;
+  line-height:1.55;
+}
+.premium-kids.premium-cinematic-sky .premium-faq-arrow{
+  display:grid;
+  place-items:center;
+  width:29px;
+  height:29px;
+  flex:none;
+  border-radius:50%;
+  border:1px solid rgba(137,187,245,.4);
+  background:rgba(43,86,159,.21);
+  color:#e2f3ff;
+  font-size:24px;
+  line-height:1;
+  transform:rotate(0deg);
+  transition:transform .28s ease,background .28s ease;
+}
+.premium-kids.premium-cinematic-sky .premium-faq-animated details[open] .premium-faq-arrow{
+  transform:rotate(180deg);
+  background:rgba(64,146,233,.38);
+}
+/* details/summary nativos conservam teclado, leitor de tela e estados abertos.
+   Chrome moderno: transição progressiva do conteúdo sem medir alturas em JS. */
+.premium-kids.premium-cinematic-sky .premium-faq-animated details{
+  interpolate-size:allow-keywords;
+}
+.premium-kids.premium-cinematic-sky .premium-faq-animated details::details-content{
+  block-size:0;
+  overflow:hidden;
+  transition:block-size .34s ease,content-visibility .34s allow-discrete;
+}
+.premium-kids.premium-cinematic-sky .premium-faq-animated details[open]::details-content{
+  block-size:auto;
+}
+.premium-kids.premium-cinematic-sky .premium-faq-answer{
+  position:relative;
+  z-index:1;
+  border-top:1px solid rgba(117,170,238,.22);
+  margin:0 19px 8px 69px;
+}
+.premium-kids.premium-cinematic-sky .premium-faq-animated details .premium-faq-answer p{
+  padding:14px 0 12px;
+  margin:0;
+  color:#d3e5fc;
+  font-size:13px;
+  line-height:1.7;
+}
+/* Stagger uma única vez quando o FAQ entra na área visível.
+   Sem depender da animação para deixar as perguntas acessíveis. */
+.premium-kids.premium-cinematic-sky .premium-faq-animated.has-entered .premium-faq-animated-item{
+  animation:pk-faq-list-enter .54s cubic-bezier(.2,.8,.2,1) both;
+  animation-delay:calc(var(--faq-index) * 75ms);
+}
+@keyframes pk-faq-list-enter{
+  from{opacity:0;transform:translate3d(0,15px,0) scale(.992)}
+  to{opacity:1;transform:translate3d(0,0,0) scale(1)}
+}
+@media(max-width:620px){
+  .premium-kids.premium-cinematic-sky .premium-faq-animated .premium-faq-list{gap:9px}
+  .premium-kids.premium-cinematic-sky .premium-faq-animated summary{
+    padding:11px 12px;
+    min-height:59px;
+    gap:10px;
+  }
+  .premium-kids.premium-cinematic-sky .premium-faq-index{
+    flex-basis:31px;width:31px;height:31px;font-size:11px;border-radius:10px;
+  }
+  .premium-kids.premium-cinematic-sky .premium-faq-question{font-size:12px}
+  .premium-kids.premium-cinematic-sky .premium-faq-arrow{
+    width:26px;height:26px;font-size:21px;
+  }
+  .premium-kids.premium-cinematic-sky .premium-faq-answer{margin-left:52px;margin-right:12px}
+}
+@media(prefers-reduced-motion:reduce){
+  .premium-kids.premium-cinematic-sky .premium-faq-animated .premium-faq-animated-item{
+    animation:none!important;
+    transition:none!important;
+    transform:none!important;
+  }
+  .premium-kids.premium-cinematic-sky .premium-faq-animated .premium-faq-arrow{
+    transition:none!important;
+  }
+  .premium-kids.premium-cinematic-sky .premium-faq-animated details::details-content{
+    transition:none!important;
+  }
+}
