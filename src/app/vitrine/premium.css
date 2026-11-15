@@ -1795,12 +1795,12 @@
   margin:0;
   padding:0;
   overflow:hidden;
-  border:1px solid rgba(124,167,235,.36);
+  border:1px solid rgba(95,137,191,.24);
   border-radius:17px;
   background:
-    radial-gradient(ellipse at 85% 0%,rgba(51,100,177,.15),transparent 62%),
-    linear-gradient(120deg,rgba(16,33,69,.96),rgba(12,27,59,.92));
-  box-shadow:0 10px 28px rgba(0,6,22,.22),inset 0 1px rgba(255,255,255,.05);
+    radial-gradient(ellipse at 85% 0%,rgba(37,82,147,.09),transparent 62%),
+    linear-gradient(120deg,rgba(7,17,36,.97),rgba(5,13,29,.96));
+  box-shadow:0 10px 28px rgba(0,4,18,.26),inset 0 1px rgba(255,255,255,.025);
   color:#f4f9ff;
   backdrop-filter:blur(8px);
   transition:transform .22s ease,border-color .22s ease,
@@ -1813,14 +1813,14 @@
   z-index:0;
   pointer-events:none;
   background:radial-gradient(220px circle at var(--faq-x) var(--faq-y),
-    rgba(130,194,255,.19),rgba(75,132,234,.06) 44%,transparent 80%);
+    rgba(107,174,245,.13),rgba(57,112,209,.035) 44%,transparent 80%);
   opacity:0;
   transition:opacity .22s ease;
 }
 .premium-kids.premium-cinematic-sky .premium-faq-animated details.premium-faq-animated-item:hover{
   transform:translateY(-2px);
-  border-color:rgba(169,215,255,.73);
-  box-shadow:0 14px 31px rgba(0,9,33,.31),0 0 15px rgba(62,140,237,.12);
+  border-color:rgba(143,193,246,.48);
+  box-shadow:0 14px 31px rgba(0,7,26,.34),0 0 12px rgba(62,140,237,.075);
 }
 .premium-kids.premium-cinematic-sky .premium-faq-animated details.premium-faq-animated-item:hover::before,
 .premium-kids.premium-cinematic-sky .premium-faq-animated details.premium-faq-animated-item[open]::before{
@@ -1828,11 +1828,11 @@
 }
 .premium-kids.premium-cinematic-sky .premium-faq-animated details.premium-faq-animated-item[open]{
   transform:none;
-  border-color:rgba(152,216,255,.82);
+  border-color:rgba(140,193,242,.48);
   background:
-    radial-gradient(ellipse at 84% 0%,rgba(69,131,218,.22),transparent 69%),
-    linear-gradient(120deg,rgba(20,49,94,.97),rgba(12,29,66,.96));
-  box-shadow:inset 3px 0 rgba(139,213,255,.76),0 12px 30px rgba(0,6,28,.32);
+    radial-gradient(ellipse at 84% 0%,rgba(58,119,201,.13),transparent 69%),
+    linear-gradient(120deg,rgba(13,30,56,.98),rgba(9,22,45,.97));
+  box-shadow:inset 2px 0 rgba(118,186,243,.52),0 12px 30px rgba(0,5,23,.35);
 }
 .premium-kids.premium-cinematic-sky .premium-faq-animated summary{
   position:relative;
@@ -1865,8 +1865,8 @@
   width:36px;
   height:36px;
   border-radius:12px;
-  border:1px solid rgba(143,198,255,.29);
-  background:rgba(47,107,195,.21);
+  border:1px solid rgba(112,161,221,.23);
+  background:rgba(40,84,152,.16);
   color:#b8dfff;
   font-size:12px;
   font-variant-numeric:tabular-nums;
@@ -1875,8 +1875,8 @@
 }
 .premium-kids.premium-cinematic-sky .premium-faq-animated details[open] .premium-faq-index{
   color:#fff;
-  background:rgba(53,132,220,.46);
-  border-color:rgba(179,227,255,.68);
+  background:rgba(48,112,187,.29);
+  border-color:rgba(150,205,255,.48);
   box-shadow:0 0 13px rgba(87,171,255,.19);
 }
 .premium-kids.premium-cinematic-sky .premium-faq-question{
@@ -1892,8 +1892,8 @@
   height:29px;
   flex:none;
   border-radius:50%;
-  border:1px solid rgba(137,187,245,.4);
-  background:rgba(43,86,159,.21);
+  border:1px solid rgba(114,160,221,.27);
+  background:rgba(35,71,131,.17);
   color:#e2f3ff;
   font-size:24px;
   line-height:1;
@@ -1920,7 +1920,7 @@
 .premium-kids.premium-cinematic-sky .premium-faq-answer{
   position:relative;
   z-index:1;
-  border-top:1px solid rgba(117,170,238,.22);
+  border-top:1px solid rgba(106,150,210,.17);
   margin:0 19px 8px 69px;
 }
 .premium-kids.premium-cinematic-sky .premium-faq-animated details .premium-faq-answer p{
