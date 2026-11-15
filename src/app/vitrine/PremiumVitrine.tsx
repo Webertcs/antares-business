@@ -299,26 +299,41 @@ export default function PremiumVitrine(){
    <section id="experiencia" className="premium-section"><div className="premium-section-title"><span>✦ COMO FUNCIONA</span><h2>A escola vira um portal para o espaço!</h2><p>A aventura acontece em três passos simples.</p></div><div className="premium-three"><article><div>🚚</div><b>01</b><h3>Chegamos e montamos</h3><p>Levamos a estrutura do planetário móvel até o local combinado.</p></article><article><div>🪐</div><b>02</b><h3>A turma entra na cúpula</h3><p>As crianças mergulham em uma experiência imersiva.</p></article><article><div>🚀</div><b>03</b><h3>Exploramos juntos</h3><p>Uma viagem guiada cheia de descobertas e perguntas.</p></article></div></section>
    <section className="premium-showcase" aria-label="Experiências ilustradas do planetário"><div className="premium-section-title"><span>✦ CONHEÇA NOSSO UNIVERSO</span><h2>Uma experiência para lembrar</h2><p>Da cúpula às estrelas: conheça possibilidades de visitas, jornadas e eventos.</p></div>{reactBitsPreview && !reduce && galleryAvailable ? <div className="premium-reactbits-gallery-area"><p className="premium-reactbits-gallery-hint">A galeria se movimenta sozinha. Arraste ou deslize para explorar; ao interagir, o movimento pausa. Toque em uma imagem para ampliar.</p><div className="premium-reactbits-gallery-frame"><CircularGallery items={reactBitsGalleryItems} bend={1.6} itemSize={0.83} itemAspect={1.1} gap={0.24} wave={0.55} fadeEdges={0.12} shadow={0.32} textColor="#f8fbff" font="bold 25px system-ui" scrollSpeed={1} scrollEase={0.07} autoScroll={0.85} showTitles={true} grayscale={false} openOnClick={true} intro={true} /></div><p className="premium-reactbits-gallery-credit">Imagens astronômicas reais e material ilustrativo; não são registros de eventos realizados pelo ANTARES. Créditos: <a href="https://science.nasa.gov/asset/webb/cosmic-cliffs-in-the-carina-nebula-nircam-and-miri-composite-image/" target="_blank" rel="noopener noreferrer">NASA/ESA/CSA/STScI (Carina)</a> · <a href="https://science.nasa.gov/asset/webb/pillars-of-creation-nircam-image/" target="_blank" rel="noopener noreferrer">NASA/ESA/CSA/STScI (Pilares)</a> · <a href="https://science.nasa.gov/photojournal/jewel-of-the-solar-system/" target="_blank" rel="noopener noreferrer">NASA/JPL-Caltech/SSI/Cornell (Saturno)</a> · <a href="https://science.nasa.gov/resource/blue-marble/" target="_blank" rel="noopener noreferrer">NASA Goddard (Terra)</a>.</p></div> : <>{reactBitsPreview && <p className="premium-reactbits-gallery-hint">Galeria em versão estática para preservar a acessibilidade e a compatibilidade deste dispositivo.</p>}<div className="premium-showcase-grid">{showcasePhotos.map(card=><article key={card.title}><MarketingPhoto src={card.src} fallback={card.fallback} alt={card.alt} width={700} height={450} className="premium-showcase-photo"/><div><h3>{card.title}</h3><p>{card.desc}</p></div></article>)}</div><p className="premium-showcase-disclaimer">Fotografias ilustrativas de outras experiências e do espaço. Não representam eventos realizados pelo ANTARES. <span className="premium-photo-credits">Créditos: <a href="https://www.eso.org/public/images/upr_IMG_6184-CC/" target="_blank" rel="noopener noreferrer">ESO / P. Horálek</a> · <a href="https://unsplash.com/photos/photography-of-astronaut-beside-satellite-OLlj17tUZnU" target="_blank" rel="noopener noreferrer">NASA / Unsplash</a> · <a href="https://commons.wikimedia.org/wiki/File:SPB-MobilesPlanetariumINTENSE%C2%A9SPB_FotoF.-M_(9).jpg" target="_blank" rel="noopener noreferrer">SPB Kommunikation</a> (<a href="https://creativecommons.org/licenses/by-sa/4.0/" target="_blank" rel="noopener noreferrer">CC BY-SA 4.0</a>) · <a href="https://unsplash.com/photos/night-sky-with-milky-way-observatory-and-people-stargazing-dU4dX1l0UFM" target="_blank" rel="noopener noreferrer">Scott Goodwill / Unsplash</a>. </span></p></>}</section>
    <section id="viagens" className="premium-section premium-journeys"><div className="premium-section-title"><span>PARA CADA TURMA</span><h2>Uma aventura para cada idade</h2><p>Escolha uma faixa etária para conhecer algumas possibilidades de conteúdo.</p></div><div className="premium-age-tabs" role="tablist" aria-label="Faixas etárias">{(Object.keys(journeys) as Age[]).map(a=><button role="tab" aria-selected={age===a} key={a} onClick={()=>setAge(a)}>{a}</button>)}</div><div className="premium-journey-grid">{journeys[age].map(([emoji,title,description])=><article key={title}><span>{emoji}</span><h3>{title}</h3><p>{description}</p></article>)}</div></section>
-   <section id="jogo" className="premium-game-reveal" aria-labelledby="premium-game-title">
+   <section id="jogo" className={'premium-game-reveal'+(reactBitsPreview?' premium-game-cinematic':'')} aria-labelledby="premium-game-title">
     <div className="premium-game-content">
      <span className="premium-game-eyebrow">✦ UM NOVO CAPÍTULO DO UNIVERSO ANTARES</span>
      <h2 id="premium-game-title">A aventura continua <em>além da cúpula.</em></h2>
      <p>Astro, Lunna e Pixel estão se preparando para uma nova jornada educativa. Em breve, as crianças poderão continuar descobrindo o espaço em uma experiência digital ANTARES.</p>
+     {reactBitsPreview&&<div className="premium-game-micro-benefits" aria-label="O que vem por aí">
+      <span>✦ Aprender brincando</span>
+      <span>✦ Descobrir o universo</span>
+      <span>✦ Viajar com os mascotes</span>
+     </div>}
      <div className="premium-game-soon">EM BREVE</div>
      <small>Prévia ilustrativa do futuro jogo ANTARES Kids. Lançamento ainda não anunciado.</small>
     </div>
-    <figure className="premium-game-art" aria-label="Arte conceitual do futuro jogo ANTARES com Astro, Lunna, Pixel e planetas">
+    <figure className={'premium-game-art'+(reactBitsPreview?' premium-game-art-cinematic':'')} aria-label="Arte conceitual do futuro jogo ANTARES com Astro, Lunna, Pixel e planetas">
      <div className="premium-game-planet premium-game-planet-a" aria-hidden="true"/>
      <div className="premium-game-planet premium-game-planet-b" aria-hidden="true"/>
      <div className="premium-game-planet premium-game-planet-c" aria-hidden="true"/>
      <div className="premium-game-orbit premium-game-orbit-one" aria-hidden="true"/>
      <div className="premium-game-orbit premium-game-orbit-two" aria-hidden="true"/>
-     <div className="premium-game-cast">
-      <Image src="/mascotes/lunna.png" alt="" width={185} height={238} className="premium-game-figure premium-game-lunna"/>
-      <Image src="/mascotes/astro.png" alt="" width={200} height={254} className="premium-game-figure premium-game-astro"/>
-      <Image src="/mascotes/pixel.png" alt="" width={140} height={155} className="premium-game-figure premium-game-pixel"/>
-     </div>
-     <figcaption>JOGO EDUCATIVO ANTARES <strong>EM BREVE</strong></figcaption>
+     {reactBitsPreview
+      ? <Image
+         src="/vitrine/mascotes-jogo-novas-poses.webp"
+         alt="Lunna flutuando e apontando para uma estrela, Astro explorando um mapa de constelações e Pixel voando acima deles"
+         width={700}
+         height={467}
+         className="premium-game-new-pose-art"
+        />
+      : <>
+         <div className="premium-game-cast">
+          <Image src="/mascotes/lunna.png" alt="" width={185} height={238} className="premium-game-figure premium-game-lunna"/>
+          <Image src="/mascotes/astro.png" alt="" width={200} height={254} className="premium-game-figure premium-game-astro"/>
+          <Image src="/mascotes/pixel.png" alt="" width={140} height={155} className="premium-game-figure premium-game-pixel"/>
+         </div>
+         <figcaption>JOGO EDUCATIVO ANTARES <strong>EM BREVE</strong></figcaption>
+        </>}
     </figure>
    </section>
    <ProvaSocial experimental={reactBitsPreview}/>

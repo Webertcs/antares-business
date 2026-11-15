@@ -2514,3 +2514,190 @@
     text-shadow:none;
   }
 }
+
+
+/* ANTARES Kids · Futuro jogo sem caixa sobre caixa: o céu principal atravessa
+   toda a seção; mascotes em poses novas (arte original, fundo transparente).
+   Exclusivamente ?reactbits=1; a vitrine oficial permanece inalterada. */
+.premium-kids.premium-cinematic-sky .premium-game-reveal.premium-game-cinematic{
+  width:min(calc(100% - 44px),1220px);
+  max-width:1220px;
+  margin:48px auto 76px;
+  padding:29px 8px;
+  display:grid;
+  grid-template-columns:minmax(0,.86fr) minmax(0,1.14fr);
+  align-items:center;
+  gap:clamp(12px,2.5vw,38px);
+  border:0;
+  border-radius:0;
+  background:transparent;
+  box-shadow:none;
+  overflow:visible;
+}
+.premium-kids.premium-cinematic-sky .premium-game-reveal.premium-game-cinematic::before{
+  display:none;
+}
+.premium-kids.premium-cinematic-sky .premium-game-cinematic .premium-game-content{
+  z-index:3;
+}
+.premium-kids.premium-cinematic-sky .premium-game-cinematic .premium-game-content h2{
+  color:#f7fbff;
+  text-shadow:0 3px 22px rgba(0,3,15,.42);
+}
+.premium-kids.premium-cinematic-sky .premium-game-cinematic .premium-game-content h2 em{
+  background:linear-gradient(95deg,#6ad5ff,#c3acff 58%,#ffe1a4);
+  background-clip:text;
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+}
+.premium-kids.premium-cinematic-sky .premium-game-cinematic .premium-game-content p{
+  color:#cadff8;
+  max-width:480px;
+}
+.premium-kids.premium-cinematic-sky .premium-game-cinematic .premium-game-micro-benefits{
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+  margin:15px 0 19px;
+}
+.premium-kids.premium-cinematic-sky .premium-game-cinematic .premium-game-micro-benefits span{
+  border:1px solid rgba(110,168,231,.3);
+  border-radius:999px;
+  padding:7px 11px;
+  background:rgba(7,23,47,.54);
+  color:#dbeaff;
+  font-size:11px;
+  font-weight:750;
+  line-height:1.25;
+}
+.premium-kids.premium-cinematic-sky .premium-game-cinematic .premium-game-soon{
+  border:1px solid rgba(255,237,180,.7);
+  background:linear-gradient(110deg,#ffd164,#ffe49b);
+  color:#152847;
+  box-shadow:0 7px 24px rgba(235,175,63,.18);
+}
+.premium-kids.premium-cinematic-sky .premium-game-cinematic .premium-game-content>small{
+  color:#b4c9e7;
+}
+.premium-kids.premium-cinematic-sky .premium-game-cinematic .premium-game-art-cinematic{
+  position:relative;
+  isolation:isolate;
+  display:grid;
+  place-items:center;
+  min-width:0;
+  width:100%;
+  min-height:330px;
+  margin:0;
+  padding:0;
+  border:0;
+  border-radius:0;
+  background:transparent;
+  box-shadow:none;
+  overflow:visible;
+}
+.premium-kids.premium-cinematic-sky .premium-game-cinematic .premium-game-art-cinematic::before{
+  content:"";
+  position:absolute;
+  pointer-events:none;
+  display:block;
+  z-index:-1;
+  width:106%;
+  height:90%;
+  inset:6% auto auto -3%;
+  background:
+    radial-gradient(ellipse at 53% 58%,rgba(73,83,204,.19),transparent 66%),
+    radial-gradient(ellipse at 25% 61%,rgba(109,40,144,.11),transparent 64%),
+    radial-gradient(ellipse at 83% 52%,rgba(25,124,174,.12),transparent 61%);
+  border:0;
+  border-radius:50%;
+  opacity:.82;
+}
+.premium-kids.premium-cinematic-sky .premium-game-cinematic .premium-game-art-cinematic::after{
+  display:none;
+}
+.premium-kids.premium-cinematic-sky .premium-game-cinematic .premium-game-new-pose-art{
+  display:block;
+  position:relative;
+  z-index:2;
+  width:100%;
+  height:auto;
+  max-width:700px;
+  max-height:450px;
+  object-fit:contain;
+  border:0;
+  border-radius:0;
+  background:transparent;
+  box-shadow:none;
+  filter:drop-shadow(0 13px 25px rgba(1,6,24,.2));
+}
+.premium-kids.premium-cinematic-sky .premium-game-cinematic .premium-game-orbit{
+  z-index:0;
+  border-color:rgba(132,185,245,.2);
+  border-style:solid;
+}
+.premium-kids.premium-cinematic-sky .premium-game-cinematic .premium-game-orbit-one{
+  width:75%;
+  height:24%;
+  top:34%;
+  left:13%;
+  transform:rotate(-17deg);
+}
+.premium-kids.premium-cinematic-sky .premium-game-cinematic .premium-game-orbit-two{
+  width:67%;
+  height:20%;
+  top:46%;
+  left:15%;
+  transform:rotate(13deg);
+}
+.premium-kids.premium-cinematic-sky .premium-game-cinematic .premium-game-planet{
+  z-index:1;
+  opacity:.54;
+  box-shadow:inset -12px -13px 19px rgba(9,16,48,.6),0 0 24px rgba(91,151,238,.24);
+}
+.premium-kids.premium-cinematic-sky .premium-game-cinematic .premium-game-planet-a{
+  width:60px;height:60px;top:9%;right:8%;
+}
+.premium-kids.premium-cinematic-sky .premium-game-cinematic .premium-game-planet-b{
+  width:36px;height:36px;top:13%;left:12%;
+}
+.premium-kids.premium-cinematic-sky .premium-game-cinematic .premium-game-planet-c{
+  width:19px;height:19px;top:72%;right:15%;
+}
+@media(max-width:940px){
+  .premium-kids.premium-cinematic-sky .premium-game-reveal.premium-game-cinematic{
+    grid-template-columns:1fr;
+    width:min(calc(100% - 34px),790px);
+    gap:8px;
+    margin:30px auto 62px;
+    padding:18px 8px 25px;
+  }
+  .premium-kids.premium-cinematic-sky .premium-game-cinematic .premium-game-art-cinematic{
+    width:min(100%,640px);
+    min-height:0;
+    margin:5px auto 0;
+  }
+  .premium-kids.premium-cinematic-sky .premium-game-cinematic .premium-game-content p{
+    max-width:690px;
+  }
+}
+@media(max-width:620px){
+  .premium-kids.premium-cinematic-sky .premium-game-reveal.premium-game-cinematic{
+    width:calc(100% - 24px);
+    padding:14px 4px 23px;
+    margin:25px auto 45px;
+  }
+  .premium-kids.premium-cinematic-sky .premium-game-cinematic .premium-game-new-pose-art{
+    max-height:none;
+  }
+  .premium-kids.premium-cinematic-sky .premium-game-cinematic .premium-game-micro-benefits{
+    margin-bottom:16px;
+  }
+  .premium-kids.premium-cinematic-sky .premium-game-cinematic .premium-game-micro-benefits span{
+    font-size:10px;
+  }
+}
+@media(prefers-reduced-motion:reduce){
+  .premium-kids.premium-cinematic-sky .premium-game-cinematic .premium-game-new-pose-art{
+    animation:none!important;
+  }
+}
