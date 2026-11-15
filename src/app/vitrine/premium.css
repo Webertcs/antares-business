@@ -1074,13 +1074,18 @@
  -webkit-mask-image:radial-gradient(circle at center,#000 52%,transparent 72%);
  mask-image:radial-gradient(circle at center,#000 52%,transparent 72%);
 }
-/* Saturno é ampliado proporcionalmente, sem comprimir o globo ou seus anéis.
-   Somente o sexto astro da segunda órbita recebe a ampliação. */
+/* Saturno em retrato de órbita Cassini: disco inteiro e anéis destacados,
+   ampliação moderada para evitar caixa preta e cortes na borda da imagem. */
 .premium-kids .premium-cinematic-orbit-stage .orbit-item[data-orbit-item="5"] .orbit-image{
- transform:scale(1.6);transform-origin:center center;
- -webkit-mask-image:radial-gradient(circle at center,#000 64%,transparent 84%);
- mask-image:radial-gradient(circle at center,#000 64%,transparent 84%);
- filter:drop-shadow(0 0 8px rgba(226,205,169,.18));
+ transform:scale(1.3);transform-origin:center center;
+ -webkit-mask-image:radial-gradient(ellipse at center,#000 51%,transparent 76%);
+ mask-image:radial-gradient(ellipse at center,#000 51%,transparent 76%);
+ filter:drop-shadow(0 0 9px rgba(241,218,163,.19));
+}
+/* A Terra entra como 7º astro e flutua livre, sem um fundo quadrado. */
+.premium-kids .premium-cinematic-orbit-stage .orbit-item[data-orbit-item="6"] .orbit-image{
+ -webkit-mask-image:radial-gradient(circle at center,#000 47%,transparent 71%);
+ mask-image:radial-gradient(circle at center,#000 47%,transparent 71%);
 }
 /* Foco visível mantém a navegação por teclado sem criar cartões permanentes. */
 .premium-kids .premium-cinematic-orbit-stage .orbit-item:focus-visible .orbit-item-inner{
@@ -1101,7 +1106,7 @@
  .premium-kids .premium-cinematic-orbit-heading p{font-size:13px}
  .premium-kids .premium-cinematic-orbit-stage{height:330px;border-radius:20px}
 
- .premium-kids .premium-cinematic-orbit-stage .orbit-item[data-orbit-item="5"] .orbit-image{transform:scale(1.4)}
+ .premium-kids .premium-cinematic-orbit-stage .orbit-item[data-orbit-item="5"] .orbit-image{transform:scale(1.16)}
  .premium-kids .premium-cinematic-orbit-actions{font-size:11px}
 }
 @media(prefers-reduced-motion:reduce){

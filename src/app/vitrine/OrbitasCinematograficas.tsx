@@ -47,10 +47,18 @@ const ORBIT_ITEMS = [
   {
     src: '/api/vitrine/galeria/saturno-cinema',
     title: 'Saturno — a joia do Sistema Solar',
-    alt: 'Saturno completo com anéis amplos fotografado pela missão Cassini',
-    description: 'Imagem de Saturno e seus anéis, capturada pela missão Cassini em cores naturais.',
+    alt: 'Saturno amarelo-dourado com o globo inteiro e anéis em fotografia da sonda Cassini',
+    description: 'Saturno em tons dourados, com anéis detalhados, fotografado pela sonda Cassini.',
     kind: 'Imagem Cassini · composição fotográfica',
-    source: 'https://science.nasa.gov/photojournal/saturn-in-color/'
+    source: 'https://science.nasa.gov/photojournal/staring-at-saturn/'
+  },
+  {
+    src: '/api/vitrine/galeria/terra-cinema',
+    title: 'Terra — nosso lar azul',
+    alt: 'Terra vista de frente, com nuvens, oceanos e as Américas em imagem Blue Marble da NASA',
+    description: 'O planeta Terra observado no espaço, em imagem composta com dados do satélite Suomi NPP.',
+    kind: 'Blue Marble 2012 · NASA/NOAA',
+    source: 'https://science.nasa.gov/photojournal/earth/'
   }
 ] as const;
 
@@ -64,7 +72,7 @@ export default function OrbitasCinematograficas() {
       <div className="premium-cinematic-orbit-heading">
         <span>✦ VIAGENS PELO UNIVERSO</span>
         <h2 id="premium-cinematic-orbit-title">Planetas que fazem a imaginação decolar</h2>
-        <p>Uma viagem visual por seis mundos extraordinários, com imagens espaciais de impacto cinematográfico — sem substituir o nosso sistema solar.</p>
+        <p>Uma viagem visual por sete mundos extraordinários, com imagens espaciais de impacto cinematográfico — sem substituir o nosso sistema solar.</p>
       </div>
 
       <div className="premium-cinematic-orbit-stage">
