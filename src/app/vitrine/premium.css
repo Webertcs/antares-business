@@ -1061,12 +1061,23 @@
  background:linear-gradient(110deg,rgba(4,11,30,.46),rgba(5,15,40,.15)),url('/vitrine/galeria-ceu-profundo.svg') center/cover;
  border:1px solid rgba(136,187,255,.4);box-shadow:inset 0 0 78px rgba(4,12,33,.58),0 14px 42px rgba(1,8,29,.32);
 }
-.premium-kids .premium-cinematic-orbit-stage .orbit-container{color:#e1f2ff}
-.premium-kids .premium-cinematic-orbit-stage .orbit-item-inner{
- border:1px solid rgba(164,214,255,.65);background:#06132b;
- box-shadow:0 14px 28px rgba(0,5,19,.5),0 0 20px rgba(79,153,255,.13);
+/* Planetas livres, sem molduras. O modo screen dissolve o preto das fotos
+   astronômicas no céu estrelado; a órbita original e o carrossel não mudam. */
+.premium-kids .premium-cinematic-orbit-stage .orbit-container{
+ color:#e1f2ff;isolation:auto;
 }
-.premium-kids .premium-cinematic-orbit-stage .orbit-image{object-fit:cover}
+.premium-kids .premium-cinematic-orbit-stage .orbit-item-inner{
+ border:0;border-radius:0;background:transparent;overflow:visible;box-shadow:none;
+}
+.premium-kids .premium-cinematic-orbit-stage .orbit-image{
+ object-fit:contain;border-radius:0;mix-blend-mode:screen;
+ -webkit-mask-image:radial-gradient(circle at center,#000 52%,transparent 72%);
+ mask-image:radial-gradient(circle at center,#000 52%,transparent 72%);
+}
+/* Foco visível mantém a navegação por teclado sem criar cartões permanentes. */
+.premium-kids .premium-cinematic-orbit-stage .orbit-item:focus-visible .orbit-item-inner{
+ outline:2px solid rgba(176,219,255,.85);outline-offset:5px;border-radius:50%;
+}
 .premium-kids .premium-cinematic-orbit-stage .orbit-center-content>*{pointer-events:none}
 .premium-kids .premium-cinematic-orbit-center{
  display:flex;flex-direction:column;align-items:center;gap:8px;
