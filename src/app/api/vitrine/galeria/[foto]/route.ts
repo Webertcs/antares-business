@@ -17,7 +17,7 @@ const PHOTOS = {
  'marte-cinema':'https://science.nasa.gov/wp-content/uploads/2023/04/hs-2016-15-a-full_tif-jpg.webp',
  'netuno-cinema':'https://assets.science.nasa.gov/dynamicimage/assets/science/missions/webb/science/2020/02/STScI-01EVSTT4S1TW8QH9QCE3YPGF6T.png?fit=clip&w=820&h=820',
  'venus-cinema':'https://assets.science.nasa.gov/dynamicimage/assets/science/psd/photojournal/pia/pia00/pia00270/PIA00270.jpg?fit=clip&w=820&h=820',
- 'saturno-cinema':'https://assets.science.nasa.gov/dynamicimage/assets/science/psd/photojournal/pia/pia21/pia21047/PIA21047.jpg?fit=clip&w=900&h=900',
+ 'mercurio-cinema':'https://assets.science.nasa.gov/dynamicimage/assets/science/psd/photojournal/pia/pia16/pia16853/PIA16853.jpg?fit=clip&w=820&h=820',
  'terra-cinema':'https://images-assets.nasa.gov/image/PIA18033/PIA18033~large.jpg'
 } as const;
 

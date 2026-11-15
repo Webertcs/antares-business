@@ -45,12 +45,12 @@ const ORBIT_ITEMS = [
     source: 'https://science.nasa.gov/photojournal/venus-computer-simulated-global-view-centered-at-90-degrees-east-longitude/'
   },
   {
-    src: '/api/vitrine/galeria/saturno-cinema',
-    title: 'Saturno — a joia do Sistema Solar',
-    alt: 'Saturno amarelo-dourado com o globo inteiro e anéis em fotografia da sonda Cassini',
-    description: 'Saturno em tons dourados, com anéis detalhados, fotografado pela sonda Cassini.',
-    kind: 'Imagem Cassini · composição fotográfica',
-    source: 'https://science.nasa.gov/photojournal/staring-at-saturn/'
+    src: '/api/vitrine/galeria/mercurio-cinema',
+    title: 'Mercúrio — o planeta mais próximo do Sol',
+    alt: 'Mercúrio como globo colorido com crateras em imagem de cores realçadas da missão MESSENGER',
+    description: 'Cores realçadas revelam as diferenças da superfície craterada de Mercúrio.',
+    kind: 'Imagem MESSENGER · cores realçadas',
+    source: 'https://science.nasa.gov/photojournal/colors-of-the-innermost-planet-view-1/'
   },
   {
     src: '/api/vitrine/galeria/terra-cinema',
