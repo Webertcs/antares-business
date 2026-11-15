@@ -17,7 +17,7 @@ const PHOTOS = {
  'marte-cinema':'https://science.nasa.gov/wp-content/uploads/2023/04/hs-2016-15-a-full_tif-jpg.webp',
  'netuno-cinema':'https://assets.science.nasa.gov/dynamicimage/assets/science/missions/webb/science/2020/02/STScI-01EVSTT4S1TW8QH9QCE3YPGF6T.png?fit=clip&w=820&h=820',
  'venus-cinema':'https://assets.science.nasa.gov/dynamicimage/assets/science/psd/photojournal/pia/pia00/pia00270/PIA00270.jpg?fit=clip&w=820&h=820',
- 'saturno-cinema':'https://assets.science.nasa.gov/dynamicimage/assets/science/psd/solar/2023/09/1/185_PIA17172.jpg?fit=clip&w=960&h=750'
+ 'saturno-cinema':'https://assets.science.nasa.gov/dynamicimage/assets/science/psd/photojournal/pia/pia05/pia05389/jpeg/PIA05389.jpg?fit=clip&w=1024&h=1024'
 } as const;
 
 export async function GET(_request: Request,{params}:{params:Promise<{foto:string}>}){

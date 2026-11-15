@@ -1,6 +1,5 @@
 'use client';
 
-import Image from 'next/image';
 import { useState } from 'react';
 import OrbitImages from './reactbits/OrbitImages';
 
@@ -47,20 +46,18 @@ const ORBIT_ITEMS = [
   },
   {
     src: '/api/vitrine/galeria/saturno-cinema',
-    title: 'Saturno — os anéis contra a luz',
-    alt: 'Saturno em sombra, rodeado por anéis luminosos numa composição feita pela missão Cassini',
-    description: 'Em contraluz, os anéis de Saturno revelam toda sua dimensão e beleza.',
+    title: 'Saturno — a joia do Sistema Solar',
+    alt: 'Saturno completo com anéis amplos fotografado pela missão Cassini',
+    description: 'Imagem de Saturno e seus anéis, capturada pela missão Cassini em cores naturais.',
     kind: 'Imagem Cassini · composição fotográfica',
-    source: 'https://science.nasa.gov/resource/the-day-the-earth-smiled/'
+    source: 'https://science.nasa.gov/photojournal/saturn-in-color/'
   }
 ] as const;
 
 const ORBIT_IMAGES = ORBIT_ITEMS.map(item => ({ src: item.src, alt: item.alt }));
 
 export default function OrbitasCinematograficas() {
-  const [selected, setSelected] = useState(0);
   const [paused, setPaused] = useState(false);
-  const current = ORBIT_ITEMS[selected];
 
   return (
     <section className="premium-cinematic-orbit" aria-labelledby="premium-cinematic-orbit-title">
@@ -95,37 +92,14 @@ export default function OrbitasCinematograficas() {
           intro
           width="100%"
           height="100%"
-          onItemClick={index => setSelected(index)}
-          centerContent={
-            <div className="premium-cinematic-orbit-center" aria-hidden="true">
-              <strong>✦ ANTARES</strong>
-              <span>DESCOBRIR O UNIVERSO</span>
-            </div>
-          }
         />
       </div>
       <div className="premium-cinematic-orbit-actions">
-        <span>Arraste ou toque em uma imagem para descobrir mais.</span>
         <button type="button" onClick={() => setPaused(value => !value)} aria-pressed={paused}>
           {paused ? '▶ Retomar movimento' : 'Ⅱ Pausar movimento'}
         </button>
       </div>
 
-      <div className="premium-cinematic-orbit-detail" aria-live="polite">
-        <Image src={current.src} alt={current.alt} width={220} height={150} unoptimized className="premium-cinematic-orbit-detail-image" />
-        <div>
-          <small>{current.kind}</small>
-          <h3>{current.title}</h3>
-          <p>{current.description}</p>
-          <a className="premium-cinematic-orbit-source" href={current.source} target="_blank" rel="noopener noreferrer" style={{display:'inline-block',marginTop:9,fontSize:11,color:'#a9d5ff',textDecoration:'underline',textUnderlineOffset:3}}>Ver imagem e créditos na NASA</a>
-        </div>
-      </div>
-
-      <p className="premium-cinematic-orbit-credit">
-        Órbitas ilustrativas, sem escala astronômica. Imagens da NASA/JPL-Caltech, NASA/ESA/CSA/STScI e colaboradores;
-        fotografias processadas para realce de cor. Vênus é uma reconstrução por radar com cores simuladas.
-        As imagens não representam apresentações realizadas pelo planetário.
-      </p>
     </section>
   );
 }
