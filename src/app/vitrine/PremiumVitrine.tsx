@@ -322,7 +322,16 @@ export default function PremiumVitrine(){
     </figure>
    </section>
    <ProvaSocial/>
-   <section id="escolas" className="premium-school"><div><span>ESCOLAS E INSTITUIÇÕES</span><h2>O universo pode voltar todos os anos.</h2><p>Planeje visitas recorrentes com turmas diferentes. Pacotes e condições especiais são definidos em proposta personalizada.</p><a className="premium-button" href="#orcamento">Conhecer as possibilidades <ArrowRight size={17}/></a></div><div className="premium-school-art premium-school-picture"><Image src="/vitrine/cupula-escola-antares.webp" alt="Imagem conceitual de cúpula inflável de planetário móvel, sem pessoas, em pátio escolar" width={533} height={400} className="premium-school-photo"/><small className="premium-school-credit">Ilustração digital de um planetário móvel. Não é uma foto do ANTARES.</small></div></section>
+   <section id="escolas" className={'premium-school'+(reactBitsPreview?' premium-school-cinematic':'')}><div><span>ESCOLAS E INSTITUIÇÕES</span><h2>O universo pode voltar todos os anos.</h2><p>Planeje visitas recorrentes com turmas diferentes. Pacotes e condições especiais são definidos em proposta personalizada.</p><a className="premium-button" href="#orcamento">Conhecer as possibilidades <ArrowRight size={17}/></a></div><div className="premium-school-art premium-school-picture">
+       <Image
+        src={reactBitsPreview?'/vitrine/cupula-cinematografica-astro.webp':'/vitrine/cupula-escola-antares.webp'}
+        alt={reactBitsPreview?'Ilustração cinematográfica de cúpula de planetário móvel com Astro apresentando a experiência':'Imagem conceitual de cúpula inflável de planetário móvel, sem pessoas, em pátio escolar'}
+        width={533}
+        height={400}
+        className="premium-school-photo"
+       />
+       {!reactBitsPreview&&<small className="premium-school-credit">Ilustração digital de um planetário móvel. Não é uma foto do ANTARES.</small>}
+      </div></section>
     <section id="orcamento" className={'premium-section premium-contact premium-contact-v2'+(reactBitsPreview?' premium-contact-cinematic':'')}>
      <div>
       <span>PRONTOS PARA DECOLAR?</span>
