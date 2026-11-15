@@ -2266,10 +2266,11 @@
   aspect-ratio:290/191;
   object-fit:cover;
   object-position:center;
-  /* Uma única moldura: a borda já está desenhada na ilustração. */
+  /* A arte já tem iluminação própria: sem nova moldura nem sombra retangular. */
   border:0;
+  outline:0;
   border-radius:22px;
-  box-shadow:0 18px 35px rgba(0,4,19,.27);
+  box-shadow:none;
   filter:none;
 }
 @media(max-width:620px){
