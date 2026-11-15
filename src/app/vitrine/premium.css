@@ -1124,3 +1124,32 @@
 @media(prefers-reduced-motion:reduce){
  .premium-kids .premium-cinematic-orbit-stage .orbit-item-inner{transition:none!important}
 }
+
+
+/* React Bits Star Border — somente dois CTAs do hero experimental. */
+.premium-kids .premium-hero-cta a.star-border.premium-star-border-cta{
+  position:relative;isolation:isolate;overflow:visible;
+  flex-shrink:0;min-height:48px;
+  border-radius:999px;font-weight:850;white-space:nowrap;
+}
+.premium-kids .premium-hero-cta a.premium-star-border-cta-primary{
+  background:linear-gradient(110deg,#ffd15f,#ffe790);
+  color:#162548;border:1px solid #fff0b8;
+}
+.premium-kids .premium-hero-cta a.premium-star-border-cta-secondary{
+  background:rgba(25,58,113,.82);
+  color:#f3f7ff;border:1px solid rgba(175,207,255,.6);
+}
+.premium-kids .premium-hero-cta .premium-star-border-cta .star-border__light{
+  z-index:1;pointer-events:none;
+}
+.premium-kids .premium-hero-cta .premium-star-border-label{
+  position:relative;z-index:2;display:inline-flex;
+  align-items:center;justify-content:center;gap:9px;
+}
+.premium-kids .premium-hero-cta .premium-star-border-cta:focus-visible{
+  outline:3px solid #ffd97a;outline-offset:5px;
+}
+@media(prefers-reduced-motion:reduce){
+  .premium-kids .premium-hero-cta .premium-star-border-cta{transition:none}
+}
