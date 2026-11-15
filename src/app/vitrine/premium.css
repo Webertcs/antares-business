@@ -1074,14 +1074,13 @@
  -webkit-mask-image:radial-gradient(circle at center,#000 52%,transparent 72%);
  mask-image:radial-gradient(circle at center,#000 52%,transparent 72%);
 }
-/* Mercúrio: a imagem original tem margens pretas em volta do disco.
-   O raio "closest-side" acompanha o planeta, eliminando o quadrado
-   sem afetar a textura ou o movimento dos demais astros. */
+/* Mercúrio: recorte mais justo elimina o halo preto remanescente.
+   Mantém o mesmo tamanho do astro; altera somente a transparência ao redor. */
 .premium-kids .premium-cinematic-orbit-stage .orbit-item[data-orbit-item="5"] .orbit-image{
  transform:scale(1.52);transform-origin:center center;
- -webkit-mask-image:radial-gradient(circle closest-side at center,#000 0 55%,rgba(0,0,0,.98) 59%,transparent 70%);
- mask-image:radial-gradient(circle closest-side at center,#000 0 55%,rgba(0,0,0,.98) 59%,transparent 70%);
- filter:drop-shadow(0 0 8px rgba(168,185,221,.18));
+ -webkit-mask-image:radial-gradient(circle closest-side at center,#000 0 49%,rgba(0,0,0,.96) 53%,transparent 62%);
+ mask-image:radial-gradient(circle closest-side at center,#000 0 49%,rgba(0,0,0,.96) 53%,transparent 62%);
+ filter:drop-shadow(0 0 5px rgba(168,185,221,.13));
 }
 /* A Terra entra como 7º astro e flutua livre, sem um fundo quadrado. */
 .premium-kids .premium-cinematic-orbit-stage .orbit-item[data-orbit-item="6"] .orbit-image{
