@@ -5,6 +5,8 @@ import './CircularGallery.css';
 
 export type GalleryItem = {
   image: string;
+  /** Amplia a área da textura para reduzir levemente o sujeito sem alterar o cartão. */
+  imageScale?: number;
   text?: string;
   description?: string;
   alt?: string;
@@ -191,6 +193,7 @@ uniform vec2 uResolution;
 uniform vec2 uSize;
 uniform float uRadius;
 uniform float uImageAspect;
+uniform float uImageScale;
 uniform float uReady;
 uniform vec3 uPlaceholder;
 uniform float uGray;
@@ -237,7 +240,12 @@ void main() {
   vec2 uv = vLocal / uSize + 0.5;
   float aspect = uSize.x / uSize.y;
   vec2 crop = aspect > uImageAspect ? vec2(1.0, uImageAspect / aspect) : vec2(aspect / uImageAspect, 1.0);
-  vec3 image = texture(uTexture, (uv - 0.5) * crop + 0.5).rgb;
+  vec2 texUV = (uv - 0.5) * crop * max(uImageScale, 1.0) + 0.5;
+  vec3 image = texture(uTexture, clamp(texUV, 0.0, 1.0)).rgb;
+  // Completa as margens com azul quase preto, sem esticar o mascote.
+  if (uImageScale > 1.0 && (texUV.x < 0.0 || texUV.x > 1.0 || texUV.y < 0.0 || texUV.y > 1.0)) {
+    image = vec3(0.008, 0.015, 0.04);
+  }
   vec3 color = mix(uPlaceholder, image, uReady);
   float luma = dot(color, vec3(0.2126, 0.7152, 0.0722));
   color = mix(color, vec3(luma), uGray) * (1.0 - uDim);
@@ -723,6 +731,7 @@ const CircularGallery = ({
         const entry = card.entry;
         gl.bindTexture(gl.TEXTURE_2D, entry.texture || blank);
         gl.uniform1f(u.uImageAspect, entry.aspect);
+        gl.uniform1f(u.uImageScale, mix(card.item.imageScale ?? 1, 1, card.focus));
         gl.uniform1f(u.uReady, entry.ready);
         gl.uniform1f(u.uGray, card.gray);
         gl.uniform1f(u.uDim, card.dim);

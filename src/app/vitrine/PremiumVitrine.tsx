@@ -37,12 +37,12 @@ const showcasePhotos=[
 ] as const;
 const reactBitsGalleryItems = [
  {image:'/api/vitrine/galeria/nebulosa',text:'Nebulosa de Carina',description:'Nuvens cósmicas e estrelas fotografadas pelo telescópio James Webb.',alt:'Nebulosa de Carina registrada pelo telescópio James Webb'},
- {image:'/vitrine/cupula-escola-antares.webp',text:'Cúpula na escola',description:'Ilustração da estrutura do planetário móvel em um pátio escolar.',alt:'Ilustração da cúpula inflável do planetário em ambiente escolar'},
- {image:'/mascotes/astro.png',text:'Astro',description:'Nosso pequeno explorador do universo ANTARES.',alt:'Mascote Astro'},
+ {image:'/vitrine/observatorio-antares.webp',text:'Observatório ANTARES',description:'Arte conceitual de um observatório sob o céu estrelado. Não representa a estrutura móvel utilizada nas escolas.',alt:'Ilustração de um observatório espacial com lua brilhante e cúpula arquitetônica'},
+ {image:'/mascotes/astro.png',imageScale:1.13,text:'Astro',description:'Nosso pequeno explorador do universo ANTARES.',alt:'Mascote Astro'},
  {image:'/api/vitrine/galeria/saturno',text:'Saturno e seus anéis',description:'Saturno em imagem real capturada pela missão Cassini.',alt:'Fotografia de Saturno e seus anéis pela nave Cassini'},
- {image:'/mascotes/lunna.png',text:'Lunna',description:'Uma companheira para descobrir estrelas, planetas e galáxias.',alt:'Mascote Lunna'},
+ {image:'/mascotes/lunna.png',imageScale:1.13,text:'Lunna',description:'Uma companheira para descobrir estrelas, planetas e galáxias.',alt:'Mascote Lunna'},
  {image:'/api/vitrine/galeria/pilares',text:'Pilares da Criação',description:'Uma incrível região de formação de estrelas na Nebulosa da Águia.',alt:'Pilares da Criação em imagem do telescópio James Webb'},
- {image:'/mascotes/pixel.png',text:'Pixel',description:'O robô que acompanha nossa aventura espacial.',alt:'Mascote Pixel'},
+ {image:'/mascotes/pixel.png',imageScale:1.13,text:'Pixel',description:'O robô que acompanha nossa aventura espacial.',alt:'Mascote Pixel'},
  {image:'/api/vitrine/galeria/terra',text:'Nosso planeta Terra',description:'A Terra vista do espaço em uma imagem composta pela NASA.',alt:'Imagem da Terra em fundo espacial'}
 ];
 const ecosystemCards=[
