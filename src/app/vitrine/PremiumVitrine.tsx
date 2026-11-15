@@ -45,6 +45,13 @@ const journeys={
  '10–12 anos':[['🌌','Além dos planetas','Estrelas, galáxias e distâncias cósmicas.'],['🔭','Missões da ciência','Sondas, telescópios e grandes descobertas.']]
 };
 type Age=keyof typeof journeys;
+/** Etapas reais do atendimento, representadas por cenas CARTOON ilustrativas
+ * no preview React Bits. Não são fotografias de eventos do planetário. */
+const premiumExperienceSteps=[
+ {number:'01',title:'Chegamos e montamos',description:'Levamos a estrutura do planetário móvel até o local combinado.',src:'/vitrine/como-funciona-montagem.webp',alt:'Ilustração dos mascotes Astro, Lunna e Pixel preparando o equipamento do planetário junto à cúpula.'},
+ {number:'02',title:'A turma entra na cúpula',description:'As crianças mergulham em uma experiência imersiva.',src:'/vitrine/como-funciona-cupula.webp',alt:'Ilustração de várias crianças fascinadas com uma galáxia luminosa projetada dentro da cúpula.'},
+ {number:'03',title:'Exploramos juntos',description:'Uma viagem guiada cheia de descobertas e perguntas.',src:'/vitrine/como-funciona-exploracao.webp',alt:'Ilustração dos mascotes Astro, Lunna e Pixel explorando o espaço com um telescópio.'}
+] as const;
 const journeyArtByTitle:Record<string,JourneyArtKind>={
  'Olá, Sistema Solar!':'saturn',
  'Histórias no céu':'constellation',
@@ -315,7 +322,44 @@ export default function PremiumVitrine(){
           </article>)}
         </div>}
    </section>
-   <section id="experiencia" className="premium-section"><div className="premium-section-title"><span>✦ COMO FUNCIONA</span><h2>A escola vira um portal para o espaço!</h2><p>A aventura acontece em três passos simples.</p></div><div className="premium-three"><article><div>🚚</div><b>01</b><h3>Chegamos e montamos</h3><p>Levamos a estrutura do planetário móvel até o local combinado.</p></article><article><div>🪐</div><b>02</b><h3>A turma entra na cúpula</h3><p>As crianças mergulham em uma experiência imersiva.</p></article><article><div>🚀</div><b>03</b><h3>Exploramos juntos</h3><p>Uma viagem guiada cheia de descobertas e perguntas.</p></article></div></section>
+   <section id="experiencia" className={'premium-section'+(reactBitsPreview?' premium-steps-cinematic':'')}>
+    <div className="premium-section-title">
+     <span>✦ COMO FUNCIONA</span>
+     <h2>A escola vira um portal para o espaço!</h2>
+     <p>A aventura acontece em três passos simples.</p>
+    </div>
+    {reactBitsPreview
+     ? <div className="premium-three premium-three-cinematic">
+        {premiumExperienceSteps.map(step=><SpotlightCard
+          key={step.number}
+          className="premium-step-spotlight"
+          theme="dark"
+          spotlightColor="#a8d9ff"
+          spotlightSize={340}
+          intensity={0.21}
+          softness={0.83}
+          borderGlow={0.68}
+          proximity={100}
+          smoothing={0.2}
+          ambient={false}
+          flare={false}
+         >
+          <div className="premium-step-visual">
+           <Image src={step.src} alt={step.alt} width={520} height={310} className="premium-step-scene"/>
+          </div>
+          <div className="premium-step-details">
+           <b>{step.number}</b>
+           <h3>{step.title}</h3>
+           <p>{step.description}</p>
+          </div>
+         </SpotlightCard>)}
+       </div>
+     : <div className="premium-three">
+        <article><div>🚚</div><b>01</b><h3>Chegamos e montamos</h3><p>Levamos a estrutura do planetário móvel até o local combinado.</p></article>
+        <article><div>🪐</div><b>02</b><h3>A turma entra na cúpula</h3><p>As crianças mergulham em uma experiência imersiva.</p></article>
+        <article><div>🚀</div><b>03</b><h3>Exploramos juntos</h3><p>Uma viagem guiada cheia de descobertas e perguntas.</p></article>
+       </div>}
+   </section>
    <section className="premium-showcase" aria-label="Experiências ilustradas do planetário"><div className="premium-section-title"><span>✦ CONHEÇA NOSSO UNIVERSO</span><h2>Uma experiência para lembrar</h2><p>Da cúpula às estrelas: conheça possibilidades de visitas, jornadas e eventos.</p></div>{reactBitsPreview && !reduce && galleryAvailable ? <div className="premium-reactbits-gallery-area"><div className="premium-reactbits-gallery-frame"><CircularGallery items={reactBitsGalleryItems} bend={1.6} itemSize={0.83} itemAspect={1.1} gap={0.24} wave={0.55} fadeEdges={0.12} shadow={0.32} textColor="#f8fbff" font="bold 25px system-ui" scrollSpeed={1} scrollEase={0.07} autoScroll={0.85} showTitles={true} grayscale={false} openOnClick={true} intro={true} /></div></div> : <><div className="premium-showcase-grid">{showcasePhotos.map(card=><article key={card.title}><MarketingPhoto src={card.src} fallback={card.fallback} alt={card.alt} width={700} height={450} className="premium-showcase-photo"/><div><h3>{card.title}</h3><p>{card.desc}</p></div></article>)}</div><p className="premium-showcase-disclaimer">Fotografias ilustrativas de outras experiências e do espaço. Não representam eventos realizados pelo ANTARES. <span className="premium-photo-credits">Créditos: <a href="https://www.eso.org/public/images/upr_IMG_6184-CC/" target="_blank" rel="noopener noreferrer">ESO / P. Horálek</a> · <a href="https://unsplash.com/photos/photography-of-astronaut-beside-satellite-OLlj17tUZnU" target="_blank" rel="noopener noreferrer">NASA / Unsplash</a> · <a href="https://commons.wikimedia.org/wiki/File:SPB-MobilesPlanetariumINTENSE%C2%A9SPB_FotoF.-M_(9).jpg" target="_blank" rel="noopener noreferrer">SPB Kommunikation</a> (<a href="https://creativecommons.org/licenses/by-sa/4.0/" target="_blank" rel="noopener noreferrer">CC BY-SA 4.0</a>) · <a href="https://unsplash.com/photos/night-sky-with-milky-way-observatory-and-people-stargazing-dU4dX1l0UFM" target="_blank" rel="noopener noreferrer">Scott Goodwill / Unsplash</a>. </span></p></>}</section>
    <section id="viagens" className={'premium-section premium-journeys'+(reactBitsPreview?' premium-journeys-cinematic':'')}>
     <div className="premium-section-title">
