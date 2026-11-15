@@ -2490,3 +2490,27 @@
     transform:none!important;
   }
 }
+
+
+/* ANTARES Kids · Shiny Text em Confiança.
+   Reflexo metálico da versão original React Bits, sem modificar layout
+   nem título da vitrine pública. Respeita prefers-reduced-motion. */
+.premium-kids.premium-cinematic-sky .premium-proof-cinematic .premium-proof-heading h2 .premium-proof-shiny-title.shiny-text{
+  display:inline-block;
+  max-width:100%;
+  color:#e4ecf8;
+  font:inherit;
+  line-height:inherit;
+  letter-spacing:inherit;
+  text-align:inherit;
+  vertical-align:baseline;
+  text-shadow:none;
+}
+.premium-kids.premium-cinematic-sky .premium-proof-cinematic .premium-proof-heading h2 .premium-proof-shiny-title.shiny-text .shiny-text__glow{
+  filter:blur(.12em);
+}
+@media(prefers-reduced-motion:reduce){
+  .premium-kids.premium-cinematic-sky .premium-proof-cinematic .premium-proof-heading h2 .premium-proof-shiny-title.shiny-text{
+    text-shadow:none;
+  }
+}

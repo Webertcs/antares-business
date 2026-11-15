@@ -5,6 +5,8 @@ import {authorizedTestimonials,verifiedMetrics} from './prova-social';
 
 // Cards interativos carregados apenas quando renderizados na vitrine experimental.
 const SpotlightCard = dynamic(() => import('./reactbits/SpotlightCard'), {ssr:false});
+// Componente original React Bits Shiny Text, aplicado apenas na prévia.
+import ShinyText from './reactbits/ShinyText';
 
 const commitments=[
  {title:'A visita é planejada com a escola',description:'Alinhamos a proposta, a data e a organização da experiência com a instituição.',icon:CalendarCheck2},
@@ -18,7 +20,24 @@ export default function ProvaSocial({experimental=false}:{experimental?:boolean}
  return <section id="confianca" className={'premium-proof'+(experimental?' premium-proof-cinematic':'')} aria-labelledby="premium-proof-title">
   <div className="premium-proof-heading">
    <span>✦ A CONFIANÇA TAMBÉM FAZ PARTE DA VIAGEM</span>
-   <h2 id="premium-proof-title">Uma experiência pensada para sua escola, do primeiro contato à última descoberta.</h2>
+   <h2 id="premium-proof-title">{experimental
+     ? <ShinyText
+        text="Uma experiência pensada para sua escola, do primeiro contato à última descoberta."
+        className="premium-proof-shiny-title"
+        color="#dce5f2"
+        shineColor="#ffffff"
+        speed={7.5}
+        delay={2.1}
+        angle={113}
+        shineWidth={26}
+        softness={0.82}
+        bands={1}
+        glow={0.12}
+        easing="smooth"
+        direction="right"
+        trigger="loop"
+      />
+     : 'Uma experiência pensada para sua escola, do primeiro contato à última descoberta.'}</h2>
    <p>Mais do que conhecer os planetas, queremos que cada visita seja bem planejada, acolhedora e inspiradora para a turma.</p>
   </div>
   {metrics.length>0&&<div className="premium-proof-metrics" aria-label="Resultados verificados do planetário">
