@@ -1616,3 +1616,77 @@
     transition:none!important;
   }
 }
+
+
+/* ANTARES Kids · Rodapé integrado à própria vitrine (somente ?reactbits=1).
+ * Não há faixa divisória, logo ou slogan duplicados. O CTA está no main,
+ * depois do FAQ, e o orçamento flutuante se oculta quando ele entra na tela. */
+.premium-kids.premium-cinematic-sky .premium-endcap{
+  position:relative;
+  z-index:1;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  max-width:1200px;
+  margin:0 auto;
+  padding:9px 20px 70px;
+  background:transparent;
+  border:0;
+}
+.premium-kids.premium-cinematic-sky .premium-back-to-top{
+  position:relative;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:13px;
+  min-height:51px;
+  padding:10px 23px 10px 12px;
+  border:1px solid rgba(151,207,255,.64);
+  border-radius:999px;
+  background:
+    radial-gradient(ellipse at 15% 0%,rgba(91,174,255,.23),transparent 65%),
+    linear-gradient(115deg,rgba(20,53,99,.94),rgba(9,26,59,.96));
+  color:#eef8ff;
+  font-size:13px;
+  font-weight:850;
+  letter-spacing:.065em;
+  text-transform:uppercase;
+  text-decoration:none;
+  box-shadow:0 8px 28px rgba(0,7,27,.35),inset 0 1px rgba(242,249,255,.1);
+  transition:transform .22s ease,border-color .22s ease,box-shadow .22s ease,background .22s ease;
+}
+.premium-kids.premium-cinematic-sky .premium-back-to-top:hover{
+  transform:translateY(-3px);
+  border-color:rgba(217,240,255,.95);
+  color:#fff;
+  box-shadow:0 13px 34px rgba(0,13,40,.49),0 0 23px rgba(88,167,255,.2);
+}
+.premium-kids.premium-cinematic-sky .premium-back-to-top-icon{
+  display:grid;
+  place-items:center;
+  flex:none;
+  width:31px;height:31px;
+  border:1px solid rgba(179,222,255,.57);
+  border-radius:50%;
+  background:rgba(65,130,215,.32);
+  color:#fff;
+  font-size:19px;
+  font-weight:750;
+  line-height:1;
+}
+.premium-kids.premium-cinematic-sky .premium-back-to-top:focus-visible{
+  outline:3px solid #ffe6a8;
+  outline-offset:4px;
+}
+@media(max-width:620px){
+  .premium-kids.premium-cinematic-sky .premium-endcap{padding:10px 16px 59px;}
+  .premium-kids.premium-cinematic-sky .premium-back-to-top{
+    min-height:48px;
+    padding:9px 19px 9px 10px;
+    font-size:12px;
+  }
+}
+@media(prefers-reduced-motion:reduce){
+  .premium-kids.premium-cinematic-sky .premium-back-to-top{transition:none}
+  .premium-kids.premium-cinematic-sky .premium-back-to-top:hover{transform:none}
+}

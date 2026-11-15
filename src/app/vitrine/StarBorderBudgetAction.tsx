@@ -1,6 +1,7 @@
 'use client';
 
 import { MessageCircle } from 'lucide-react';
+import { useEffect, useState } from 'react';
 import StarBorder from './reactbits/StarBorder';
 
 /**
@@ -9,6 +10,20 @@ import StarBorder from './reactbits/StarBorder';
  * Os demais links de navegação e os botões de formulário não recebem efeitos.
  */
 export default function StarBorderBudgetAction({ location }: { location: 'nav' | 'floating' }) {
+  const [atEnd, setAtEnd] = useState(false);
+
+  useEffect(() => {
+    if (location !== 'floating') return;
+    const end = document.querySelector<HTMLElement>('[data-vitrine-end]');
+    if (!end) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => setAtEnd(entry.isIntersecting),
+      { rootMargin: '0px 0px 95px 0px', threshold: 0 }
+    );
+    observer.observe(end);
+    return () => observer.disconnect();
+  }, [location]);
+
   if (location === 'nav') {
     return (
       <StarBorder
@@ -32,6 +47,8 @@ export default function StarBorderBudgetAction({ location }: { location: 'nav' |
       </StarBorder>
     );
   }
+
+  if (atEnd) return null;
 
   return (
     <StarBorder
