@@ -6,46 +6,52 @@ import OrbitImages from './reactbits/OrbitImages';
 
 const ORBIT_ITEMS = [
   {
-    src: '/vitrine/observatorio-antares.webp',
-    title: 'Observatório ANTARES',
-    alt: 'Arte do observatório ANTARES com Lua e cúpula iluminada',
-    description: 'Uma visão cinematográfica que inspira a descoberta do céu.',
-    kind: 'Arte conceitual'
+    src: '/api/vitrine/galeria/jupiter-cinema',
+    title: 'Júpiter — um mundo de tempestades',
+    alt: 'Júpiter com tempestades e nuvens azuis e alaranjadas, em cores realçadas pela missão Juno',
+    description: 'A sonda Juno revela um planeta gigante coberto por tempestades e formas surpreendentes.',
+    kind: 'Imagem Juno · cores realçadas',
+    source: 'https://science.nasa.gov/photojournal/exotic-marble/'
   },
   {
-    src: '/api/vitrine/galeria/saturno',
-    title: 'Saturno e seus anéis',
-    alt: 'Saturno e seus anéis fotografados pela sonda Cassini',
-    description: 'Os anéis revelam um dos cenários mais impressionantes do Sistema Solar.',
-    kind: 'Imagem astronômica'
+    src: '/api/vitrine/galeria/urano-cinema',
+    title: 'Urano — o gigante dos anéis',
+    alt: 'Urano azul-claro com anéis brilhantes em imagem infravermelha do James Webb',
+    description: 'O telescópio James Webb revela anéis delicados em torno do planeta azul.',
+    kind: 'Imagem Webb · cores representativas',
+    source: 'https://science.nasa.gov/asset/webb/uranus-nircam-image/'
   },
   {
-    src: '/api/vitrine/galeria/terra',
-    title: 'Nosso planeta Terra',
-    alt: 'Imagem do planeta Terra visto do espaço',
-    description: 'Nosso lar visto de longe, pequeno diante da imensidão do universo.',
-    kind: 'Imagem astronômica'
+    src: '/api/vitrine/galeria/marte-cinema',
+    title: 'Marte — o planeta vermelho',
+    alt: 'Marte em tons alaranjados, fotografado pelo telescópio espacial Hubble',
+    description: 'Desertos, nuvens e regiões escuras marcam a superfície do nosso vizinho.',
+    kind: 'Fotografia · telescópio Hubble',
+    source: 'https://science.nasa.gov/image-detail/hs-2016-15-a-full_tif/'
   },
   {
-    src: '/api/vitrine/galeria/nebulosa',
-    title: 'Nebulosa de Carina',
-    alt: 'Nebulosa de Carina fotografada pelo telescópio James Webb',
-    description: 'Nuvens de gás e poeira formam uma paisagem cósmica fascinante.',
-    kind: 'Imagem astronômica'
+    src: '/api/vitrine/galeria/netuno-cinema',
+    title: 'Netuno — o azul profundo',
+    alt: 'Netuno azul intenso com nuvens e tempestades visto pela Voyager 2',
+    description: 'A Voyager 2 registrou este mundo distante, envolto em nuvens e ventos intensos.',
+    kind: 'Fotografia · Voyager 2',
+    source: 'https://science.nasa.gov/asset/webb/neptune-voyager-2/'
   },
   {
-    src: '/api/vitrine/galeria/pilares',
-    title: 'Pilares da Criação',
-    alt: 'Pilares da Criação registrados pelo telescópio James Webb',
-    description: 'Colunas de gás e poeira onde novas estrelas podem se formar.',
-    kind: 'Imagem astronômica'
+    src: '/api/vitrine/galeria/venus-cinema',
+    title: 'Vênus — a superfície dourada',
+    alt: 'Globo dourado de Vênus reconstruído a partir de imagens de radar da missão Magellan',
+    description: 'Uma visualização de Vênus feita com dados de radar e cores simuladas pela NASA.',
+    kind: 'Reconstrução de radar · cores simuladas',
+    source: 'https://science.nasa.gov/photojournal/venus-computer-simulated-global-view-centered-at-90-degrees-east-longitude/'
   },
   {
-    src: '/api/vitrine/galeria/galaxia',
-    title: 'Universo profundo',
-    alt: 'Campo profundo do James Webb com milhares de galáxias distantes',
-    description: 'Um pequeno pedaço do céu revela milhares de galáxias.',
-    kind: 'Imagem astronômica'
+    src: '/api/vitrine/galeria/saturno-cinema',
+    title: 'Saturno — os anéis contra a luz',
+    alt: 'Saturno em sombra, rodeado por anéis luminosos numa composição feita pela missão Cassini',
+    description: 'Em contraluz, os anéis de Saturno revelam toda sua dimensão e beleza.',
+    kind: 'Imagem Cassini · composição fotográfica',
+    source: 'https://science.nasa.gov/resource/the-day-the-earth-smiled/'
   }
 ] as const;
 
@@ -60,8 +66,8 @@ export default function OrbitasCinematograficas() {
     <section className="premium-cinematic-orbit" aria-labelledby="premium-cinematic-orbit-title">
       <div className="premium-cinematic-orbit-heading">
         <span>✦ VIAGENS PELO UNIVERSO</span>
-        <h2 id="premium-cinematic-orbit-title">Imagens que fazem a imaginação decolar</h2>
-        <p>Uma seleção especial de planetas, nebulosas e paisagens cósmicas. Uma segunda órbita para explorar — sem substituir o nosso sistema solar.</p>
+        <h2 id="premium-cinematic-orbit-title">Planetas que fazem a imaginação decolar</h2>
+        <p>Uma viagem visual por seis mundos extraordinários, com imagens espaciais de impacto cinematográfico — sem substituir o nosso sistema solar.</p>
       </div>
 
       <div className="premium-cinematic-orbit-stage">
@@ -111,13 +117,14 @@ export default function OrbitasCinematograficas() {
           <small>{current.kind}</small>
           <h3>{current.title}</h3>
           <p>{current.description}</p>
+          <a className="premium-cinematic-orbit-source" href={current.source} target="_blank" rel="noopener noreferrer" style={{display:'inline-block',marginTop:9,fontSize:11,color:'#a9d5ff',textDecoration:'underline',textUnderlineOffset:3}}>Ver imagem e créditos na NASA</a>
         </div>
       </div>
 
       <p className="premium-cinematic-orbit-credit">
-        Órbitas ilustrativas, sem escala astronômica. Imagens da NASA/ESA/CSA/STScI e ilustração digital do ANTARES;
-        nenhuma imagem representa uma apresentação realizada pelo planetário.
-        {' '}<a href="https://science.nasa.gov/asset/webb/webbs-first-deep-field-nircam-image/" target="_blank" rel="noopener noreferrer">Créditos do campo profundo</a>.
+        Órbitas ilustrativas, sem escala astronômica. Imagens da NASA/JPL-Caltech, NASA/ESA/CSA/STScI e colaboradores;
+        fotografias processadas para realce de cor. Vênus é uma reconstrução por radar com cores simuladas.
+        As imagens não representam apresentações realizadas pelo planetário.
       </p>
     </section>
   );
