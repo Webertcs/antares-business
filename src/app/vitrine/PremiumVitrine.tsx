@@ -321,7 +321,7 @@ export default function PremiumVitrine(){
      <figcaption>JOGO EDUCATIVO ANTARES <strong>EM BREVE</strong></figcaption>
     </figure>
    </section>
-   <ProvaSocial/>
+   <ProvaSocial experimental={reactBitsPreview}/>
    <section id="escolas" className={'premium-school'+(reactBitsPreview?' premium-school-cinematic':'')}><div><span>ESCOLAS E INSTITUIÇÕES</span><h2>O universo pode voltar todos os anos.</h2><p>Planeje visitas recorrentes com turmas diferentes. Pacotes e condições especiais são definidos em proposta personalizada.</p><a className="premium-button" href="#orcamento">Conhecer as possibilidades <ArrowRight size={17}/></a></div><div className="premium-school-art premium-school-picture">
        <Image
         src={reactBitsPreview?'/vitrine/cupula-cinematografica-astro.webp':'/vitrine/cupula-escola-antares.webp'}

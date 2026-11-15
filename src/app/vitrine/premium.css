@@ -2274,3 +2274,200 @@
     border-radius:16px;
   }
 }
+
+
+/* ANTARES Kids · Confiança em céu contínuo + cards reais do React Bits.
+   Exclusivo da vitrine experimental, sem afetar provas sociais verificadas,
+   textos, link de orçamento ou a aparência da vitrine principal. */
+.premium-kids.premium-cinematic-sky .premium-proof.premium-proof-cinematic{
+  position:relative;
+  isolation:isolate;
+  width:min(100% - 44px,1220px);
+  max-width:1220px;
+  margin:18px auto 65px;
+  padding:46px 20px 24px;
+  border:0;
+  border-radius:0;
+  background:transparent;
+  backdrop-filter:none;
+  box-shadow:none;
+  overflow:visible;
+  color:#f5f9ff;
+}
+.premium-kids.premium-cinematic-sky .premium-proof-cinematic::before{
+  display:none;
+}
+.premium-kids.premium-cinematic-sky .premium-proof-cinematic .premium-proof-heading{
+  max-width:850px;
+  margin:0 auto 34px;
+  text-align:center;
+}
+.premium-kids.premium-cinematic-sky .premium-proof-cinematic .premium-proof-heading>span{
+  color:#ffdf9b;
+  letter-spacing:.15em;
+}
+.premium-kids.premium-cinematic-sky .premium-proof-cinematic .premium-proof-heading h2{
+  color:#f6faff;
+  text-shadow:0 4px 25px rgba(0,4,24,.59);
+}
+.premium-kids.premium-cinematic-sky .premium-proof-cinematic .premium-proof-heading p{
+  color:#c8dcf6;
+}
+.premium-kids.premium-cinematic-sky .premium-proof-cinematic .premium-proof-grid{
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  align-items:stretch;
+  gap:16px;
+}
+.premium-kids.premium-cinematic-sky .premium-proof-cinematic .premium-proof-grid article.premium-proof-spotlight.spotlight-card{
+  position:relative;
+  min-width:0;
+  min-height:177px;
+  padding:22px;
+  border:1px solid rgba(102,151,215,.34);
+  border-radius:19px;
+  background:
+    radial-gradient(ellipse at 88% 0%,rgba(38,88,155,.12),transparent 71%),
+    linear-gradient(135deg,#0a1932,#061122 78%);
+  box-shadow:0 10px 29px rgba(0,6,25,.32),inset 0 1px rgba(247,250,255,.045);
+  transform:translateY(0);
+  transition:transform .24s ease,border-color .24s ease,box-shadow .24s ease;
+}
+.premium-kids.premium-cinematic-sky .premium-proof-cinematic .premium-proof-grid article.premium-proof-spotlight.spotlight-card:hover{
+  transform:translateY(-3px);
+  border-color:rgba(155,212,255,.65);
+  box-shadow:0 15px 35px rgba(0,6,29,.4),0 0 20px rgba(70,147,240,.085);
+}
+.premium-kids.premium-cinematic-sky .premium-proof-cinematic .premium-proof-spotlight .premium-proof-icon{
+  position:relative;
+  z-index:2;
+  display:grid;
+  place-items:center;
+  width:42px;
+  height:42px;
+  margin-bottom:15px;
+  border-radius:13px;
+  border:1px solid rgba(126,185,242,.32);
+  background:rgba(47,102,179,.18);
+  color:#a9dcff;
+  box-shadow:none;
+}
+.premium-kids.premium-cinematic-sky .premium-proof-cinematic .premium-proof-spotlight h3{
+  position:relative;
+  z-index:2;
+  margin:0 0 9px;
+  color:#fff;
+  font-size:15px;
+  font-weight:850;
+  line-height:1.38;
+}
+.premium-kids.premium-cinematic-sky .premium-proof-cinematic .premium-proof-spotlight p{
+  position:relative;
+  z-index:2;
+  margin:0;
+  color:#c5d9f4;
+  font-size:12px;
+  line-height:1.7;
+}
+.premium-kids.premium-cinematic-sky .premium-proof-cinematic .premium-proof-spotlight .spotlight-card__edge{
+  z-index:1;
+  pointer-events:none;
+}
+/* Fechamento solto sobre o céu estrelado: sem a antiga faixa azul. */
+.premium-kids.premium-cinematic-sky .premium-proof-cinematic .premium-proof-bottom{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:27px;
+  margin-top:22px;
+  padding:13px 4px 0;
+  background:transparent;
+  border:0;
+  border-radius:0;
+  box-shadow:none;
+}
+.premium-kids.premium-cinematic-sky .premium-proof-cinematic .premium-proof-verification{
+  max-width:700px;
+}
+.premium-kids.premium-cinematic-sky .premium-proof-cinematic .premium-proof-shield{
+  width:40px;
+  height:40px;
+  border:1px solid rgba(131,212,203,.37);
+  border-radius:13px;
+  background:rgba(19,86,89,.17);
+  color:#9fe1cd;
+}
+.premium-kids.premium-cinematic-sky .premium-proof-cinematic .premium-proof-verification strong{
+  color:#fff;
+  font-size:14px;
+}
+.premium-kids.premium-cinematic-sky .premium-proof-cinematic .premium-proof-verification p{
+  color:#c8d9f1;
+  font-size:12px;
+  line-height:1.6;
+}
+.premium-kids.premium-cinematic-sky .premium-proof-cinematic .premium-proof-cta{
+  white-space:normal;
+  text-align:center;
+  padding:12px 20px;
+  background:linear-gradient(115deg,#ffd05d,#ffe48c);
+  border:1px solid rgba(255,231,154,.73);
+  color:#172444!important;
+  box-shadow:0 8px 24px rgba(228,174,68,.22);
+}
+.premium-kids.premium-cinematic-sky .premium-proof-cinematic .premium-proof-cta:hover{
+  box-shadow:0 12px 28px rgba(255,194,72,.34);
+}
+.premium-kids.premium-cinematic-sky .premium-proof-cinematic .premium-proof-metric,
+.premium-kids.premium-cinematic-sky .premium-proof-cinematic .premium-proof-testimonials figure{
+  background:rgba(8,22,46,.92);
+  border-color:rgba(122,166,225,.33);
+}
+@media(max-width:1050px){
+  .premium-kids.premium-cinematic-sky .premium-proof.premium-proof-cinematic{
+    width:min(100% - 32px,1220px);
+    margin:12px auto 55px;
+    padding:35px 12px 18px;
+  }
+  .premium-kids.premium-cinematic-sky .premium-proof-cinematic .premium-proof-grid{
+    gap:12px;
+  }
+}
+@media(max-width:720px){
+  .premium-kids.premium-cinematic-sky .premium-proof.premium-proof-cinematic{
+    width:calc(100% - 24px);
+    margin:12px auto 43px;
+    padding:28px 4px 14px;
+  }
+  .premium-kids.premium-cinematic-sky .premium-proof-cinematic .premium-proof-heading{
+    margin-bottom:23px;
+  }
+  .premium-kids.premium-cinematic-sky .premium-proof-cinematic .premium-proof-grid{
+    grid-template-columns:1fr;
+    gap:10px;
+  }
+  .premium-kids.premium-cinematic-sky .premium-proof-cinematic .premium-proof-grid article.premium-proof-spotlight.spotlight-card{
+    min-height:0;
+    padding:18px;
+  }
+  .premium-kids.premium-cinematic-sky .premium-proof-cinematic .premium-proof-spotlight .premium-proof-icon{
+    margin-bottom:10px;
+  }
+  .premium-kids.premium-cinematic-sky .premium-proof-cinematic .premium-proof-bottom{
+    align-items:stretch;
+    flex-direction:column;
+    gap:14px;
+    margin-top:23px;
+    padding:0 4px;
+  }
+  .premium-kids.premium-cinematic-sky .premium-proof-cinematic .premium-proof-cta{
+    align-self:stretch;
+  }
+}
+@media(prefers-reduced-motion:reduce){
+  .premium-kids.premium-cinematic-sky .premium-proof-cinematic .premium-proof-grid article.premium-proof-spotlight.spotlight-card,
+  .premium-kids.premium-cinematic-sky .premium-proof-cinematic .premium-proof-cta{
+    transition:none!important;
+    transform:none!important;
+  }
+}
