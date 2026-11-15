@@ -185,7 +185,7 @@ export default function PremiumVitrine(){
  }
  const stopped=paused||reduce;
  useEffect(()=>{const svg=orbitSvg.current;if(!svg)return;if(stopped)svg.pauseAnimations();else svg.unpauseAnimations();},[stopped]);
- return <div className={'premium-kids'+(dark?' premium-night':'')}>
+ return <div className={'premium-kids'+(dark?' premium-night':'')+(reactBitsPreview?' premium-cinematic-sky':'')}>
   <div className="premium-galaxy-backdrop" aria-hidden="true"><div className="premium-galaxy-nebula"/><div className="premium-stars-layer far"/><div className="premium-stars-layer near"/><div className="premium-comet comet-a"/><div className="premium-comet comet-b"/><div className="premium-comet comet-c"/></div>
   <header className={'premium-header'+(reactBitsPreview?' premium-preview-header':'')}>
     {!reactBitsPreview&&<a href="#inicio" className="premium-logo"><span>✦</span> ANTARES <small>PLANETÁRIO KIDS</small></a>}

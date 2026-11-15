@@ -1353,3 +1353,166 @@
   .premium-kids .premium-magic-bento-grid .magic-bento__light,
   .premium-kids .premium-magic-bento-grid .magic-bento__border{animation:none!important;transition:none!important}
 }
+
+
+/* ============================================================
+   ANTARES · LABORATÓRIO — CÉU CINEMATOGRÁFICO GLOBAL
+   SOMENTE: /vitrine?reactbits=1. Os dois carrosséis, os planetas,
+   os mascotes, os cards e o tema da vitrine normal permanecem iguais.
+   Imagem local já versionada + gradientes CSS + estrelas existentes:
+   nenhum novo pacote, requisição remota ou JS de animação.
+   ============================================================ */
+.premium-kids.premium-cinematic-sky{
+  --pk-bg:#030817;
+  --pk-ink:#f5f9ff;
+  --pk-muted:#cbdcf8;
+  --pk-card:#10223d;
+  --pk-line:#527398;
+  background:#030817;
+  color:#f5f9ff;
+  color-scheme:dark;
+}
+/* Camada única, contínua do topo ao rodapé, atrás de toda a página. */
+.premium-kids.premium-cinematic-sky>.premium-galaxy-backdrop{
+  background-color:#030817;
+  background-image:
+    radial-gradient(ellipse 42% 9% at 55% 7%,rgba(28,78,150,.24),transparent 100%),
+    radial-gradient(ellipse 32% 11% at 18% 25%,rgba(31,64,123,.14),transparent 100%),
+    radial-gradient(ellipse 38% 12% at 80% 46%,rgba(27,82,126,.16),transparent 100%),
+    radial-gradient(ellipse 30% 10% at 24% 68%,rgba(65,42,125,.12),transparent 100%),
+    radial-gradient(ellipse 40% 10% at 71% 90%,rgba(15,81,130,.16),transparent 100%),
+    linear-gradient(180deg,#020713 0%,#061023 20%,#030a1b 43%,#040b1a 65%,#030817 100%);
+}
+/* O mesmo céu ilustrativo dos carrosséis reaparece em profundidade,
+   sem gerar bordas ou retângulos claros entre as seções. */
+.premium-kids.premium-cinematic-sky>.premium-galaxy-backdrop::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  pointer-events:none;
+  background-image:
+    url('/vitrine/galeria-ceu-profundo.svg'),
+    url('/vitrine/galeria-ceu-profundo.svg'),
+    url('/vitrine/galeria-ceu-profundo.svg');
+  background-repeat:no-repeat;
+  background-size:
+    min(1500px,100vw) auto,
+    min(1450px,100vw) auto,
+    min(1500px,100vw) auto;
+  background-position:center 1.5%,center 47%,center 91%;
+  mix-blend-mode:screen;
+  opacity:.31;
+}
+/* Nebulosas distantes, com pouco violeta e sem halos excessivos. */
+.premium-kids.premium-cinematic-sky .premium-galaxy-nebula{
+  background:
+    radial-gradient(ellipse 43% 11% at 26% 13%,rgba(65,82,168,.2),transparent 85%),
+    radial-gradient(ellipse 36% 12% at 74% 37%,rgba(31,107,167,.15),transparent 87%),
+    radial-gradient(ellipse 41% 13% at 28% 73%,rgba(99,58,152,.12),transparent 89%),
+    radial-gradient(ellipse 35% 9% at 80% 91%,rgba(39,103,147,.13),transparent 88%);
+  filter:blur(40px);
+  opacity:.9;
+}
+.premium-kids.premium-cinematic-sky .premium-stars-layer.far{
+  opacity:.7;
+}
+.premium-kids.premium-cinematic-sky .premium-stars-layer.near{
+  opacity:.58;
+  animation-duration:16s;
+}
+/* Cometas lentos: três passagens esparsas ao longo da página.
+   Não competem com as órbitas, o carrossel ou o texto. */
+.premium-kids.premium-cinematic-sky .premium-comet{
+  background:linear-gradient(90deg,transparent,rgba(100,171,235,.2),rgba(226,247,255,.85));
+  filter:drop-shadow(0 0 5px rgba(117,199,247,.36));
+  animation-name:pk-cinematic-comet;
+  animation-duration:44s;
+}
+.premium-kids.premium-cinematic-sky .premium-comet.comet-b{
+  animation-duration:59s;
+  filter:drop-shadow(0 0 4px rgba(176,150,244,.3));
+}
+.premium-kids.premium-cinematic-sky .premium-comet.comet-c{
+  animation-duration:67s;
+}
+.premium-kids.premium-cinematic-sky .premium-comet::after{
+  width:4px;height:4px;top:-1px;
+  background:#e8faff;
+  box-shadow:0 0 9px rgba(193,226,255,.68);
+}
+@keyframes pk-cinematic-comet{
+  0%,7%{opacity:0;transform:translate3d(-8vw,0,0) rotate(-18deg)}
+  10%{opacity:.43}
+  17%{opacity:.32}
+  23%,100%{opacity:0;transform:translate3d(125vw,-29vh,0) rotate(-18deg)}
+}
+/* O palco agora compartilha o céu global; o brilho atrás do título
+   permanece sutil para preservar o contraste do texto e dos mascotes. */
+.premium-kids.premium-cinematic-sky .premium-hero::before{
+  background:
+    radial-gradient(ellipse at 49% 49%,rgba(44,98,171,.15),transparent 66%),
+    radial-gradient(ellipse at 20% 36%,rgba(82,64,135,.08),transparent 54%);
+  filter:blur(36px);
+}
+.premium-kids.premium-cinematic-sky .premium-header.premium-preview-header{
+  background:transparent;
+  border:0;
+  box-shadow:none;
+  backdrop-filter:none;
+  -webkit-backdrop-filter:none;
+}
+/* Grandes blocos utilizam superfície translúcida escura, em vez de
+   barras roxas que quebravam a continuidade do espaço. */
+.premium-kids.premium-cinematic-sky .premium-school{
+  background:
+    radial-gradient(ellipse at 81% 24%,rgba(44,106,176,.12),transparent 56%),
+    linear-gradient(115deg,rgba(5,17,38,.86),rgba(9,22,48,.83));
+  border-block-color:rgba(130,176,239,.22);
+  box-shadow:inset 0 0 64px rgba(24,61,111,.2);
+}
+.premium-kids.premium-cinematic-sky .premium-journeys{
+  background:rgba(8,19,40,.73);
+  border-color:rgba(125,166,233,.2);
+}
+.premium-kids.premium-cinematic-sky .premium-game-reveal{
+  background:
+    radial-gradient(ellipse at 88% 13%,rgba(63,76,160,.18),transparent 59%),
+    linear-gradient(135deg,rgba(10,25,55,.94),rgba(9,22,48,.93) 60%,rgba(17,23,60,.92));
+  border-color:rgba(134,193,255,.39);
+}
+.premium-kids.premium-cinematic-sky .premium-footer{
+  background:rgba(3,9,22,.56);
+  border-top-color:rgba(137,181,239,.19);
+}
+/* Carrosséis aprovados continuam os protagonistas, sem mudanças no
+   comportamento, imagens ou máscara dos planetas. */
+.premium-kids.premium-cinematic-sky .premium-reactbits-gallery-frame,
+.premium-kids.premium-cinematic-sky .premium-cinematic-orbit-stage{
+  border-color:rgba(115,170,237,.35);
+  box-shadow:inset 0 0 76px rgba(2,9,25,.45),0 12px 34px rgba(0,4,18,.23);
+}
+.premium-kids.premium-cinematic-sky .premium-section-title h2,
+.premium-kids.premium-cinematic-sky .premium-ecosystem-heading h2,
+.premium-kids.premium-cinematic-sky .premium-cinematic-orbit-heading h2{
+  color:#f6faff;
+  text-shadow:0 4px 22px rgba(0,4,20,.65);
+}
+.premium-kids.premium-cinematic-sky .premium-section-title p,
+.premium-kids.premium-cinematic-sky .premium-cinematic-orbit-heading p{
+  color:#d8e5fa;
+}
+@media(max-width:620px){
+  .premium-kids.premium-cinematic-sky>.premium-galaxy-backdrop::before{
+    background-size:120vw auto,120vw auto,120vw auto;
+    opacity:.24;
+  }
+  .premium-kids.premium-cinematic-sky .premium-comet.comet-c{display:none}
+  .premium-kids.premium-cinematic-sky .premium-galaxy-nebula{filter:blur(27px)}
+}
+@media(prefers-reduced-motion:reduce){
+  .premium-kids.premium-cinematic-sky .premium-stars-layer.near,
+  .premium-kids.premium-cinematic-sky .premium-comet{
+    animation:none!important;
+  }
+  .premium-kids.premium-cinematic-sky .premium-comet{display:none}
+}
