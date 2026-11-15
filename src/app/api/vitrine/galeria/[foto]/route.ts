@@ -9,7 +9,8 @@ const PHOTOS = {
  nebulosa:'https://assets.science.nasa.gov/dynamicimage/assets/science/missions/webb/science/2022/07/STScI-01G8GYD8B1H306SSPR4MY6NGN0.png?fit=clip&w=1000&h=690',
  pilares:'https://assets.science.nasa.gov/dynamicimage/assets/science/missions/webb/science/2022/10/STScI-01GGF8H15VZ09MET9HFBRQX4S3.png?fit=clip&w=750&h=1000',
  saturno:'https://assets.science.nasa.gov/dynamicimage/assets/science/psd/photojournal/pia/pia17/pia17474/PIA17474.jpg?fit=clip&w=1000&h=690',
- terra:'https://assets.science.nasa.gov/dynamicimage/assets/science/esd/climate/2023/12/ImageWall5_1920x1200-80.jpg?fit=clip&w=1000&h=690'
+ terra:'https://assets.science.nasa.gov/dynamicimage/assets/science/esd/climate/2023/12/ImageWall5_1920x1200-80.jpg?fit=clip&w=1000&h=690',
+ galaxia:'https://assets.science.nasa.gov/dynamicimage/assets/science/missions/webb/science/2022/07/STScI-01G8H1K2BCNATEZSKVRN9Z69SR.png?fit=clip&w=1000&h=1000'
 } as const;
 
 export async function GET(_request: Request,{params}:{params:Promise<{foto:string}>}){

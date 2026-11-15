@@ -10,6 +10,8 @@ import GradientText from './reactbits/GradientText';
 
 // A galeria WebGL é carregada apenas na prévia experimental da vitrine.
 const CircularGallery = dynamic(() => import('./reactbits/CircularGallery'), { ssr: false });
+// Segunda órbita: visível somente no experimento React Bits, sem tocar no sistema solar.
+const OrbitasCinematograficas = dynamic(() => import('./OrbitasCinematograficas'), { ssr: false });
 const spaceStars=Array.from({length:165},(_,i)=>({x:(i*73+Math.floor(i*i*0.37))%900,y:(i*137+Math.floor(i*i*.19))%510,r:i%11===0?2.1:i%4===0?1.25:.68,opacity:.24+(i%8)*.087}));
 const worlds=[
  {id:'sol',name:'Sol',icon:'☀️',fact:'O Sol é uma estrela! Sua luz leva cerca de oito minutos para chegar à Terra.',duration:0},
@@ -202,6 +204,7 @@ export default function PremiumVitrine(){
     <p className="premium-motion-note">Oito planetas oficiais · Órbitas ilustrativas, sem escala real · Toque para descobrir curiosidades.</p>
     <details className="premium-pluto"><summary>✨ E Plutão, onde está?</summary><p>Plutão é um planeta anão desde a classificação adotada pela União Astronômica Internacional em 2006. Ele continua sendo um mundo fascinante!</p></details>
    </div></section>
+   {reactBitsPreview && <OrbitasCinematograficas />}
    <section className="premium-ecosystem" aria-labelledby="premium-ecosystem-title">
     <div className="premium-ecosystem-heading"><span>✦ O ECOSSISTEMA ANTARES</span><h2 id="premium-ecosystem-title">Uma experiência que começa na escola e continua nas descobertas</h2></div>
     {reactBitsPreview&&<p className="premium-reactbits-preview-label" role="status">✨ Prévia React Bits: passe o mouse nos cartões para ver o efeito.</p>}
