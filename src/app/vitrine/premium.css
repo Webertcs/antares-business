@@ -1087,6 +1087,17 @@
  -webkit-mask-image:radial-gradient(circle at center,#000 47%,transparent 71%);
  mask-image:radial-gradient(circle at center,#000 47%,transparent 71%);
 }
+/* 8º astro: Saturno é um PNG transparente gerado em memória a partir da
+   fotografia da Cassini. Não usamos máscara circular: os anéis ultrapassam
+   o disco e não podem ser recortados como os outros planetas. */
+.premium-kids .premium-cinematic-orbit-stage .orbit-item[data-orbit-item="7"] .orbit-image{
+ transform:scale(1.75);
+ transform-origin:center center;
+ mix-blend-mode:normal;
+ -webkit-mask-image:none;
+ mask-image:none;
+ filter:drop-shadow(0 0 8px rgba(255,224,164,.22));
+}
 /* Foco visível mantém a navegação por teclado sem criar cartões permanentes. */
 .premium-kids .premium-cinematic-orbit-stage .orbit-item:focus-visible .orbit-item-inner{
  outline:2px solid rgba(176,219,255,.85);outline-offset:5px;border-radius:50%;
@@ -1107,6 +1118,7 @@
  .premium-kids .premium-cinematic-orbit-stage{height:330px;border-radius:20px}
 
  .premium-kids .premium-cinematic-orbit-stage .orbit-item[data-orbit-item="5"] .orbit-image{transform:scale(1.35)}
+ .premium-kids .premium-cinematic-orbit-stage .orbit-item[data-orbit-item="7"] .orbit-image{transform:scale(1.45)}
  .premium-kids .premium-cinematic-orbit-actions{font-size:11px}
 }
 @media(prefers-reduced-motion:reduce){
