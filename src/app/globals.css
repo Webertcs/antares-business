@@ -3468,3 +3468,47 @@
  font-style:normal;
  letter-spacing:normal;
 }
+
+
+/* ANTARES HONEYBOOK PILOT — neutral sidebar limited to Atendimentos */
+body:has(.honeybook-workspace){--bg:#f9fafb;--ink:#22252a;--muted:#6c727a;--line:#e2e5e9}
+body:has(.honeybook-workspace) .sidebar{
+ background:#fcfcfd!important;color:#32373d!important;border-right:1px solid #e0e2e6;
+ box-shadow:none!important
+}
+body:has(.honeybook-workspace) .sidebar .antares-logo-art-premium{
+ filter:brightness(0) opacity(.88)!important
+}
+body:has(.honeybook-workspace) .sidebar .brand-lockup>span,
+body:has(.honeybook-workspace) .sidebar .nav-label{
+ color:#777e86!important;text-shadow:none!important
+}
+body:has(.honeybook-workspace) .sidebar .nav-item,
+body:has(.honeybook-workspace) .sidebar .owner-nav-link{
+ color:#454b53!important;background:transparent;box-shadow:none!important
+}
+body:has(.honeybook-workspace) .sidebar .nav-item:hover,
+body:has(.honeybook-workspace) .sidebar .owner-nav-link:hover{
+ background:#f0f1f3!important;color:#25282d!important
+}
+body:has(.honeybook-workspace) .sidebar .nav-item.active,
+body:has(.honeybook-workspace) .sidebar .owner-nav-link.active{
+ background:#e8e9eb!important;color:#1c2025!important;
+ box-shadow:none!important;border-left:0!important;font-weight:800
+}
+body:has(.honeybook-workspace) .sidebar .nav-count{
+ background:#dedfe2!important;color:#434a51!important
+}
+body:has(.honeybook-workspace) .sidebar .profile{
+ color:#22272e!important;border-color:#e0e2e6!important
+}
+body:has(.honeybook-workspace) .sidebar .profile strong{color:#292d33!important}
+body:has(.honeybook-workspace) .sidebar .profile small{color:#777d85!important}
+body:has(.honeybook-workspace) .sidebar .sidebar-settings-shortcut{
+ color:#545c65!important;border-color:#e2e4e8!important
+}
+body:has(.honeybook-workspace) .main .topbar{background:#fff;border-color:#e4e6ea}
+body:has(.honeybook-workspace) .main .content{background:#f9fafb}
+@media(max-width:760px){
+ body:has(.honeybook-workspace) .sidebar{box-shadow:12px 0 30px #1a1c2430!important}
+}
