@@ -240,8 +240,8 @@ export default function PremiumVitrine(){
       <label className="premium-consent"><input required type="checkbox"/> Autorizo o contato em resposta a este pedido de orçamento. Entendo que os dados serão usados para esse atendimento.</label>
       <input className="premium-honeypot" type="text" name="website" tabIndex={-1} autoComplete="off" aria-hidden="true"/>
       <button className="premium-button premium-form-submit" type="submit" disabled={leadSending}>{leadSending?"Registrando pedido...":"Solicitar minha proposta"} <Send size={17}/></button>
-      {reactBitsPreview&&<a className="premium-budget-whatsapp" href={'https://wa.me/'+ANTARES_OFFICIAL_WHATSAPP+'?text='+encodeURIComponent(ANTARES_WHATSAPP_INTRO)} target="_blank" rel="noopener noreferrer" aria-label="Conversar pelo WhatsApp oficial do ANTARES Kids, número (61) 99125-1625">
-       <MessageCircle size={19} aria-hidden="true"/><span>Conversar pelo WhatsApp</span><small>(61) 99125-1625</small>
+      {reactBitsPreview&&<a className="premium-budget-whatsapp" href={'https://wa.me/'+ANTARES_OFFICIAL_WHATSAPP+'?text='+encodeURIComponent(ANTARES_WHATSAPP_INTRO)} target="_blank" rel="noopener noreferrer" aria-label="Conversar pelo WhatsApp oficial do ANTARES Kids">
+       <MessageCircle size={19} aria-hidden="true"/><span>Conversar pelo WhatsApp</span>
       </a>}
       {formStatus&&<p role="status" aria-live="polite" className="premium-form-status">{formStatus}</p>}
       {quoteDraft&&!leadSending&&<div className="premium-quote-preview">
