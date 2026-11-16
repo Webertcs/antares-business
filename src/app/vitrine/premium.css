@@ -3065,3 +3065,214 @@
     transform:none!important;
   }
 }
+
+
+/* ANTARES Kids · Ecossistema cinematográfico (layout aprovado no conceito 2x2).
+   Somente ?reactbits=1. A vitrine normal continua com os benefícios originais.
+   Artes originais sem textos embutidos: copy permanece acessível e editável. */
+.premium-kids.premium-cinematic-sky .premium-ecosystem.premium-ecosystem-cinematic{
+  max-width:1250px;
+  width:min(100% - 36px,1250px);
+  margin:34px auto 60px;
+  padding:32px 10px 46px;
+  background:transparent;
+  border:0;
+  box-shadow:none;
+}
+.premium-kids.premium-cinematic-sky .premium-ecosystem-cinematic .premium-ecosystem-heading{
+  max-width:1100px;
+  text-align:center;
+  margin:0 auto 28px;
+}
+.premium-kids.premium-cinematic-sky .premium-ecosystem-cinematic .premium-ecosystem-heading h2{
+  margin:15px auto 12px;
+  max-width:980px;
+  font-size:clamp(28px,3.4vw,44px);
+  line-height:1.1;
+  color:#fbfdff;
+}
+.premium-kids.premium-cinematic-sky .premium-ecosystem-cinematic .premium-ecosystem-heading .premium-ecosystem-intro{
+  margin:0 auto;
+  max-width:930px;
+  color:#d1e0f6;
+  font-size:clamp(13px,1.28vw,16px);
+  line-height:1.55;
+}
+.premium-kids.premium-cinematic-sky .premium-ecosystem-cinematic .premium-ecosystem-cinematic-grid{
+  display:grid;
+  grid-template-columns:repeat(12,minmax(0,1fr));
+  gap:16px;
+  margin:30px auto 0;
+  max-width:1210px;
+}
+.premium-kids.premium-cinematic-sky .premium-ecosystem-cinematic .premium-ecosystem-cinematic-grid>article.premium-ecosystem-scene-card.spotlight-card{
+  position:relative;
+  isolation:isolate;
+  display:block;
+  grid-column:span 6;
+  width:100%;
+  min-width:0;
+  min-height:252px;
+  padding:0;
+  overflow:hidden;
+  border:1px solid rgba(95,169,250,.55);
+  border-radius:24px;
+  background:linear-gradient(125deg,#06152d,#031126 80%);
+  box-shadow:0 18px 42px rgba(0,6,23,.36),inset 0 1px rgba(190,229,255,.1);
+  transition:transform .25s ease,border-color .25s ease,box-shadow .25s ease;
+}
+.premium-kids.premium-cinematic-sky .premium-ecosystem-cinematic .premium-ecosystem-cinematic-grid>article.premium-ecosystem-scene-card.spotlight-card:nth-child(1),
+.premium-kids.premium-cinematic-sky .premium-ecosystem-cinematic .premium-ecosystem-cinematic-grid>article.premium-ecosystem-scene-card.spotlight-card:nth-child(4){
+  grid-column:span 7;
+}
+.premium-kids.premium-cinematic-sky .premium-ecosystem-cinematic .premium-ecosystem-cinematic-grid>article.premium-ecosystem-scene-card.spotlight-card:nth-child(2),
+.premium-kids.premium-cinematic-sky .premium-ecosystem-cinematic .premium-ecosystem-cinematic-grid>article.premium-ecosystem-scene-card.spotlight-card:nth-child(3){
+  grid-column:span 5;
+}
+.premium-kids.premium-cinematic-sky .premium-ecosystem-cinematic .premium-ecosystem-cinematic-grid>article.premium-ecosystem-scene-card.spotlight-card:hover{
+  transform:translateY(-2px);
+  border-color:rgba(127,209,255,.95);
+  box-shadow:0 19px 44px rgba(0,6,29,.4),0 0 27px rgba(39,143,255,.2),inset 0 1px rgba(207,238,255,.11);
+}
+.premium-kids.premium-cinematic-sky .premium-ecosystem-cinematic .premium-ecosystem-scene-card .premium-ecosystem-scene-art{
+  position:absolute;
+  z-index:1;
+  display:block;
+  inset:0 0 0 auto;
+  width:66%;
+  height:100%;
+  overflow:hidden;
+  pointer-events:none;
+  -webkit-mask-image:linear-gradient(to right,transparent 0%,rgba(0,0,0,.36) 18%,#000 47%);
+  mask-image:linear-gradient(to right,transparent 0%,rgba(0,0,0,.36) 18%,#000 47%);
+}
+.premium-kids.premium-cinematic-sky .premium-ecosystem-cinematic .premium-ecosystem-scene-art .premium-ecosystem-scene-image{
+  display:block;
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  object-position:center;
+  border:0;
+  border-radius:0;
+  box-shadow:none;
+  filter:saturate(1.08);
+}
+.premium-kids.premium-cinematic-sky .premium-ecosystem-cinematic .premium-ecosystem-scene-card::before{
+  content:"";
+  position:absolute;
+  z-index:1;
+  inset:0;
+  border-radius:inherit;
+  background:linear-gradient(90deg,rgba(3,14,32,.22),transparent 72%);
+  pointer-events:none;
+}
+.premium-kids.premium-cinematic-sky .premium-ecosystem-cinematic .premium-ecosystem-scene-card .premium-ecosystem-scene-copy{
+  position:relative;
+  z-index:3;
+  width:61%;
+  min-height:252px;
+  display:flex;
+  flex-direction:column;
+  align-items:flex-start;
+  justify-content:center;
+  padding:21px 8px 24px 27px;
+  pointer-events:none;
+  color:#fff;
+}
+.premium-kids.premium-cinematic-sky .premium-ecosystem-cinematic .premium-ecosystem-scene-card .premium-ecosystem-scene-top{
+  display:flex;
+  align-items:center;
+  flex-wrap:wrap;
+  gap:10px;
+  margin:0 0 19px;
+}
+.premium-kids.premium-cinematic-sky .premium-ecosystem-cinematic .premium-ecosystem-scene-card .premium-ecosystem-scene-icon{
+  display:grid;
+  place-items:center;
+  width:41px;
+  height:41px;
+  flex:0 0 41px;
+  color:#ffe18c;
+  border:1px solid rgba(113,188,255,.59);
+  border-radius:12px;
+  background:linear-gradient(125deg,rgba(23,88,169,.75),rgba(6,36,89,.76));
+  box-shadow:inset 0 1px rgba(221,240,255,.2),0 0 14px rgba(46,136,255,.14);
+}
+.premium-kids.premium-cinematic-sky .premium-ecosystem-cinematic .premium-ecosystem-scene-card .premium-ecosystem-scene-label{
+  color:#9bd3ff;
+  font-weight:900;
+  font-size:11px;
+  letter-spacing:.12em;
+}
+.premium-kids.premium-cinematic-sky .premium-ecosystem-cinematic .premium-ecosystem-scene-card .premium-ecosystem-scene-copy h3{
+  position:relative;
+  z-index:3;
+  font-size:clamp(19px,2vw,27px);
+  line-height:1.19;
+  font-weight:900;
+  letter-spacing:-.025em;
+  color:#fff;
+  margin:0 0 12px;
+  text-shadow:0 2px 16px rgba(0,6,22,.6);
+}
+.premium-kids.premium-cinematic-sky .premium-ecosystem-cinematic .premium-ecosystem-scene-card .premium-ecosystem-scene-copy p{
+  position:relative;
+  z-index:3;
+  margin:0;
+  max-width:290px;
+  color:#dce9ff;
+  font-size:clamp(12px,1.25vw,15px);
+  line-height:1.48;
+  text-shadow:0 2px 11px rgba(0,5,18,.54);
+}
+@media(max-width:980px){
+  .premium-kids.premium-cinematic-sky .premium-ecosystem-cinematic .premium-ecosystem-cinematic-grid{
+    gap:12px;
+  }
+  .premium-kids.premium-cinematic-sky .premium-ecosystem-cinematic .premium-ecosystem-cinematic-grid>article.premium-ecosystem-scene-card.spotlight-card{
+    min-height:225px;
+  }
+  .premium-kids.premium-cinematic-sky .premium-ecosystem-cinematic .premium-ecosystem-scene-card .premium-ecosystem-scene-copy{
+    width:66%;
+    min-height:225px;
+    padding:15px 6px 18px 16px;
+  }
+  .premium-kids.premium-cinematic-sky .premium-ecosystem-cinematic .premium-ecosystem-scene-card .premium-ecosystem-scene-top{gap:7px;margin-bottom:11px;}
+  .premium-kids.premium-cinematic-sky .premium-ecosystem-cinematic .premium-ecosystem-scene-card .premium-ecosystem-scene-icon{width:33px;height:33px;flex-basis:33px;}
+  .premium-kids.premium-cinematic-sky .premium-ecosystem-cinematic .premium-ecosystem-scene-card .premium-ecosystem-scene-label{font-size:9px;}
+  .premium-kids.premium-cinematic-sky .premium-ecosystem-cinematic .premium-ecosystem-scene-card .premium-ecosystem-scene-copy h3{font-size:clamp(17px,2.1vw,22px);margin-bottom:8px;}
+  .premium-kids.premium-cinematic-sky .premium-ecosystem-cinematic .premium-ecosystem-scene-card .premium-ecosystem-scene-copy p{font-size:12px;}
+}
+@media(max-width:780px){
+  .premium-kids.premium-cinematic-sky .premium-ecosystem.premium-ecosystem-cinematic{width:calc(100% - 26px);padding:24px 2px 40px;margin:18px auto 38px;}
+  .premium-kids.premium-cinematic-sky .premium-ecosystem-cinematic .premium-ecosystem-cinematic-grid{
+    grid-template-columns:1fr;
+    max-width:540px;
+    gap:14px;
+  }
+  .premium-kids.premium-cinematic-sky .premium-ecosystem-cinematic .premium-ecosystem-cinematic-grid>article.premium-ecosystem-scene-card.spotlight-card{
+    grid-column:1/-1!important;
+    min-height:238px;
+  }
+  .premium-kids.premium-cinematic-sky .premium-ecosystem-cinematic .premium-ecosystem-scene-card .premium-ecosystem-scene-copy{
+    width:61%;
+    min-height:238px;
+    padding:20px 8px 22px 20px;
+  }
+  .premium-kids.premium-cinematic-sky .premium-ecosystem-cinematic .premium-ecosystem-scene-card .premium-ecosystem-scene-copy h3{font-size:22px;}
+  .premium-kids.premium-cinematic-sky .premium-ecosystem-cinematic .premium-ecosystem-scene-card .premium-ecosystem-scene-copy p{font-size:13px;}
+}
+@media(max-width:420px){
+  .premium-kids.premium-cinematic-sky .premium-ecosystem-cinematic .premium-ecosystem-cinematic-grid>article.premium-ecosystem-scene-card.spotlight-card{min-height:218px;}
+  .premium-kids.premium-cinematic-sky .premium-ecosystem-cinematic .premium-ecosystem-scene-card .premium-ecosystem-scene-copy{
+    min-height:218px;
+    padding:15px 5px 17px 13px;
+    width:65%;
+  }
+  .premium-kids.premium-cinematic-sky .premium-ecosystem-cinematic .premium-ecosystem-scene-card .premium-ecosystem-scene-copy h3{font-size:19px;}
+  .premium-kids.premium-cinematic-sky .premium-ecosystem-cinematic .premium-ecosystem-scene-card .premium-ecosystem-scene-copy p{font-size:12px;}
+  .premium-kids.premium-cinematic-sky .premium-ecosystem-cinematic .premium-ecosystem-scene-card .premium-ecosystem-scene-label{font-size:9px;letter-spacing:.07em;}
+}
+@media(prefers-reduced-motion:reduce){
+  .premium-kids.premium-cinematic-sky .premium-ecosystem-cinematic .premium-ecosystem-cinematic-grid>article.premium-ecosystem-scene-card.spotlight-card{transition:none!important;transform:none!important;}
+}

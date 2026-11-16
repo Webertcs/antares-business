@@ -2,7 +2,7 @@
 import Image from 'next/image';
 import dynamic from 'next/dynamic';
 import {useEffect,useRef,useState} from 'react';
-import {ArrowRight,Volume2,VolumeX,Pause,Play,Send,ShieldCheck,MessageCircle,CalendarDays} from 'lucide-react';
+import {ArrowRight,Volume2,VolumeX,Pause,Play,Send,ShieldCheck,MessageCircle,CalendarDays,Orbit,Sparkles,School,Gamepad2} from 'lucide-react';
 import './premium.css';
 import ProvaSocial from './ProvaSocial';
 import GradientText from './reactbits/GradientText';
@@ -18,8 +18,6 @@ const StarBorderHeroActions = dynamic(() => import('./StarBorderHeroActions'), {
 const StarBorderBudgetAction = dynamic(() => import('./StarBorderBudgetAction'), { ssr: false });
 // Voltar ao topo: estrela real percorre toda a borda, como nos CTAs aprovados.
 const StarBorderBackToTop = dynamic(() => import('./StarBorderBackToTop'), { ssr: false });
-// Bento original do React Bits, simplificado sem dependências externas de ícones.
-const MagicBento = dynamic(() => import('./reactbits/MagicBento'), { ssr: false });
 // Iluminação React Bits reaproveitada nos benefícios e no painel de proposta.
 const SpotlightCard = dynamic(() => import('./reactbits/SpotlightCard'), { ssr: false });
 // Contorno orbital do orçamento: estrela circunda o painel, sem alterar o Spotlight interior.
@@ -92,15 +90,19 @@ const ecosystemCards=[
  {icon:'🏫',title:'Na sua escola',description:'O planetário móvel vai até a instituição, mediante agendamento.'},
  {icon:'🎮',title:'Universo em expansão',description:'A aventura também chegará ao jogo educativo ANTARES.'}
 ] as const;
-// Quatro benefícios existentes, sem dados fictícios: organização Bento 2+1 / 1+2.
-const ecosystemBentoItems = ecosystemCards.map((card,index) => ({
-  id: card.title,
-  label: ['IMERSÃO','APRENDIZADO','NA SUA ESCOLA','NOVAS AVENTURAS'][index],
-  icon: <span className="premium-magic-bento-emoji" aria-hidden="true">{card.icon}</span>,
-  title: card.title,
-  description: card.description,
-  colSpan: index === 0 || index === 3 ? 2 : 1
+// Quatro artes originais extraídas da composição cinematográfica aprovada.
+// Os textos continuam sendo conteúdo HTML real (acessibilidade, responsividade).
+const ecosystemCinematicItems = ecosystemCards.map((card,index) => ({
+ ...card,
+ label: ['IMERSÃO','APRENDIZADO','NA SUA ESCOLA','NOVAS AVENTURAS'][index],
+ artwork: [
+  '/vitrine/ecosistema-imersao.webp',
+  '/vitrine/ecosistema-aprendizado.webp',
+  '/vitrine/ecosistema-escola.webp',
+  '/vitrine/ecosistema-aventuras.webp'
+ ][index]
 }));
+const ecosystemCinematicIcons = [Orbit,Sparkles,School,Gamepad2] as const;
 function MarketingPhoto({src,fallback,alt,width,height,className}:{src:string;fallback:string;alt:string;width:number;height:number;className?:string}){
  const [broken,setBroken]=useState(false);
  return <Image src={broken?fallback:src} alt={alt} width={width} height={height} className={className}
@@ -290,30 +292,43 @@ export default function PremiumVitrine(){
     <details className="premium-pluto"><summary>✨ E Plutão, onde está?</summary><p>Plutão é um planeta anão desde a classificação adotada pela União Astronômica Internacional em 2006. Ele continua sendo um mundo fascinante!</p></details>
    </div></section>
    {reactBitsPreview && <OrbitasCinematograficas />}
-   <section className="premium-ecosystem" aria-labelledby="premium-ecosystem-title">
-    <div className="premium-ecosystem-heading"><span>✦ O ECOSSISTEMA ANTARES</span><h2 id="premium-ecosystem-title">Uma experiência que começa na escola e continua nas descobertas</h2></div>
+   <section className={'premium-ecosystem'+(reactBitsPreview?' premium-ecosystem-cinematic':'')} aria-labelledby="premium-ecosystem-title">
+    <div className="premium-ecosystem-heading">
+     <span>✦ O ECOSSISTEMA ANTARES</span>
+     <h2 id="premium-ecosystem-title">Uma experiência que começa na escola e continua nas descobertas</h2>
+     {reactBitsPreview&&<p className="premium-ecosystem-intro">Ciência, imaginação e tecnologia em uma jornada contínua de aprendizado, da escola ao universo digital.</p>}
+    </div>
     {reactBitsPreview
-      ? <div className="premium-magic-bento-wrap">
-          <MagicBento
-            className="premium-magic-bento-grid"
-            items={ecosystemBentoItems}
-            columns={3}
-            rowHeight={210}
-            gap={14}
-            radius={22}
+      ? <div className="premium-ecosystem-cinematic-grid">
+         {ecosystemCinematicItems.map((card,index)=>{
+          const Icon=ecosystemCinematicIcons[index];
+          return <SpotlightCard
+            key={card.title}
+            className={`premium-ecosystem-scene-card premium-ecosystem-scene-${index+1}`}
             theme="dark"
-            glowColor="#9bd7ff"
-            textAutoHide={false}
-            enableBorderGlow
-            enableSpotlight
-            spotlightRadius={320}
-            enableStars={false}
-            enableTilt
-            enableMagnetism={false}
-            clickEffect={false}
-            intro
-            disableAnimations={reduce}
-          />
+            spotlightColor="#9cd8ff"
+            spotlightSize={370}
+            intensity={0.22}
+            softness={0.8}
+            borderGlow={0.78}
+            proximity={115}
+            smoothing={0.19}
+            ambient={false}
+            flare={false}
+           >
+            <div className="premium-ecosystem-scene-art" aria-hidden="true">
+             <Image src={card.artwork} alt="" width={540} height={315} className="premium-ecosystem-scene-image"/>
+            </div>
+            <div className="premium-ecosystem-scene-copy">
+             <div className="premium-ecosystem-scene-top">
+              <span className="premium-ecosystem-scene-icon" aria-hidden="true"><Icon size={21}/></span>
+              <span className="premium-ecosystem-scene-label">{card.label}</span>
+             </div>
+             <h3>{card.title}</h3>
+             <p>{card.description}</p>
+            </div>
+           </SpotlightCard>;
+         })}
         </div>
       : <div className="premium-ecosystem-grid">
           {ecosystemCards.map(card=><article key={card.title}>
