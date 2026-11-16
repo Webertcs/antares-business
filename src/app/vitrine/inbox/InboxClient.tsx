@@ -1,7 +1,7 @@
 'use client';
 import {useCallback,useEffect,useMemo,useState} from 'react';
 import Link from 'next/link';
-import {Archive,ArrowLeft,Building2,CalendarDays,CheckCircle2,ChevronDown,Clock3,FileText,Layers,MapPin,MessageCircle,MoreHorizontal,Phone,RefreshCw,Search,UserRound,Users} from 'lucide-react';
+import {Archive,ArrowLeft,Building2,CalendarDays,CheckCircle2,ChevronDown,Clock3,FileText,Layers,MapPin,MessageCircle,MoreHorizontal,Phone,RefreshCw,UserRound,Users} from 'lucide-react';
 import styles from './inbox.module.css';
 import ProposalComposer from './ProposalComposer';
 import ClientAcceptance from './ClientAcceptance';
@@ -15,8 +15,7 @@ function statusLabel(lead:Lead){
 }
 function matchesFilter(lead:Lead,key:string){
  if(key==='all')return true;
- if(key==='open')return ['pending','reviewing'].includes(lead.status)||
-  (lead.status==='converted'&&lead.proposal_status!=='accepted');
+ if(key==='open')return lead.status!=='archived';
  return lead.status===key;
 }
 const date=(value:string|null)=>value?new Date(value.slice(0,10)+'T12:00:00').toLocaleDateString('pt-BR'):'A combinar';
