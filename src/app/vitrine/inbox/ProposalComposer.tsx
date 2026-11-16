@@ -89,8 +89,9 @@ export default function ProposalComposer({lead,clientOptions,onClose,onSaved}:Pr
   discount<=gross&&deposit<=total&&terms.length<=2000;
  const mark=()=>{setDirty(true);setSaved(false);setNotice('');};
  const blocked=loading||busy||Boolean(loadError)||status!=='draft';
- const canApprove=Boolean(proposalId)&&status==='draft'&&!dirty&&!blocked&&valid&&
-  Boolean(validUntil)&&terms.trim().length>=10&&(model==='complimentary'||total>0);
+ const readyForReview=valid&&Boolean(validUntil)&&terms.trim().length>=10&&(model==='complimentary'||total>0);
+ const needsSave=!proposalId||dirty;
+ const canApprove=Boolean(proposalId)&&status==='draft'&&!dirty&&!blocked&&readyForReview;
  const requestClose=()=>{if(busy)return;if(confirmApprove){setConfirmApprove(false);return;}if(dirty&&!saved){setConfirmDiscard(true);return;}onClose();};
 
  async function post(url:string,body:object){
@@ -100,7 +101,7 @@ export default function ProposalComposer({lead,clientOptions,onClose,onSaved}:Pr
   return data;
  }
 
- async function save(){
+ async function save(reviewAfterSave=false){
   if(blocked||!valid)return;
   setBusy(true);setError('');setNotice('');
   let id=proposalId;
@@ -123,7 +124,8 @@ export default function ProposalComposer({lead,clientOptions,onClose,onSaved}:Pr
     id,valid:validUntil||null,terms:terms.trim(),approve:false
    });
    setDirty(false);setSaved(true);
-   setNotice('Rascunho salvo com sucesso. Você pode voltar e editar quando quiser.');
+   setNotice(reviewAfterSave?'Rascunho salvo. Confira os dados para aprovar.':'Rascunho salvo com sucesso. Você pode voltar e editar quando quiser.');
+   if(reviewAfterSave)setConfirmApprove(true);
    onSaved();
   }catch(e){
    setError((created?'O cliente e o rascunho foram criados, mas faltou concluir o salvamento. ':'')+
@@ -145,7 +147,7 @@ export default function ProposalComposer({lead,clientOptions,onClose,onSaved}:Pr
     throw Error('A aprovação ainda não foi confirmada. Atualize as solicitações antes de tentar novamente.');
    setStatus(String(data.proposal.status));
    setConfirmApprove(false);
-   setNotice('Proposta aprovada! Confira o documento antes de enviá-lo à instituição.');
+   setNotice('Proposta aprovada! Abra o PDF e encaminhe à instituição. Registre o aceite somente após a confirmação da escola.');
    onSaved();
   }catch(e){
    setConfirmApprove(false);
@@ -256,14 +258,13 @@ export default function ProposalComposer({lead,clientOptions,onClose,onSaved}:Pr
 
   <footer className={styles.footer}>
    <button type="button" className={styles.secondary} onClick={requestClose} disabled={busy}>Fechar</button>
-   {proposalId&&!dirty&&<Link className={styles.secondary} href={'/vitrine/proposta/'+proposalId+'?visualizar=1'}>Visualizar / Salvar PDF</Link>}
-   {status==='draft'&&<button type="button" className={styles.primary}
-    disabled={blocked||!valid||(!dirty&&saved)} onClick={()=>void save()}>
-    <Save size={17}/>{busy?'Salvando...':'Salvar rascunho'}</button>}
-   {status==='draft'&&proposalId&&<button type="button" className={styles.approveButton}
-    disabled={!canApprove||confirmApprove} title={!canApprove?'Salve e confira todos os dados antes de aprovar.':'Aprovar proposta internamente'}
-    onClick={()=>{setError('');setConfirmApprove(true);}}>
-    <CheckCircle2 size={17}/>Revisar e aprovar</button>}
+   {proposalId&&!dirty&&<Link className={styles.secondary} href={'/vitrine/proposta/'+proposalId+'?visualizar=1'} target="_blank" rel="noopener noreferrer">Visualizar / Salvar PDF</Link>}
+   {status==='draft'&&<button type="button" className={readyForReview?styles.approveButton:styles.primary}
+    disabled={blocked||!valid||confirmApprove||(!needsSave&&!readyForReview)}
+    onClick={()=>{setError('');if(needsSave){void save(readyForReview);}else if(readyForReview){setConfirmApprove(true);}}}>
+    {needsSave?<Save size={17}/>:<CheckCircle2 size={17}/>}
+    {busy?'Salvando...':needsSave?(readyForReview?'Salvar e revisar':'Salvar rascunho'):(readyForReview?'Revisar e aprovar':'Rascunho salvo')}
+   </button>}
    {status!=='draft'&&<span className={styles.locked}><Info size={15}/>Documento protegido</span>}
   </footer>
  </dialog>;
