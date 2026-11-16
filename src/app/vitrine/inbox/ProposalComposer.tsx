@@ -17,14 +17,14 @@ type Proposal={
  total:number;valid_until:string|null;payment_terms:string;
 };
 type Props={
- lead:Lead;existingClientId:string|null;onClose:()=>void;onSaved:()=>void;
+ lead:Lead;clientOptions:{id:string;name:string}[];onClose:()=>void;onSaved:()=>void;
 };
 const money=(n:number)=>n.toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
 const cents=(n:number)=>Math.round(n*100)/100;
 const positive=(n:number)=>Number.isFinite(n)&&n>=0&&n<=10000000&&Math.abs(n*100-Math.round(n*100))<0.000001;
 const uuid=/^[0-9a-f]{8}(-[0-9a-f]{4}){3}-[0-9a-f]{12}$/i;
 
-export default function ProposalComposer({lead,existingClientId,onClose,onSaved}:Props){
+export default function ProposalComposer({lead,clientOptions,onClose,onSaved}:Props){
  const dialogRef=useRef<HTMLDialogElement>(null);
  const approveCancelRef=useRef<HTMLButtonElement>(null);
  const [proposalId,setProposalId]=useState<string|null>(lead.converted_proposal_id);
@@ -46,6 +46,7 @@ export default function ProposalComposer({lead,existingClientId,onClose,onSaved}
  const [deposit,setDeposit]=useState(0);
  const [validUntil,setValidUntil]=useState('');
  const [terms,setTerms]=useState('');
+ const [selectedClientId,setSelectedClientId]=useState('');
 
  useEffect(()=>{
   const dialog=dialogRef.current;
@@ -106,7 +107,7 @@ export default function ProposalComposer({lead,existingClientId,onClose,onSaved}
   let created=false;
   try{
    if(!id){
-    const converted=await post('/api/vitrine/convert',{id:lead.id,existingClientId});
+    const converted=await post('/api/vitrine/convert',{id:lead.id,existingClientId:selectedClientId||null});
     if(typeof converted.proposalId!=='string'||!uuid.test(converted.proposalId)){
      throw Error('O pedido foi convertido, mas não foi possível localizar a proposta. Feche e reabra Oportunidades.');
     }
@@ -172,7 +173,14 @@ export default function ProposalComposer({lead,existingClientId,onClose,onSaved}
     <div className={styles.schoolAside}><small>Público</small><strong>{lead.audience}</strong></div>
    </section>
 
-   {!proposalId&&<p className={styles.note}>{existingClientId?'A proposta será vinculada ao cliente selecionado.':'A instituição será cadastrada.'} Você poderá voltar e editar o rascunho depois.</p>}
+   {!proposalId&&<div className={styles.clientLink}>
+     <label htmlFor="pc-client">Cadastro da instituição</label>
+     <select id="pc-client" value={selectedClientId} disabled={busy} onChange={e=>{setSelectedClientId(e.target.value);mark();}}>
+      <option value="">Cadastrar como nova instituição</option>
+      {clientOptions.map(client=><option key={client.id} value={client.id}>Vincular ao cadastro: {client.name}</option>)}
+     </select>
+     <small>{selectedClientId?'A proposta será vinculada ao cadastro escolhido, sem criar outro cliente.':'Se a instituição já estiver na lista, selecione seu cadastro para evitar duplicidade.'}</small>
+    </div>
    {loading&&<p role="status" className={styles.note}>Carregando dados da proposta...</p>}
    {status!=='draft'&&!loading&&<p className={styles.note}>Esta proposta já foi concluída e não pode ser editada. Consulte o documento para visualizar ou imprimir.</p>}
    {loadError&&<p role="alert" className={styles.error}>{loadError}</p>}
