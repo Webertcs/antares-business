@@ -3276,3 +3276,104 @@
 @media(prefers-reduced-motion:reduce){
   .premium-kids.premium-cinematic-sky .premium-ecosystem-cinematic .premium-ecosystem-cinematic-grid>article.premium-ecosystem-scene-card.spotlight-card{transition:none!important;transform:none!important;}
 }
+
+
+/* ANTARES Kids · pausa da 2ª órbita: mini-card Bento com Spotlight
+   responsivo ao cursor e Star Border real do React Bits. Exclusivo da
+   órbita cinematográfica experimental; não modifica o sistema solar. */
+.premium-kids.premium-cinematic-sky .premium-cinematic-orbit-actions button.star-border.premium-orbit-pause-bento{
+  --orbit-spot-x:50%;
+  --orbit-spot-y:50%;
+  position:relative;
+  isolation:isolate;
+  display:inline-flex;
+  justify-content:center;
+  align-items:center;
+  min-width:156px;
+  min-height:49px;
+  padding:7px 17px 7px 8px;
+  margin:0;
+  overflow:visible;
+  border:1px solid rgba(126,193,255,.56);
+  border-radius:20px;
+  background:linear-gradient(128deg,#173d74 0%,#0d2854 55%,#081d43 100%);
+  box-shadow:inset 0 1px rgba(221,244,255,.14),0 7px 23px rgba(0,9,31,.3),0 0 19px rgba(68,147,255,.08);
+  color:#f4faff;
+  font-size:14px;
+  font-weight:850;
+  letter-spacing:.012em;
+  transition:background .25s ease,transform .25s ease,border-color .25s ease,box-shadow .25s ease;
+}
+.premium-kids.premium-cinematic-sky .premium-cinematic-orbit-actions button.premium-orbit-pause-bento::after{
+  content:"";
+  position:absolute;
+  z-index:0;
+  inset:0;
+  border-radius:inherit;
+  pointer-events:none;
+  opacity:.42;
+  background:radial-gradient(ellipse 125px 95px at var(--orbit-spot-x) var(--orbit-spot-y),rgba(150,220,255,.44),rgba(47,139,247,.17) 45%,transparent 100%);
+  transition:opacity .25s ease;
+}
+.premium-kids.premium-cinematic-sky .premium-cinematic-orbit-actions button.premium-orbit-pause-bento:hover{
+  transform:translateY(-2px);
+  border-color:rgba(185,231,255,.95);
+  background:linear-gradient(125deg,#1c4b8c,#14376a 58%,#0a2552);
+  box-shadow:inset 0 1px rgba(225,246,255,.23),0 11px 27px rgba(0,8,34,.38),0 0 25px rgba(77,172,255,.19);
+}
+.premium-kids.premium-cinematic-sky .premium-cinematic-orbit-actions button.premium-orbit-pause-bento:hover::after,
+.premium-kids.premium-cinematic-sky .premium-cinematic-orbit-actions button.premium-orbit-pause-bento:focus-visible::after{
+  opacity:.95;
+}
+.premium-kids.premium-cinematic-sky .premium-cinematic-orbit-actions button.premium-orbit-pause-bento[aria-pressed="true"]{
+  border-color:rgba(255,220,142,.67);
+  box-shadow:inset 0 1px rgba(255,244,216,.15),0 7px 23px rgba(0,9,31,.3),0 0 20px rgba(255,215,123,.08);
+}
+.premium-kids.premium-cinematic-sky .premium-cinematic-orbit-actions button.premium-orbit-pause-bento:focus-visible{
+  outline:3px solid #ffdb83;
+  outline-offset:4px;
+}
+.premium-kids.premium-cinematic-sky .premium-cinematic-orbit-actions .premium-orbit-pause-bento>.star-border__light{
+  z-index:3;
+  pointer-events:none;
+}
+.premium-kids.premium-cinematic-sky .premium-cinematic-orbit-actions .premium-orbit-pause-bento-label{
+  position:relative;
+  z-index:2;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:11px;
+  line-height:1.15;
+}
+.premium-kids.premium-cinematic-sky .premium-cinematic-orbit-actions .premium-orbit-pause-bento-icon{
+  display:grid;
+  place-items:center;
+  width:33px;
+  height:33px;
+  flex:0 0 33px;
+  border:1px solid rgba(167,218,255,.72);
+  border-radius:11px;
+  background:linear-gradient(140deg,rgba(80,159,255,.58),rgba(29,80,162,.56));
+  box-shadow:inset 0 1px rgba(245,252,255,.16),0 0 13px rgba(108,184,255,.17);
+  color:#f4faff;
+}
+@media(max-width:640px){
+  .premium-kids.premium-cinematic-sky .premium-cinematic-orbit-actions button.star-border.premium-orbit-pause-bento{
+    min-width:138px;
+    min-height:45px;
+    padding:6px 14px 6px 6px;
+    font-size:13px;
+  }
+  .premium-kids.premium-cinematic-sky .premium-cinematic-orbit-actions .premium-orbit-pause-bento-icon{
+    width:30px;height:30px;flex-basis:30px;
+  }
+}
+@media(prefers-reduced-motion:reduce){
+  .premium-kids.premium-cinematic-sky .premium-cinematic-orbit-actions button.premium-orbit-pause-bento{
+    transition:none!important;
+  }
+  .premium-kids.premium-cinematic-sky .premium-cinematic-orbit-actions button.premium-orbit-pause-bento:hover{
+    transform:none!important;
+  }
+}

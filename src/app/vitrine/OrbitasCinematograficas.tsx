@@ -2,6 +2,8 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import OrbitImages from './reactbits/OrbitImages';
+import StarBorder from './reactbits/StarBorder';
+import { Pause, Play } from 'lucide-react';
 
 const ORBIT_ITEMS = [
   {
@@ -170,9 +172,42 @@ export default function OrbitasCinematograficas() {
         />
       </div>
       <div className="premium-cinematic-orbit-actions">
-        <button type="button" onClick={() => setPaused(value => !value)} aria-pressed={paused}>
-          {paused ? '▶ Retomar movimento' : 'Ⅱ Pausar movimento'}
-        </button>
+        <StarBorder
+          as="button"
+          type="button"
+          className="premium-orbit-pause-bento"
+          theme="dark"
+          color="#ffffff"
+          trailColor="#8bd9ff"
+          duration={6.2}
+          thickness={1.6}
+          radius={20}
+          trailLength={0.27}
+          stars={1}
+          glow={0.79}
+          sparkle={false}
+          hover="brighten"
+          clickPulse
+          aria-label={paused ? 'Retomar movimento dos planetas' : 'Pausar movimento dos planetas'}
+          aria-pressed={paused}
+          onClick={() => setPaused(value => !value)}
+          onPointerMove={event => {
+            const rect = event.currentTarget.getBoundingClientRect();
+            event.currentTarget.style.setProperty('--orbit-spot-x', `${event.clientX - rect.left}px`);
+            event.currentTarget.style.setProperty('--orbit-spot-y', `${event.clientY - rect.top}px`);
+          }}
+          onPointerLeave={event => {
+            event.currentTarget.style.setProperty('--orbit-spot-x', '50%');
+            event.currentTarget.style.setProperty('--orbit-spot-y', '50%');
+          }}
+        >
+          <span className="premium-orbit-pause-bento-label">
+            <span className="premium-orbit-pause-bento-icon" aria-hidden="true">
+              {paused ? <Play size={17} fill="currentColor" /> : <Pause size={17} fill="currentColor" />}
+            </span>
+            <span>{paused ? 'Retomar' : 'Pausar'}</span>
+          </span>
+        </StarBorder>
       </div>
 
     </section>
