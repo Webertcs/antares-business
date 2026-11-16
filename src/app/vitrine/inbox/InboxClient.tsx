@@ -150,8 +150,8 @@ export default function Inbox({conversionEnabled}:{conversionEnabled:boolean}){
        ? <button type="button" disabled={Boolean(busy)||!conversionEnabled} onClick={()=>openComposer(lead.id)}
          className={styles.actionPrimary}><FileText size={16}/>Editar proposta</button>
        : lead.proposal_status==='approved_internal'||lead.proposal_status==='legacy_accepted'
-       ? <button type="button" disabled={Boolean(busy)||!conversionEnabled} onClick={()=>setAcceptLeadId(lead.id)}
-         className={styles.actionPrimary}><CheckCircle2 size={16}/>Registrar aceite da escola</button>
+       ? <Link href={'/vitrine/proposta/'+lead.converted_proposal_id+'?visualizar=1'} target="_blank" rel="noopener noreferrer"
+         className={styles.actionPrimary}><FileText size={16}/>Visualizar proposta PDF</Link>
        : lead.proposal_status==='accepted'
        ? <Link href={'/agenda/reservas?proposalId='+encodeURIComponent(lead.converted_proposal_id)} className={styles.actionPrimary}>
          <CalendarDays size={16}/>Organizar reserva</Link>
@@ -160,6 +160,9 @@ export default function Inbox({conversionEnabled}:{conversionEnabled:boolean}){
      {lead.status==='archived'&&
       <button type="button" disabled={Boolean(busy)} onClick={()=>void review(lead.id,'pending')}
        className={styles.actionPrimary}><Archive size={16}/>Reabrir solicitação</button>}
+     {lead.status==='converted'&&lead.converted_proposal_id&&['approved_internal','legacy_accepted'].includes(String(lead.proposal_status))&&
+      <button type="button" disabled={Boolean(busy)||!conversionEnabled} onClick={()=>setAcceptLeadId(lead.id)}
+       className={styles.actionSecondary}><CheckCircle2 size={16}/>Registrar aceite real</button>}
      <a className={styles.actionWhatsApp}
       href={'https://wa.me/'+lead.phone.replace(/\D/g,'')+'?text='+encodeURIComponent('Olá, '+lead.responsible_name+'! Recebemos seu pedido de orçamento do planetário para '+lead.institution+'. Podemos conversar?')}
       target="_blank" rel="noopener noreferrer"><MessageCircle size={16}/>WhatsApp</a>
