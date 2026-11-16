@@ -1,8 +1,8 @@
 'use client';
 import {useCallback,useEffect,useMemo,useState} from 'react';
 import Link from 'next/link';
-import {Archive,ArrowLeft,Building2,CalendarDays,CheckCircle2,ChevronDown,Clock3,FileText,MapPin,MessageCircle,MoreHorizontal,Phone,RefreshCw,Search,UserRound,Users} from 'lucide-react';
-import styles from './inbox.honeybook.module.css';
+import {Archive,ArrowLeft,Building2,CalendarDays,CheckCircle2,ChevronDown,Clock3,FileText,Layers,MapPin,MessageCircle,MoreHorizontal,Phone,RefreshCw,UserRound,Users} from 'lucide-react';
+import styles from './inbox.module.css';
 import ProposalComposer from './ProposalComposer';
 import ClientAcceptance from './ClientAcceptance';
 type Lead={id:string;responsible_name:string;institution:string;city:string;phone:string;
@@ -15,13 +15,8 @@ function statusLabel(lead:Lead){
 }
 function matchesFilter(lead:Lead,key:string){
  if(key==='all')return true;
- if(key==='new')return lead.status==='pending';
- if(key==='reviewing')return lead.status==='reviewing';
- if(key==='draft')return lead.status==='converted'&&lead.proposal_status==='draft';
- if(key==='awaiting')return lead.status==='converted'&&['approved_internal','legacy_accepted'].includes(String(lead.proposal_status));
- if(key==='accepted')return lead.status==='converted'&&lead.proposal_status==='accepted';
- if(key==='archived')return lead.status==='archived';
- return false;
+ if(key==='open')return lead.status!=='archived'&&!(lead.status==='converted'&&lead.proposal_status==='accepted');
+ return lead.status===key;
 }
 const date=(value:string|null)=>value?new Date(value.slice(0,10)+'T12:00:00').toLocaleDateString('pt-BR'):'A combinar';
 function whatsAppMessage(lead:Lead){
@@ -51,8 +46,7 @@ export default function Inbox({conversionEnabled}:{conversionEnabled:boolean}){
  const [leads,setLeads]=useState<Lead[]>([]);
  const [clients,setClients]=useState<{id:string;name:string;kind:string}[]>([]);
  const kindOf=(audience:string)=>({Escola:'school',Empresa:'company',Associação:'association','Evento particular':'private'} as Record<string,string>)[audience]||'private';
- const [error,setError]=useState('');const [busy,setBusy]=useState('');const [filter,setFilter]=useState('all');
- const [search,setSearch]=useState('');const [page,setPage]=useState(1);const pageSize=10;
+ const [error,setError]=useState('');const [busy,setBusy]=useState('');const [filter,setFilter]=useState('open');
  const [loading,setLoading]=useState(true);const [notice,setNotice]=useState('');
  const [composerLeadId,setComposerLeadId]=useState<string|null>(null);
  const [acceptLeadId,setAcceptLeadId]=useState<string|null>(null);
@@ -67,10 +61,7 @@ export default function Inbox({conversionEnabled}:{conversionEnabled:boolean}){
   finally{setLoading(false);}
  },[]);
  useEffect(()=>{void load();if(conversionEnabled){fetch('/api/crm/clientes',{cache:'no-store'}).then(r=>r.json()).then(d=>setClients(d.clients||[])).catch(()=>setNotice('Lista de clientes indisponível.'));}},[load,conversionEnabled]);
- const shown=useMemo(()=>leads.filter(x=>matchesFilter(x,filter)&&
-  (!search.trim()||[x.institution,x.responsible_name,x.city,x.audience].some(v=>(typeof v==='string'?v:'').toLocaleLowerCase('pt-BR').includes(search.trim().toLocaleLowerCase('pt-BR'))))),[leads,filter,search]);
- const totalPages=Math.max(1,Math.ceil(shown.length/pageSize));
- const visible=shown.slice((page-1)*pageSize,page*pageSize);
+ const shown=useMemo(()=>leads.filter(x=>matchesFilter(x,filter)),[leads,filter]);
  function openComposer(id:string){
   if(busy||!conversionEnabled)return;
   setComposerLeadId(id);
@@ -83,38 +74,34 @@ export default function Inbox({conversionEnabled}:{conversionEnabled:boolean}){
   }catch(e){setNotice(e instanceof Error?e.message:'Falha ao salvar');}
   finally{setBusy('');}
  }
- return <main className={`${styles.page} honeybook-workspace`}>
+ return <main className={styles.page}>
+  <nav aria-label="Navegação" className={styles.breadcrumb}>
+   <ArrowLeft size={14}/><Link href="/clientes">Clientes e eventos</Link><span aria-hidden="true">›</span><span>Oportunidades</span>
+  </nav>
   <header className={styles.hero}>
    <div className={styles.heroTitle}>
+    <span className={styles.heroIcon}><FileText size={26} aria-hidden="true"/></span>
     <div>
-     <h1>Atendimentos</h1>
-     <p>Acompanhe os pedidos e as apresentações do planetário em um só lugar.</p>
+     <span className={styles.eyebrow}>ANTARES BUSINESS · VITRINE</span>
+     <h1>Oportunidades</h1>
+     <p>Pedidos da vitrine, propostas e confirmações em um só lugar.</p>
     </div>
    </div>
-   <div className={styles.headerActions}>
-    <label className={styles.search}>
-     <span className={styles.searchIcon}><Search size={18} aria-hidden="true"/></span>
-     <span className={styles.srOnly}>Buscar escola ou responsável</span>
-     <input value={search} onChange={e=>{setSearch(e.target.value);setPage(1);}} placeholder="Buscar escola ou responsável"/>
-    </label>
-    <button type="button" className={styles.refresh} disabled={loading} onClick={()=>void load()}>
-     <RefreshCw size={16} aria-hidden="true"/><span>{loading?'Atualizando...':'Atualizar'}</span>
-    </button>
-   </div>
+   <button type="button" className={styles.refresh} disabled={loading} onClick={()=>void load()}>
+    <RefreshCw size={15} aria-hidden="true"/> {loading?'Atualizando...':'Atualizar lista'}
+   </button>
   </header>
-  <div className={styles.filters} role="group" aria-label="Filtrar atendimentos">
+  <div className={styles.filters} role="group" aria-label="Filtrar solicitações">
    {([
-    {key:'all',name:'Todos'},
-    {key:'new',name:'Novos'},
-    {key:'reviewing',name:'Em análise'},
-    {key:'draft',name:'Propostas'},
-    {key:'awaiting',name:'Aguardando aceite'},
-    {key:'accepted',name:'Aceites registrados'},
-    {key:'archived',name:'Arquivados'}
+    {key:'open',name:'Em andamento',Icon:Clock3,theme:styles.filterPending},
+    {key:'all',name:'Todas',Icon:Layers,theme:''},
+    {key:'converted',name:'Com proposta',Icon:FileText,theme:styles.filterConverted},
+    {key:'archived',name:'Arquivadas',Icon:Archive,theme:styles.filterArchived}
    ] as const).map(option=><button type="button" key={option.key}
-    className={[styles.filter,filter===option.key?styles.filterActive:''].filter(Boolean).join(' ')}
-    onClick={()=>{setFilter(option.key);setPage(1);}} aria-pressed={filter===option.key}>
-    {option.name}<span className={styles.filterCount}>{leads.filter(l=>matchesFilter(l,option.key)).length}</span>
+    className={[styles.filter,option.theme,filter===option.key?styles.filterActive:''].filter(Boolean).join(' ')}
+    onClick={()=>setFilter(option.key)} aria-pressed={filter===option.key}>
+    <option.Icon size={16} aria-hidden="true"/>
+    {option.name} ({leads.filter(l=>matchesFilter(l,option.key)).length})
    </button>)}
   </div>
   {error&&<p role="alert" className={[styles.notification,styles.error].join(' ')}>{error}</p>}
@@ -122,21 +109,13 @@ export default function Inbox({conversionEnabled}:{conversionEnabled:boolean}){
   {loading?<div className={styles.empty} role="status">Carregando solicitações...</div>:
    !error&&shown.length===0?<div className={styles.empty}>Nenhuma solicitação nesta categoria.</div>:null}
   <div className={styles.list}>
-   <div className={styles.tableHead} aria-hidden="true">
-    <span>Escola / Atendimento</span><span>Data pretendida</span><span>Etapa</span><span>Próximo passo</span>
-   </div>
-   {!loading&&visible.map(lead=><article key={lead.id} className={styles.lead}>
+   {!loading&&shown.map(lead=><article key={lead.id} className={styles.lead}>
     <div className={styles.leadHead}>
      <div className={styles.leadIcon}><Building2 size={24} aria-hidden="true"/></div>
      <div className={styles.leadTitle}>
       <h2>{lead.institution}</h2>
-      <div className={styles.leadSubtitle}>{lead.attendees??'A combinar'} participantes · {lead.city||'Cidade a combinar'}</div>
+      <div className={styles.leadSubtitle}>Pedido recebido pelo site</div>
      </div>
-
-    </div>
-    <div className={styles.quickFacts}>
-     <CalendarDays size={16} aria-hidden="true"/><span>{date(lead.desired_date)}</span>
-    </div>
      <span className={[styles.status,
       lead.status==='converted'&&lead.proposal_status==='accepted'?styles.statusConverted:
       lead.status==='converted'?styles.statusReviewing:
@@ -146,7 +125,29 @@ export default function Inbox({conversionEnabled}:{conversionEnabled:boolean}){
       {lead.status==='converted'&&lead.proposal_status==='accepted'&&<CheckCircle2 size={14} aria-hidden="true"/>}
       {statusLabel(lead)}
      </span>
-
+    </div>
+    <div className={styles.quickFacts}>
+     <span><UserRound size={14} aria-hidden="true"/>{lead.responsible_name}</span>
+     <span><Users size={14} aria-hidden="true"/>{lead.attendees??'A combinar'} participantes</span>
+     <span><CalendarDays size={14} aria-hidden="true"/>{date(lead.desired_date)}</span>
+    </div>
+    <details className={styles.leadDetails}>
+     <summary>Ver informações do pedido <ChevronDown size={15} aria-hidden="true"/></summary>
+     <div className={styles.details}>
+     <div className={styles.detailGroup}>
+      <div className={styles.detail}><UserRound size={16}/><span><b>Responsável:</b> {lead.responsible_name}</span></div>
+      <div className={styles.detail}><MapPin size={16}/><span><b>Cidade:</b> {lead.city||'Não informada'}</span></div>
+      <div className={styles.detail}><Users size={16}/><span><b>Público:</b> {lead.audience}</span></div>
+      <div className={styles.detail}><Users size={16}/><span><b>Participantes:</b> {lead.attendees??'A combinar'}</span></div>
+     </div>
+     <div className={styles.detailGroup}>
+      <div className={styles.detail}><CalendarDays size={16}/><span><b>Data desejada:</b> {date(lead.desired_date)}</span></div>
+      <div className={styles.detail}><Phone size={16}/><span><b>WhatsApp:</b> {lead.phone}</span></div>
+      <div className={styles.detail}><Clock3 size={16}/><span><b>Recebido:</b> {new Date(lead.created_at).toLocaleString('pt-BR')}</span></div>
+      <LeadObservations notes={lead.notes}/>
+     </div>
+     </div>
+    </details>
     <div className={styles.actions}>
      {conversionEnabled&&lead.status!=='archived'&&lead.status!=='converted'&&
       <button type="button" disabled={Boolean(busy)} onClick={()=>openComposer(lead.id)}
@@ -191,33 +192,8 @@ export default function Inbox({conversionEnabled}:{conversionEnabled:boolean}){
       </div>
      </details>
     </div>
-    <details className={styles.leadDetails}>
-     <summary>Ver informações do pedido <ChevronDown size={15} aria-hidden="true"/></summary>
-     <div className={styles.details}>
-     <div className={styles.detailGroup}>
-      <div className={styles.detail}><UserRound size={16}/><span><b>Responsável:</b> {lead.responsible_name}</span></div>
-      <div className={styles.detail}><MapPin size={16}/><span><b>Cidade:</b> {lead.city||'Não informada'}</span></div>
-      <div className={styles.detail}><Users size={16}/><span><b>Público:</b> {lead.audience}</span></div>
-      <div className={styles.detail}><Users size={16}/><span><b>Participantes:</b> {lead.attendees??'A combinar'}</span></div>
-     </div>
-     <div className={styles.detailGroup}>
-      <div className={styles.detail}><CalendarDays size={16}/><span><b>Data desejada:</b> {date(lead.desired_date)}</span></div>
-      <div className={styles.detail}><Phone size={16}/><span><b>WhatsApp:</b> {lead.phone}</span></div>
-      <div className={styles.detail}><Clock3 size={16}/><span><b>Recebido:</b> {new Date(lead.created_at).toLocaleString('pt-BR')}</span></div>
-      <LeadObservations notes={lead.notes}/>
-     </div>
-     </div>
-    </details>
    </article>)}
   </div>
-  {!loading&&shown.length>0&&<div className={styles.pagination}>
-   <span>Exibindo {Math.min((page-1)*pageSize+1,shown.length)}–{Math.min(page*pageSize,shown.length)} de {shown.length} atendimentos</span>
-   <div>
-    <button type="button" disabled={page<=1} onClick={()=>setPage(v=>Math.max(1,v-1))} aria-label="Página anterior"><ArrowLeft size={15}/></button>
-    <span>Página {page} de {totalPages}</span>
-    <button type="button" disabled={page>=totalPages} onClick={()=>setPage(v=>Math.min(totalPages,v+1))} aria-label="Próxima página"><ArrowLeft size={15} style={{transform:'rotate(180deg)'}}/></button>
-   </div>
-  </div>}
   {activeLead&&<ProposalComposer
     key={activeLead.id}
     lead={activeLead}
