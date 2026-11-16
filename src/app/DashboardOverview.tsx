@@ -45,7 +45,7 @@ export default function DashboardOverview({cash,receivable,proposals,upcoming,ca
    {[
     {label:'Saldo realizado',value:moneyForDisplay(cash),icon:Wallet,href:'/financeiro',hint:'Abrir Financeiro'},
     {label:'A receber',value:moneyForDisplay(receivable),icon:ArrowUpRight,href:'/financeiro/receber',hint:'Abrir contas a receber'},
-    {label:'Propostas abertas',value:proposals,icon:FileText,href:'/operacoes?area=comercial',hint:'Consultar propostas'},
+    {label:'Propostas abertas',value:proposals,icon:FileText,href:'/clientes',hint:'Consultar clientes e propostas'},
     {label:'Oportunidades da Vitrine',value:inboxAvailable?String(notifications?.opportunitiesCount??0):'—',icon:BriefcaseBusiness,href:'/vitrine/inbox',hint:'Abrir solicitações recebidas pela Vitrine'}
    ].map(k=>{
     const body=<><span className="owner-kpi-icon"><k.icon size={20}/></span>
