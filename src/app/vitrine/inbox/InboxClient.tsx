@@ -68,7 +68,7 @@ export default function Inbox({conversionEnabled}:{conversionEnabled:boolean}){
  },[]);
  useEffect(()=>{void load();if(conversionEnabled){fetch('/api/crm/clientes',{cache:'no-store'}).then(r=>r.json()).then(d=>setClients(d.clients||[])).catch(()=>setNotice('Lista de clientes indisponível.'));}},[load,conversionEnabled]);
  const shown=useMemo(()=>leads.filter(x=>matchesFilter(x,filter)&&
-  (!search.trim()||[x.institution,x.responsible_name,x.city,x.audience].some(v=>v.toLocaleLowerCase('pt-BR').includes(search.trim().toLocaleLowerCase('pt-BR'))))),[leads,filter,search]);
+  (!search.trim()||[x.institution,x.responsible_name,x.city,x.audience].some(v=>(typeof v==='string'?v:'').toLocaleLowerCase('pt-BR').includes(search.trim().toLocaleLowerCase('pt-BR'))))),[leads,filter,search]);
  const totalPages=Math.max(1,Math.ceil(shown.length/pageSize));
  const visible=shown.slice((page-1)*pageSize,page*pageSize);
  function openComposer(id:string){
