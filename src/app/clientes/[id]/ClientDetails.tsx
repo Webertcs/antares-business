@@ -500,16 +500,28 @@ export default function ClientDetails({id,writesEnabled,proposalWritesEnabled,co
  {([['active','Ativas',proposals.length-archivedCount],['archived','Arquivadas',archivedCount],['all','Todas',proposals.length]] as const).map(([value,label,count])=><button key={value} type="button" aria-pressed={proposalFilter===value} onClick={()=>setProposalFilter(value)} style={{...actionLink,border:'1px solid #91b7e8',background:proposalFilter===value?'#145ac3':'#e6f1ff',color:proposalFilter===value?'#fff':'#174987'}}>{label} ({count})</button>)}
  </div>
  {commercialError?<p role="alert">{commercialError}</p>:!commercial?<p>Carregando informações comerciais…</p>:commercial.unavailable.includes('proposals')?<p>Propostas temporariamente indisponíveis.</p>:visibleProposals.length===0?<p>{proposalFilter==='archived'?'Nenhuma proposta arquivada.':proposalFilter==='active'?'Nenhuma proposta ativa.':'Nenhuma proposta vinculada a esta instituição.'}</p>:visibleProposals.map(p=><div key={String(p.id)} className="client-premium-entry" style={row}><strong>{String(p.title||'Proposta')}</strong> · {money(p.total)} · <strong>{statusNames[String(p.status)]||String(p.status||'Sem situação')}</strong>{Boolean(p.archived_at)&&<span style={{marginLeft:8,color:'#526e96',fontWeight:700}}>· Arquivada</span>}<div style={{fontSize:12}}>Criada em {dateBR(p.created_at?String(p.created_at):null)}</div>
- <div style={{display:'flex',gap:7,flexWrap:'wrap',marginTop:10}}>
- <button type="button" onClick={()=>proposalPdf(p)} style={actionLink}>PDF / Imprimir</button>
- <button type="button" onClick={()=>openProposalWhatsapp(p)} style={{...actionLink,background:'#16803c'}}>WhatsApp</button>
- {proposalWritesEnabled&&!p.archived_at&&['draft','sent'].includes(String(p.status))&&<>
- <button type="button" disabled={commercialActionBusy} onClick={()=>commercialAction(String(p.id),'sent')} style={actionLink}>Confirmar envio</button>
- <button type="button" disabled={commercialActionBusy||closingBusy} onClick={()=>{setClosingProposal({id:String(p.id),title:String(p.title||'Proposta')});setClosingMode('verbal');setClosingResponsible('');setClosingTerms('');setClosingError('');setCommercialFeedback('');}} style={{...actionLink,background:'#0b8b75'}}>Fechar negócio</button>
- <button type="button" disabled={commercialActionBusy} onClick={()=>commercialAction(String(p.id),'rejected')} style={{...actionLink,background:'#526e96'}}>Recusada</button>
- </>}
- {proposalWritesEnabled&&<button type="button" disabled={commercialActionBusy} onClick={()=>commercialAction(String(p.id),p.archived_at?'restore':'archive')} style={{...actionLink,background:p.archived_at?'#166e9e':'#526e96'}}>{p.archived_at?'Reativar':'Arquivar'}</button>}
- {proposalWritesEnabled&&!p.archived_at&&String(p.status)==='accepted'&&!contracts.some(c=>String(c.proposal_id)===String(p.id))&&<button type="button" onClick={()=>setContractFor(String(p.id))} style={actionLink}>Criar contrato</button>}
+ <div style={{display:'flex',gap:8,flexWrap:'wrap',alignItems:'center',marginTop:12}}>
+  {proposalWritesEnabled&&!p.archived_at&&String(p.status)==='sent'
+   ?<button type="button" disabled={commercialActionBusy||closingBusy} onClick={()=>{setClosingProposal({id:String(p.id),title:String(p.title||'Proposta')});setClosingMode('verbal');setClosingResponsible('');setClosingTerms('');setClosingError('');setCommercialFeedback('');}} style={{...actionLink,background:'#087e73'}}>Fechar negócio</button>
+   :proposalWritesEnabled&&!p.archived_at&&String(p.status)==='accepted'&&!contracts.some(c=>String(c.proposal_id)===String(p.id))
+   ?<button type="button" onClick={()=>setContractFor(String(p.id))} style={actionLink}>Criar contrato</button>
+   :!p.archived_at&&String(p.status)==='draft'
+   ?<button type="button" onClick={()=>openProposalWhatsapp(p)} style={actionLink}>Enviar pelo WhatsApp</button>
+   :<button type="button" onClick={()=>proposalPdf(p)} style={actionLink}>Visualizar PDF</button>}
+  {(!p.archived_at&&['draft','sent'].includes(String(p.status))||!p.archived_at&&String(p.status)==='accepted'&&!contracts.some(c=>String(c.proposal_id)===String(p.id)))&&
+   <button type="button" onClick={()=>proposalPdf(p)} style={{...actionLink,background:'#e8f2ff',color:'#174987',boxShadow:'none'}}>Visualizar PDF</button>}
+  <details style={{minWidth:126}}>
+   <summary style={{cursor:'pointer',fontSize:12,fontWeight:700,color:'#174987',border:'1px solid #b5cfee',background:'#eff6ff',borderRadius:8,padding:'9px 12px'}}>Mais ações</summary>
+   <div style={{display:'flex',gap:7,flexWrap:'wrap',padding:'9px 0'}}>
+    {(!p.archived_at&&String(p.status)!=='draft')&&<button type="button" onClick={()=>openProposalWhatsapp(p)} style={{...actionLink,background:'#16803c'}}>WhatsApp</button>}
+    {proposalWritesEnabled&&!p.archived_at&&['draft','sent'].includes(String(p.status))&&<>
+     <button type="button" disabled={commercialActionBusy} onClick={()=>commercialAction(String(p.id),'sent')} style={actionLink}>Confirmar envio</button>
+     {String(p.status)==='draft'&&<button type="button" disabled={commercialActionBusy||closingBusy} onClick={()=>{setClosingProposal({id:String(p.id),title:String(p.title||'Proposta')});setClosingMode('verbal');setClosingResponsible('');setClosingTerms('');setClosingError('');setCommercialFeedback('');}} style={actionLink}>Fechar negócio</button>}
+     <button type="button" disabled={commercialActionBusy} onClick={()=>commercialAction(String(p.id),'rejected')} style={{...actionLink,background:'#526e96'}}>Marcar recusada</button>
+    </>}
+    {proposalWritesEnabled&&<button type="button" disabled={commercialActionBusy} onClick={()=>commercialAction(String(p.id),p.archived_at?'restore':'archive')} style={{...actionLink,background:'#526e96'}}>{p.archived_at?'Reativar proposta':'Arquivar proposta'}</button>}
+   </div>
+  </details>
  </div>
  {contractFor===String(p.id)&&<form onSubmit={e=>{e.preventDefault();void commercialAction(String(p.id),'contract')}} style={{display:'grid',gap:9,maxWidth:540,marginTop:12}}>
  <label style={formLabel}>Modalidade<select style={formInput} value={contractInline.mode} onChange={e=>setContractInline(v=>({...v,mode:e.target.value}))}><option value="written">Formal por escrito</option><option value="verbal">Acordo verbal</option><option value="whatsapp">WhatsApp</option></select></label>
