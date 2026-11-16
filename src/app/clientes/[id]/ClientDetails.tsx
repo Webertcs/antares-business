@@ -41,7 +41,7 @@ export default function ClientDetails({id,writesEnabled,proposalWritesEnabled,co
  const relationshipTier=totalRelationshipVisits>=8?'Diamante':totalRelationshipVisits>=4?'Ouro':totalRelationshipVisits>=2?'Prata':totalRelationshipVisits===1?'Bronze':'Sem categoria';
  const relationshipBenefits:Record<string,string>={'Bronze':'5% na segunda visita e acompanhamento','Prata':'10% e prioridade de agenda','Ouro':'15%, sessão extra a cada 5 visitas e material exclusivo','Diamante':'20%, sessão gratuita anual e selo Escola Parceira'};
  const pendingRelationship=relationship.actions.filter(a=>!a.archived&&a.status!=='completed'&&a.status!=='dismissed'&&a.due_date).sort((a,b)=>(a.due_date||'').localeCompare(b.due_date||''));
- const [activeTab,setActiveTab]=useState<'propostas'|'contratos'|'alunos'|'eventos'|'financeiro'|'fidelizacao'|'historico'|'observacoes'>('eventos');
+ const [activeTab,setActiveTab]=useState<'propostas'|'contratos'|'alunos'|'eventos'|'financeiro'|'fidelizacao'|'historico'|'observacoes'>('propostas');
  const [eventView,setEventView]=useState<'active'|'archived'>('active');
  const [commercial,setCommercial]=useState<{proposals:Record<string,unknown>[];contracts:Record<string,unknown>[];unavailable:string[]}|null>(null);
  const [commercialError,setCommercialError]=useState('');
@@ -476,11 +476,24 @@ export default function ClientDetails({id,writesEnabled,proposalWritesEnabled,co
  {([['Telefone',client.phone||'—'],...(client.phone_secondary?[['Telefone secundário',client.phone_secondary]]:[]),['E-mail',client.email||'—'],['Tipo',kinds[client.kind]||client.kind]] as [string,string][]).map(([label,value])=><div key={label} style={{minWidth:0}}><div style={{fontSize:12,fontWeight:650,color:'#b8dcff'}}>{label}</div><div style={{fontSize:14,lineHeight:1.4,overflowWrap:'anywhere',wordBreak:'normal',marginTop:2}}>{value}</div></div>)}
  </div>
  </header>
- <div className="client-detail-metrics" style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(min(100%,165px),1fr))',gap:8,marginBottom:10}}>
- {([['Eventos',events.length,'eventos'],['Propostas',proposals.length,'propostas'],['Contratos',contracts.length,'contratos']] as [string,number,'eventos'|'propostas'|'contratos'][]).map(([label,value,tab])=><button type="button" key={label} onClick={()=>setActiveTab(tab)} aria-current={activeTab===tab?'page':undefined} aria-label={`Abrir ${label.toLowerCase()} deste cliente`} className="client-detail-metric" style={{textAlign:'left',cursor:'pointer',background:'#edf5ff',border:'1px solid #bdd3f3',borderTop:'3px solid #347fe0',borderRadius:10,padding:'7px 12px',minHeight:59}}><div style={{fontSize:12,fontWeight:650,color:'#42628b'}}>{label}</div><strong style={{fontSize:21,lineHeight:1.15,color:'#143e82'}}>{value}</strong></button>)}
- <button type="button" onClick={()=>setActiveTab('financeiro')} aria-current={activeTab==='financeiro'?'page':undefined} aria-label="Abrir financeiro desta instituição" className="client-detail-metric" style={{textAlign:'left',cursor:'pointer',background:'#edf5ff',border:'1px solid #bdd3f3',borderTop:'3px solid #347fe0',borderRadius:10,padding:'7px 12px',minHeight:59}}><div style={{fontSize:12,fontWeight:650,color:'#42628b'}}>Financeiro da instituição</div><strong style={{display:'block',marginTop:2,fontSize:17,lineHeight:1.15,color:'#143e82'}}>{finance?money(finance.titles.filter(t=>t.client_id===id).reduce((n,t)=>n+Math.max(0,Number(t.total)-Number(t.paid)),0)):'Consultar valores'}</strong></button>
+ <div aria-label="Resumo do atendimento" style={{display:'flex',gap:18,alignItems:'center',flexWrap:'wrap',padding:'10px 14px',marginBottom:12,border:'1px solid #c9dcef',borderRadius:12,background:'#f3f8ff',color:'#244a79',fontSize:13}}>
+  <span><strong style={{fontSize:17,color:'#123c80'}}>{proposals.length}</strong> propostas</span>
+  <span><strong style={{fontSize:17,color:'#123c80'}}>{contracts.length}</strong> contratos</span>
+  <span><strong style={{fontSize:17,color:'#123c80'}}>{events.length}</strong> eventos</span>
  </div>
- <nav className="client-detail-tabs" aria-label="Seções do cliente" style={{display:'flex',flexWrap:'wrap',gap:8,margin:'12px 0'}}>{([['eventos','Eventos'],['propostas','Propostas'],['contratos','Contratos'],['alunos','Alunos'],['fidelizacao','Fidelização'],['financeiro','Financeiro'],['historico','Histórico'],['observacoes','Observações']] as const).map(([key,label])=><button key={key} type="button" aria-current={activeTab===key?'page':undefined} onClick={()=>setActiveTab(key)} style={{cursor:'pointer',border:'1px solid #a9c7ee',borderRadius:10,padding:'10px 15px',fontWeight:700,background:activeTab===key?'linear-gradient(110deg,#0862cf,#16458e)':'#eaf3ff',color:activeTab===key?'#fff':'#174987'}}>{label}</button>)}</nav>
+ <nav className="client-detail-tabs" aria-label="Seções do cliente" style={{display:'flex',flexWrap:'wrap',alignItems:'center',gap:8,margin:'12px 0 16px'}}>
+  {([['propostas','Propostas'],['contratos','Contratos'],['eventos','Eventos'],['financeiro','Financeiro']] as const).map(([key,label])=>
+   <button key={key} type="button" aria-current={activeTab===key?'page':undefined} onClick={()=>setActiveTab(key)}
+    style={{cursor:'pointer',border:'1px solid #a9c7ee',borderRadius:10,padding:'10px 15px',fontWeight:700,background:activeTab===key?'#155cc1':'#eaf3ff',color:activeTab===key?'#fff':'#174987'}}>{label}</button>)}
+  <details style={{minWidth:178,flex:'0 0 auto'}}>
+   <summary style={{cursor:'pointer',border:'1px solid #a9c7ee',borderRadius:10,padding:'10px 15px',fontWeight:700,background:['alunos','fidelizacao','historico','observacoes'].includes(activeTab)?'#155cc1':'#eaf3ff',color:['alunos','fidelizacao','historico','observacoes'].includes(activeTab)?'#fff':'#174987'}}>Mais informações</summary>
+   <div style={{display:'grid',gap:5,marginTop:6,padding:7,border:'1px solid #c5d8f0',borderRadius:10,background:'#f7fbff'}}>
+    {([['alunos','Alunos'],['fidelizacao','Fidelização'],['historico','Histórico'],['observacoes','Observações']] as const).map(([key,label])=>
+     <button type="button" key={key} aria-current={activeTab===key?'page':undefined} onClick={()=>setActiveTab(key)}
+      style={{textAlign:'left',cursor:'pointer',border:0,borderRadius:7,padding:'9px 11px',fontWeight:650,background:activeTab===key?'#d8e8ff':'transparent',color:'#174987'}}>{label}</button>)}
+   </div>
+  </details>
+ </nav>
  {activeTab==='propostas'&&<section className="client-premium-tab" data-client-tab="propostas" style={{...panel,borderLeftColor:'#169caa'}}><h2 style={heading}>Propostas e orçamentos ({proposals.length})</h2><p style={{fontSize:13}}>Propostas comerciais vinculadas a {client.name}.</p>
  {proposalWritesEnabled&&<button type="button" style={{...actionLink,background:'#145ac3',margin:'12px 0 16px'}} onClick={()=>{setProposalDraft({...emptyProposalDraft});setCommercialForm('proposal');}}>+ Nova proposta</button>}
  <div role="group" aria-label="Filtrar propostas" style={{display:'flex',flexWrap:'wrap',gap:7,alignItems:'center',margin:'4px 0 12px'}}>
