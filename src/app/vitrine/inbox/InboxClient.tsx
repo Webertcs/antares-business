@@ -7,7 +7,18 @@ import ProposalComposer from './ProposalComposer';
 import ClientAcceptance from './ClientAcceptance';
 type Lead={id:string;responsible_name:string;institution:string;city:string;phone:string;
  audience:string;attendees:number|null;desired_date:string|null;notes:string;status:string;created_at:string;converted_client_id:string|null;converted_proposal_id:string|null;proposal_status:string|null};
-const label:Record<string,string>={pending:'Pendente',reviewing:'Em análise',converted:'Convertido',archived:'Arquivado'};
+const label:Record<string,string>={pending:'Novo pedido',reviewing:'Em análise',converted:'Proposta criada',archived:'Arquivado'};
+function statusLabel(lead:Lead){
+ if(lead.status!=='converted')return label[lead.status]||lead.status;
+ const statuses:Record<string,string>={draft:'Rascunho da proposta',approved_internal:'Proposta aprovada',legacy_accepted:'Aceite a confirmar',accepted:'Aceite registrado'};
+ return statuses[String(lead.proposal_status||'')]||'Proposta criada';
+}
+function matchesFilter(lead:Lead,key:string){
+ if(key==='all')return true;
+ if(key==='open')return ['pending','reviewing'].includes(lead.status)||
+  (lead.status==='converted'&&lead.proposal_status!=='accepted');
+ return lead.status===key;
+}
 const date=(value:string|null)=>value?new Date(value.slice(0,10)+'T12:00:00').toLocaleDateString('pt-BR'):'A combinar';
 
 function LeadObservations({notes}:{notes:string|null}){
@@ -30,7 +41,7 @@ export default function Inbox({conversionEnabled}:{conversionEnabled:boolean}){
  const [clients,setClients]=useState<{id:string;name:string;kind:string}[]>([]);
  const [chosen,setChosen]=useState<Record<string,string>>({});
  const kindOf=(audience:string)=>({Escola:'school',Empresa:'company',Associação:'association','Evento particular':'private'} as Record<string,string>)[audience]||'private';
- const [error,setError]=useState('');const [busy,setBusy]=useState('');const [filter,setFilter]=useState('all');
+ const [error,setError]=useState('');const [busy,setBusy]=useState('');const [filter,setFilter]=useState('open');
  const [loading,setLoading]=useState(true);const [notice,setNotice]=useState('');
  const [composerLeadId,setComposerLeadId]=useState<string|null>(null);
  const [acceptLeadId,setAcceptLeadId]=useState<string|null>(null);
@@ -45,7 +56,7 @@ export default function Inbox({conversionEnabled}:{conversionEnabled:boolean}){
   finally{setLoading(false);}
  },[]);
  useEffect(()=>{void load();if(conversionEnabled){fetch('/api/crm/clientes',{cache:'no-store'}).then(r=>r.json()).then(d=>setClients(d.clients||[])).catch(()=>setNotice('Lista de clientes indisponível.'));}},[load,conversionEnabled]);
- const shown=useMemo(()=>leads.filter(x=>filter==='all'||x.status===filter),[leads,filter]);
+ const shown=useMemo(()=>leads.filter(x=>matchesFilter(x,filter)),[leads,filter]);
  function openComposer(id:string){
   if(busy||!conversionEnabled)return;
   setComposerLeadId(id);
@@ -60,15 +71,15 @@ export default function Inbox({conversionEnabled}:{conversionEnabled:boolean}){
  }
  return <main className={styles.page}>
   <nav aria-label="Navegação" className={styles.breadcrumb}>
-   <ArrowLeft size={14}/><Link href="/clientes">Clientes e eventos</Link><span aria-hidden="true">›</span><span>Solicitações de orçamento</span>
+   <ArrowLeft size={14}/><Link href="/clientes">Clientes e eventos</Link><span aria-hidden="true">›</span><span>Oportunidades</span>
   </nav>
   <header className={styles.hero}>
    <div className={styles.heroTitle}>
     <span className={styles.heroIcon}><FileText size={26} aria-hidden="true"/></span>
     <div>
      <span className={styles.eyebrow}>ANTARES BUSINESS · VITRINE</span>
-     <h1>Solicitações de orçamento</h1>
-     <p>Acompanhe os pedidos recebidos e prepare propostas para cada instituição.</p>
+     <h1>Oportunidades</h1>
+     <p>Pedidos da vitrine, propostas e confirmações em um só lugar.</p>
     </div>
    </div>
    <button type="button" className={styles.refresh} disabled={loading} onClick={()=>void load()}>
@@ -77,16 +88,15 @@ export default function Inbox({conversionEnabled}:{conversionEnabled:boolean}){
   </header>
   <div className={styles.filters} role="group" aria-label="Filtrar solicitações">
    {([
+    {key:'open',name:'Em andamento',Icon:Clock3,theme:styles.filterPending},
     {key:'all',name:'Todas',Icon:Layers,theme:''},
-    {key:'pending',name:'Pendentes',Icon:Clock3,theme:styles.filterPending},
-    {key:'reviewing',name:'Em análise',Icon:Search,theme:styles.filterReview},
-    {key:'archived',name:'Arquivadas',Icon:Archive,theme:styles.filterArchived},
-    {key:'converted',name:'Convertidas',Icon:CheckCircle2,theme:styles.filterConverted}
+    {key:'converted',name:'Com proposta',Icon:FileText,theme:styles.filterConverted},
+    {key:'archived',name:'Arquivadas',Icon:Archive,theme:styles.filterArchived}
    ] as const).map(option=><button type="button" key={option.key}
     className={[styles.filter,option.theme,filter===option.key?styles.filterActive:''].filter(Boolean).join(' ')}
     onClick={()=>setFilter(option.key)} aria-pressed={filter===option.key}>
     <option.Icon size={16} aria-hidden="true"/>
-    {option.name} ({option.key==='all'?leads.length:leads.filter(l=>l.status===option.key).length})
+    {option.name} ({leads.filter(l=>matchesFilter(l,option.key)).length})
    </button>)}
   </div>
   {error&&<p role="alert" className={[styles.notification,styles.error].join(' ')}>{error}</p>}
@@ -102,15 +112,23 @@ export default function Inbox({conversionEnabled}:{conversionEnabled:boolean}){
       <div className={styles.leadSubtitle}>Pedido recebido pelo site</div>
      </div>
      <span className={[styles.status,
-      lead.status==='converted'?styles.statusConverted:
+      lead.status==='converted'&&lead.proposal_status==='accepted'?styles.statusConverted:
+      lead.status==='converted'?styles.statusReviewing:
       lead.status==='archived'?styles.statusArchived:
       lead.status==='reviewing'?styles.statusReviewing:
       lead.status==='pending'?styles.statusPending:''].join(' ')}>
-      {lead.status==='converted'&&<CheckCircle2 size={14} aria-hidden="true"/>}
-      {label[lead.status]||lead.status}
+      {lead.status==='converted'&&lead.proposal_status==='accepted'&&<CheckCircle2 size={14} aria-hidden="true"/>}
+      {statusLabel(lead)}
      </span>
     </div>
-    <div className={styles.details}>
+    <div className={styles.quickFacts}>
+     <span><UserRound size={14} aria-hidden="true"/>{lead.responsible_name}</span>
+     <span><Users size={14} aria-hidden="true"/>{lead.attendees??'A combinar'} participantes</span>
+     <span><CalendarDays size={14} aria-hidden="true"/>{date(lead.desired_date)}</span>
+    </div>
+    <details className={styles.leadDetails}>
+     <summary>Ver informações do pedido <ChevronDown size={15} aria-hidden="true"/></summary>
+     <div className={styles.details}>
      <div className={styles.detailGroup}>
       <div className={styles.detail}><UserRound size={16}/><span><b>Responsável:</b> {lead.responsible_name}</span></div>
       <div className={styles.detail}><MapPin size={16}/><span><b>Cidade:</b> {lead.city||'Não informada'}</span></div>
@@ -123,7 +141,8 @@ export default function Inbox({conversionEnabled}:{conversionEnabled:boolean}){
       <div className={styles.detail}><Clock3 size={16}/><span><b>Recebido:</b> {new Date(lead.created_at).toLocaleString('pt-BR')}</span></div>
       <LeadObservations notes={lead.notes}/>
      </div>
-    </div>
+     </div>
+    </details>
     <div className={styles.actions}>
      {conversionEnabled&&lead.status!=='archived'&&lead.status!=='converted'&&
       <button type="button" disabled={Boolean(busy)} onClick={()=>openComposer(lead.id)}
@@ -167,7 +186,7 @@ export default function Inbox({conversionEnabled}:{conversionEnabled:boolean}){
          <FileText size={16}/>Visualizar / Salvar PDF</Link>}
        {lead.status==='converted'&&lead.converted_proposal_id&&lead.proposal_status!=='draft'&&
         <span className={styles.moreHint}>{lead.proposal_status==='accepted'?'Aceite registrado. Proposta liberada para agendamento.':'Aprovação interna não equivale ao aceite da escola.'}</span>}
-       <Link href="/clientes" className={styles.actionSecondary}><Users size={16}/>Abrir cadastro de clientes</Link>
+       {lead.converted_client_id&&<Link href={'/clientes/'+lead.converted_client_id} className={styles.actionSecondary}><Users size={16}/>Ficha da instituição</Link>}
       </div>
      </details>
     </div>
