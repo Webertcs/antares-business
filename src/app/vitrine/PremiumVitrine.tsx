@@ -4,6 +4,10 @@ import dynamic from 'next/dynamic';
 import {useEffect,useRef,useState} from 'react';
 import {ArrowRight,Volume2,VolumeX,Pause,Play,Send,ShieldCheck,MessageCircle,CalendarDays,Orbit,Sparkles,School,Gamepad2} from 'lucide-react';
 import './premium.css';
+
+// Contato público confirmado pelo proprietário da vitrine. Número no formato internacional do WhatsApp.
+const ANTARES_OFFICIAL_WHATSAPP = '5561991251625';
+const ANTARES_WHATSAPP_INTRO = 'Olá! Conheci o ANTARES Kids pelo site e gostaria de saber mais sobre as apresentações do planetário.';
 import ProvaSocial from './ProvaSocial';
 import ShinyText from './reactbits/ShinyText';
 import JourneyArtwork, {type JourneyArtKind} from './JourneyArtwork';
@@ -204,18 +208,11 @@ export default function PremiumVitrine(){
     setFormStatus(gameUpdatesOptIn?'✅ Recebemos seu pedido! Seu interesse nas novidades do jogo também foi anotado. Nossa equipe poderá entrar em contato.':'✅ Recebemos seu pedido! Nossa equipe avaliará sua solicitação e poderá entrar em contato.');
     return;
    }
-   // Em implantação: nunca afirmar que o pedido foi salvo se a API não confirmar.
+   // Só confirmamos o recebimento quando a API responder com sucesso.
   }catch{
-   // Falha de conexão: oferecer encaminhamento manual abaixo.
+   // Disponibiliza o contato direto somente após não conseguir confirmar o recebimento.
   }finally{setLeadSending(false);}
-  const number=process.env.NEXT_PUBLIC_ANTARES_WHATSAPP?.replace(/\D/g,'');
-  if(!number||number.length<11||number.length>13){
-   setFormStatus('Não foi possível enviar seu pedido neste momento. Copie a mensagem abaixo para encaminhá-la à nossa equipe.');
-   return;
-  }
-  const href='https://wa.me/'+number+'?text='+encodeURIComponent(text);
-  window.open(href,'_blank','noopener,noreferrer');
-  setFormStatus('Abrimos o WhatsApp para você confirmar o envio. Se a conversa não aparecer, copie a mensagem abaixo para encaminhá-la à nossa equipe.');
+  setFormStatus('Não conseguimos confirmar o recebimento pelo formulário. Você pode encaminhar a mensagem preparada diretamente pelo WhatsApp.');
  }
  async function copyQuote(){
   try{await navigator.clipboard.writeText(quoteDraft);setFormStatus('Mensagem copiada. Você pode enviá-la ao atendimento do planetário.');}
@@ -243,9 +240,16 @@ export default function PremiumVitrine(){
       <label className="premium-consent"><input required type="checkbox"/> Autorizo o contato em resposta a este pedido de orçamento. Entendo que os dados serão usados para esse atendimento.</label>
       <input className="premium-honeypot" type="text" name="website" tabIndex={-1} autoComplete="off" aria-hidden="true"/>
       <button className="premium-button premium-form-submit" type="submit" disabled={leadSending}>{leadSending?"Registrando pedido...":"Solicitar minha proposta"} <Send size={17}/></button>
+      {reactBitsPreview&&<a className="premium-budget-whatsapp" href={'https://wa.me/'+ANTARES_OFFICIAL_WHATSAPP+'?text='+encodeURIComponent(ANTARES_WHATSAPP_INTRO)} target="_blank" rel="noopener noreferrer" aria-label="Conversar pelo WhatsApp oficial do ANTARES Kids, número (61) 99125-1625">
+       <MessageCircle size={19} aria-hidden="true"/><span>Conversar pelo WhatsApp</span><small>(61) 99125-1625</small>
+      </a>}
       {formStatus&&<p role="status" aria-live="polite" className="premium-form-status">{formStatus}</p>}
-      {quoteDraft&&<div className="premium-quote-preview"><label>Mensagem preparada<textarea readOnly rows={7} value={quoteDraft} aria-label="Mensagem de orçamento pronta para copiar"/></label><button type="button" onClick={copyQuote} className="premium-copy-quote">Copiar mensagem</button></div>}
-      <small className="premium-form-disclaimer">{reactBitsPreview?'Nossa equipe analisará sua solicitação e poderá entrar em contato pelo WhatsApp informado. Se houver uma falha no envio, você poderá copiar sua mensagem para encaminhá-la ao atendimento.':'Nossa equipe analisará sua solicitação antes de preparar uma proposta. Se não conseguir enviar por aqui, você poderá encaminhar sua mensagem pelo WhatsApp.'}</small>
+      {quoteDraft&&!leadSending&&<div className="premium-quote-preview">
+       <label>Mensagem preparada<textarea readOnly rows={7} value={quoteDraft} aria-label="Mensagem de orçamento pronta para copiar"/></label>
+       <a className="premium-budget-whatsapp premium-budget-whatsapp-fallback" href={'https://wa.me/'+ANTARES_OFFICIAL_WHATSAPP+'?text='+encodeURIComponent(quoteDraft)} target="_blank" rel="noopener noreferrer"><MessageCircle size={18} aria-hidden="true"/> Enviar mensagem pelo WhatsApp</a>
+       <button type="button" onClick={copyQuote} className="premium-copy-quote">Copiar mensagem</button>
+      </div>}
+      <small className="premium-form-disclaimer">{reactBitsPreview?'Nossa equipe receberá sua solicitação e entrará em contato para planejar uma experiência especial para sua escola.':'Nossa equipe analisará sua solicitação antes de preparar uma proposta. Se não conseguir enviar por aqui, você poderá encaminhar sua mensagem pelo WhatsApp.'}</small>
      </form>
  );
  const stopped=paused||reduce;

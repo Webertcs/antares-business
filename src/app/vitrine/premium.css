@@ -3755,3 +3755,65 @@
     height:99px;
   }
 }
+
+
+/* ANTARES Kids — contato oficial do planetário na vitrine experimental.
+   WhatsApp secundário ao envio do CRM, sempre com confirmação pelo visitante. */
+.premium-kids.premium-cinematic-sky .premium-budget-whatsapp{
+  width:100%;
+  min-height:49px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  flex-wrap:wrap;
+  gap:9px;
+  padding:10px 15px;
+  border:1px solid rgba(105,200,181,.56);
+  border-radius:999px;
+  background:linear-gradient(120deg,rgba(7,36,52,.94),rgba(7,28,48,.95));
+  box-shadow:inset 0 1px rgba(183,248,231,.10),0 4px 18px rgba(0,13,34,.18);
+  color:#e2fff6;
+  font-size:13px;
+  line-height:1.35;
+  font-weight:800;
+  text-align:center;
+  text-decoration:none;
+  transition:background .2s ease,border-color .2s ease,box-shadow .2s ease,transform .2s ease;
+}
+.premium-kids.premium-cinematic-sky .premium-budget-whatsapp>svg{
+  color:#86dfbb;
+  flex:none;
+}
+.premium-kids.premium-cinematic-sky .premium-budget-whatsapp>small{
+  color:#b8dbd2;
+  font-size:11px;
+  font-weight:650;
+  white-space:nowrap;
+}
+.premium-kids.premium-cinematic-sky .premium-budget-whatsapp:hover,
+.premium-kids.premium-cinematic-sky .premium-budget-whatsapp:focus-visible{
+  border-color:#9af1d3;
+  background:linear-gradient(120deg,rgba(11,58,65,.96),rgba(9,42,58,.96));
+  box-shadow:inset 0 1px rgba(214,255,241,.15),0 0 22px rgba(54,190,161,.15);
+  transform:translateY(-1px);
+}
+.premium-kids.premium-cinematic-sky .premium-budget-whatsapp:focus-visible{
+  outline:3px solid #ffe59a;
+  outline-offset:3px;
+}
+.premium-kids.premium-cinematic-sky .premium-quote-preview .premium-budget-whatsapp-fallback{
+  border-radius:13px;
+  font-size:12px;
+}
+@media(max-width:490px){
+  .premium-kids.premium-cinematic-sky .premium-budget-whatsapp{
+    gap:6px;
+    padding:11px 12px;
+  }
+}
+@media(prefers-reduced-motion:reduce){
+  .premium-kids.premium-cinematic-sky .premium-budget-whatsapp{
+    transition:none!important;
+    transform:none!important;
+  }
+}
