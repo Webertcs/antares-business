@@ -180,7 +180,7 @@ export default function ProposalComposer({lead,clientOptions,onClose,onSaved}:Pr
       {clientOptions.map(client=><option key={client.id} value={client.id}>Vincular ao cadastro: {client.name}</option>)}
      </select>
      <small>{selectedClientId?'A proposta será vinculada ao cadastro escolhido, sem criar outro cliente.':'Se a instituição já estiver na lista, selecione seu cadastro para evitar duplicidade.'}</small>
-    </div>
+    </div>}
    {loading&&<p role="status" className={styles.note}>Carregando dados da proposta...</p>}
    {status!=='draft'&&!loading&&<p className={styles.note}>Esta proposta já foi concluída e não pode ser editada. Consulte o documento para visualizar ou imprimir.</p>}
    {loadError&&<p role="alert" className={styles.error}>{loadError}</p>}
