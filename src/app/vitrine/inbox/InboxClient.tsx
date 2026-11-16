@@ -83,7 +83,7 @@ export default function Inbox({conversionEnabled}:{conversionEnabled:boolean}){
   }catch(e){setNotice(e instanceof Error?e.message:'Falha ao salvar');}
   finally{setBusy('');}
  }
- return <main className={styles.page}>
+ return <main className={`${styles.page} honeybook-workspace`}>
   <header className={styles.hero}>
    <div className={styles.heroTitle}>
     <div>
