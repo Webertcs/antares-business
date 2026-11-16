@@ -45,7 +45,7 @@ export default function ReceberClient(){
   const id=payIds[t.id]||crypto.randomUUID();setPayIds(v=>({...v,[t.id]:id}));setBusy(true);
   try{const result=await post({action:'pay',id,receivable_id:t.id,amount,paid_on:today()});
    await load();setPayment(v=>({...v,[t.id]:''}));setPayIds(v=>{const n={...v};delete n[t.id];return n;});
-   setStatus(result.alreadyExists?'Baixa já registrada; não foi duplicada.':'Recebimento registrado no caixa.');
+   setStatus(result.alreadyExists?'Este recebimento já estava registrado; nenhum lançamento foi duplicado.':'');
   }catch(e){setStatus(e instanceof Error?e.message:'Erro');}finally{setBusy(false);}
  }
  const input={display:'block' as const,width:'100%',padding:'11px 12px',border:'1px solid #a9c5e9',borderRadius:10,marginTop:7,background:'linear-gradient(180deg,#fff,#f3f8ff)',boxShadow:'inset 0 1px 3px rgba(24,64,123,.07),0 2px 6px rgba(24,64,123,.06)',color:'#183458',fontSize:14};
@@ -78,7 +78,6 @@ export default function ReceberClient(){
  <button type="button" disabled={busy||!writesEnabled} onClick={()=>pay(t)} style={{padding:'9px 12px',background:'linear-gradient(135deg,#174d9b,#317fe1)',color:'white',border:'1px solid #245cae',borderRadius:8,fontWeight:800,boxShadow:'0 4px 9px rgba(32,94,180,.22)',cursor:'pointer'}}>Receber</button></div>}{remain===0&&'Quitado'}</td>
  </tr>})}</tbody></table></div>
  {!titles.length&&<p>Nenhum título cadastrado.</p>}
- <p style={{fontSize:12,color:'#607b9f',margin:'17px 0 0'}}>Os recebimentos confirmados são registrados no livro-caixa.</p>
  </section>
  </div></main>;
 }
