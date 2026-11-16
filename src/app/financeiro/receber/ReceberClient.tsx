@@ -69,13 +69,21 @@ export default function ReceberClient(){
  {status&&<p role="status" style={{padding:12,background:'#e9effc',borderRadius:8}}>{status}</p>}
  {!writesEnabled&&<p role="status" style={{padding:14,background:'#fff4e5',border:'1px solid #efc991',borderRadius:9,color:'#864413'}}>Novos lançamentos estão temporariamente indisponíveis. Você ainda pode consultar os títulos e recebimentos existentes.</p>}
  <section style={box}><h2 style={{fontSize:19,fontWeight:800,color:'#174987',margin:'0 0 20px',paddingBottom:15,borderBottom:'2px solid #d9e8fa'}}>Novo título</h2>
- <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(190px,1fr))',gap:15}}>
+ <style>{`
+ .antares-title-grid{display:grid;grid-template-columns:minmax(165px,1.35fr) minmax(170px,1.55fr) minmax(100px,.72fr) minmax(142px,.9fr) auto;gap:12px;align-items:end}
+ .antares-title-grid>label{display:block;min-width:0;font-size:13px}
+ .antares-title-grid>label input,.antares-title-grid>label select{min-width:0}
+ .antares-title-submit{height:43px;white-space:nowrap}
+ @media(max-width:1050px){.antares-title-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.antares-title-submit{grid-column:2;justify-self:end}}
+ @media(max-width:560px){.antares-title-grid{grid-template-columns:minmax(0,1fr)}.antares-title-submit{grid-column:1;width:100%}}
+ `}</style>
+ <div className="antares-title-grid">
  <label>Instituição<select style={input} value={client} onChange={e=>{setClient(e.target.value);setDraftId(null);}}><option value="">Selecione</option>{clients.map(c=><option key={c.id} value={c.id}>{c.name}</option>)}</select></label>
  <label>Descrição<input style={input} maxLength={300} value={description} onChange={e=>{setDescription(e.target.value);setDraftId(null);}}/></label>
  <label>Valor total (R$)<input style={input} inputMode="decimal" value={total} onChange={e=>{setTotal(e.target.value);setDraftId(null);}} placeholder="0,00"/></label>
  <label>Vencimento<input style={input} type="date" value={due} onChange={e=>{setDue(e.target.value);setDraftId(null);}}/></label>
+ <button className="antares-title-submit" disabled={busy||!writesEnabled} onClick={create} style={{padding:'10px 14px',background:'linear-gradient(135deg,#174d9b,#317fe1)',color:'white',border:'1px solid #245cae',borderRadius:10,fontWeight:800,boxShadow:'0 5px 12px rgba(32,94,180,.28)',cursor:'pointer'}}>Criar título</button>
  </div>
- <button disabled={busy||!writesEnabled} onClick={create} style={{marginTop:18,padding:'11px 18px',background:'linear-gradient(135deg,#174d9b,#317fe1)',color:'white',border:'1px solid #245cae',borderRadius:10,fontWeight:800,boxShadow:'0 5px 12px rgba(32,94,180,.28)',cursor:'pointer'}}>Criar título</button>
  </section>
  <section style={box}><h2 style={{fontSize:19,fontWeight:800,color:'#174987',margin:'0 0 18px',paddingBottom:15,borderBottom:'2px solid #d9e8fa'}}>Títulos cadastrados <span style={{fontSize:12,fontWeight:600,color:'#607b9f',marginLeft:6}}>({titles.length})</span></h2>
  <div style={{overflowX:'auto'}}><table style={{borderCollapse:'collapse',width:'100%',textAlign:'left',fontSize:13,minWidth:760}}>
