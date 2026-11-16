@@ -483,17 +483,9 @@ export default function ClientDetails({id,writesEnabled,proposalWritesEnabled,co
   <span><strong style={{fontSize:17,color:'#123c80'}}>{events.length}</strong> eventos</span>
  </div>
  <nav className="client-detail-tabs" aria-label="Seções do cliente" style={{display:'flex',flexWrap:'wrap',alignItems:'center',gap:8,margin:'12px 0 16px'}}>
-  {([['propostas','Propostas'],['contratos','Contratos'],['eventos','Eventos'],['financeiro','Financeiro']] as const).map(([key,label])=>
+  {([['propostas','Propostas'],['contratos','Contratos'],['eventos','Eventos'],['financeiro','Financeiro'],['alunos','Alunos'],['fidelizacao','Fidelização'],['historico','Histórico'],['observacoes','Observações']] as const).map(([key,label])=>
    <button key={key} type="button" aria-current={activeTab===key?'page':undefined} onClick={()=>{setActiveTab(key);setCommercialFeedback('');}}
     style={{cursor:'pointer',border:'1px solid #a9c7ee',borderRadius:10,padding:'10px 15px',fontWeight:700,background:activeTab===key?'#155cc1':'#eaf3ff',color:activeTab===key?'#fff':'#174987'}}>{label}</button>)}
-  <details style={{position:'relative',minWidth:178,flex:'0 0 auto',zIndex:20}}>
-   <summary style={{cursor:'pointer',border:'1px solid #a9c7ee',borderRadius:10,padding:'10px 15px',fontWeight:700,background:['alunos','fidelizacao','historico','observacoes'].includes(activeTab)?'#155cc1':'#eaf3ff',color:['alunos','fidelizacao','historico','observacoes'].includes(activeTab)?'#fff':'#174987'}}>Mais informações</summary>
-   <div style={{position:'absolute',top:'calc(100% + 6px)',right:0,zIndex:30,width:190,display:'grid',gap:5,padding:7,border:'1px solid #c5d8f0',borderRadius:10,background:'#f7fbff',boxShadow:'0 12px 28px rgba(17,49,94,.18)'}}>
-    {([['alunos','Alunos'],['fidelizacao','Fidelização'],['historico','Histórico'],['observacoes','Observações']] as const).map(([key,label])=>
-     <button type="button" key={key} aria-current={activeTab===key?'page':undefined} onClick={e=>{setActiveTab(key);setCommercialFeedback('');e.currentTarget.closest('details')?.removeAttribute('open');}}
-      style={{textAlign:'left',cursor:'pointer',border:0,borderRadius:7,padding:'9px 11px',fontWeight:650,background:activeTab===key?'#d8e8ff':'transparent',color:'#174987'}}>{label}</button>)}
-   </div>
-  </details>
  </nav>
  {activeTab==='propostas'&&<section className="client-premium-tab" data-client-tab="propostas" style={{...panel,borderLeftColor:'#169caa'}}><h2 style={heading}>Propostas e orçamentos ({proposals.length})</h2><p style={{fontSize:13}}>Propostas comerciais vinculadas a {client.name}.</p>
  {proposalWritesEnabled&&<button type="button" style={{...actionLink,background:'#145ac3',margin:'12px 0 16px'}} onClick={()=>{setProposalDraft({...emptyProposalDraft});setCommercialForm('proposal');}}>+ Nova proposta</button>}
@@ -511,18 +503,13 @@ export default function ClientDetails({id,writesEnabled,proposalWritesEnabled,co
    :<button type="button" onClick={()=>proposalPdf(p)} style={actionLink}>Visualizar PDF</button>}
   {(!p.archived_at&&['draft','sent'].includes(String(p.status))||!p.archived_at&&String(p.status)==='accepted'&&!contracts.some(c=>String(c.proposal_id)===String(p.id)))&&
    <button type="button" onClick={()=>proposalPdf(p)} style={{...actionLink,background:'#e8f2ff',color:'#174987',boxShadow:'none'}}>Visualizar PDF</button>}
-  <details style={{minWidth:126}}>
-   <summary style={{cursor:'pointer',fontSize:12,fontWeight:700,color:'#174987',border:'1px solid #b5cfee',background:'#eff6ff',borderRadius:8,padding:'9px 12px'}}>Mais ações</summary>
-   <div style={{display:'flex',gap:7,flexWrap:'wrap',padding:'9px 0'}}>
-    {(!p.archived_at&&String(p.status)!=='draft')&&<button type="button" onClick={()=>openProposalWhatsapp(p)} style={{...actionLink,background:'#16803c'}}>WhatsApp</button>}
-    {proposalWritesEnabled&&!p.archived_at&&['draft','sent'].includes(String(p.status))&&<>
-     <button type="button" disabled={commercialActionBusy} onClick={()=>commercialAction(String(p.id),'sent')} style={actionLink}>Confirmar envio</button>
-     {String(p.status)==='draft'&&<button type="button" disabled={commercialActionBusy||closingBusy} onClick={()=>{setClosingProposal({id:String(p.id),title:String(p.title||'Proposta')});setClosingMode('verbal');setClosingResponsible('');setClosingTerms('');setClosingError('');setCommercialFeedback('');}} style={actionLink}>Fechar negócio</button>}
-     <button type="button" disabled={commercialActionBusy} onClick={()=>commercialAction(String(p.id),'rejected')} style={{...actionLink,background:'#526e96'}}>Marcar recusada</button>
-    </>}
-    {proposalWritesEnabled&&<button type="button" disabled={commercialActionBusy} onClick={()=>commercialAction(String(p.id),p.archived_at?'restore':'archive')} style={{...actionLink,background:'#526e96'}}>{p.archived_at?'Reativar proposta':'Arquivar proposta'}</button>}
-   </div>
-  </details>
+  {(!p.archived_at&&String(p.status)!=='draft')&&<button type="button" onClick={()=>openProposalWhatsapp(p)} style={{...actionLink,background:'#16803c'}}>WhatsApp</button>}
+  {proposalWritesEnabled&&!p.archived_at&&['draft','sent'].includes(String(p.status))&&<>
+   <button type="button" disabled={commercialActionBusy} onClick={()=>commercialAction(String(p.id),'sent')} style={{...actionLink,background:'#e8f2ff',color:'#174987',boxShadow:'none'}}>Confirmar envio</button>
+   {String(p.status)==='draft'&&<button type="button" disabled={commercialActionBusy||closingBusy} onClick={()=>{setClosingProposal({id:String(p.id),title:String(p.title||'Proposta')});setClosingMode('verbal');setClosingResponsible('');setClosingTerms('');setClosingError('');setCommercialFeedback('');}} style={actionLink}>Fechar negócio</button>}
+   <button type="button" disabled={commercialActionBusy} onClick={()=>commercialAction(String(p.id),'rejected')} style={{...actionLink,background:'#526e96'}}>Marcar recusada</button>
+  </>}
+  {proposalWritesEnabled&&<button type="button" disabled={commercialActionBusy} onClick={()=>commercialAction(String(p.id),p.archived_at?'restore':'archive')} style={{...actionLink,background:'#526e96'}}>{p.archived_at?'Reativar proposta':'Arquivar proposta'}</button>}
  </div>
  {contractFor===String(p.id)&&<form onSubmit={e=>{e.preventDefault();void commercialAction(String(p.id),'contract')}} style={{display:'grid',gap:9,maxWidth:540,marginTop:12}}>
  <label style={formLabel}>Modalidade<select style={formInput} value={contractInline.mode} onChange={e=>setContractInline(v=>({...v,mode:e.target.value}))}><option value="written">Formal por escrito</option><option value="verbal">Acordo verbal</option><option value="whatsapp">WhatsApp</option></select></label>
