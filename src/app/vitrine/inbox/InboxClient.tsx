@@ -38,7 +38,6 @@ function LeadObservations({notes}:{notes:string|null}){
 export default function Inbox({conversionEnabled}:{conversionEnabled:boolean}){
  const [leads,setLeads]=useState<Lead[]>([]);
  const [clients,setClients]=useState<{id:string;name:string;kind:string}[]>([]);
- const [chosen,setChosen]=useState<Record<string,string>>({});
  const kindOf=(audience:string)=>({Escola:'school',Empresa:'company',Associação:'association','Evento particular':'private'} as Record<string,string>)[audience]||'private';
  const [error,setError]=useState('');const [busy,setBusy]=useState('');const [filter,setFilter]=useState('open');
  const [loading,setLoading]=useState(true);const [notice,setNotice]=useState('');
@@ -171,15 +170,6 @@ export default function Inbox({conversionEnabled}:{conversionEnabled:boolean}){
          className={s==='archived'?styles.actionMuted:styles.actionSecondary}>
          {s==='reviewing'?'Iniciar análise':s==='pending'?'Marcar como pendente':'Arquivar'}
         </button>)}
-       {conversionEnabled&&lead.status!=='converted'&&lead.status!=='archived'&&
-        <label className={styles.selectLabel}>Cliente da proposta
-         <select aria-label={'Cliente para '+lead.institution} value={chosen[lead.id]||''}
-          onChange={e=>setChosen(old=>({...old,[lead.id]:e.target.value}))}>
-          <option value="">Criar novo cliente</option>
-          {clients.filter(c=>c.kind===kindOf(lead.audience)).map(c=>
-           <option key={c.id} value={c.id}>Vincular: {c.name}</option>)}
-         </select>
-        </label>}
        {lead.status==='converted'&&lead.converted_proposal_id&&['draft','approved_internal','legacy_accepted'].includes(String(lead.proposal_status))&&
         <Link href={'/vitrine/proposta/'+lead.converted_proposal_id+'?visualizar=1'} className={styles.actionSecondary}>
          <FileText size={16}/>Visualizar / Salvar PDF</Link>}
@@ -194,7 +184,7 @@ export default function Inbox({conversionEnabled}:{conversionEnabled:boolean}){
   {activeLead&&<ProposalComposer
     key={activeLead.id}
     lead={activeLead}
-    existingClientId={chosen[activeLead.id]||null}
+    clientOptions={clients.filter(c=>c.kind===kindOf(activeLead.audience)).slice().sort((a,b)=>a.name.localeCompare(b.name,'pt-BR')).map(c=>({id:c.id,name:c.name}))}
     onClose={()=>setComposerLeadId(null)}
     onSaved={()=>{void load();}}
   />}
