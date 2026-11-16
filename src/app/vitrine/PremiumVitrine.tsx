@@ -5,7 +5,7 @@ import {useEffect,useRef,useState} from 'react';
 import {ArrowRight,Volume2,VolumeX,Pause,Play,Send,ShieldCheck,MessageCircle,CalendarDays,Orbit,Sparkles,School,Gamepad2} from 'lucide-react';
 import './premium.css';
 import ProvaSocial from './ProvaSocial';
-import GradientText from './reactbits/GradientText';
+import ShinyText from './reactbits/ShinyText';
 import JourneyArtwork, {type JourneyArtKind} from './JourneyArtwork';
 
 // A galeria WebGL é carregada apenas na prévia experimental da vitrine.
@@ -263,7 +263,21 @@ export default function PremiumVitrine(){
     </nav>
     {!reactBitsPreview&&<button className="premium-theme" onClick={()=>setDark(v=>!v)} aria-label={dark?'Ativar tema claro':'Ativar tema escuro'}>{dark?'☀️':'🌙'}</button>}
   </header>
-  <main><section className="premium-hero" id="inicio"><div className="premium-copy"><span className="premium-eyebrow">✦ O UNIVERSO VAI ATÉ SUA ESCOLA</span><h1>Uma experiência espacial <em>{reactBitsPreview?<GradientText colors={['#68e6ff','#c7acff','#ffc77b','#68e6ff']} animationSpeed={4} variant="flow" scale={2} glow={0.25}>inesquecível começa aqui!</GradientText>:'inesquecível começa aqui!'}</em></h1><p>O ANTARES Kids leva ciência, imaginação e uma experiência imersiva até sua escola. E essa aventura vai continuar no universo digital em breve.</p><div className="premium-hero-cta">{reactBitsPreview?<StarBorderHeroActions/>:<><a href="#orcamento" className="premium-hero-primary">Pedir orçamento <ArrowRight size={17}/></a><a href="#jogo" className="premium-hero-secondary">Conhecer o jogo <ArrowRight size={16}/></a></>}</div>{!reactBitsPreview&&<div className="premium-trust"><span>✦ Experiência imersiva</span><span>✦ Educativo e divertido</span><span>✦ Na sua escola</span><span>✦ Jogo em breve</span></div>}</div>
+  <main><section className="premium-hero" id="inicio"><div className="premium-copy"><span className="premium-eyebrow">✦ O UNIVERSO VAI ATÉ SUA ESCOLA</span><h1>Uma experiência espacial <em className={reactBitsPreview?'premium-hero-shiny':undefined}>{reactBitsPreview?<ShinyText
+ color="#79bee8"
+ shineColor="#ffffff"
+ speed={3.2}
+ delay={0.45}
+ angle={110}
+ shineWidth={29}
+ softness={0.45}
+ bands={1}
+ glow={0.58}
+ direction="right"
+ easing="linear"
+ trigger="loop"
+ className="premium-hero-shiny-text"
+>inesquecível começa aqui!</ShinyText>:'inesquecível começa aqui!'}</em></h1><p>O ANTARES Kids leva ciência, imaginação e uma experiência imersiva até sua escola. E essa aventura vai continuar no universo digital em breve.</p><div className="premium-hero-cta">{reactBitsPreview?<StarBorderHeroActions/>:<><a href="#orcamento" className="premium-hero-primary">Pedir orçamento <ArrowRight size={17}/></a><a href="#jogo" className="premium-hero-secondary">Conhecer o jogo <ArrowRight size={16}/></a></>}</div>{!reactBitsPreview&&<div className="premium-trust"><span>✦ Experiência imersiva</span><span>✦ Educativo e divertido</span><span>✦ Na sua escola</span><span>✦ Jogo em breve</span></div>}</div>
    <div className="premium-universe"><div className="premium-sky"><svg ref={orbitSvg} className="premium-orbit-svg" viewBox="0 0 900 510" aria-label="Sistema solar com órbitas fixas e planetas em movimento">
      <defs><radialGradient id="pk-vignette" cx=".35" cy=".27" r=".8"><stop offset="0" stopColor="#fff" stopOpacity=".53"/><stop offset=".5" stopColor="#fff" stopOpacity="0"/><stop offset="1" stopColor="#020817" stopOpacity=".82"/></radialGradient><linearGradient id="pk-shade" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stopColor="#ffffff" stopOpacity=".55"/><stop offset=".45" stopColor="#ffffff" stopOpacity="0"/><stop offset="1" stopColor="#020823" stopOpacity=".65"/></linearGradient><radialGradient id="pk-sun-glow"><stop offset="0" stopColor="#ffec94"/><stop offset=".55" stopColor="#ffd45a"/><stop offset="1" stopColor="#e99520"/></radialGradient><filter id="pk-sun-halo"><feGaussianBlur stdDeviation="15"/></filter></defs>
      <g aria-hidden="true" className="pk-stellar-depth">{spaceStars.map((star,i)=><circle key={i} cx={star.x} cy={star.y} r={star.r} fill={i%9===0?"#8adfff":i%13===0?"#ffe6ad":"#fff"} opacity={star.opacity}/>)}</g>
@@ -288,8 +302,8 @@ export default function PremiumVitrine(){
       <div className={"premium-crew-pixel premium-crew-member"+(showSpeech&&mascot==="PIXEL"?" is-presenting":"")}><button type="button" className="premium-pixel-button" aria-label="PIXEL apresenta uma curiosidade" onClick={()=>{setMascot("PIXEL");setShowSpeech(true);setSpeechMode("intro");speakFact("", "PIXEL","intro");}}><Image src="/mascotes/pixel.png" width={105} height={115} alt="PIXEL, robô companheiro"/><span className="premium-pixel-label">PIXEL</span></button>{showSpeech&&mascot==="PIXEL"&&<div className="premium-character-bubble premium-pixel-bubble" role="status"><button aria-label="Fechar curiosidade" className="premium-bubble-close" onClick={()=>setShowSpeech(false)}>×</button>{speechMode==="intro"?<b>Olá! Eu sou o PIXEL! 🤖</b>:<><b>PIXEL explica {world.name}</b><p>{world.fact}</p></>}</div>}</div>
     </div>
     <div className="premium-planet-picker" aria-label="Escolha um astro para explorar"><span>EXPLORAR O SISTEMA SOLAR</span><div className="premium-planet-options">{worlds.map(w=><button key={w.id} type="button" aria-pressed={world.id===w.id} onClick={()=>selectWorld(w)}>{w.name}</button>)}</div></div>
-    <p className="premium-motion-note">Oito planetas oficiais · Órbitas ilustrativas, sem escala real · Toque para descobrir curiosidades.</p>
-    <details className="premium-pluto"><summary>✨ E Plutão, onde está?</summary><p>Plutão é um planeta anão desde a classificação adotada pela União Astronômica Internacional em 2006. Ele continua sendo um mundo fascinante!</p></details>
+    {!reactBitsPreview&&<p className="premium-motion-note">Oito planetas oficiais · Órbitas ilustrativas, sem escala real · Toque para descobrir curiosidades.</p>}
+    <details className="premium-pluto"><summary>{reactBitsPreview?'✨ E Plutão?':'✨ E Plutão, onde está?'}</summary><p>Plutão é um planeta anão desde a classificação adotada pela União Astronômica Internacional em 2006. Ele continua sendo um mundo fascinante!</p></details>
    </div></section>
    {reactBitsPreview && <OrbitasCinematograficas />}
    <section className={'premium-ecosystem'+(reactBitsPreview?' premium-ecosystem-cinematic':'')} aria-labelledby="premium-ecosystem-title">

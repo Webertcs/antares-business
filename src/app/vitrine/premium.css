@@ -3455,3 +3455,120 @@
     opacity:.43;
   }
 }
+
+
+/* ANTARES Kids — acabamento experimental do sistema solar e título.
+   Mantém o recurso pedagógico de Plutão e a vitrine oficial intactos. */
+.premium-kids.premium-cinematic-sky .premium-copy h1 em.premium-hero-shiny{
+  background:none;
+  background-image:none;
+  -webkit-text-fill-color:initial;
+  color:#79bee8;
+  text-shadow:none;
+}
+.premium-kids.premium-cinematic-sky .premium-copy h1 em.premium-hero-shiny>.premium-hero-shiny-text.shiny-text{
+  display:inline-block;
+  max-width:100%;
+  vertical-align:baseline;
+  line-height:inherit;
+  white-space:normal;
+  font-style:normal;
+  font-weight:inherit;
+  color:#79bee8;
+  -webkit-background-clip:text;
+  background-clip:text;
+  -webkit-text-fill-color:transparent;
+  text-shadow:none;
+}
+.premium-kids.premium-cinematic-sky .premium-copy h1 em.premium-hero-shiny .shiny-text__glow{
+  opacity:.58;
+  filter:blur(.10em);
+}
+.premium-kids.premium-cinematic-sky details.premium-pluto{
+  position:relative;
+  order:5;
+  width:fit-content;
+  max-width:min(94%,460px);
+  padding:0;
+  margin:19px auto 0;
+  border:0;
+  border-radius:0;
+  background:transparent;
+  box-shadow:none;
+  color:#eaf5ff;
+  text-align:center;
+}
+.premium-kids.premium-cinematic-sky details.premium-pluto>summary{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  min-height:37px;
+  padding:7px 16px;
+  border:1px solid rgba(127,171,238,.53);
+  border-radius:999px;
+  background:rgba(8,26,56,.88);
+  color:#f2f7ff;
+  box-shadow:0 4px 14px rgba(0,9,30,.19),inset 0 1px rgba(185,226,255,.06);
+  font-size:12px;
+  line-height:1.3;
+  font-weight:800;
+  letter-spacing:.006em;
+  cursor:pointer;
+  list-style:none;
+  user-select:none;
+  transition:border-color .24s ease,box-shadow .24s ease,background .24s ease,transform .24s ease;
+}
+.premium-kids.premium-cinematic-sky details.premium-pluto>summary::-webkit-details-marker{
+  display:none;
+}
+.premium-kids.premium-cinematic-sky details.premium-pluto>summary::before{
+  content:"▸";
+  display:inline-block;
+  margin-right:9px;
+  color:#a4d4ff;
+  font-size:11px;
+  transition:transform .2s ease;
+}
+.premium-kids.premium-cinematic-sky details.premium-pluto[open]>summary::before{
+  transform:rotate(90deg);
+}
+.premium-kids.premium-cinematic-sky details.premium-pluto>summary:hover,
+.premium-kids.premium-cinematic-sky details.premium-pluto>summary:focus-visible{
+  transform:translateY(-1px);
+  border-color:rgba(174,220,255,.9);
+  background:rgba(20,55,108,.93);
+  box-shadow:0 0 19px rgba(82,164,255,.18),0 7px 16px rgba(0,9,30,.28);
+}
+.premium-kids.premium-cinematic-sky details.premium-pluto>summary:focus-visible{
+  outline:3px solid #ffdf93;
+  outline-offset:3px;
+}
+.premium-kids.premium-cinematic-sky details.premium-pluto>p{
+  max-width:min(100%,450px);
+  margin:12px auto 0;
+  padding:14px 19px;
+  border:1px solid rgba(115,174,243,.35);
+  border-radius:16px;
+  background:rgba(6,19,43,.94);
+  box-shadow:0 11px 28px rgba(0,6,25,.22);
+  font-size:13px;
+  line-height:1.64;
+  color:#d9eaff;
+}
+@media(max-width:620px){
+  .premium-kids.premium-cinematic-sky details.premium-pluto{
+    max-width:calc(100% - 25px);
+    margin-top:16px;
+  }
+  .premium-kids.premium-cinematic-sky details.premium-pluto>summary{
+    min-height:35px;
+    font-size:12px;
+  }
+}
+@media(prefers-reduced-motion:reduce){
+  .premium-kids.premium-cinematic-sky details.premium-pluto>summary,
+  .premium-kids.premium-cinematic-sky details.premium-pluto>summary::before{
+    transition:none!important;
+    transform:none!important;
+  }
+}
