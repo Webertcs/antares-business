@@ -19,6 +19,13 @@ function matchesFilter(lead:Lead,key:string){
  return lead.status===key;
 }
 const date=(value:string|null)=>value?new Date(value.slice(0,10)+'T12:00:00').toLocaleDateString('pt-BR'):'A combinar';
+function whatsAppMessage(lead:Lead){
+ if(['approved_internal','legacy_accepted'].includes(String(lead.proposal_status)))
+  return 'Olá, '+lead.responsible_name+'! A proposta do planetário para '+lead.institution+' está pronta. Vou encaminhar o PDF para sua avaliação. Aguardo seu retorno!';
+ if(lead.proposal_status==='accepted')
+  return 'Olá, '+lead.responsible_name+'! Obrigado pela confirmação da proposta para '+lead.institution+'. Vamos combinar os detalhes da apresentação?';
+ return 'Olá, '+lead.responsible_name+'! Recebemos seu pedido de orçamento do planetário para '+lead.institution+'. Podemos conversar?';
+}
 
 function LeadObservations({notes}:{notes:string|null}){
  const raw=notes||'';
@@ -164,7 +171,7 @@ export default function Inbox({conversionEnabled}:{conversionEnabled:boolean}){
       <button type="button" disabled={Boolean(busy)||!conversionEnabled} onClick={()=>setAcceptLeadId(lead.id)}
        className={styles.actionSecondary}><CheckCircle2 size={16}/>Registrar aceite real</button>}
      <a className={styles.actionWhatsApp}
-      href={'https://wa.me/'+lead.phone.replace(/\D/g,'')+'?text='+encodeURIComponent('Olá, '+lead.responsible_name+'! Recebemos seu pedido de orçamento do planetário para '+lead.institution+'. Podemos conversar?')}
+      href={'https://wa.me/'+lead.phone.replace(/\D/g,'')+'?text='+encodeURIComponent(whatsAppMessage(lead))}
       target="_blank" rel="noopener noreferrer"><MessageCircle size={16}/>WhatsApp</a>
      <details className={styles.more}>
       <summary className={styles.moreSummary} aria-label={'Mais opções para '+lead.institution}>
