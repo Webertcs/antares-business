@@ -490,7 +490,7 @@ export default function ClientDetails({id,writesEnabled,proposalWritesEnabled,co
    <summary style={{cursor:'pointer',border:'1px solid #a9c7ee',borderRadius:10,padding:'10px 15px',fontWeight:700,background:['alunos','fidelizacao','historico','observacoes'].includes(activeTab)?'#155cc1':'#eaf3ff',color:['alunos','fidelizacao','historico','observacoes'].includes(activeTab)?'#fff':'#174987'}}>Mais informações</summary>
    <div style={{position:'absolute',top:'calc(100% + 6px)',right:0,zIndex:30,width:190,display:'grid',gap:5,padding:7,border:'1px solid #c5d8f0',borderRadius:10,background:'#f7fbff',boxShadow:'0 12px 28px rgba(17,49,94,.18)'}}>
     {([['alunos','Alunos'],['fidelizacao','Fidelização'],['historico','Histórico'],['observacoes','Observações']] as const).map(([key,label])=>
-     <button type="button" key={key} aria-current={activeTab===key?'page':undefined} onClick={()=>{setActiveTab(key);setCommercialFeedback('');}}
+     <button type="button" key={key} aria-current={activeTab===key?'page':undefined} onClick={e=>{setActiveTab(key);setCommercialFeedback('');e.currentTarget.closest('details')?.removeAttribute('open');}}
       style={{textAlign:'left',cursor:'pointer',border:0,borderRadius:7,padding:'9px 11px',fontWeight:650,background:activeTab===key?'#d8e8ff':'transparent',color:'#174987'}}>{label}</button>)}
    </div>
   </details>
