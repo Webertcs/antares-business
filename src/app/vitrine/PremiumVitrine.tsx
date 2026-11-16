@@ -130,10 +130,11 @@ export default function PremiumVitrine(){
  const [today,setToday]=useState('');
  const [dark,setDark]=useState(false);
  const [reduce,setReduce]=useState(false);
- const [reactBitsPreview,setReactBitsPreview]=useState(false);
+ // Vitrine cinematográfica oficial: disponível diretamente em /vitrine.
+ const reactBitsPreview = true;
  const [galleryAvailable,setGalleryAvailable]=useState(false);
  const orbitSvg=useRef<SVGSVGElement|null>(null);
- useEffect(()=>{setReactBitsPreview(new URLSearchParams(window.location.search).get('reactbits')==='1');},[]);
+ // O modo experimental foi promovido a padrão; não há dependência de query string.
  useEffect(()=>{if(!reactBitsPreview)return;try{const canvas=document.createElement('canvas');setGalleryAvailable(Boolean(canvas.getContext('webgl2')));}catch{setGalleryAvailable(false);}},[reactBitsPreview]);
  useEffect(()=>{setReduce(window.matchMedia('(prefers-reduced-motion: reduce)').matches);setVoiceAvailable('speechSynthesis'in window);const d=new Date();setToday([d.getFullYear(),String(d.getMonth()+1).padStart(2,'0'),String(d.getDate()).padStart(2,'0')].join('-'));return()=>{window.speechSynthesis?.cancel();};},[]);
  function speakFact(fact:string,speaker:'Astro'|'Lunna'|'PIXEL',mode:'intro'|'planet'='planet'){
