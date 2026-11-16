@@ -12,6 +12,18 @@ export type JourneyArtKind =
   | 'telescope';
 
 export default function JourneyArtwork({kind}: {kind: JourneyArtKind}): ReactElement {
+  // Artes cinematográficas aprovadas para 8–9 e 10–12 anos.
+  // Um atlas WebP otimizado contém os quatro recortes, sem redesenhar as cenas.
+  // As duas ilustrações vetoriais de 6–7 anos permanecem intactas.
+  if (kind==='rocket'||kind==='jupiter'||kind==='galaxy'||kind==='telescope') {
+    const sceneLabels:Record<'rocket'|'jupiter'|'galaxy'|'telescope',string>={
+      rocket:'Foguete espacial decolando entre nuvens luminosas',
+      jupiter:'Júpiter, planeta gigante com faixas douradas e luas',
+      galaxy:'Galáxia espiral luminosa e outras galáxias distantes',
+      telescope:'Telescópio espacial apontado para o céu estrelado'
+    };
+    return <span role="img" aria-label={sceneLabels[kind]} className={`premium-journey-illustration premium-journey-illustration-photo premium-journey-illustration-${kind}`}/>;
+  }
   const g = (part: string) => `antares-journey-${kind}-${part}`;
   const stars = [
     [13, 31, 1.1], [39, 15, 1.3], [138, 18, 1], [153, 68, 1.3],

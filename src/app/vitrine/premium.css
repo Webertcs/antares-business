@@ -3714,3 +3714,44 @@
     font-size:14px;
   }
 }
+
+
+/* ANTARES Kids · Artes cinematográficas aprovadas nas faixas 8–9 e 10–12.
+   Um único atlas leve reutiliza os recortes exatos do conceito aprovado.
+   Componentes 6–7, cards Spotlight, títulos e navegação permanecem intactos. */
+.premium-kids.premium-cinematic-sky .premium-journeys-cinematic .premium-journey-illustration-photo{
+  display:block;
+  flex:0 0 auto;
+  width:min(100%,170px);
+  height:125px;
+  max-height:100%;
+  border-radius:11px;
+  background-image:url('/vitrine/idade-cinematico-atlas.webp');
+  background-size:200% 200%;
+  background-repeat:no-repeat;
+  mask-image:linear-gradient(90deg,transparent 0%,#000 6%,#000 94%,transparent 100%);
+  -webkit-mask-image:linear-gradient(90deg,transparent 0%,#000 6%,#000 94%,transparent 100%);
+  filter:drop-shadow(0 0 8px rgba(60,147,252,.14));
+}
+.premium-kids.premium-cinematic-sky .premium-journeys-cinematic .premium-journey-illustration-photo.premium-journey-illustration-rocket{
+  background-position:left top;
+}
+.premium-kids.premium-cinematic-sky .premium-journeys-cinematic .premium-journey-illustration-photo.premium-journey-illustration-jupiter{
+  background-position:right top;
+}
+.premium-kids.premium-cinematic-sky .premium-journeys-cinematic .premium-journey-illustration-photo.premium-journey-illustration-galaxy{
+  background-position:left bottom;
+}
+.premium-kids.premium-cinematic-sky .premium-journeys-cinematic .premium-journey-illustration-photo.premium-journey-illustration-telescope{
+  background-position:right bottom;
+}
+@media(max-width:760px){
+  .premium-kids.premium-cinematic-sky .premium-journeys-cinematic .premium-journey-illustration-photo{
+    height:110px;
+  }
+}
+@media(max-width:375px){
+  .premium-kids.premium-cinematic-sky .premium-journeys-cinematic .premium-journey-illustration-photo{
+    height:99px;
+  }
+}
