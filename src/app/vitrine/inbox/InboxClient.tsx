@@ -135,7 +135,7 @@ export default function Inbox({conversionEnabled}:{conversionEnabled:boolean}){
 
     </div>
     <div className={styles.quickFacts}>
-     <CalendarDays size={16} aria-hidden="true"/><span>${date(lead.desired_date)}</span>
+     <CalendarDays size={16} aria-hidden="true"/><span>{date(lead.desired_date)}</span>
     </div>
      <span className={[styles.status,
       lead.status==='converted'&&lead.proposal_status==='accepted'?styles.statusConverted:
