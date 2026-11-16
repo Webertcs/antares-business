@@ -48,38 +48,37 @@ export default function ReceberClient(){
    setStatus(result.alreadyExists?'Baixa já registrada; não foi duplicada.':'Recebimento registrado no caixa.');
   }catch(e){setStatus(e instanceof Error?e.message:'Erro');}finally{setBusy(false);}
  }
- const input={display:'block' as const,width:'100%',padding:10,border:'1px solid #bfcfe8',borderRadius:8,marginTop:6};
- const box={padding:22,border:'1px solid #cad6ea',borderRadius:14,background:'white',marginBottom:18};
- return <main style={{minHeight:'100%',background:'#f2f6fd',color:'#102a56',padding:'clamp(16px,3vw,32px)',fontFamily:'Arial,sans-serif'}}>
- <div style={{maxWidth:1050,margin:'auto'}}>
+ const input={display:'block' as const,width:'100%',padding:'11px 12px',border:'1px solid #cbd8ed',borderRadius:9,marginTop:7,background:'#fff',color:'#183458',fontSize:14};
+ const box={padding:'22px 24px',border:'1px solid #d4e2f6',borderRadius:14,background:'white',marginBottom:20,boxShadow:'0 3px 14px rgba(30,73,130,.05)'};
+ return <main style={{minHeight:'100%',background:'#f2f6fd',color:'#102a56',padding:'clamp(16px,3vw,32px)',fontFamily:'inherit'}}>
+ <div style={{maxWidth:1180,margin:'auto'}}>
  
- <h1>Contas a receber</h1>
- <p>Controle por instituição, vencimento e pagamentos parciais. Títulos não são receitas recebidas.</p>
+ <header style={{background:'linear-gradient(110deg,#173f83,#2871c4)',color:'#fff',borderRadius:14,padding:'24px 28px',marginBottom:22,boxShadow:'0 8px 24px rgba(23,63,131,.12)'}}><div style={{fontSize:11,fontWeight:700,letterSpacing:'0.12em',opacity:.85,marginBottom:8}}>FINANCEIRO · ANTARES BUSINESS</div><h1 style={{fontSize:27,fontWeight:750,margin:'0 0 7px'}}>Contas a receber</h1><p style={{margin:0,fontSize:14,opacity:.9}}>Acompanhe títulos, vencimentos e pagamentos em um só lugar.</p></header>
  {status&&<p role="status" style={{padding:12,background:'#e9effc',borderRadius:8}}>{status}</p>}
  {!writesEnabled&&<p role="status" style={{padding:14,background:'#fff4e5',border:'1px solid #efc991',borderRadius:9,color:'#864413'}}>Novos lançamentos estão temporariamente indisponíveis. Você ainda pode consultar os títulos e recebimentos existentes.</p>}
- <section style={box}><h2>Novo título</h2>
- <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(200px,1fr))',gap:15}}>
+ <section style={box}><h2 style={{fontSize:18,margin:'0 0 18px',paddingBottom:13,borderBottom:'1px solid #e5edf9'}}>Novo título</h2>
+ <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(190px,1fr))',gap:15}}>
  <label>Instituição<select style={input} value={client} onChange={e=>{setClient(e.target.value);setDraftId(null);}}><option value="">Selecione</option>{clients.map(c=><option key={c.id} value={c.id}>{c.name}</option>)}</select></label>
  <label>Descrição<input style={input} maxLength={300} value={description} onChange={e=>{setDescription(e.target.value);setDraftId(null);}}/></label>
  <label>Valor total (R$)<input style={input} inputMode="decimal" value={total} onChange={e=>{setTotal(e.target.value);setDraftId(null);}} placeholder="0,00"/></label>
  <label>Vencimento<input style={input} type="date" value={due} onChange={e=>{setDue(e.target.value);setDraftId(null);}}/></label>
  </div>
- <button disabled={busy||!writesEnabled} onClick={create} style={{marginTop:16,padding:12,background:'#2454d3',color:'white',borderRadius:8}}>Criar título</button>
+ <button disabled={busy||!writesEnabled} onClick={create} style={{marginTop:18,padding:'11px 18px',background:'#2464c6',color:'white',border:'none',borderRadius:9,fontWeight:700,cursor:'pointer'}}>Criar título</button>
  </section>
- <section style={box}><h2>Títulos cadastrados</h2>
- <div style={{overflowX:'auto'}}><table style={{borderCollapse:'collapse',width:'100%',textAlign:'left'}}>
- <thead><tr>{['Instituição / título','Vencimento','Total','Recebido','Pendente','Baixa parcial'].map(c=><th key={c} style={{padding:10,borderBottom:'1px solid #ccd6e7'}}>{c}</th>)}</tr></thead>
+ <section style={box}><h2 style={{fontSize:18,margin:'0 0 16px',paddingBottom:13,borderBottom:'1px solid #e5edf9'}}>Títulos cadastrados <span style={{fontSize:12,fontWeight:600,color:'#607b9f',marginLeft:6}}>({titles.length})</span></h2>
+ <div style={{overflowX:'auto'}}><table style={{borderCollapse:'collapse',width:'100%',textAlign:'left',fontSize:13,minWidth:760}}>
+ <thead><tr>{['Instituição / título','Vencimento','Total','Recebido','Pendente','Baixa parcial'].map(c=><th key={c} style={{padding:'13px 11px',borderBottom:'2px solid #d8e4f4',background:'#f4f8ff',fontWeight:700,color:'#244776',whiteSpace:'nowrap'}}>{c}</th>)}</tr></thead>
  <tbody>{titles.map(t=>{const remain=Math.max(0,Number(t.total)-Number(t.paid));return <tr key={t.id}>
- <td style={{padding:10,borderBottom:'1px solid #e2e9f3'}}><strong>{t.client_name}</strong><div>{t.description}</div></td>
- <td style={{padding:10}}>{String(t.due_on).slice(0,10).split('-').reverse().join('/')}</td>
+ <td style={{padding:'14px 11px',borderBottom:'1px solid #e2e9f3'}}><strong>{t.client_name}</strong><div>{t.description}</div></td>
+ <td style={{padding:'14px 11px',borderBottom:'1px solid #e2e9f3',whiteSpace:'nowrap'}}>{String(t.due_on).slice(0,10).split('-').reverse().join('/')}</td>
  <td style={{padding:10}}>{brl(Number(t.total))}</td><td style={{padding:10}}>{brl(Number(t.paid))}</td>
- <td style={{padding:10,fontWeight:700}}>{brl(remain)}</td>
+ <td style={{padding:'14px 11px',borderBottom:'1px solid #e2e9f3',fontWeight:700,whiteSpace:'nowrap'}}>{brl(remain)}</td>
  <td style={{padding:10}}>{remain>0&&<div style={{display:'flex',gap:6}}>
- <input aria-label={'Valor recebido de '+t.client_name} value={payment[t.id]||''} placeholder="R$" inputMode="decimal" style={{width:95,padding:7,border:'1px solid #bbcae1'}} onChange={e=>{setPayment(v=>({...v,[t.id]:e.target.value}));setPayIds(v=>{const n={...v};delete n[t.id];return n;});}}/>
- <button type="button" disabled={busy||!writesEnabled} onClick={()=>pay(t)} style={{padding:8,background:'#2454d3',color:'white',borderRadius:7}}>Receber</button></div>}{remain===0&&'Quitado'}</td>
+ <input aria-label={'Valor recebido de '+t.client_name} value={payment[t.id]||''} placeholder="R$" inputMode="decimal" style={{width:92,padding:9,border:'1px solid #bbcae1',borderRadius:7}} onChange={e=>{setPayment(v=>({...v,[t.id]:e.target.value}));setPayIds(v=>{const n={...v};delete n[t.id];return n;});}}/>
+ <button type="button" disabled={busy||!writesEnabled} onClick={()=>pay(t)} style={{padding:'9px 12px',background:'#2464c6',color:'white',border:'none',borderRadius:7,fontWeight:700,cursor:'pointer'}}>Receber</button></div>}{remain===0&&'Quitado'}</td>
  </tr>})}</tbody></table></div>
  {!titles.length&&<p>Nenhum título cadastrado.</p>}
- <p style={{fontSize:12}}>As baixas confirmadas aparecem no livro-caixa. Estornos preservam o histórico e devolvem o saldo pendente.</p>
+ <p style={{fontSize:12,color:'#607b9f',margin:'17px 0 0'}}>Os recebimentos confirmados são registrados no livro-caixa.</p>
  </section>
  </div></main>;
 }
