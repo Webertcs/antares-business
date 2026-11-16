@@ -15,7 +15,7 @@ function statusLabel(lead:Lead){
 }
 function matchesFilter(lead:Lead,key:string){
  if(key==='all')return true;
- if(key==='open')return lead.status!=='archived';
+ if(key==='open')return lead.status!=='archived'&&!(lead.status==='converted'&&lead.proposal_status==='accepted');
  return lead.status===key;
 }
 const date=(value:string|null)=>value?new Date(value.slice(0,10)+'T12:00:00').toLocaleDateString('pt-BR'):'A combinar';
@@ -152,6 +152,9 @@ export default function Inbox({conversionEnabled}:{conversionEnabled:boolean}){
        : lead.proposal_status==='approved_internal'||lead.proposal_status==='legacy_accepted'
        ? <button type="button" disabled={Boolean(busy)||!conversionEnabled} onClick={()=>setAcceptLeadId(lead.id)}
          className={styles.actionPrimary}><CheckCircle2 size={16}/>Registrar aceite da escola</button>
+       : lead.proposal_status==='accepted'
+       ? <Link href={'/agenda/reservas?proposalId='+encodeURIComponent(lead.converted_proposal_id)} className={styles.actionPrimary}>
+         <CalendarDays size={16}/>Organizar reserva</Link>
        : <Link href={'/vitrine/proposta/'+lead.converted_proposal_id+'?visualizar=1'} className={styles.actionPrimary}>
          <FileText size={16}/>Visualizar / Salvar PDF</Link>)}
      {lead.status==='archived'&&
@@ -170,7 +173,7 @@ export default function Inbox({conversionEnabled}:{conversionEnabled:boolean}){
          className={s==='archived'?styles.actionMuted:styles.actionSecondary}>
          {s==='reviewing'?'Iniciar análise':s==='pending'?'Marcar como pendente':'Arquivar'}
         </button>)}
-       {lead.status==='converted'&&lead.converted_proposal_id&&['draft','approved_internal','legacy_accepted'].includes(String(lead.proposal_status))&&
+       {lead.status==='converted'&&lead.converted_proposal_id&&['draft','approved_internal','legacy_accepted','accepted'].includes(String(lead.proposal_status))&&
         <Link href={'/vitrine/proposta/'+lead.converted_proposal_id+'?visualizar=1'} className={styles.actionSecondary}>
          <FileText size={16}/>Visualizar / Salvar PDF</Link>}
        {lead.status==='converted'&&lead.converted_proposal_id&&lead.proposal_status!=='draft'&&
