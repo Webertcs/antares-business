@@ -262,3 +262,38 @@
  .morePanel{right:0;max-width:calc(100vw - 44px)}
  .morePanel a,.morePanel button{flex:none}
 }
+
+
+/* ANTARES — cartões compactos de oportunidades (informações sob demanda). */
+.filters{grid-template-columns:repeat(4,minmax(0,1fr))}
+.lead{padding:14px 17px}
+.leadHead{padding-bottom:10px}
+.quickFacts{
+ display:flex;align-items:center;flex-wrap:wrap;
+ gap:8px 18px;margin-top:11px;color:#375980;font-size:12px
+}
+.quickFacts span{display:inline-flex;align-items:center;gap:6px}
+.quickFacts svg{flex-shrink:0;color:#2874d0}
+.leadDetails{margin-top:11px;border-top:1px solid #d6e4f5}
+.leadDetails>summary{
+ display:inline-flex;align-items:center;gap:6px;
+ color:#1a5ca9;font-size:12px;font-weight:750;
+ cursor:pointer;list-style:none;padding:10px 0 2px
+}
+.leadDetails>summary::-webkit-details-marker{display:none}
+.leadDetails>summary::marker{content:''}
+.leadDetails>summary svg{transition:transform .15s}
+.leadDetails[open]>summary svg{transform:rotate(180deg)}
+.leadDetails>summary:focus-visible{outline:3px solid #79bcff;outline-offset:2px}
+.leadDetails .details{
+ margin-top:8px;padding:12px 0;border-top:1px solid #e1ebf8;border-bottom:0
+}
+.actions{margin-top:11px}
+@media(max-width:750px){
+ .filters{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .quickFacts{gap:7px 13px}
+ .lead{padding:14px}
+ .leadDetails .details{grid-template-columns:1fr;gap:10px}
+ .leadDetails .detailGroup+.detailGroup{border-left:0;padding-left:0}
+}
+@media(prefers-reduced-motion:reduce){.leadDetails>summary svg{transition:none}}
