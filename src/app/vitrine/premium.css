@@ -3377,3 +3377,81 @@
     transform:none!important;
   }
 }
+
+
+/* ANTARES Kids — acabamento do topo experimental.
+   Sem selo de desenvolvimento e sem etiquetas repetidas. O degradê do
+   título, botões, falas e o sistema solar educacional continuam intactos. */
+.premium-kids.premium-cinematic-sky .premium-hero .premium-hero-cta{
+  margin-bottom:16px;
+}
+.premium-kids.premium-cinematic-sky .premium-hero .premium-crew{
+  position:relative;
+  display:flex;
+  align-items:stretch;
+  justify-content:center;
+  gap:clamp(28px,7vw,115px);
+  min-height:216px;
+  margin-top:18px;
+  margin-bottom:18px;
+  padding:17px 0 11px;
+  overflow:visible;
+}
+.premium-kids.premium-cinematic-sky .premium-hero .premium-crew-member{
+  position:relative;
+  display:flex;
+  align-items:flex-end;
+  justify-content:center;
+  isolation:isolate;
+}
+.premium-kids.premium-cinematic-sky .premium-hero .premium-crew-member::before{
+  content:"";
+  position:absolute;
+  z-index:0;
+  left:-12%;
+  right:-12%;
+  top:22%;
+  bottom:8%;
+  border-radius:50%;
+  pointer-events:none;
+  background:radial-gradient(ellipse at 50% 63%,rgba(64,141,247,.17),rgba(42,97,180,.05) 54%,transparent 72%);
+  filter:blur(16px);
+}
+.premium-kids.premium-cinematic-sky .premium-hero .premium-crew-member:nth-child(3)::before{
+  background:radial-gradient(ellipse at 50% 63%,rgba(137,114,243,.15),rgba(87,69,152,.05) 54%,transparent 72%);
+}
+.premium-kids.premium-cinematic-sky .premium-hero .premium-crew-member:nth-child(4)::before{
+  background:radial-gradient(ellipse at 50% 63%,rgba(79,185,245,.16),rgba(52,107,173,.05) 54%,transparent 72%);
+}
+.premium-kids.premium-cinematic-sky .premium-hero .premium-crew-member>.premium-mascot,
+.premium-kids.premium-cinematic-sky .premium-hero .premium-crew-member>.premium-pixel-button{
+  position:relative;
+  z-index:1;
+  align-self:flex-end;
+}
+.premium-kids.premium-cinematic-sky .premium-hero .premium-crew-glow{
+  opacity:.58;
+}
+@media(max-width:720px){
+  .premium-kids.premium-cinematic-sky .premium-hero .premium-hero-cta{margin-bottom:10px;}
+  .premium-kids.premium-cinematic-sky .premium-hero .premium-crew{
+    gap:clamp(7px,3.5vw,23px);
+    min-height:130px;
+    margin-top:10px;
+    margin-bottom:12px;
+    padding:9px 0 5px;
+  }
+  .premium-kids.premium-cinematic-sky .premium-hero .premium-crew-member::before{
+    left:-8%;
+    right:-8%;
+    top:30%;
+    bottom:15%;
+    filter:blur(11px);
+  }
+}
+@media(prefers-reduced-motion:reduce){
+  .premium-kids.premium-cinematic-sky .premium-hero .premium-crew-member::before{
+    filter:none;
+    opacity:.43;
+  }
+}
