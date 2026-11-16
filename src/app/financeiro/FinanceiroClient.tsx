@@ -1,6 +1,7 @@
 'use client';
 import {useEffect,useState} from 'react';
 import FinanceReport from './FinanceReport';
+import {ChevronLeft,ChevronRight,Eye,EyeOff} from 'lucide-react';
 
 type Entry={id:string;entry_type:'income'|'expense';amount:number;description:string;occurred_on:string;reversal_of:string|null;presentation_title:string|null;dome_name:string|null};
 type Data={entries:Entry[];income:number;expenses:number;balance:number;writesEnabled:boolean;limited:boolean;domes:{id:string;name:string;active:boolean}[];presentations:{id:string;title:string;starts_at:string}[]};
@@ -115,14 +116,44 @@ export default function FinanceiroClient(){
  .finance-premium section.finance-print-hide table td button:hover {background:#d7e8ff;}
  @media(max-width:760px){.finance-premium nav[aria-label="Áreas financeiras"] {grid-template-columns:repeat(2,minmax(0,1fr)) !important;gap:6px !important;}.finance-premium nav[aria-label="Áreas financeiras"] button {font-size:12px;padding:9px !important;}}
  @media print {.finance-premium {background:white !important;}.finance-premium section.finance-print-hide table td {padding:6px !important;}}
- }`}</style><main className="finance-premium" style={{background:'#f3f6fc',color:'#11264d',minHeight:'100%',padding:'clamp(16px,3vw,32px)',fontFamily:'Arial,sans-serif'}}>
+ }
+
+ .finance-premium .finance-value-eye{flex:0 0 auto;width:31px;height:31px;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;border:1px solid #b5d0f2;border-radius:9px;background:#edf5ff;color:#1f5ca9;box-shadow:0 2px 6px rgba(24,73,140,.08)}
+ .finance-premium .finance-value-eye:hover{background:#dfeeff}
+ .finance-premium .finance-value-eye:focus-visible,.finance-premium .finance-page-control:focus-visible{outline:3px solid #83b4ed;outline-offset:2px}
+ .finance-premium .finance-entry-pagination{display:flex;align-items:center;justify-content:flex-end;gap:10px;flex-wrap:wrap;margin-top:18px;padding:12px 0 2px}
+ .finance-premium .finance-page-control{display:inline-flex;align-items:center;justify-content:center;gap:5px;min-height:38px;padding:9px 13px;border:1px solid #9ebee9;border-radius:9px;background:linear-gradient(145deg,#eff6ff,#dceaff);color:#164782;font-size:12px;font-weight:800;cursor:pointer;box-shadow:0 3px 8px rgba(21,65,135,.11)}
+ .finance-premium .finance-page-control:hover:not(:disabled){background:linear-gradient(145deg,#dcecff,#c3dcfb);box-shadow:0 5px 12px rgba(21,65,135,.15)}
+ .finance-premium .finance-page-control:disabled{background:#e9edf3;color:#737f92;border-color:#d5dde8;box-shadow:none;opacity:.72;cursor:not-allowed}
+ .finance-premium .finance-page-counter{border:1px solid #c5d8f1;background:#fff;border-radius:9px;padding:9px 12px;color:#204b83;font-size:12px;font-weight:800;white-space:nowrap}
+ .finance-premium .finance-receivable-section{margin-top:23px;padding:20px 20px 16px;border-radius:13px;background:#fff;border:1px solid #c8d9ee;box-shadow:0 7px 20px rgba(32,77,138,.08);overflow:hidden}
+ .finance-premium .finance-receivable-charges{border-left:4px solid #3979d6}
+ .finance-premium .finance-receivable-payments{border-left:4px solid #199874;background:linear-gradient(160deg,#fff,#f7fcfa)}
+ .finance-premium .finance-receivable-heading{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;padding-bottom:15px;margin-bottom:12px;border-bottom:1px solid #dbe6f4}
+ .finance-premium .finance-receivable-heading h3{font-size:17px;font-weight:800;letter-spacing:-.2px;color:#164582;margin:0 0 5px}
+ .finance-premium .finance-receivable-payments .finance-receivable-heading h3{color:#126448}
+ .finance-premium .finance-receivable-heading p{margin:0;font-size:12px;line-height:1.5;color:#627996}
+ .finance-premium .finance-receivable-count{border-radius:999px;padding:6px 10px;white-space:nowrap;background:#e8f1ff;color:#255a9b;font-size:11px;font-weight:800}
+ .finance-premium .finance-receivable-payments .finance-receivable-count{background:#e4f5ed;color:#187550}
+ .finance-premium .finance-receivable-scroll{width:100%;overflow-x:auto}
+ .finance-premium .finance-receivable-table{width:100%}
+ .finance-premium .finance-receivable-table th{padding:12px 11px!important;background:#eaf2ff;color:#254d82;border-bottom:2px solid #cadff7!important;font-size:11px;font-weight:800;text-align:left;white-space:nowrap}
+ .finance-premium .finance-receivable-payments .finance-receivable-table th{background:#e8f7ef;color:#17674d;border-bottom-color:#c2e5d4!important}
+ .finance-premium .finance-receivable-table td{padding:12px 11px!important;border-bottom:1px solid #e2ebf5!important;color:#25446f;font-size:12px;line-height:1.4;vertical-align:middle}
+ .finance-premium .finance-receivable-table tbody tr:nth-child(odd){background:#fff}
+ .finance-premium .finance-receivable-table tbody tr:nth-child(even){background:#f3f8ff}
+ .finance-premium .finance-receivable-payments .finance-receivable-table tbody tr:nth-child(even){background:#f1faf5}
+ .finance-premium .finance-receivable-table tbody tr:hover{background:#e6f1ff}
+ .finance-premium .finance-receivable-payments .finance-receivable-table tbody tr:hover{background:#e3f5ea}
+ @media(max-width:640px){.finance-premium .finance-receivable-section{padding:15px 12px}.finance-premium .finance-entry-pagination{justify-content:center;gap:6px}.finance-premium .finance-page-control{padding:9px 10px}.finance-premium .finance-page-counter{padding:9px 8px}}
+`}</style><main className="finance-premium" style={{background:'#f3f6fc',color:'#11264d',minHeight:'100%',padding:'clamp(16px,3vw,32px)',fontFamily:'Arial,sans-serif'}}>
  <div style={{maxWidth:1120,margin:'0 auto'}}>
  
  <header className="finance-print-hide" style={{background:'linear-gradient(110deg,#143b78,#2467ba)',color:'#fff',borderRadius:16,padding:'22px 24px',display:'flex',justifyContent:'space-between',alignItems:'center',gap:12,flexWrap:'wrap'}}><div><small style={{letterSpacing:1.5}}>ANTARES BUSINESS</small><h1 style={{fontSize:25,margin:'5px 0'}}>Financeiro</h1><p style={{margin:0,fontSize:13}}>Controle de receitas, despesas e recebimentos</p></div></header>
  {loading&&<p className="finance-print-hide">Carregando movimentações...</p>}
  {error&&<p className="finance-print-hide" role="alert" style={{color:'#a32727'}}>{error}</p>}
- {data&&<><div className="finance-print-hide" style={{display:'flex',justifyContent:'flex-end',margin:'12px 0 -8px'}}><button type="button" onClick={()=>setShowValues(v=>!v)} aria-pressed={showValues} style={{background:'#e9f2ff',border:'1px solid #bed0e8',color:'#17457f',padding:'7px 12px',borderRadius:8,cursor:'pointer',fontWeight:700}}>{showValues?'Ocultar valores':'Mostrar valores'}</button></div><div className="finance-print-hide" style={{display:'grid',gridTemplateColumns:'repeat(4,minmax(0,1fr))',gap:10,margin:'18px 0'}}>
- {([['Entradas realizadas',data.income],['Saídas realizadas',data.expenses],['Saldo acumulado',data.balance],['A receber',receivables?.titles.reduce((n,t)=>n+Math.max(0,Number(t.total)-Number(t.paid)),0)??0]] as [string,number][]).map(([label,value])=><div style={{...card,minWidth:0,padding:'12px 14px',borderRadius:10,background:'linear-gradient(145deg,#ffffff 15%,#f0f6ff 100%)',boxShadow:'0 3px 12px rgba(22,65,122,.06)',borderTop:label==='Entradas realizadas'?'3px solid #159b79':label==='Saídas realizadas'?'3px solid #e39c46':label==='A receber'?'3px solid #4388e5':'3px solid #245bb2'}} key={label}><small style={{color:'#486489',fontWeight:600}}>{label}</small><h2 style={{fontSize:17,margin:'6px 0 0',color:'#173d78'}}>{privateMoney(value)}</h2></div>)}</div>
+ {data&&<><div className="finance-print-hide" style={{display:'grid',gridTemplateColumns:'repeat(4,minmax(0,1fr))',gap:10,margin:'18px 0'}}>
+ {([['Entradas realizadas',data.income],['Saídas realizadas',data.expenses],['Saldo acumulado',data.balance],['A receber',receivables?.titles.reduce((n,t)=>n+Math.max(0,Number(t.total)-Number(t.paid)),0)??0]] as [string,number][]).map(([label,value])=><div style={{...card,minWidth:0,padding:'12px 14px',borderRadius:10,background:'linear-gradient(145deg,#ffffff 15%,#f0f6ff 100%)',boxShadow:'0 3px 12px rgba(22,65,122,.06)',borderTop:label==='Entradas realizadas'?'3px solid #159b79':label==='Saídas realizadas'?'3px solid #e39c46':label==='A receber'?'3px solid #4388e5':'3px solid #245bb2'}} key={label}><div style={{display:'flex',justifyContent:'space-between',alignItems:'center',gap:8,minHeight:31}}><small style={{color:'#486489',fontWeight:600}}>{label}</small>{label==='Entradas realizadas'&&<button type="button" className="finance-value-eye" onClick={()=>setShowValues(v=>!v)} aria-label={showValues?'Ocultar valores financeiros':'Mostrar valores financeiros'} title={showValues?'Ocultar valores':'Mostrar valores'} aria-pressed={showValues}>{showValues?<EyeOff size={17} aria-hidden="true"/>:<Eye size={17} aria-hidden="true"/>}</button>}</div><h2 style={{fontSize:17,margin:'6px 0 0',color:'#173d78'}}>{privateMoney(value)}</h2></div>)}</div>
 
  <nav className="finance-print-hide" aria-label="Áreas financeiras" style={{display:'grid',gridTemplateColumns:'repeat(4,minmax(0,1fr))',gap:8,margin:'0 0 18px'}}>{([['extrato','Extrato'],['receber','Contas a receber'],['relatorios','Relatórios e fluxo de caixa'],['lancamento','Novo lançamento']] as const).map(([key,label])=><button type="button" key={key} onClick={()=>key==='lancamento'?setEntryModalOpen(true):setSection(key)} aria-pressed={section===key} style={{background:key==='lancamento'?'linear-gradient(120deg,#102f65,#174c96)':section===key?'linear-gradient(120deg,#2057a5,#317bdb)':'linear-gradient(145deg,#eaf3ff,#dbeaff)',color:key==='lancamento'||section===key?'white':'#17457f',border:key==='lancamento'||section===key?'1px solid #123d7b':'1px solid #b7d1f3',padding:'10px 8px',minWidth:0,borderRadius:9,fontWeight:700,cursor:'pointer'}}>{label}</button>)}</nav>
  {section==='extrato'&&<section className="finance-print-hide" style={{...card,background:'linear-gradient(155deg,#f4f8ff 0%,#eaf2ff 55%,#f7faff 100%)',border:'1px solid #a8c6f0',borderTop:'4px solid #2d6cd2',boxShadow:'0 9px 26px rgba(30,75,145,.13)'}}><h2 style={{color:'#164784',fontSize:18,margin:'0 0 6px'}}>Extrato auditável</h2>
@@ -140,7 +171,7 @@ export default function FinanceiroClient(){
  <td style={{padding:12,borderBottom:'1px solid #e3eaf3'}}>{e.presentation_title||'Não vinculada'}</td>
  <td style={{padding:12,borderBottom:'1px solid #e3eaf3',fontWeight:700}}><div style={{display:'flex',alignItems:'center',justifyContent:'space-between',gap:8,whiteSpace:'nowrap'}}><span style={{fontVariantNumeric:'tabular-nums'}}>{showValues?(e.entry_type==='income'?'+':'−'):' '} {privateMoney(Number(e.amount))}</span>{data.writesEnabled&&!e.reversal_of&&!reversed.has(e.id)&&<button type="button" disabled={!!reversing} onClick={()=>reverseEntry(e.id)} style={{flexShrink:0,padding:'7px 10px',border:'1px solid #174b93',borderRadius:8,background:'linear-gradient(135deg,#1c5db2,#16427f)',color:'#fff',fontWeight:700,boxShadow:'0 3px 8px rgba(17,56,111,.18)',cursor:'pointer'}}>Estornar</button>}</div></td>
  </tr>)}</tbody></table>{entries.length===0&&<p>Nenhuma movimentação encontrada para os filtros selecionados.</p>}</div>
- {entries.length>pageSize&&<div style={{display:'flex',alignItems:'center',justifyContent:'flex-end',gap:12,marginTop:14}}><button type="button" disabled={entryPage<=1} onClick={()=>setEntryPage(p=>Math.max(1,p-1))}>Anterior</button><span>Página {Math.min(entryPage,Math.ceil(entries.length/pageSize))} de {Math.ceil(entries.length/pageSize)}</span><button type="button" disabled={entryPage*pageSize>=entries.length} onClick={()=>setEntryPage(p=>p+1)}>Próxima</button></div>}
+ {entries.length>pageSize&&<nav className="finance-entry-pagination" aria-label="Navegação das páginas do extrato"><button type="button" className="finance-page-control" disabled={entryPage<=1} onClick={()=>setEntryPage(p=>Math.max(1,p-1))}><ChevronLeft size={16} aria-hidden="true"/>Anterior</button><span className="finance-page-counter">Página {Math.min(entryPage,Math.ceil(entries.length/pageSize))} de {Math.ceil(entries.length/pageSize)}</span><button type="button" className="finance-page-control" disabled={entryPage*pageSize>=entries.length} onClick={()=>setEntryPage(p=>p+1)}>Próxima<ChevronRight size={16} aria-hidden="true"/></button></nav>}
  {data.limited&&<p style={{color:'#92400e'}}>Exibindo somente os mil lançamentos mais recentes. Totais não são definitivos.</p>}
  </section>}
  {receivableError&&<p role="alert" style={{color:'#a32727'}}>{receivableError}</p>}
@@ -149,10 +180,20 @@ export default function FinanceiroClient(){
  <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(180px,1fr))',gap:12,margin:'16px 0'}}>
  {([['Total de cobranças',receivables.titles.reduce((n,t)=>n+Number(t.total||0),0)],['Já recebido',receivables.titles.reduce((n,t)=>n+Number(t.paid||0),0)],['Pendente',receivables.titles.reduce((n,t)=>n+Math.max(0,Number(t.total||0)-Number(t.paid||0)),0)]] as [string,number][]).map(([label,value])=><div key={label} style={{background:'linear-gradient(145deg,#fff,#e5f0ff)',border:'1px solid #b9d2f4',borderTop:label==='Pendente'?'3px solid #d68d36':label==='Já recebido'?'3px solid #159b79':'3px solid #2e6bc2',borderRadius:11,padding:14,boxShadow:'0 4px 12px rgba(28,77,142,.09)'}}><small>{label}</small><h3 style={{margin:'8px 0 0'}}>{brl(value)}</h3></div>)}
  </div>
- <h3>Extrato de cobranças</h3>
- <div style={{overflowX:'auto'}}><table style={{width:'100%',borderCollapse:'collapse',textAlign:'left',fontSize:13}}><thead><tr>{['Instituição','Descrição','Vencimento','Total','Recebido','Pendente'].map(h=><th key={h} style={{padding:9,borderBottom:'1px solid #ccd8ea'}}>{h}</th>)}</tr></thead><tbody>{receivables.titles.map(t=><tr key={t.id}><td style={{padding:9}}>{t.client_name}</td><td style={{padding:9}}>{t.description}</td><td style={{padding:9}}>{String(t.due_on).slice(0,10).split('-').reverse().join('/')}</td><td style={{padding:9}}>{brl(Number(t.total))}</td><td style={{padding:9}}>{brl(Number(t.paid))}</td><td style={{padding:9,fontWeight:700}}>{brl(Math.max(0,Number(t.total)-Number(t.paid)))}</td></tr>)}</tbody></table>{receivables.titles.length===0&&<p>Nenhuma cobrança cadastrada.</p>}</div>
- <h3 style={{marginTop:22}}>Extrato de recebimentos por instituição</h3>
- <div style={{overflowX:'auto'}}><table style={{width:'100%',borderCollapse:'collapse',textAlign:'left',fontSize:13}}><thead><tr>{['Data','Instituição','Descrição','Valor recebido'].map(h=><th key={h} style={{padding:9,borderBottom:'1px solid #ccd8ea'}}>{h}</th>)}</tr></thead><tbody>{receivables.payments.map(p=><tr key={p.id}><td style={{padding:9}}>{String(p.occurred_on).slice(0,10).split('-').reverse().join('/')}</td><td style={{padding:9}}>{p.client_name}</td><td style={{padding:9}}>{p.description}</td><td style={{padding:9,fontWeight:700,color:'#16724a'}}>+ {brl(Number(p.amount))}</td></tr>)}</tbody></table>{receivables.payments.length===0&&<p>Nenhum recebimento vinculado.</p>}</div>
+ <div className="finance-receivable-section finance-receivable-charges">
+  <div className="finance-receivable-heading">
+   <div><h3>Extrato de cobranças</h3><p>Valores cadastrados, vencimentos e saldos pendentes.</p></div>
+   <span className="finance-receivable-count">{receivables.titles.length} {receivables.titles.length===1?'título':'títulos'}</span>
+  </div>
+  <div className="finance-receivable-scroll"><table className="finance-receivable-table" style={{width:'100%',minWidth:700,borderCollapse:'collapse',textAlign:'left',fontSize:13}}><thead><tr>{['Instituição','Descrição','Vencimento','Total','Recebido','Pendente'].map(h=><th key={h}>{h}</th>)}</tr></thead><tbody>{receivables.titles.map(t=><tr key={t.id}><td>{t.client_name}</td><td>{t.description}</td><td>{String(t.due_on).slice(0,10).split('-').reverse().join('/')}</td><td>{brl(Number(t.total))}</td><td>{brl(Number(t.paid))}</td><td style={{fontWeight:750}}>{brl(Math.max(0,Number(t.total)-Number(t.paid)))}</td></tr>)}</tbody></table>{receivables.titles.length===0&&<p>Nenhuma cobrança cadastrada.</p>}</div>
+ </div>
+ <div className="finance-receivable-section finance-receivable-payments">
+  <div className="finance-receivable-heading">
+   <div><h3>Extrato de recebimentos por instituição</h3><p>Pagamentos efetivamente registrados no caixa.</p></div>
+   <span className="finance-receivable-count">{receivables.payments.length} {receivables.payments.length===1?'recebimento':'recebimentos'}</span>
+  </div>
+  <div className="finance-receivable-scroll"><table className="finance-receivable-table" style={{width:'100%',minWidth:620,borderCollapse:'collapse',textAlign:'left',fontSize:13}}><thead><tr>{['Data','Instituição','Descrição','Valor recebido'].map(h=><th key={h}>{h}</th>)}</tr></thead><tbody>{receivables.payments.map(p=><tr key={p.id}><td>{String(p.occurred_on).slice(0,10).split('-').reverse().join('/')}</td><td>{p.client_name}</td><td>{p.description}</td><td style={{fontWeight:750,color:'#11754e'}}>+ {brl(Number(p.amount))}</td></tr>)}</tbody></table>{receivables.payments.length===0&&<p>Nenhum recebimento vinculado.</p>}</div>
+ </div>
  
  </section>}
  {section==='relatorios'&&report&&<FinanceReport report={report}/>} 
