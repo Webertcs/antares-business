@@ -3572,3 +3572,145 @@
     transform:none!important;
   }
 }
+
+
+/* ANTARES Kids — cartão de curiosidade cósmica para Plutão.
+   Apenas no experimento, mantendo o accordion nativo e o texto factual. */
+.premium-kids.premium-cinematic-sky details.premium-pluto{
+  width:min(100% - 24px,520px);
+  max-width:520px;
+}
+.premium-kids.premium-cinematic-sky details.premium-pluto>summary{
+  min-height:42px;
+  padding:8px 19px;
+  border-color:rgba(110,172,246,.64);
+  background:linear-gradient(115deg,rgba(9,33,75,.96),rgba(21,51,102,.94) 62%,rgba(9,28,65,.98));
+  box-shadow:inset 0 1px rgba(220,241,255,.13),0 5px 17px rgba(0,5,25,.26),0 0 18px rgba(73,149,245,.11);
+  color:#f8fbff;
+  font-size:13px;
+  letter-spacing:.012em;
+}
+.premium-kids.premium-cinematic-sky details.premium-pluto[open]>summary{
+  border-color:rgba(154,210,255,.87);
+  box-shadow:inset 0 1px rgba(230,246,255,.18),0 5px 17px rgba(0,5,25,.28),0 0 24px rgba(98,174,255,.2);
+}
+.premium-kids.premium-cinematic-sky .premium-pluto-story{
+  position:relative;
+  isolation:isolate;
+  width:100%;
+  margin:13px auto 0;
+  padding:23px 22px;
+  display:grid;
+  grid-template-columns:112px minmax(0,1fr);
+  align-items:center;
+  gap:22px;
+  overflow:hidden;
+  border:1px solid rgba(104,169,247,.47);
+  border-radius:22px;
+  background:
+    radial-gradient(ellipse 65% 90% at 11% 31%,rgba(69,123,212,.23),transparent 78%),
+    radial-gradient(ellipse 60% 90% at 97% 78%,rgba(91,83,175,.14),transparent 76%),
+    linear-gradient(135deg,rgba(12,31,68,.98),rgba(4,15,36,.99));
+  box-shadow:inset 0 1px rgba(231,246,255,.1),0 12px 30px rgba(0,7,27,.28),0 0 25px rgba(50,125,216,.07);
+  color:#e6f1ff;
+  text-align:left;
+}
+.premium-kids.premium-cinematic-sky .premium-pluto-story::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  z-index:-1;
+  pointer-events:none;
+  background-image:radial-gradient(circle,rgba(229,240,255,.82) .65px,transparent 1.45px);
+  background-size:41px 37px;
+  background-position:5px 8px;
+  opacity:.15;
+}
+.premium-kids.premium-cinematic-sky .premium-pluto-planet{
+  position:relative;
+  width:108px;
+  height:108px;
+  display:grid;
+  place-items:center;
+  filter:drop-shadow(0 0 17px rgba(134,189,247,.2));
+}
+.premium-kids.premium-cinematic-sky .premium-pluto-planet::before{
+  content:"";
+  position:absolute;
+  inset:-3px;
+  border:1px dashed rgba(138,194,255,.21);
+  border-radius:50%;
+  transform:rotate(-24deg) scale(1.08,.6);
+}
+.premium-kids.premium-cinematic-sky .premium-pluto-planet::after{
+  content:"✧";
+  position:absolute;
+  right:-1px;
+  top:1px;
+  font-size:20px;
+  color:#ffe7b2;
+  text-shadow:0 0 13px rgba(255,229,173,.75);
+}
+.premium-kids.premium-cinematic-sky .premium-pluto-planet-core{
+  position:relative;
+  display:block;
+  width:91px;
+  height:91px;
+  border-radius:50%;
+  background:
+    radial-gradient(ellipse 23% 32% at 39% 35%,rgba(243,217,191,.92),transparent 96%),
+    radial-gradient(ellipse 34% 22% at 61% 59%,rgba(145,109,107,.65),transparent 100%),
+    radial-gradient(ellipse 22% 27% at 28% 77%,rgba(202,168,154,.71),transparent 100%),
+    radial-gradient(circle at 29% 26%,#ece3d5 1%,#bcb7b7 27%,#978b9e 54%,#514d6a 79%,#292c4c 100%);
+  box-shadow:inset -13px -9px 16px rgba(5,11,36,.45),inset 5px 4px 9px rgba(251,239,219,.22),0 0 23px rgba(114,155,238,.13);
+}
+.premium-kids.premium-cinematic-sky .premium-pluto-copy{
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+  min-width:0;
+}
+.premium-kids.premium-cinematic-sky .premium-pluto-eyebrow{
+  color:#ffdf98;
+  letter-spacing:.15em;
+  font-weight:900;
+  font-size:10px;
+}
+.premium-kids.premium-cinematic-sky .premium-pluto-copy strong{
+  font-size:clamp(14px,1.4vw,17px);
+  line-height:1.25;
+  color:#fff;
+  font-weight:850;
+}
+.premium-kids.premium-cinematic-sky .premium-pluto-copy p{
+  margin:0;
+  padding:0;
+  background:none;
+  border:0;
+  box-shadow:none;
+  color:#d3e4fd;
+  font-size:12px;
+  line-height:1.6;
+}
+@media(max-width:620px){
+  .premium-kids.premium-cinematic-sky details.premium-pluto{
+    width:calc(100% - 28px);
+    max-width:520px;
+  }
+  .premium-kids.premium-cinematic-sky .premium-pluto-story{
+    grid-template-columns:76px minmax(0,1fr);
+    gap:12px;
+    padding:18px 14px;
+  }
+  .premium-kids.premium-cinematic-sky .premium-pluto-planet{
+    width:75px;
+    height:75px;
+  }
+  .premium-kids.premium-cinematic-sky .premium-pluto-planet-core{
+    width:69px;
+    height:69px;
+  }
+  .premium-kids.premium-cinematic-sky .premium-pluto-copy strong{
+    font-size:14px;
+  }
+}

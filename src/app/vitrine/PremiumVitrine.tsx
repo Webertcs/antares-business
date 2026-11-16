@@ -303,7 +303,19 @@ export default function PremiumVitrine(){
     </div>
     <div className="premium-planet-picker" aria-label="Escolha um astro para explorar"><span>EXPLORAR O SISTEMA SOLAR</span><div className="premium-planet-options">{worlds.map(w=><button key={w.id} type="button" aria-pressed={world.id===w.id} onClick={()=>selectWorld(w)}>{w.name}</button>)}</div></div>
     {!reactBitsPreview&&<p className="premium-motion-note">Oito planetas oficiais · Órbitas ilustrativas, sem escala real · Toque para descobrir curiosidades.</p>}
-    <details className="premium-pluto"><summary>{reactBitsPreview?'✨ E Plutão?':'✨ E Plutão, onde está?'}</summary><p>Plutão é um planeta anão desde a classificação adotada pela União Astronômica Internacional em 2006. Ele continua sendo um mundo fascinante!</p></details>
+    <details className="premium-pluto">
+     <summary>{reactBitsPreview?'✨ E Plutão?':'✨ E Plutão, onde está?'}</summary>
+     {reactBitsPreview?
+      <div className="premium-pluto-story">
+       <span className="premium-pluto-planet" aria-hidden="true"><span className="premium-pluto-planet-core"/></span>
+       <div className="premium-pluto-copy">
+        <span className="premium-pluto-eyebrow">✦ CURIOSIDADE CÓSMICA</span>
+        <strong>Pequeno no tamanho. Gigante em descobertas.</strong>
+        <p>Plutão é um planeta anão desde a classificação adotada pela União Astronômica Internacional em 2006. Ele continua sendo um mundo fascinante!</p>
+       </div>
+      </div>
+      :<p>Plutão é um planeta anão desde a classificação adotada pela União Astronômica Internacional em 2006. Ele continua sendo um mundo fascinante!</p>}
+    </details>
    </div></section>
    {reactBitsPreview && <OrbitasCinematograficas />}
    <section className={'premium-ecosystem'+(reactBitsPreview?' premium-ecosystem-cinematic':'')} aria-labelledby="premium-ecosystem-title">
