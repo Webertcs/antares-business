@@ -10,7 +10,9 @@ import ServiceBooking,{type ServiceBookingData,type ServiceReservation} from './
 type Lead={id:string;responsible_name:string;institution:string;city:string;phone:string;
  audience:string;attendees:number|null;desired_date:string|null;notes:string;status:string;created_at:string;converted_client_id:string|null;converted_proposal_id:string|null;proposal_status:string|null;proposal_valid_until:string|null;proposal_expired:boolean|null};
 const label:Record<string,string>={pending:'Novo pedido',reviewing:'Em análise',converted:'Proposta criada',archived:'Arquivado'};
-function statusLabel(lead:Lead){
+function statusLabel(lead:Lead,reservation:ServiceReservation|null){
+ if(reservation?.status==='completed')return 'Apresentação concluída';
+ if(reservation&&reservation.status!=='cancelled')return 'Reserva registrada';
  if(lead.status==='converted'&&lead.proposal_expired&&lead.proposal_status!=='accepted')return 'Proposta vencida';
  if(lead.status!=='converted')return label[lead.status]||lead.status;
  const statuses:Record<string,string>={draft:'Rascunho da proposta',approved_internal:'Proposta aprovada',legacy_accepted:'Aceite a confirmar',accepted:'Aceite registrado'};
@@ -51,9 +53,9 @@ function ServiceTimeline({lead,reservation,operationalKnown}:{
   {accepted&&<p style={{margin:'4px 0 0',fontSize:11,color:'#64748b'}}>O Financeiro é acompanhado separadamente e não impede a reserva.</p>}
  </div>;
 }
-function matchesFilter(lead:Lead,key:string){
+function matchesFilter(lead:Lead,key:string,reservation:ServiceReservation|null){
  if(key==='all')return true;
- if(key==='open')return lead.status!=='archived';
+ if(key==='open')return lead.status!=='archived'&&reservation?.status!=='completed';
  return lead.status===key;
 }
 const date=(value:string|null)=>value?new Date(value.slice(0,10)+'T12:00:00').toLocaleDateString('pt-BR'):'A combinar';
@@ -123,7 +125,7 @@ export default function Inbox({conversionEnabled,bookingWritesEnabled}:{conversi
  },[]);
  useEffect(()=>{void refreshBookings();},[refreshBookings]);
  useEffect(()=>{void load();if(conversionEnabled){fetch('/api/crm/clientes',{cache:'no-store'}).then(r=>r.json()).then(d=>setClients(d.clients||[])).catch(()=>setNotice('Lista de clientes indisponível.'));}},[load,conversionEnabled]);
- const shown=useMemo(()=>leads.filter(x=>matchesFilter(x,filter)),[leads,filter]);
+ const shown=useMemo(()=>leads.filter(x=>matchesFilter(x,filter,reservationFor(x))),[leads,filter,bookingData]);
  function openComposer(id:string){
   if(busy||!conversionEnabled)return;
   setComposerLeadId(id);
@@ -163,7 +165,7 @@ export default function Inbox({conversionEnabled,bookingWritesEnabled}:{conversi
     className={[styles.filter,option.theme,filter===option.key?styles.filterActive:''].filter(Boolean).join(' ')}
     onClick={()=>setFilter(option.key)} aria-pressed={filter===option.key}>
     <option.Icon size={16} aria-hidden="true"/>
-    {option.name} ({leads.filter(l=>matchesFilter(l,option.key)).length})
+    {option.name} ({leads.filter(l=>matchesFilter(l,option.key,reservationFor(l))).length})
    </button>)}
   </div>
   {error&&<p role="alert" className={[styles.notification,styles.error].join(' ')}>{error}</p>}
@@ -187,7 +189,7 @@ export default function Inbox({conversionEnabled,bookingWritesEnabled}:{conversi
       lead.status==='reviewing'?styles.statusReviewing:
       lead.status==='pending'?styles.statusPending:''].join(' ')}>
       {lead.status==='converted'&&lead.proposal_status==='accepted'&&<CheckCircle2 size={14} aria-hidden="true"/>}
-      {statusLabel(lead)}
+      {statusLabel(lead,reservationFor(lead))}
      </span>
     </div>
     <div className={styles.quickFacts}>
