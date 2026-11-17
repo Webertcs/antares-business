@@ -45,7 +45,7 @@ function ServiceTimeline({lead}:{lead:Lead}){
 }
 function matchesFilter(lead:Lead,key:string){
  if(key==='all')return true;
- if(key==='open')return lead.status!=='archived'&&!(lead.status==='converted'&&lead.proposal_status==='accepted');
+ if(key==='open')return lead.status!=='archived';
  return lead.status===key;
 }
 const date=(value:string|null)=>value?new Date(value.slice(0,10)+'T12:00:00').toLocaleDateString('pt-BR'):'A combinar';
