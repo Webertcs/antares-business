@@ -214,7 +214,11 @@ export default function ClientDetails({id,writesEnabled,proposalWritesEnabled,co
    const draft=drafts.find(d=>!d.archived_at);
    if(draft)selectSavedDraft(draft);
    const profiles=await loadLegalProfiles();
-   if(profiles&&!draft)applyLegalProfiles(profiles);
+   if(!draft){
+    // Preencher somente minutas novas, preservando rascunhos existentes.
+    fillDocumentFromProposal(contractId,true);
+    if(profiles)applyLegalProfiles(profiles);
+   }
   }catch{setDocumentNotice('Não foi possível consultar minutas salvas. Não salve até verificar a conexão.');}
  }
  async function saveDocument(contractId:string){
@@ -234,7 +238,7 @@ export default function ClientDetails({id,writesEnabled,proposalWritesEnabled,co
   const title=String(proposal.title||'Apresentação de planetário móvel');
   const total=Number(proposal.total);
   const deposit=Number(proposal.deposit||0);
-  const students=Number(proposal.attendees||0);
+  const students=Number(proposal.expected_attendees||0);
   // Os dados operacionais pertencem aos campos próprios, não ao texto das cláusulas.
   const presentation:Record<string,string>={
    'Data da apresentação':'',
@@ -242,7 +246,7 @@ export default function ClientDetails({id,writesEnabled,proposalWritesEnabled,co
    'Horários e sessões':'',
    'Público previsto':students>0?String(students)+' participantes':'',
    'Valor total e sinal':Number.isFinite(total)&&total>0?money(total)+(deposit>0?' · Sinal: '+money(deposit):''):'',
-   'Forma e prazo de pagamento':''
+   'Forma e prazo de pagamento':String(proposal.payment_terms||'').trim()
   };
   const lines=[
    '1. OBJETO DO CONTRATO',
@@ -262,8 +266,7 @@ export default function ClientDetails({id,writesEnabled,proposalWritesEnabled,co
    'Condições de remarcação, cancelamento, custos e eventuais devoluções deverão ser definidas expressamente antes da assinatura.',
    '',
    '6. DISPOSIÇÕES FINAIS',
-   'Alterações de escopo, horários ou valores deverão ser acordadas entre as partes e registradas por escrito.',
-   String(proposal.notes||'').trim()?'Observações da proposta: '+String(proposal.notes).trim():''
+   'Alterações de escopo, horários ou valores deverão ser acordadas entre as partes e registradas por escrito.'
   ].filter((line,index,all)=>line!==''||all[index-1]!=='');
   if(!confirmed){setPendingProposalFill(contractId);return;}
   setPendingProposalFill(null);
