@@ -198,7 +198,7 @@ main{margin:0;padding:0;min-height:0;max-width:none;box-shadow:none}.toolbar{dis
      {selectedId?'Minuta existente · edição com histórico':'Novo modelo · dados preenchidos automaticamente'}
     </p>
    </div>
-   <button type="button" onClick={()=>exit('back')} disabled={saving} style={grey}><ArrowLeft size={16}/>Voltar ao contrato</button>
+   <button type="button" onClick={()=>exit('dismiss')} disabled={saving} style={grey}><ArrowLeft size={16}/>Cancelar</button>
   </div>
   {!ready&&!error&&<p role="status">Consultando dados da instituição e minutas já salvas...</p>}
   {error&&<p role="alert" style={{margin:0,padding:11,border:'1px solid #fecaca',background:'#fff1f2',borderRadius:8,color:'#9f1239'}}>{error}</p>}
