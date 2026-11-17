@@ -12,7 +12,7 @@ export async function GET(){
  try{
   const db=getDb();
   const [titles,clients,payments]=await Promise.all([
-   db`SELECT r.id,r.client_id,c.name AS client_name,r.description,r.total,r.due_on,r.created_at,
+   db`SELECT r.id,r.client_id,r.proposal_id,c.name AS client_name,r.description,r.total,r.due_on,r.created_at,
       COALESCE((SELECT SUM(l.amount)
         FROM public.antares_receivable_payments p
         JOIN public.ledger_entries l ON l.id=p.ledger_id AND l.organization_id=p.organization_id
