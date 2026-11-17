@@ -294,7 +294,7 @@ export default function Inbox({conversionEnabled,bookingWritesEnabled,contractWr
     proposalId={contractLead.converted_proposal_id}
     enabled={contractWritesEnabled}
     onClose={()=>setContractLeadId(null)}
-    onSaved={()=>{setContractLeadId(null);setNotice('Contrato cadastrado. Ele é opcional e não altera a reserva.');void refreshContracts();}}
+    onSaved={()=>{setNotice('Contrato cadastrado. Ele é opcional e não altera a reserva.');void refreshContracts();}}
   />}
   {bookingLead&&bookingLead.converted_proposal_id&&<ServiceBooking
     key={bookingLead.id}
