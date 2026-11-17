@@ -503,7 +503,7 @@ export default function ClientDetails({id,writesEnabled,proposalWritesEnabled,co
  </div>
  {commercialError?<p role="alert">{commercialError}</p>:!commercial?<p>Carregando informações comerciais…</p>:commercial.unavailable.includes('proposals')?<p>Propostas temporariamente indisponíveis.</p>:visibleProposals.length===0?<p>{proposalFilter==='archived'?'Nenhuma proposta arquivada.':proposalFilter==='active'?'Nenhuma proposta ativa.':'Nenhuma proposta vinculada a esta instituição.'}</p>:visibleProposals.map(p=><div key={String(p.id)} className="client-premium-entry" style={row}><strong>{String(p.title||'Proposta')}</strong> · {money(p.total)} · <strong>{proposalStatusLabel(p)}</strong>{Boolean(p.archived_at)&&<span style={{marginLeft:8,color:'#526e96',fontWeight:700}}>· Arquivada</span>}<div style={{fontSize:12}}>Criada em {dateBR(p.created_at?String(p.created_at):null)}</div>
  <div style={{display:'flex',gap:8,flexWrap:'wrap',alignItems:'center',marginTop:12}}>
-  {proposalWritesEnabled&&!p.archived_at&&String(p.status)==='sent'
+  {proposalWritesEnabled&&!p.archived_at&&!p.from_vitrine&&String(p.status)==='sent'
    ?<button type="button" disabled={commercialActionBusy||closingBusy} onClick={()=>{setClosingProposal({id:String(p.id),title:String(p.title||'Proposta')});setClosingMode('verbal');setClosingResponsible('');setClosingTerms('');setClosingError('');setCommercialFeedback('');}} style={{...actionLink,background:'#087e73'}}>Fechar negócio</button>
    :proposalWritesEnabled&&!p.archived_at&&isConfirmedForContract(p)&&!contracts.some(c=>String(c.proposal_id)===String(p.id))
    ?<button type="button" onClick={()=>setContractFor(String(p.id))} style={actionLink}>Criar contrato</button>
