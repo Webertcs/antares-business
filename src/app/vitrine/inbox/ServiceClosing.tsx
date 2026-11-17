@@ -138,7 +138,7 @@ export default function ServiceClosing({reservation,institution,onClose,onSaved}
        :'O evento precisa estar confirmado e autorizado para encerramento.'}
      </p>}
     {state?.canClose&&!confirm&&<button type="button" disabled={busy||!/^\d+$/.test(students)||Number(students)>100000}
-      onClick={requestClose} style={{...mainButton,opacity:busy||!/^\d+$/.test(students)||Number(students)>100000?.55:1}}>
+      onClick={requestClose} style={{...mainButton,opacity:(busy||!/^\d+$/.test(students)||Number(students)>100000)?0.55:1}}>
       Conferir encerramento
      </button>}
     {confirm&&<div role="group" aria-label="Confirmar encerramento" style={{border:'1px solid #e8c486',background:'#fff7e8',borderRadius:10,padding:14,display:'grid',gap:10}}>
