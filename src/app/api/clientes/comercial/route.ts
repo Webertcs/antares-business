@@ -1,5 +1,5 @@
 import {NextRequest,NextResponse} from 'next/server';
-import {requireOwner,getTeamWriteDb} from '@/lib/equipe/auth';
+import {requireOwner,getDb,getTeamWriteDb} from '@/lib/equipe/auth';
 export const runtime='nodejs';export const dynamic='force-dynamic';
 const fail=(error:string,status=403)=>NextResponse.json({error},{status,headers:{'Cache-Control':'no-store'}});
 export async function POST(req:NextRequest){
@@ -15,6 +15,16 @@ export async function POST(req:NextRequest){
  !['sent','accepted','rejected','contract','archive','restore'].includes(b.action))return fail('Operação inválida.',400);
  const mode=b.action==='contract'?b.mode:null,terms=b.action==='contract'?b.terms:null;
  if(b.action==='contract'&&(!['written','verbal','whatsapp'].includes(mode)||typeof terms!=='string'||terms.trim().length<8||terms.length>8000))return fail('Contrato inválido.',400);
+ if(b.action==='contract'||b.action==='accepted'){
+  const checkDb=getDb();
+  const proposal=await checkDb`SELECT p.client_accepted_at,
+   EXISTS(SELECT 1 FROM public.vitrine_leads l WHERE l.organization_id=p.organization_id
+    AND l.converted_proposal_id=p.id) AS from_vitrine
+   FROM public.business_proposals p
+   WHERE p.id=${b.proposalId}::uuid AND p.organization_id=${owner.organizationId} LIMIT 1`;
+  if(proposal[0]?.from_vitrine&&(b.action==='accepted'||!proposal[0]?.client_accepted_at))
+   return fail('Registre primeiro o aceite real da escola em Oportunidades.',409);
+ }
  const db=getTeamWriteDb();
  const checks=await db`SELECT current_user='antares_team_runtime' AND NOT rolsuper AND NOT rolbypassrls AS safe_role,
  (SELECT count(*)=1 FROM pg_proc p WHERE p.pronamespace='public'::regnamespace AND p.proname='antares_client_proposal_action'
