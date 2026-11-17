@@ -37,6 +37,7 @@ export default function ServiceContract({
  const [mode,setMode]=useState<'written'|'verbal'|'whatsapp'>('written');
  const [terms,setTerms]=useState('');
  const [error,setError]=useState('');
+ const [notice,setNotice]=useState('');
  const [editingDocument,setEditingDocument]=useState(false);
 
  useEffect(()=>{
@@ -84,6 +85,14 @@ export default function ServiceContract({
    });
    const json=await res.json();
    if(!res.ok)throw Error(json.error||'Contrato não registrado.');
+   // Atualiza a mesma janela sem obrigar o usuário a voltar à lista.
+   const refresh=await fetch('/api/business',{cache:'no-store'});
+   const updated=await refresh.json();
+   if(!refresh.ok||!Array.isArray(updated.contracts)||!Array.isArray(updated.proposals))
+    throw Error('Contrato gravado. Atualize a Central para consultar o documento.');
+   setData(updated as CentralContractData);
+   setNotice('Contrato cadastrado. A confirmação da escola é registrada separadamente.');
+   if(mode==='written')setEditingDocument(true);
    onSaved();
   }catch(e){setError(e instanceof Error?e.message:'Não foi possível registrar o contrato.');}
   finally{setBusy(false);}
@@ -120,6 +129,7 @@ export default function ServiceContract({
     <strong>{institution}</strong>
     <p style={{margin:'6px 0 0',fontSize:12}}>O contrato escrito não é necessário para reservar a cúpula.</p>
    </div>
+   {notice&&<p role="status" style={{margin:0,padding:10,background:'#eaf8f0',border:'1px solid #b4e5c7',borderRadius:8,color:'#17653b'}}>{notice}</p>}
    {loading&&<p role="status">Consultando a proposta e os contratos...</p>}
    {error&&<p role="alert" style={{margin:0,padding:10,background:'#fff1f2',
     border:'1px solid #fecdd3',borderRadius:8,color:'#9f1239'}}>{error}</p>}
