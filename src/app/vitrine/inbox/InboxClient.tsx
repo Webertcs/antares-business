@@ -7,6 +7,7 @@ import ProposalComposer from './ProposalComposer';
 import ClientAcceptance from './ClientAcceptance';
 import RenewValidity from './RenewValidity';
 import ServiceBooking,{type ServiceBookingData,type ServiceReservation} from './ServiceBooking';
+import ServiceContract,{type CentralContractData} from './ServiceContract';
 type Lead={id:string;responsible_name:string;institution:string;city:string;phone:string;
  audience:string;attendees:number|null;desired_date:string|null;notes:string;status:string;created_at:string;converted_client_id:string|null;converted_proposal_id:string|null;proposal_status:string|null;proposal_valid_until:string|null;proposal_expired:boolean|null};
 const label:Record<string,string>={pending:'Novo pedido',reviewing:'Em análise',converted:'Proposta criada',archived:'Arquivado'};
@@ -85,7 +86,7 @@ function LeadObservations({notes}:{notes:string|null}){
  </>;
 }
 
-export default function Inbox({conversionEnabled,bookingWritesEnabled}:{conversionEnabled:boolean;bookingWritesEnabled:boolean}){
+export default function Inbox({conversionEnabled,bookingWritesEnabled,contractWritesEnabled}:{conversionEnabled:boolean;bookingWritesEnabled:boolean;contractWritesEnabled:boolean}){
  const [leads,setLeads]=useState<Lead[]>([]);
  const [clients,setClients]=useState<{id:string;name:string;kind:string}[]>([]);
  const kindOf=(audience:string)=>({Escola:'school',Empresa:'company',Associação:'association','Evento particular':'private'} as Record<string,string>)[audience]||'private';
@@ -95,6 +96,18 @@ export default function Inbox({conversionEnabled,bookingWritesEnabled}:{conversi
  const [acceptLeadId,setAcceptLeadId]=useState<string|null>(null);
  const [renewLeadId,setRenewLeadId]=useState<string|null>(null);
  const [bookingLeadId,setBookingLeadId]=useState<string|null>(null);
+ const [contractLeadId,setContractLeadId]=useState<string|null>(null);
+ const [contractData,setContractData]=useState<CentralContractData|null>(null);
+ const refreshContracts=useCallback(async()=>{
+  try{
+   const r=await fetch('/api/business',{cache:'no-store'});
+   const json=await r.json();
+   if(!r.ok||!Array.isArray(json.contracts)||!Array.isArray(json.proposals)||
+      json.unavailable?.includes('contracts')||json.unavailable?.includes('proposals'))
+    throw Error('Contratos indisponíveis.');
+   setContractData(json as CentralContractData);
+  }catch{setContractData(null);}
+ },[]);
  const [bookingData,setBookingData]=useState<ServiceBookingData|null>(null);
  const [bookingError,setBookingError]=useState('');
  const refreshBookings=useCallback(async()=>{
@@ -115,6 +128,7 @@ export default function Inbox({conversionEnabled,bookingWritesEnabled}:{conversi
  const acceptedLead=acceptLeadId?leads.find(l=>l.id===acceptLeadId):undefined;
  const renewLead=renewLeadId?leads.find(l=>l.id===renewLeadId):undefined;
  const bookingLead=bookingLeadId?leads.find(l=>l.id===bookingLeadId):undefined;
+ const contractLead=contractLeadId?leads.find(l=>l.id===contractLeadId):undefined;
  const load=useCallback(async()=>{setLoading(true);
   try{const r=await fetch('/api/vitrine/inbox',{cache:'no-store'});const data=await r.json();
    if(!r.ok)throw Error(data.error||'Não foi possível carregar.');
@@ -123,7 +137,7 @@ export default function Inbox({conversionEnabled,bookingWritesEnabled}:{conversi
   }catch(e){setError(e instanceof Error?e.message:'Erro ao consultar');}
   finally{setLoading(false);}
  },[]);
- useEffect(()=>{void refreshBookings();},[refreshBookings]);
+ useEffect(()=>{void refreshBookings();void refreshContracts();},[refreshBookings,refreshContracts]);
  useEffect(()=>{void load();if(conversionEnabled){fetch('/api/crm/clientes',{cache:'no-store'}).then(r=>r.json()).then(d=>setClients(d.clients||[])).catch(()=>setNotice('Lista de clientes indisponível.'));}},[load,conversionEnabled]);
  const shown=useMemo(()=>leads.filter(x=>matchesFilter(x,filter,reservationFor(x))),[leads,filter,bookingData]);
  function openComposer(id:string){
@@ -151,7 +165,7 @@ export default function Inbox({conversionEnabled,bookingWritesEnabled}:{conversi
      <p>Acompanhe cada instituição, da conversa à apresentação, sem perder o histórico.</p>
     </div>
    </div>
-   <button type="button" className={styles.refresh} disabled={loading} onClick={()=>{void load();void refreshBookings();}}>
+   <button type="button" className={styles.refresh} disabled={loading} onClick={()=>{void load();void refreshBookings();void refreshContracts();}}>
     <RefreshCw size={15} aria-hidden="true"/> {loading?'Atualizando...':'Atualizar lista'}
    </button>
   </header>
@@ -257,6 +271,11 @@ export default function Inbox({conversionEnabled,bookingWritesEnabled}:{conversi
        {lead.status==='converted'&&lead.converted_proposal_id&&['draft','approved_internal','legacy_accepted','accepted'].includes(String(lead.proposal_status))&&
         <Link href={'/vitrine/proposta/'+lead.converted_proposal_id+'?visualizar=1'} className={styles.actionSecondary}>
          <FileText size={16}/>Visualizar / Salvar PDF</Link>}
+       {lead.status==='converted'&&lead.proposal_status==='accepted'&&lead.converted_proposal_id&&
+        <button type="button" className={styles.actionSecondary} disabled={Boolean(busy)}
+         onClick={()=>setContractLeadId(lead.id)}>
+         <FileText size={16}/>{contractData?.contracts.some(c=>c.proposal_id===lead.converted_proposal_id)?'Consultar contrato':'Contrato (opcional)'}
+        </button>}
        {lead.status==='converted'&&lead.converted_proposal_id&&lead.proposal_status!=='draft'&&
         <span className={styles.moreHint}>{lead.proposal_status==='accepted'?'Aceite registrado. Proposta liberada para agendamento.':lead.proposal_expired?'Proposta vencida: a validade deve ser renovada de forma auditada.':'Aprovação interna não equivale ao aceite da escola.'}</span>}
        {lead.converted_client_id&&<Link href={'/clientes/'+lead.converted_client_id} className={styles.actionSecondary}><Users size={16}/>Ficha da instituição</Link>}
@@ -271,6 +290,14 @@ export default function Inbox({conversionEnabled,bookingWritesEnabled}:{conversi
     clientOptions={clients.filter(c=>c.kind===kindOf(activeLead.audience)).slice().sort((a,b)=>a.name.localeCompare(b.name,'pt-BR')).map(c=>({id:c.id,name:c.name}))}
     onClose={()=>setComposerLeadId(null)}
     onSaved={()=>{void load();}}
+  />}
+  {contractLead&&contractLead.converted_proposal_id&&<ServiceContract
+    key={contractLead.id}
+    institution={contractLead.institution}
+    proposalId={contractLead.converted_proposal_id}
+    enabled={contractWritesEnabled}
+    onClose={()=>setContractLeadId(null)}
+    onSaved={()=>{setContractLeadId(null);setNotice('Contrato cadastrado. Ele é opcional e não altera a reserva.');void refreshContracts();}}
   />}
   {bookingLead&&bookingLead.converted_proposal_id&&<ServiceBooking
     key={bookingLead.id}
