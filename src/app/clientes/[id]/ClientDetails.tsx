@@ -673,7 +673,9 @@ export default function ClientDetails({id,writesEnabled,proposalWritesEnabled,co
 </div>}
  {commercialForm==='contract'&&<>
  <p style={{margin:0,fontSize:12,color:'#365c8d',lineHeight:1.5}}>Contrato opcional. A reserva não depende dele. Confira os dados da proposta e complete apenas as condições realmente acordadas.</p>
- <label style={formLabel}>Proposta aceita<select required style={formInput} value={contractDraft.proposalId} onChange={e=>setContractDraft(v=>({...v,proposalId:e.target.value}))}><option value="">Selecione uma proposta aceita</option>{proposals.filter(p=>isConfirmedForContract(p)&&!contracts.some(c=>String(c.proposal_id)===String(p.id))).map(p=><option key={String(p.id)} value={String(p.id)}>{String(p.title)}</option>)}</select></label>
+ <div style={formLabel}>Proposta aceita
+  <div style={{...formInput,background:'#eaf3ff',marginTop:5}}>{String(proposals.find(p=>String(p.id)===contractDraft.proposalId)?.title||'Proposta não selecionada')} · {money(proposals.find(p=>String(p.id)===contractDraft.proposalId)?.total||0)}</div>
+  </div>
  <label style={formLabel}>Modalidade<select style={formInput} value={contractDraft.mode} onChange={e=>setContractDraft(v=>({...v,mode:e.target.value}))}><option value="written">Formal por escrito</option><option value="verbal">Acordo verbal</option><option value="whatsapp">WhatsApp</option></select></label>
  <label style={formLabel}>Condições acordadas<textarea required minLength={8} maxLength={8000} rows={4} style={formInput} value={contractDraft.terms} onChange={e=>setContractDraft(v=>({...v,terms:e.target.value}))}/></label>
  <p style={{fontSize:12,margin:0,color:'#496a97'}}>Salvar este cadastro não registra um novo aceite da escola nem cria reserva. O documento escrito pode ser elaborado depois.</p>
