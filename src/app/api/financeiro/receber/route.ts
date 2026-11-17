@@ -35,7 +35,7 @@ export async function GET(){
       AND NOT EXISTS(SELECT 1 FROM public.ledger_entries rv WHERE rv.organization_id=l.organization_id AND rv.reversal_of=l.id)
       ORDER BY l.occurred_on DESC,l.created_at DESC LIMIT 1000`
   ]);
-  return NextResponse.json({titles,clients,payments,writesEnabled:process.env.ANTARES_FINANCE_WRITES_ENABLED==='true'&&/^[a-f0-9]{64}$/i.test(process.env.ANTARES_FINANCE_CAPABILITY||'')},{headers:noStore});
+  return NextResponse.json({titles,clients,payments,limited:titles.length===500,writesEnabled:process.env.ANTARES_FINANCE_WRITES_ENABLED==='true'&&/^[a-f0-9]{64}$/i.test(process.env.ANTARES_FINANCE_CAPABILITY||'')},{headers:noStore});
  }catch{return NextResponse.json({error:'Contas a receber está temporariamente indisponível.'},{status:503,headers:noStore});}
 }
 export async function POST(req:Request){
