@@ -62,24 +62,25 @@ export default function ClientDetails({id,writesEnabled,proposalWritesEnabled,co
  }
  async function saveCommercial(e:React.FormEvent<HTMLFormElement>){
   e.preventDefault();if(commercialBusy)return;
-  const action=activeTab==='propostas'?'proposal':commercialForm;
+  const action=commercialForm;
   if(!action)return;
   if(action==='proposal'&&!proposalWritesEnabled)return;
   if(action==='proposal'&&proposalDraft.validUntil){
    const today=new Date();const localToday=[today.getFullYear(),String(today.getMonth()+1).padStart(2,'0'),String(today.getDate()).padStart(2,'0')].join('-');
    if(proposalDraft.validUntil<localToday){setCommercialFeedback('A validade da proposta não pode ser anterior à data de hoje.');return;}
   }
-  if(action==='contract'&&!contractWritesEnabled)return;
+  if(action==='contract'&&!proposalWritesEnabled)return;
   setCommercialBusy(true);setCommercialFeedback('');
   try{
    const body=action==='proposal'?{action:'proposal',clientId:id,...proposalDraft,
     attendees:Number(proposalDraft.attendees),unitPrice:Number(proposalDraft.unitPrice),fixedPrice:Number(proposalDraft.fixedPrice),
     discount:Number(proposalDraft.discount),deposit:Number(proposalDraft.deposit)}:
     {action:'contract',...contractDraft};
-   const response=await fetch(action==='proposal'?'/api/clientes/propostas':'/api/business/gravar',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+   const response=await fetch(action==='proposal'?'/api/clientes/propostas':'/api/clientes/comercial',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
    const result=await response.json();
    if(!response.ok)throw Error(result.error||'Não foi possível salvar');
    setCommercialForm(null);await refreshCommercial();
+   if(action==='contract'){setActiveTab('contratos');setContractDraft({proposalId:'',mode:'written',terms:''});}
    if(action==='proposal')setProposalDraft({...emptyProposalDraft});
    setCommercialFeedback(action==='proposal'?'Proposta cadastrada com sucesso.':'Contrato cadastrado com sucesso.');
   }catch(err){setCommercialFeedback(err instanceof Error?err.message:'Operação não concluída');}
@@ -106,7 +107,17 @@ export default function ClientDetails({id,writesEnabled,proposalWritesEnabled,co
   const entries=presentationLabels.filter(label=>fields[label]?.trim()).map(label=>label+': '+fields[label].trim());
   return [...entries,...(clauses.trim()?[clauses.trim()]:[])].join('\n\n');
  }
- const [contractFor,setContractFor]=useState<string|null>(null);
+ function openContractModal(p:Record<string,unknown>){
+  if(!isConfirmedForContract(p)||contracts.some(c=>String(c.proposal_id)===String(p.id)))return;
+  const count=Number(p.expected_attendees||0);
+  const summary=[
+   'Serviço: '+String(p.title||'Apresentação de planetário móvel'),
+   'Valor da proposta: '+money(Number(p.total||0)),
+   ...(count>0?['Público previsto: '+count+' participantes']:[])
+  ].join('\n');
+  setContractDraft({proposalId:String(p.id),mode:'written',terms:summary});
+  setCommercialFeedback('');setCommercialForm('contract');
+ }
  const [confirmContractId,setConfirmContractId]=useState<string|null>(null);
  const [contractResponsible,setContractResponsible]=useState('');
  const [editingDocumentId,setEditingDocumentId]=useState<string|null>(null);
@@ -329,7 +340,6 @@ export default function ClientDetails({id,writesEnabled,proposalWritesEnabled,co
   finally{setClosingBusy(false);}
  }
  const [commercialActionBusy,setCommercialActionBusy]=useState(false);
- const [contractInline,setContractInline]=useState({mode:'written',terms:''});
  const statusNames:Record<string,string>={draft:'Rascunho',sent:'Enviada',accepted:'Aceita',rejected:'Recusada'};
  const isConfirmedForContract=(p:Record<string,unknown>)=>String(p.status)==='accepted'&&(!p.from_vitrine||Boolean(p.client_accepted_at));
  const proposalStatusLabel=(p:Record<string,unknown>)=>{
@@ -506,7 +516,7 @@ export default function ClientDetails({id,writesEnabled,proposalWritesEnabled,co
   {proposalWritesEnabled&&!p.archived_at&&!p.from_vitrine&&String(p.status)==='sent'
    ?<button type="button" disabled={commercialActionBusy||closingBusy} onClick={()=>{setClosingProposal({id:String(p.id),title:String(p.title||'Proposta')});setClosingMode('verbal');setClosingResponsible('');setClosingTerms('');setClosingError('');setCommercialFeedback('');}} style={{...actionLink,background:'#087e73'}}>Fechar negócio</button>
    :proposalWritesEnabled&&!p.archived_at&&isConfirmedForContract(p)&&!contracts.some(c=>String(c.proposal_id)===String(p.id))
-   ?<button type="button" onClick={()=>setContractFor(String(p.id))} style={actionLink}>Criar contrato</button>
+   ?<button type="button" onClick={()=>openContractModal(p)} style={actionLink}>Criar contrato</button>
    :!p.archived_at&&p.from_vitrine&&p.approved_at&&!p.client_accepted_at
    ?<Link href="/vitrine/inbox" style={actionLink}>Continuar em Oportunidades</Link>
    :!p.archived_at&&String(p.status)==='draft'
@@ -522,11 +532,6 @@ export default function ClientDetails({id,writesEnabled,proposalWritesEnabled,co
   </>}
   {proposalWritesEnabled&&<button type="button" disabled={commercialActionBusy} onClick={()=>commercialAction(String(p.id),p.archived_at?'restore':'archive')} style={{...actionLink,background:'#526e96'}}>{p.archived_at?'Reativar proposta':'Arquivar proposta'}</button>}
  </div>
- {contractFor===String(p.id)&&<form onSubmit={e=>{e.preventDefault();void commercialAction(String(p.id),'contract')}} style={{display:'grid',gap:9,maxWidth:540,marginTop:12}}>
- <label style={formLabel}>Modalidade<select style={formInput} value={contractInline.mode} onChange={e=>setContractInline(v=>({...v,mode:e.target.value}))}><option value="written">Formal por escrito</option><option value="verbal">Acordo verbal</option><option value="whatsapp">WhatsApp</option></select></label>
- <label style={formLabel}>Condições acordadas<textarea required minLength={8} maxLength={8000} rows={4} style={formInput} value={contractInline.terms} onChange={e=>setContractInline(v=>({...v,terms:e.target.value}))}/></label>
- <div style={{display:'flex',gap:8}}><button type="submit" disabled={commercialActionBusy} style={actionLink}>Salvar contrato</button><button type="button" onClick={()=>setContractFor(null)} style={{...actionLink,background:'#526e96'}}>Cancelar</button></div>
- </form>}
  </div>)}
 </section>}
  {activeTab==='contratos'&&<section className="client-premium-tab" data-client-tab="contratos" style={{...panel,borderLeftColor:'#3c7ad4'}}><h2 style={heading}>Contratos ({contracts.length})</h2><p style={{fontSize:13}}>Contratos vinculados a propostas aceitas de {client.name}. O cadastro não equivale à confirmação do cliente.</p>
@@ -650,12 +655,13 @@ export default function ClientDetails({id,writesEnabled,proposalWritesEnabled,co
  <p style={{margin:0}}>Total estimado: <strong>{proposalDraft.model?money(Math.max(0,(proposalDraft.model==='per_student'?Number(proposalDraft.attendees)*Number(proposalDraft.unitPrice):proposalDraft.model==='fixed'?Number(proposalDraft.fixedPrice):0)-Number(proposalDraft.discount))):'—'}</strong></p>
 </div>}
  {commercialForm==='contract'&&<>
-
+ <p style={{margin:0,fontSize:12,color:'#365c8d',lineHeight:1.5}}>Contrato opcional. A reserva não depende dele. Confira os dados da proposta e complete apenas as condições realmente acordadas.</p>
  <label style={formLabel}>Proposta aceita<select required style={formInput} value={contractDraft.proposalId} onChange={e=>setContractDraft(v=>({...v,proposalId:e.target.value}))}><option value="">Selecione uma proposta aceita</option>{proposals.filter(p=>isConfirmedForContract(p)&&!contracts.some(c=>String(c.proposal_id)===String(p.id))).map(p=><option key={String(p.id)} value={String(p.id)}>{String(p.title)}</option>)}</select></label>
  <label style={formLabel}>Modalidade<select style={formInput} value={contractDraft.mode} onChange={e=>setContractDraft(v=>({...v,mode:e.target.value}))}><option value="written">Formal por escrito</option><option value="verbal">Acordo verbal</option><option value="whatsapp">WhatsApp</option></select></label>
  <label style={formLabel}>Condições acordadas<textarea required minLength={8} maxLength={8000} rows={4} style={formInput} value={contractDraft.terms} onChange={e=>setContractDraft(v=>({...v,terms:e.target.value}))}/></label>
- <p style={{fontSize:12}}>Registre apenas acordos efetivamente autorizados pelo cliente.</p>
+ <p style={{fontSize:12,margin:0,color:'#496a97'}}>Salvar este cadastro não registra um novo aceite da escola nem cria reserva. O documento escrito pode ser elaborado depois.</p>
  </>}
+ {commercialForm==='contract'&&commercialFeedback&&<p role="alert" style={{color:'#9f1239',fontSize:13}}>{commercialFeedback}</p>}
  <div style={{display:'flex',justifyContent:'flex-end',gap:10}}><button type="button" disabled={commercialBusy} onClick={()=>setCommercialForm(null)} style={{...actionLink,background:'#eaf3ff',color:'#174987'}}>Cancelar</button><button type="submit" disabled={commercialBusy||commercialForm==='contract'&&!proposals.some(p=>isConfirmedForContract(p)&&!contracts.some(c=>String(c.proposal_id)===String(p.id)))} style={actionLink}>{commercialBusy?'Salvando…':'Salvar'}</button></div>
  </form></>}
  </dialog>
