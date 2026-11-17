@@ -257,64 +257,80 @@ export default function Inbox({conversionEnabled,bookingWritesEnabled,contractWr
      </div>
      </div>
     </details>
-    <div className={styles.actions}>
-     {conversionEnabled&&lead.status!=='archived'&&lead.status!=='converted'&&
-      <button type="button" disabled={Boolean(busy)} onClick={()=>openComposer(lead.id)}
-       className={styles.actionPrimary}><FileText size={16}/>Preparar proposta</button>}
-     {lead.status==='converted'&&lead.converted_proposal_id&&
-      (lead.proposal_status==='draft'
-       ? <button type="button" disabled={Boolean(busy)||!conversionEnabled} onClick={()=>openComposer(lead.id)}
-         className={styles.actionPrimary}><FileText size={16}/>Editar proposta</button>
-       : lead.proposal_status==='approved_internal'||lead.proposal_status==='legacy_accepted'
-       ? <Link href={'/vitrine/proposta/'+lead.converted_proposal_id+'?visualizar=1'} target="_blank" rel="noopener noreferrer"
-         className={styles.actionPrimary}><FileText size={16}/>Visualizar proposta PDF</Link>
-       : lead.proposal_status==='accepted'
-       ? <button type="button" className={styles.actionPrimary} disabled={Boolean(busy)}
-          onClick={()=>setBookingLeadId(lead.id)}>
-          <CalendarDays size={16}/>{reservationFor(lead)?'Ver reserva':'Organizar reserva'}</button>
-       : <Link href={'/vitrine/proposta/'+lead.converted_proposal_id+'?visualizar=1'} className={styles.actionPrimary}>
-         <FileText size={16}/>Visualizar / Salvar PDF</Link>)}
-     {lead.status==='archived'&&
-      <button type="button" disabled={Boolean(busy)} onClick={()=>void review(lead.id,'pending')}
-       className={styles.actionPrimary}><Archive size={16}/>Reabrir solicitação</button>}
-     {lead.status==='converted'&&!lead.proposal_expired&&lead.converted_proposal_id&&['approved_internal','legacy_accepted'].includes(String(lead.proposal_status))&&
-      <button type="button" disabled={Boolean(busy)||!conversionEnabled} onClick={()=>setAcceptLeadId(lead.id)}
-       className={styles.actionSecondary}><CheckCircle2 size={16}/>Registrar aceite real</button>}
-     {conversionEnabled&&lead.status==='converted'&&lead.converted_proposal_id&&lead.proposal_expired&&['approved_internal','legacy_accepted'].includes(String(lead.proposal_status))&&
-      <button type="button" disabled={Boolean(busy)} className={styles.actionPrimary} onClick={()=>setRenewLeadId(lead.id)}><CalendarDays size={16}/>Renovar validade</button>}
+    <div className={[styles.actions,lead.status==='converted'&&lead.proposal_status==='accepted'?styles.journeyActions:''].filter(Boolean).join(' ')} aria-label="Ações do atendimento em ordem da jornada">
+     {lead.converted_client_id&&
+      <Link href={'/clientes/'+lead.converted_client_id} className={styles.actionSecondary}
+       title="Abrir ficha da instituição" aria-label="Ficha da instituição">
+       <Users size={15}/>Ficha
+      </Link>}
      <a className={styles.actionWhatsApp}
       href={'https://wa.me/'+lead.phone.replace(/\D/g,'')+'?text='+encodeURIComponent(whatsAppMessage(lead))}
-      target="_blank" rel="noopener noreferrer"><MessageCircle size={16}/>WhatsApp</a>
+      target="_blank" rel="noopener noreferrer" title="Abrir conversa real no WhatsApp">
+      <MessageCircle size={15}/>WhatsApp
+     </a>
+     {conversionEnabled&&lead.status!=='archived'&&lead.status!=='converted'&&
+      <button type="button" disabled={Boolean(busy)} onClick={()=>openComposer(lead.id)}
+       className={styles.actionPrimary}><FileText size={15}/>Preparar proposta</button>}
+     {lead.status==='converted'&&lead.converted_proposal_id&&lead.proposal_status==='draft'&&
+      <button type="button" disabled={Boolean(busy)||!conversionEnabled} onClick={()=>openComposer(lead.id)}
+       className={styles.actionPrimary} title="Editar proposta em rascunho"><FileText size={15}/>Editar proposta</button>}
+     {lead.status==='converted'&&lead.converted_proposal_id&&lead.proposal_status!=='draft'&&
+      <Link href={'/vitrine/proposta/'+lead.converted_proposal_id+'?visualizar=1'}
+       target="_blank" rel="noopener noreferrer"
+       className={lead.proposal_status==='accepted'?styles.actionSecondary:styles.actionPrimary}
+       title="Visualizar proposta comercial em PDF" aria-label="Visualizar proposta em PDF">
+       <FileText size={15}/>PDF
+      </Link>}
+     {lead.status==='converted'&&lead.converted_proposal_id&&lead.proposal_status==='draft'&&
+      <Link href={'/vitrine/proposta/'+lead.converted_proposal_id+'?visualizar=1'}
+       target="_blank" rel="noopener noreferrer" className={styles.actionSecondary}
+       title="Prévia da proposta em PDF" aria-label="Prévia da proposta em PDF"><FileText size={15}/>PDF</Link>}
+     {lead.status==='converted'&&!lead.proposal_expired&&lead.converted_proposal_id&&['approved_internal','legacy_accepted'].includes(String(lead.proposal_status))&&
+      <button type="button" disabled={Boolean(busy)||!conversionEnabled}
+       onClick={()=>setAcceptLeadId(lead.id)} className={styles.actionPrimary}
+       title="Registrar o aceite verdadeiro da escola"><CheckCircle2 size={15}/>Registrar aceite</button>}
+     {conversionEnabled&&lead.status==='converted'&&lead.converted_proposal_id&&lead.proposal_expired&&['approved_internal','legacy_accepted'].includes(String(lead.proposal_status))&&
+      <button type="button" disabled={Boolean(busy)} className={styles.actionPrimary}
+       onClick={()=>setRenewLeadId(lead.id)} title="Renovar validade da proposta">
+       <CalendarDays size={15}/>Renovar validade</button>}
+     {lead.status==='converted'&&lead.proposal_status==='accepted'&&lead.converted_proposal_id&&
+      <button type="button" className={styles.actionSecondary} disabled={Boolean(busy)}
+       onClick={()=>setContractLeadId(lead.id)}
+       title={contractData?.contracts.some(c=>c.proposal_id===lead.converted_proposal_id)?'Elaborar ou consultar documento':'Criar contrato opcional'}
+       aria-label={contractData?.contracts.some(c=>c.proposal_id===lead.converted_proposal_id)?'Elaborar documento do contrato':'Criar contrato opcional'}>
+       <FileText size={15}/>Contrato
+      </button>}
+     {lead.status==='converted'&&lead.proposal_status==='accepted'&&lead.converted_proposal_id&&
+      <button type="button" className={reservationFor(lead)?styles.actionSecondary:styles.actionPrimary}
+       disabled={Boolean(busy)} onClick={()=>setBookingLeadId(lead.id)}
+       title={reservationFor(lead)?'Ver reserva de cúpula':'Organizar reserva de cúpula'}>
+       <CalendarDays size={15}/>{reservationFor(lead)?'Ver reserva':'Reservar'}
+      </button>}
+     {lead.status==='converted'&&lead.proposal_status==='accepted'&&lead.converted_proposal_id&&lead.converted_client_id&&
+      <button type="button" className={styles.actionSecondary} disabled={Boolean(busy)}
+       onClick={()=>setFinanceLeadId(lead.id)} title="Financeiro desta proposta">
+       <Wallet size={15}/>Financeiro
+      </button>}
+     {lead.status==='converted'&&lead.proposal_status==='accepted'&&
+      (reservationFor(lead)?
+       <button type="button" className={(reservationFor(lead)?.crm_event_status==='completed'||reservationFor(lead)?.status==='completed')?styles.actionSecondary:styles.actionPrimary}
+        disabled={Boolean(busy)} onClick={()=>setClosingLeadId(lead.id)}
+        title={(reservationFor(lead)?.crm_event_status==='completed'||reservationFor(lead)?.status==='completed')?'Ver encerramento':'Acompanhar conclusão da apresentação'}>
+        <CheckCircle2 size={15}/>Conclusão
+       </button>:
+       <button type="button" disabled className={styles.actionMuted}
+        title="Disponível após organizar a reserva de cúpula" aria-label="Conclusão disponível após reserva">
+        <CheckCircle2 size={15}/>Conclusão
+       </button>)}
+     {lead.status==='archived'&&
+      <button type="button" disabled={Boolean(busy)} onClick={()=>void review(lead.id,'pending')}
+       className={styles.actionPrimary}><Archive size={15}/>Reabrir solicitação</button>}
      {lead.status!=='converted'&&(['pending','reviewing','archived'] as const)
        .filter(status=>status!==lead.status&&!(lead.status==='archived'&&status==='pending')).map(status=>
         <button type="button" key={status} disabled={Boolean(busy)} onClick={()=>void review(lead.id,status)}
          className={status==='archived'?styles.actionMuted:styles.actionSecondary}>
          {status==='reviewing'?'Iniciar análise':status==='pending'?'Marcar como pendente':'Arquivar'}
         </button>)}
-     {lead.status==='converted'&&lead.converted_proposal_id&&
-       ['draft','accepted'].includes(String(lead.proposal_status))&&
-       <Link href={'/vitrine/proposta/'+lead.converted_proposal_id+'?visualizar=1'}
-        target="_blank" rel="noopener noreferrer" className={styles.actionSecondary}>
-        <FileText size={16}/>Visualizar PDF</Link>}
-     {lead.status==='converted'&&lead.proposal_status==='accepted'&&reservationFor(lead)&&
-       <button type="button" className={styles.actionSecondary} disabled={Boolean(busy)}
-        onClick={()=>setClosingLeadId(lead.id)}>
-        <CheckCircle2 size={16}/>{reservationFor(lead)?.crm_event_status==='completed'||reservationFor(lead)?.status==='completed'?'Ver conclusão':'Conclusão'}
-       </button>}
-     {lead.status==='converted'&&lead.proposal_status==='accepted'&&lead.converted_proposal_id&&lead.converted_client_id&&
-       <button type="button" className={styles.actionSecondary} disabled={Boolean(busy)}
-        onClick={()=>setFinanceLeadId(lead.id)}>
-        <Wallet size={16}/>Financeiro
-       </button>}
-     {lead.status==='converted'&&lead.proposal_status==='accepted'&&lead.converted_proposal_id&&
-       <button type="button" className={styles.actionSecondary} disabled={Boolean(busy)}
-        onClick={()=>setContractLeadId(lead.id)}>
-        <FileText size={16}/>{contractData?.contracts.some(c=>c.proposal_id===lead.converted_proposal_id)?'Elaborar documento':'Criar contrato (opcional)'}
-       </button>}
-     {lead.converted_client_id&&
-       <Link href={'/clientes/'+lead.converted_client_id} className={styles.actionSecondary}>
-        <Users size={16}/>Ficha da instituição
-       </Link>}
     </div>
    </article>)}
   </div>
