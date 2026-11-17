@@ -113,7 +113,8 @@ export default function ServiceBooking({
 
  return <dialog ref={dialog} aria-labelledby="service-booking-title"
   onCancel={e=>{e.preventDefault();if(!busy)onClose();}}
-  style={{width:'min(100% - 24px,590px)',maxHeight:'90vh',overflowY:'auto',
+  style={{position:'fixed',top:'50%',left:'50%',transform:'translate(-50%, -50%)',margin:0,
+   width:'min(100% - 24px,590px)',maxHeight:'90vh',overflowY:'auto',
    border:0,borderRadius:17,padding:0,color:'#183d73',background:'#f8fbff',
    boxShadow:'0 25px 70px #071c4990'}}>
   <header style={{display:'flex',gap:12,alignItems:'center',justifyContent:'space-between',
