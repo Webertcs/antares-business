@@ -1,7 +1,7 @@
 'use client';
 import {useCallback,useEffect,useMemo,useState} from 'react';
 import Link from 'next/link';
-import {Archive,ArrowLeft,Building2,CalendarDays,CheckCircle2,ChevronDown,Clock3,FileText,Layers,MapPin,MessageCircle,MoreHorizontal,Phone,RefreshCw,UserRound,Users} from 'lucide-react';
+import {Archive,ArrowLeft,Building2,CalendarDays,CheckCircle2,ChevronDown,Clock3,FileText,Layers,MapPin,MessageCircle,Phone,RefreshCw,UserRound,Users} from 'lucide-react';
 import styles from './inbox.module.css';
 import ProposalComposer from './ProposalComposer';
 import ClientAcceptance from './ClientAcceptance';
@@ -258,29 +258,26 @@ export default function Inbox({conversionEnabled,bookingWritesEnabled,contractWr
      <a className={styles.actionWhatsApp}
       href={'https://wa.me/'+lead.phone.replace(/\D/g,'')+'?text='+encodeURIComponent(whatsAppMessage(lead))}
       target="_blank" rel="noopener noreferrer"><MessageCircle size={16}/>WhatsApp</a>
-     <details className={styles.more}>
-      <summary className={styles.moreSummary} aria-label={'Mais opções para '+lead.institution}>
-       <MoreHorizontal size={16}/>Mais opções<ChevronDown size={14} className={styles.moreChevron}/>
-      </summary>
-      <div className={styles.morePanel}>
-       {lead.status!=='converted'&&(['pending','reviewing','archived'] as const).filter(s=>s!==lead.status&&!(lead.status==='archived'&&s==='pending')).map(s=>
-        <button type="button" key={s} disabled={Boolean(busy)} onClick={()=>void review(lead.id,s)}
-         className={s==='archived'?styles.actionMuted:styles.actionSecondary}>
-         {s==='reviewing'?'Iniciar análise':s==='pending'?'Marcar como pendente':'Arquivar'}
+     {lead.status!=='converted'&&(['pending','reviewing','archived'] as const)
+       .filter(status=>status!==lead.status&&!(lead.status==='archived'&&status==='pending')).map(status=>
+        <button type="button" key={status} disabled={Boolean(busy)} onClick={()=>void review(lead.id,status)}
+         className={status==='archived'?styles.actionMuted:styles.actionSecondary}>
+         {status==='reviewing'?'Iniciar análise':status==='pending'?'Marcar como pendente':'Arquivar'}
         </button>)}
-       {lead.status==='converted'&&lead.converted_proposal_id&&['draft','approved_internal','legacy_accepted','accepted'].includes(String(lead.proposal_status))&&
-        <Link href={'/vitrine/proposta/'+lead.converted_proposal_id+'?visualizar=1'} className={styles.actionSecondary}>
-         <FileText size={16}/>Visualizar / Salvar PDF</Link>}
-       {lead.status==='converted'&&lead.proposal_status==='accepted'&&lead.converted_proposal_id&&
-        <button type="button" className={styles.actionSecondary} disabled={Boolean(busy)}
-         onClick={()=>setContractLeadId(lead.id)}>
-         <FileText size={16}/>{contractData?.contracts.some(c=>c.proposal_id===lead.converted_proposal_id)?'Consultar contrato':'Contrato (opcional)'}
-        </button>}
-       {lead.status==='converted'&&lead.converted_proposal_id&&lead.proposal_status!=='draft'&&
-        <span className={styles.moreHint}>{lead.proposal_status==='accepted'?'Aceite registrado. Proposta liberada para agendamento.':lead.proposal_expired?'Proposta vencida: a validade deve ser renovada de forma auditada.':'Aprovação interna não equivale ao aceite da escola.'}</span>}
-       {lead.converted_client_id&&<Link href={'/clientes/'+lead.converted_client_id} className={styles.actionSecondary}><Users size={16}/>Ficha da instituição</Link>}
-      </div>
-     </details>
+     {lead.status==='converted'&&lead.converted_proposal_id&&
+       ['draft','accepted'].includes(String(lead.proposal_status))&&
+       <Link href={'/vitrine/proposta/'+lead.converted_proposal_id+'?visualizar=1'}
+        target="_blank" rel="noopener noreferrer" className={styles.actionSecondary}>
+        <FileText size={16}/>Visualizar PDF</Link>}
+     {lead.status==='converted'&&lead.proposal_status==='accepted'&&lead.converted_proposal_id&&
+       <button type="button" className={styles.actionSecondary} disabled={Boolean(busy)}
+        onClick={()=>setContractLeadId(lead.id)}>
+        <FileText size={16}/>{contractData?.contracts.some(c=>c.proposal_id===lead.converted_proposal_id)?'Consultar contrato':'Contrato opcional'}
+       </button>}
+     {lead.converted_client_id&&
+       <Link href={'/clientes/'+lead.converted_client_id} className={styles.actionSecondary}>
+        <Users size={16}/>Ficha da instituição
+       </Link>}
     </div>
    </article>)}
   </div>
