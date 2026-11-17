@@ -1,7 +1,7 @@
 'use client';
 
 import {useEffect,useRef,useState,type FormEvent} from 'react';
-import Link from 'next/link';
+import ContractDraftEditor from './ContractDraftEditor';
 import {FileCheck2,X} from 'lucide-react';
 
 export type CentralContract={
@@ -37,6 +37,7 @@ export default function ServiceContract({
  const [mode,setMode]=useState<'written'|'verbal'|'whatsapp'>('written');
  const [terms,setTerms]=useState('');
  const [error,setError]=useState('');
+ const [editingDocument,setEditingDocument]=useState(false);
 
  useEffect(()=>{
   const current=ref.current;
@@ -88,9 +89,9 @@ export default function ServiceContract({
  }
 
  return <dialog ref={ref} aria-labelledby="central-contract-title"
-  onCancel={e=>{e.preventDefault();if(!busy)onClose();}}
+  onCancel={e=>{e.preventDefault();if(!busy&&!editingDocument)onClose();}}
   style={{position:'fixed',top:'50%',left:'50%',transform:'translate(-50%, -50%)',margin:0,
-   width:'min(100% - 24px,570px)',maxHeight:'90dvh',overflowY:'auto',
+   width:editingDocument?'min(100% - 24px,850px)':'min(100% - 24px,570px)',maxHeight:'90dvh',overflowY:'auto',
    padding:0,border:0,borderRadius:17,color:'#173d77',background:'#f9fbff',
    boxShadow:'0 25px 70px #071c4990'}}>
   <header style={{padding:'17px 20px',display:'flex',alignItems:'center',justifyContent:'space-between',
@@ -101,10 +102,19 @@ export default function ServiceContract({
      <h2 id="central-contract-title" style={{margin:0,fontSize:20,color:'#fff'}}>Contrato opcional</h2>
     </div>
    </div>
-   <button type="button" disabled={busy} aria-label="Fechar contrato" onClick={onClose}
+   <button type="button" disabled={busy||editingDocument} aria-label="Fechar contrato" onClick={onClose}
     style={{...secondary,padding:8}}><X size={18}/></button>
   </header>
   <div style={{padding:20,display:'grid',gap:14}}>
+   {editingDocument&&contract&&proposal?<ContractDraftEditor
+     key={contract.id}
+     contractId={contract.id}
+     clientId={proposal.client_id}
+     proposal={proposal}
+     institution={institution}
+     responsible=""
+     onClose={()=>setEditingDocument(false)}
+   />:<>
    <div style={{padding:13,background:'#e9f2ff',border:'1px solid #c8dcf7',borderRadius:11}}>
     <strong>{institution}</strong>
     <p style={{margin:'6px 0 0',fontSize:12}}>O contrato escrito não é necessário para reservar a cúpula.</p>
@@ -117,9 +127,7 @@ export default function ServiceContract({
     <p style={{margin:0,fontSize:13}}>Situação: {contract.status==='confirmed'?'Confirmado':contract.status==='pending'?'Pendente de confirmação':contract.status}</p>
     <p style={{margin:0,fontSize:13}}>Modalidade: {contract.confirmation_mode==='written'?'Formal por escrito':contract.confirmation_mode==='verbal'?'Verbal':'WhatsApp'}</p>
     <p style={{margin:0,fontSize:12,color:'#496a97'}}>O cadastro não substitui a confirmação real do cliente.</p>
-    {proposal?.client_id&&<Link href={'/clientes/'+proposal.client_id+'?aba=contratos'} style={{...button,textDecoration:'none',textAlign:'center'}}>
-     Elaborar ou consultar documento
-    </Link>}
+    {proposal?.client_id&&<button type="button" onClick={()=>setEditingDocument(true)} style={button}>Elaborar documento</button>}
    </div>}
    {!loading&&!contract&&proposal&&accepted&&<form onSubmit={e=>void save(e)} style={{display:'grid',gap:13}}>
     <label style={{fontSize:13,fontWeight:750}}>Proposta aceita
@@ -147,6 +155,7 @@ export default function ServiceContract({
    </form>}
    {!loading&&!contract&&(!proposal||!accepted)&&<p role="alert">Registre primeiro o aceite verdadeiro da proposta.</p>}
    {(!proposal||contract)&&<button type="button" disabled={busy} onClick={onClose} style={secondary}>Fechar</button>}
+   </>}
   </div>
  </dialog>;
 }
