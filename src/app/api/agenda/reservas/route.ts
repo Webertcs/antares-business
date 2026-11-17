@@ -6,7 +6,7 @@ const fail=(error:string,status:number)=>NextResponse.json({error},{status,heade
 export async function GET(){
  const owner=await requireOwner();if(!owner)return fail('Somente proprietário',403);
  try{const db=getDb();const [proposals,domes,links]=await Promise.all([
- db`SELECT p.id,p.title,c.name AS client_name, (m.operational_client_id IS NOT NULL) AS mapped FROM public.business_proposals p JOIN public.crm_clients c ON c.id=p.client_id AND c.organization_id=p.organization_id LEFT JOIN public.antares_client_links m ON m.organization_id=p.organization_id AND m.crm_client_id=p.client_id WHERE p.organization_id=${owner.organizationId} AND p.status='accepted'
+ db`SELECT p.id,p.title,p.expected_attendees,c.name AS client_name, (m.operational_client_id IS NOT NULL) AS mapped FROM public.business_proposals p JOIN public.crm_clients c ON c.id=p.client_id AND c.organization_id=p.organization_id LEFT JOIN public.antares_client_links m ON m.organization_id=p.organization_id AND m.crm_client_id=p.client_id WHERE p.organization_id=${owner.organizationId} AND p.status='accepted'
  AND (p.client_accepted_at IS NOT NULL
   OR NOT EXISTS(SELECT 1 FROM public.vitrine_leads vl
    WHERE vl.organization_id=p.organization_id AND vl.converted_proposal_id=p.id)
