@@ -39,6 +39,8 @@ export default function ServiceContract({
  const [error,setError]=useState('');
  const [notice,setNotice]=useState('');
  const [editingDocument,setEditingDocument]=useState(false);
+ const [closeRequest,setCloseRequest]=useState(0);
+ const requestDismiss=()=>{if(busy)return;if(editingDocument)setCloseRequest(v=>v+1);else onClose();};
 
  useEffect(()=>{
   const current=ref.current;
@@ -99,7 +101,7 @@ export default function ServiceContract({
  }
 
  return <dialog ref={ref} aria-labelledby="central-contract-title"
-  onCancel={e=>{e.preventDefault();if(!busy&&!editingDocument)onClose();}}
+  onCancel={e=>{e.preventDefault();requestDismiss();}}
   style={{position:'fixed',top:'50%',left:'50%',transform:'translate(-50%, -50%)',margin:0,
    width:editingDocument?'min(100% - 24px,850px)':'min(100% - 24px,570px)',maxHeight:'90dvh',overflowY:'auto',
    padding:0,border:0,borderRadius:17,color:'#173d77',background:'#f9fbff',
@@ -112,7 +114,7 @@ export default function ServiceContract({
      <h2 id="central-contract-title" style={{margin:0,fontSize:20,color:'#fff'}}>{editingDocument?'Elaborar documento':'Contrato opcional'}</h2>
     </div>
    </div>
-   <button type="button" disabled={busy||editingDocument} aria-label="Fechar contrato" onClick={onClose}
+   <button type="button" disabled={busy} aria-label="Fechar contrato" onClick={requestDismiss}
     style={{...secondary,padding:8}}><X size={18}/></button>
   </header>
   <div style={{padding:20,display:'grid',gap:14}}>
@@ -124,6 +126,8 @@ export default function ServiceContract({
      institution={institution}
      responsible=""
      onClose={()=>setEditingDocument(false)}
+     onDismiss={onClose}
+     closeRequest={closeRequest}
    />:<>
    <div style={{padding:13,background:'#e9f2ff',border:'1px solid #c8dcf7',borderRadius:11}}>
     <strong>{institution}</strong>
