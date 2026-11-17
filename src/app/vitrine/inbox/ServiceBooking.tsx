@@ -70,10 +70,10 @@ export default function ServiceBooking({
  const domes=data?.domes.filter(d=>d.mapped)||[];
  const selectedDome=domes.find(d=>d.id===domeId);
  const startDate=normal(start),endDate=normal(end);
- const validDates=Boolean(startDate&&endDate&&endDate>startDate&&startDate.getTime()>Date.now());
+ const validDates=Boolean(startDate&&endDate&&endDate.getTime()>startDate.getTime()&&startDate.getTime()>Date.now());
  const conflicting=Boolean(validDates&&domeId&&data?.links.some(r=>
   r.status!=='cancelled'&&r.dome_id===domeId&&
-  new Date(r.starts_at)<endDate!&&new Date(r.ends_at)>startDate!));
+  new Date(r.starts_at).getTime()<endDate!.getTime()&&new Date(r.ends_at).getTime()>startDate!.getTime()));
  const canSave=enabled&&!busy&&Boolean(proposal?.mapped)&&Boolean(selectedDome)&&validDates&&!conflicting&&!reservation;
 
  async function linkClient(){
