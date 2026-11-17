@@ -47,5 +47,14 @@ export async function POST(req:NextRequest){
   const result=await sql`SELECT public.business_confirm_client_acceptance(
    ${owner.user.id},${id}::uuid,${String(channel)},${evidence}) AS status`;
   return reply({ok:true,status:result[0]?.status},200);
- }catch{return reply({error:'Aceite não registrado. Confira a aprovação interna, validade, dados e permissões.'},409);}
+ }catch(error){
+  // Registrar apenas o código técnico; nunca expor evidências, dados pessoais ou SQL ao navegador.
+  const code=typeof error==='object'&&error!==null&&'code' in error&&typeof error.code==='string'
+   ?error.code:'UNKNOWN';
+  console.error('[ANTARES][ACEITE] Operação recusada pelo banco. Código:',code);
+  return reply({
+   error:'O banco não confirmou o aceite. A proposta não foi alterada. Confira se o aceite já foi registrado e se a proposta está válida e aprovada internamente.',
+   code:'ACCEPTANCE_REJECTED'
+  },409);
+ }
 }
