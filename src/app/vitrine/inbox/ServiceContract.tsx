@@ -55,6 +55,7 @@ export default function ServiceContract({
     const proposal=(json.proposals as CentralContractProposal[]).find(p=>p.id===proposalId);
     if(!proposal)throw Error('Proposta não encontrada na instituição.');
     setData(json as CentralContractData);
+    if((json.contracts as CentralContract[]).some(c=>c.proposal_id===proposalId))setEditingDocument(true);
     const n=Number(proposal.expected_attendees||0);
     setTerms([
      'Serviço: '+proposal.title,
@@ -99,7 +100,7 @@ export default function ServiceContract({
    <div style={{display:'flex',alignItems:'center',gap:10}}>
     <FileCheck2 size={24}/>
     <div><small style={{opacity:.8,fontWeight:750}}>CENTRAL DE ATENDIMENTO</small>
-     <h2 id="central-contract-title" style={{margin:0,fontSize:20,color:'#fff'}}>Contrato opcional</h2>
+     <h2 id="central-contract-title" style={{margin:0,fontSize:20,color:'#fff'}}>{editingDocument?'Elaborar documento':'Contrato opcional'}</h2>
     </div>
    </div>
    <button type="button" disabled={busy||editingDocument} aria-label="Fechar contrato" onClick={onClose}
