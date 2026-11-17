@@ -7,7 +7,8 @@ export type ServiceProposal={id:string;title:string;client_name:string;mapped:bo
 export type ServiceDome={id:string;name:string;capacity:number|null;mapped:boolean};
 export type ServiceReservation={
  proposal_id:string;presentation_id:string;starts_at:string;ends_at:string;
- status:string;dome_id:string|null;dome_name:string|null
+ status:string;dome_id:string|null;dome_name:string|null;
+ crm_event_id:string|null;crm_event_status:string|null
 };
 export type ServiceBookingData={
  proposals:ServiceProposal[];domes:ServiceDome[];links:ServiceReservation[]
