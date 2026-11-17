@@ -36,8 +36,9 @@ const parseDraft=(d:Draft):FormData=>({
 const sanitize=(v:string)=>v.replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]||c));
 const htmlLines=(v:string)=>sanitize(v).replace(/\r\n?/g,'\n').replace(/\n/g,'<br>');
 
-export default function ContractDraftEditor({contractId,clientId,proposal,institution,responsible,onClose}:{
- contractId:string;clientId:string;proposal:Proposal;institution:string;responsible:string;onClose:()=>void;
+export default function ContractDraftEditor({contractId,clientId,proposal,institution,responsible,onClose,onDismiss,closeRequest}:{
+ contractId:string;clientId:string;proposal:Proposal;institution:string;responsible:string;
+ onClose:()=>void;onDismiss:()=>void;closeRequest:number;
 }){
  const [form,setForm]=useState<FormData>(blank);
  const [selectedId,setSelectedId]=useState<string|null>(null);
@@ -47,7 +48,7 @@ export default function ContractDraftEditor({contractId,clientId,proposal,instit
  const [saving,setSaving]=useState(false);
  const [error,setError]=useState('');
  const [notice,setNotice]=useState('');
- const [discard,setDiscard]=useState(false);
+ const [discard,setDiscard]=useState<'back'|'dismiss'|null>(null);
  const update=(field:keyof FormData,value:string)=>{setForm(v=>({...v,[field]:value}));setDirty(true);setNotice('');};
 
  async function getDrafts(){
@@ -161,11 +162,16 @@ header img{max-width:100%;height:auto;max-height:58mm}h1{font-size:19pt;color:#1
 </main></body></html>`);
   page.document.close();
  }
- function exit(){
+ function exit(target:'back'|'dismiss'='back'){
   if(saving)return;
-  if(dirty){setDiscard(true);return;}
-  onClose();
+  if(dirty){setDiscard(target);return;}
+  if(target==='dismiss')onDismiss();else onClose();
  }
+ useEffect(()=>{
+  if(closeRequest>0)exit('dismiss');
+  // O pedido é emitido somente pelo X/Esc do modal principal.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+ },[closeRequest]);
 
  return <section aria-label="Editor do documento contratual"
   style={{display:'grid',gap:15,color:'#174374'}}>
@@ -176,7 +182,7 @@ header img{max-width:100%;height:auto;max-height:58mm}h1{font-size:19pt;color:#1
      {selectedId?'Minuta existente · edição com histórico':'Novo modelo · dados preenchidos automaticamente'}
     </p>
    </div>
-   <button type="button" onClick={exit} disabled={saving} style={grey}><ArrowLeft size={16}/>Voltar ao contrato</button>
+   <button type="button" onClick={()=>exit('back')} disabled={saving} style={grey}><ArrowLeft size={16}/>Voltar ao contrato</button>
   </div>
   {!ready&&!error&&<p role="status">Consultando dados da instituição e minutas já salvas...</p>}
   {error&&<p role="alert" style={{margin:0,padding:11,border:'1px solid #fecaca',background:'#fff1f2',borderRadius:8,color:'#9f1239'}}>{error}</p>}
@@ -208,6 +214,7 @@ header img{max-width:100%;height:auto;max-height:58mm}h1{font-size:19pt;color:#1
      onChange={e=>update('terms',e.target.value)}/>
    </label>
    <div style={{display:'flex',flexWrap:'wrap',gap:9,alignItems:'center',justifyContent:'flex-end'}}>
+    <button type="button" disabled={saving} onClick={()=>exit('dismiss')} style={grey}>Cancelar</button>
     <button type="button" disabled={saving||(!dirty&&Boolean(saved))} onClick={()=>void save()} style={action}>
      <Save size={16}/>{saving?'Salvando...':'Salvar minuta'}
     </button>
@@ -215,14 +222,16 @@ header img{max-width:100%;height:auto;max-height:58mm}h1{font-size:19pt;color:#1
      <FileDown size={16}/>Visualizar / PDF salvo
     </button>
    </div>
-   <p style={{margin:0,fontSize:11,color:'#587ba6'}}>O PDF utiliza somente a última versão salva. Para confirmação contratual, utilize o registro de confirmação real do cliente.</p>
   </div>}
-  {discard&&<div role="group" aria-label="Descartar alterações do documento" style={{padding:14,border:'1px solid #f0c785',borderRadius:10,background:'#fff7e9',display:'grid',gap:9}}>
-   <strong>Descartar alterações não salvas?</strong>
-   <p style={{margin:0,fontSize:12}}>A última minuta salva no banco será preservada.</p>
-   <div style={{display:'flex',gap:8,flexWrap:'wrap'}}>
-    <button type="button" onClick={()=>setDiscard(false)} style={grey}>Continuar editando</button>
-    <button type="button" onClick={onClose} style={action}>Descartar alterações</button>
+  {discard&&<div style={{position:'fixed',inset:0,zIndex:20,background:'rgba(7,29,68,.72)',display:'grid',placeItems:'center',padding:16}}>
+   <div role="alertdialog" aria-modal="true" aria-labelledby="discard-contract-title" aria-describedby="discard-contract-description"
+    style={{width:'min(100%,430px)',padding:20,border:'1px solid #f0c785',borderRadius:14,background:'#fffaf1',display:'grid',gap:13,boxShadow:'0 24px 70px #071a4380'}}>
+    <strong id="discard-contract-title" style={{fontSize:17,color:'#7b4318'}}>Descartar alterações?</strong>
+    <p id="discard-contract-description" style={{margin:0,fontSize:13,color:'#62462e'}}>Os campos não salvos serão descartados. A última minuta salva continuará preservada.</p>
+    <div style={{display:'flex',gap:8,flexWrap:'wrap',justifyContent:'flex-end'}}>
+     <button type="button" onClick={()=>setDiscard(null)} style={grey}>Continuar editando</button>
+     <button type="button" onClick={()=>{if(discard==='dismiss')onDismiss();else onClose();}} style={action}>Descartar e sair</button>
+    </div>
    </div>
   </div>}
  </section>;
