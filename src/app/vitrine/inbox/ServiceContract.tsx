@@ -89,7 +89,8 @@ export default function ServiceContract({
 
  return <dialog ref={ref} aria-labelledby="central-contract-title"
   onCancel={e=>{e.preventDefault();if(!busy)onClose();}}
-  style={{width:'min(100% - 24px,570px)',maxHeight:'90dvh',overflowY:'auto',
+  style={{position:'fixed',top:'50%',left:'50%',transform:'translate(-50%, -50%)',margin:0,
+   width:'min(100% - 24px,570px)',maxHeight:'90dvh',overflowY:'auto',
    padding:0,border:0,borderRadius:17,color:'#173d77',background:'#f9fbff',
    boxShadow:'0 25px 70px #071c4990'}}>
   <header style={{padding:'17px 20px',display:'flex',alignItems:'center',justifyContent:'space-between',
