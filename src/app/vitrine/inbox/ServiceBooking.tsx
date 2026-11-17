@@ -3,7 +3,7 @@
 import {useEffect,useRef,useState,type FormEvent} from 'react';
 import {CalendarCheck2,CheckCircle2,X} from 'lucide-react';
 
-export type ServiceProposal={id:string;title:string;client_name:string;mapped:boolean};
+export type ServiceProposal={id:string;title:string;client_name:string;mapped:boolean;expected_attendees:number|null};
 export type ServiceDome={id:string;name:string;capacity:number|null;mapped:boolean};
 export type ServiceReservation={
  proposal_id:string;presentation_id:string;starts_at:string;ends_at:string;
@@ -69,12 +69,13 @@ export default function ServiceBooking({
  const reservation=data?.links.find(r=>r.proposal_id===proposalId&&r.status!=='cancelled');
  const domes=data?.domes.filter(d=>d.mapped)||[];
  const selectedDome=domes.find(d=>d.id===domeId);
+ const capacityOk=!selectedDome||!proposal?.expected_attendees||selectedDome.capacity==null||Number(proposal.expected_attendees)<=Number(selectedDome.capacity);
  const startDate=normal(start),endDate=normal(end);
  const validDates=Boolean(startDate&&endDate&&endDate.getTime()>startDate.getTime()&&startDate.getTime()>Date.now());
  const conflicting=Boolean(validDates&&domeId&&data?.links.some(r=>
   r.status!=='cancelled'&&r.dome_id===domeId&&
   new Date(r.starts_at).getTime()<endDate!.getTime()&&new Date(r.ends_at).getTime()>startDate!.getTime()));
- const canSave=enabled&&!busy&&Boolean(proposal?.mapped)&&Boolean(selectedDome)&&validDates&&!conflicting&&!reservation;
+ const canSave=enabled&&!busy&&Boolean(proposal?.mapped)&&Boolean(selectedDome)&&validDates&&!conflicting&&capacityOk&&!reservation;
 
  async function linkClient(){
   if(!enabled||busy||!proposal)return;
@@ -152,7 +153,7 @@ export default function ServiceBooking({
      <select required disabled={!enabled||busy} value={domeId} onChange={e=>setDomeId(e.target.value)}
       style={{...field,marginTop:5}}>
       <option value="">Selecionar cúpula</option>
-      {domes.map(d=><option key={d.id} value={d.id}>{d.name}{d.capacity?' · até '+d.capacity+' pessoas':''}</option>)}
+      {domes.map(d=><option key={d.id} value={d.id} disabled={Boolean(proposal?.expected_attendees&&d.capacity!=null&&Number(proposal.expected_attendees)>Number(d.capacity))}>{d.name}{d.capacity?' · até '+d.capacity+' pessoas':''}</option>)}
      </select>
     </label>
     {domes.length===0&&<p role="status" style={{color:'#92400e',fontSize:12}}>
@@ -168,6 +169,7 @@ export default function ServiceBooking({
        value={end} onChange={e=>setEnd(e.target.value)} style={{...field,marginTop:5}}/>
      </label>
     </div>
+    {!capacityOk&&<p role="alert" style={{margin:0,color:'#a02135',fontSize:12}}>Esta cúpula não comporta o público previsto. Selecione outra cúpula.</p>}
     {conflicting&&<p role="alert" style={{margin:0,color:'#a02135',fontSize:12}}>
      Esta cúpula já possui apresentação no intervalo escolhido. Selecione outro horário ou cúpula.
     </p>}
