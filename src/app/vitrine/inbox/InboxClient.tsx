@@ -6,9 +6,10 @@ import styles from './inbox.module.css';
 import ProposalComposer from './ProposalComposer';
 import ClientAcceptance from './ClientAcceptance';
 type Lead={id:string;responsible_name:string;institution:string;city:string;phone:string;
- audience:string;attendees:number|null;desired_date:string|null;notes:string;status:string;created_at:string;converted_client_id:string|null;converted_proposal_id:string|null;proposal_status:string|null};
+ audience:string;attendees:number|null;desired_date:string|null;notes:string;status:string;created_at:string;converted_client_id:string|null;converted_proposal_id:string|null;proposal_status:string|null;proposal_valid_until:string|null;proposal_expired:boolean|null};
 const label:Record<string,string>={pending:'Novo pedido',reviewing:'Em análise',converted:'Proposta criada',archived:'Arquivado'};
 function statusLabel(lead:Lead){
+ if(lead.status==='converted'&&lead.proposal_expired&&lead.proposal_status!=='accepted')return 'Proposta vencida';
  if(lead.status!=='converted')return label[lead.status]||lead.status;
  const statuses:Record<string,string>={draft:'Rascunho da proposta',approved_internal:'Proposta aprovada',legacy_accepted:'Aceite a confirmar',accepted:'Aceite registrado'};
  return statuses[String(lead.proposal_status||'')]||'Proposta criada';
@@ -118,6 +119,7 @@ export default function Inbox({conversionEnabled}:{conversionEnabled:boolean}){
      </div>
      <span className={[styles.status,
       lead.status==='converted'&&lead.proposal_status==='accepted'?styles.statusConverted:
+      lead.status==='converted'&&lead.proposal_expired?styles.statusPending:
       lead.status==='converted'?styles.statusReviewing:
       lead.status==='archived'?styles.statusArchived:
       lead.status==='reviewing'?styles.statusReviewing:
@@ -131,6 +133,7 @@ export default function Inbox({conversionEnabled}:{conversionEnabled:boolean}){
      <span><Users size={14} aria-hidden="true"/>{lead.attendees??'A combinar'} participantes</span>
      <span><CalendarDays size={14} aria-hidden="true"/>{date(lead.desired_date)}</span>
     </div>
+    {lead.status==='converted'&&lead.proposal_expired&&lead.proposal_status!=='accepted'&&<p role="status" style={{margin:'9px 0',padding:'10px 12px',background:'#fff4e4',border:'1px solid #e6bd72',borderRadius:8,color:'#805014',fontSize:13,fontWeight:650}}>Validade encerrada{lead.proposal_valid_until?' em '+date(lead.proposal_valid_until):''}. O aceite está bloqueado pelo banco. Solicite a renovação formal da proposta antes de registrar a confirmação da escola.</p>}
     <details className={styles.leadDetails}>
      <summary>Ver informações do pedido <ChevronDown size={15} aria-hidden="true"/></summary>
      <div className={styles.details}>
@@ -167,7 +170,7 @@ export default function Inbox({conversionEnabled}:{conversionEnabled:boolean}){
      {lead.status==='archived'&&
       <button type="button" disabled={Boolean(busy)} onClick={()=>void review(lead.id,'pending')}
        className={styles.actionPrimary}><Archive size={16}/>Reabrir solicitação</button>}
-     {lead.status==='converted'&&lead.converted_proposal_id&&['approved_internal','legacy_accepted'].includes(String(lead.proposal_status))&&
+     {lead.status==='converted'&&!lead.proposal_expired&&lead.converted_proposal_id&&['approved_internal','legacy_accepted'].includes(String(lead.proposal_status))&&
       <button type="button" disabled={Boolean(busy)||!conversionEnabled} onClick={()=>setAcceptLeadId(lead.id)}
        className={styles.actionSecondary}><CheckCircle2 size={16}/>Registrar aceite real</button>}
      <a className={styles.actionWhatsApp}
@@ -187,7 +190,7 @@ export default function Inbox({conversionEnabled}:{conversionEnabled:boolean}){
         <Link href={'/vitrine/proposta/'+lead.converted_proposal_id+'?visualizar=1'} className={styles.actionSecondary}>
          <FileText size={16}/>Visualizar / Salvar PDF</Link>}
        {lead.status==='converted'&&lead.converted_proposal_id&&lead.proposal_status!=='draft'&&
-        <span className={styles.moreHint}>{lead.proposal_status==='accepted'?'Aceite registrado. Proposta liberada para agendamento.':'Aprovação interna não equivale ao aceite da escola.'}</span>}
+        <span className={styles.moreHint}>{lead.proposal_status==='accepted'?'Aceite registrado. Proposta liberada para agendamento.':lead.proposal_expired?'Proposta vencida: a validade deve ser renovada de forma auditada.':'Aprovação interna não equivale ao aceite da escola.'}</span>}
        {lead.converted_client_id&&<Link href={'/clientes/'+lead.converted_client_id} className={styles.actionSecondary}><Users size={16}/>Ficha da instituição</Link>}
       </div>
      </details>
