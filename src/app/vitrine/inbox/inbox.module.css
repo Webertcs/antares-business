@@ -297,3 +297,33 @@
  .leadDetails .detailGroup+.detailGroup{border-left:0;padding-left:0}
 }
 @media(prefers-reduced-motion:reduce){.leadDetails>summary svg{transition:none}}
+
+
+/* Central de Atendimento — sete ações na ordem da jornada em uma única linha desktop.
+   Em telas estreitas a grade quebra sem esconder ou mudar a ordem das ações. */
+.journeyActions{
+ display:grid;
+ grid-template-columns:repeat(7,minmax(0,1fr));
+ align-items:stretch;
+ gap:6px;
+ width:100%;
+}
+.journeyActions>a,.journeyActions>button{
+ min-width:0;
+ min-height:37px;
+ padding:8px 4px;
+ gap:4px;
+ line-height:1.1;
+ font-size:10.5px;
+ white-space:nowrap;
+ text-align:center;
+}
+.journeyActions>a svg,.journeyActions>button svg{width:14px;height:14px;flex:0 0 14px}
+.journeyActions button:disabled{cursor:not-allowed}
+@media(max-width:880px){
+ .journeyActions{grid-template-columns:repeat(4,minmax(0,1fr))}
+}
+@media(max-width:540px){
+ .journeyActions{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .journeyActions>a,.journeyActions>button{min-height:39px;font-size:11px;padding:9px 6px}
+}
