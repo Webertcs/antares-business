@@ -13,8 +13,9 @@ import ServiceClosing from './ServiceClosing';
 type Lead={id:string;responsible_name:string;institution:string;city:string;phone:string;
  audience:string;attendees:number|null;desired_date:string|null;notes:string;status:string;created_at:string;converted_client_id:string|null;converted_proposal_id:string|null;proposal_status:string|null;proposal_valid_until:string|null;proposal_expired:boolean|null};
 const label:Record<string,string>={pending:'Novo pedido',reviewing:'Em análise',converted:'Proposta criada',archived:'Arquivado'};
+const isCompleted=(reservation:ServiceReservation|null)=>reservation?.crm_event_status==='completed'||reservation?.status==='completed';
 function statusLabel(lead:Lead,reservation:ServiceReservation|null){
- if(reservation?.crm_event_status==='completed'||reservation?.status==='completed')return 'Apresentação concluída';
+ if(isCompleted(reservation))return 'Concluída · arquivada';
  if(reservation&&reservation.status!=='cancelled')return 'Reserva registrada';
  if(lead.status==='converted'&&lead.proposal_expired&&lead.proposal_status!=='accepted')return 'Proposta vencida';
  if(lead.status!=='converted')return label[lead.status]||lead.status;
@@ -27,7 +28,7 @@ function ServiceTimeline({lead,reservation,operationalKnown,finance}:{
  finance:{charged:number;paid:number}|null
 }){
  const bookingDone=Boolean(reservation&&reservation.status!=='cancelled');
- const finished=Boolean(reservation?.crm_event_status==='completed'||reservation?.status==='completed');
+ const finished=isCompleted(reservation);
  const hasProposal=lead.status==='converted'&&Boolean(lead.converted_proposal_id);
  const accepted=hasProposal&&lead.proposal_status==='accepted';
  const steps=[
@@ -47,7 +48,7 @@ function ServiceTimeline({lead,reservation,operationalKnown,finance}:{
    </li>)}
   </ol>
   <p style={{margin:'10px 0 0',fontSize:12,color:'#365780'}}>
-   {finished?'Apresentação concluída conforme o registro operacional. Confira os recebimentos no Financeiro.':
+   {finished?'Apresentação concluída e arquivada para consulta. Quantidade de alunos registrada na operação. Confira eventuais recebimentos no Financeiro.':
     bookingDone?'Reserva registrada para '+(reservation?.starts_at?dateTime(reservation.starts_at):'data a confirmar')+'. Acompanhe a apresentação e o financeiro.':
     accepted&&!operationalKnown?'Aceite registrado. O estado das reservas não pôde ser consultado. Atualize a Central.':
     accepted?'Próxima ação: organizar a reserva. Contrato escrito é opcional.':
@@ -62,8 +63,10 @@ function ServiceTimeline({lead,reservation,operationalKnown,finance}:{
  </div>;
 }
 function matchesFilter(lead:Lead,key:string,reservation:ServiceReservation|null){
+ const completed=isCompleted(reservation);
  if(key==='all')return true;
- if(key==='open')return lead.status!=='archived'&&reservation?.status!=='completed'&&reservation?.crm_event_status!=='completed';
+ if(key==='open')return lead.status!=='archived'&&!completed;
+ if(key==='archived')return lead.status==='archived'||completed;
  return lead.status===key;
 }
 const money=(n:number)=>new Intl.NumberFormat('pt-BR',{style:'currency',currency:'BRL'}).format(n);
@@ -346,7 +349,7 @@ export default function Inbox({conversionEnabled,bookingWritesEnabled,contractWr
     institution={closingLead.institution}
     reservation={reservationFor(closingLead)!}
     onClose={()=>setClosingLeadId(null)}
-    onSaved={()=>{setNotice('Encerramento registrado. Consulte o histórico da apresentação.');void refreshBookings();void refreshFinance();void load();}}
+    onSaved={()=>{setClosingLeadId(null);setFilter('open');setNotice('Apresentação concluída. Atendimento movido para Arquivadas, com histórico e documentos preservados.');void refreshBookings();void refreshFinance();void load();}}
    />}
   {financeLead&&financeLead.converted_proposal_id&&financeLead.converted_client_id&&<ServiceFinance
     key={financeLead.id}
