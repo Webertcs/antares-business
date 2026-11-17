@@ -1,7 +1,7 @@
 'use client';
 
 import {useEffect,useState,type CSSProperties} from 'react';
-import {FileDown,Save,ArrowLeft,FileText} from 'lucide-react';
+import {FileDown,Save,ArrowLeft} from 'lucide-react';
 
 type Proposal={id:string;title:string;total:number;expected_attendees:number|null;payment_terms?:string|null};
 type Draft={
@@ -139,7 +139,7 @@ header img{max-width:100%;height:auto;max-height:58mm}h1{font-size:19pt;color:#1
 <h2>Prestador de serviços</h2><p>${sanitize(d.provider_legal_name||'Planetário ANTARES')} · ${sanitize(d.provider_document||'Documento a informar')}<br>${sanitize(d.provider_address||'Endereço a informar')}<br>Representante: ${sanitize(d.provider_representative||'A informar')}</p>
 <h2>Representante da instituição</h2><p>${sanitize(d.responsible||'A informar')}</p>
 <h2>Objeto</h2><p>${htmlLines(d.object_text||'A informar')}</p>
-<h2>Cláusulas e condições</h2><p>${htmlLines(d.terms)}</p>
+<h2>Cláusulas e condições</h2><p>${htmlLines(d.terms.startsWith('[ANTARES_CONTRATO_LIVRE_V1]\\n')?d.terms.slice('[ANTARES_CONTRATO_LIVRE_V1]\\n'.length):d.terms)}</p>
 <div class="signatures"><div>Contratante</div><div>Prestador de serviços</div></div>
 <footer style="margin-top:35px;font-size:9pt;color:#64748b">ANTARES · Minuta para conferência pelas partes · Versão ${d.version_number}</footer>
 </main></body></html>`);
@@ -192,10 +192,10 @@ header img{max-width:100%;height:auto;max-height:58mm}h1{font-size:19pt;color:#1
      onChange={e=>update('terms',e.target.value)}/>
    </label>
    <div style={{display:'flex',flexWrap:'wrap',gap:9,alignItems:'center',justifyContent:'flex-end'}}>
-    <button type="button" disabled={saving||!dirty&&!saved} onClick={()=>void save()} style={action}>
+    <button type="button" disabled={saving||(!dirty&&Boolean(saved))} onClick={()=>void save()} style={action}>
      <Save size={16}/>{saving?'Salvando...':'Salvar minuta'}
     </button>
-    <button type="button" disabled={saving||dirty||!saved} onClick={print} style={{...grey,opacity:dirty||!saved?.6:1}}>
+    <button type="button" disabled={saving||dirty||!saved} onClick={print} style={{...grey,opacity:(dirty||!saved)?0.6:1}}>
      <FileDown size={16}/>Visualizar / PDF salvo
     </button>
    </div>
