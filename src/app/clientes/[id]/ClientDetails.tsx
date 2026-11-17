@@ -353,7 +353,7 @@ export default function ClientDetails({id,writesEnabled,proposalWritesEnabled,co
   if(p.from_vitrine&&p.client_accepted_at)return 'Aceita pela escola';
   return statusNames[String(p.status)]||String(p.status||'Sem situação');
  };
- async function commercialAction(proposalId:string,action:'sent'|'accepted'|'rejected'|'contract'|'archive'|'restore'){
+ async function commercialAction(proposalId:string,action:'sent'|'accepted'|'rejected'|'archive'|'restore'){
   if(commercialActionBusy)return;
   if(action==='archive'&&!window.confirm('Arquivar esta proposta? Ela poderá ser reativada a qualquer momento.'))return;
   if(action==='restore'&&!window.confirm('Reativar esta proposta?'))return;
@@ -361,9 +361,9 @@ export default function ClientDetails({id,writesEnabled,proposalWritesEnabled,co
   if(action==='accepted'&&!window.confirm('Confirmar que o cliente aceitou esta proposta?'))return;
   setCommercialActionBusy(true);setCommercialFeedback('');
   try{
-   const response=await fetch('/api/clientes/comercial',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({proposalId,action,...(action==='contract'?contractInline:{})})});
+   const response=await fetch('/api/clientes/comercial',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({proposalId,action})});
    const result=await response.json();if(!response.ok)throw Error(result.error||'Operação não concluída');
-   await refreshCommercial();setContractFor(null);setCommercialFeedback(action==='contract'?'Contrato registrado com sucesso.':action==='archive'?'Proposta arquivada.':action==='restore'?'Proposta reativada.':'Situação da proposta atualizada.');
+   await refreshCommercial();setCommercialFeedback(action==='archive'?'Proposta arquivada.':action==='restore'?'Proposta reativada.':'Situação da proposta atualizada.');
   }catch(e){setCommercialFeedback(e instanceof Error?e.message:'Operação não concluída');}
   finally{setCommercialActionBusy(false);}
  }
