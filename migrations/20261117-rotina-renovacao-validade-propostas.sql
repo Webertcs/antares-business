@@ -49,15 +49,11 @@ SET search_path TO pg_catalog,public,pg_temp
 AS $function$
 DECLARE
  v_org uuid;
- v_count integer;
  v_proposal public.business_proposals%ROWTYPE;
 BEGIN
- SELECT count(*),max(tm.organization_id)
- INTO v_count,v_org
+ SELECT tm.organization_id INTO STRICT v_org
  FROM public.team_members tm
  WHERE tm.auth_subject=p_subject AND tm.active AND tm.role='owner';
- IF v_count<>1 OR v_org IS NULL
- THEN RAISE EXCEPTION 'Proprietario nao autorizado'; END IF;
 
  SELECT * INTO v_proposal FROM public.business_proposals
  WHERE id=p_proposal_id AND organization_id=v_org FOR UPDATE;
