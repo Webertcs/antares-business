@@ -142,15 +142,31 @@ export default function ContractDraftEditor({contractId,clientId,proposal,instit
   const d=saved;
   const page=window.open('','_blank');
   if(!page){setError('Permita a abertura da janela para imprimir ou salvar em PDF.');return;}
-  const logo=new URL('/antares-logo-pdf.png',window.location.origin).href;
+  const logo=new URL('/antares-logo-horizontal.png',window.location.origin).href;
   page.document.open();
   page.document.write(`<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><title>${sanitize(d.title)} · ANTARES</title>
-<style>@page{size:A4;margin:17mm}body{font-family:Arial,sans-serif;background:#eaf1f9;color:#183858;margin:0;line-height:1.55;font-size:11pt}
-main{max-width:190mm;min-height:255mm;box-sizing:border-box;padding:19mm;margin:20px auto;background:#fff;box-shadow:0 3px 18px #aec2dd}
-header img{max-width:100%;height:auto;max-height:58mm}h1{font-size:19pt;color:#12418b;border-bottom:3px solid #2675cf;padding:12px 0}h2{font-size:12pt;color:#174987;border-bottom:1px solid #d5e4f5;margin-top:21px;padding-bottom:5px}p{overflow-wrap:anywhere}.signatures{display:flex;gap:25px;margin-top:60px}.signatures div{flex:1;text-align:center;border-top:1px solid #123c70;padding-top:10px}.toolbar{max-width:190mm;margin:15px auto}.toolbar button{padding:12px 18px;background:#165abc;color:white;border:0;border-radius:8px;cursor:pointer}
-@media print{body{background:white}main{margin:0;padding:0;min-height:0;box-shadow:none}.toolbar{display:none}}
+<style>
+@page{size:A4;margin:12mm}*{box-sizing:border-box}
+body{font:10.5pt/1.5 Arial,Helvetica,sans-serif;color:#143563;background:#eaf1f9;margin:0}
+main{max-width:190mm;margin:18px auto;padding:17mm;background:#fff;min-height:255mm;box-shadow:0 5px 20px #c3d2e7}
+.doc-header{display:flex;align-items:center;justify-content:space-between;gap:16px;background:linear-gradient(112deg,#102d68 0%,#164c95 56%,#287bd2 100%);color:#fff;padding:18px 20px;border-radius:10px;break-inside:avoid}
+.doc-logo{background:#fff;border:1px solid #d9e8ff;border-radius:9px;width:170px;height:76px;flex-shrink:0;display:grid;place-items:center;padding:7px}
+.doc-logo img{max-width:100%;max-height:100%;object-fit:contain}
+.doc-heading{text-align:right;display:grid;gap:5px}
+.doc-heading span{font-size:9pt;font-weight:800;letter-spacing:1.5px;color:#d4eaff}
+.doc-heading strong{font-size:17pt;line-height:1.2;color:#fff}
+.doc-heading small{font-size:8pt;letter-spacing:1.3px;color:#d4eaff}
+h1{font-size:17pt;color:#103c77;line-height:1.3;margin:23px 0 18px;overflow-wrap:anywhere}
+h2{font-size:11pt;color:#164987;margin:20px 0 7px;padding-bottom:6px;border-bottom:1px solid #d5e4f5;break-after:avoid}
+p{margin:7px 0 10px;overflow-wrap:anywhere}.signatures{display:flex;gap:28px;margin-top:54px;break-inside:avoid}
+.signatures div{flex:1;border-top:1px solid #28496f;text-align:center;padding-top:10px;font-size:10pt}
+footer{margin-top:36px;border-top:1px solid #d6e2f1;padding-top:12px;color:#607895;font-size:9pt}
+.toolbar{max-width:190mm;margin:18px auto}.toolbar button{padding:11px 18px;background:#165abc;color:#fff;border:0;border-radius:8px;cursor:pointer}
+@media(max-width:580px){.doc-header{flex-wrap:wrap}.doc-heading{text-align:left}}
+@media print{body{background:#fff!important;-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}
+main{margin:0;padding:0;min-height:0;max-width:none;box-shadow:none}.toolbar{display:none}h1,h2{break-after:avoid}p{orphans:3;widows:3}}
 </style></head><body><div class="toolbar"><button onclick="window.print()">Imprimir / Salvar PDF</button></div><main>
-<header><img src="${sanitize(logo)}" alt="ANTARES"></header>
+<header class="doc-header"><div class="doc-logo"><img src="${sanitize(logo)}" alt="Logomarca ANTARES"></div><div class="doc-heading"><span>ANTARES BUSINESS</span><strong>MINUTA DE CONTRATO</strong><small>PLANETÁRIO MÓVEL DIGITAL</small></div></header>
 <h1>${sanitize(d.title)}</h1>
 <h2>Instituição contratante</h2><p>${sanitize(d.contractor_legal_name||d.institution)} · ${sanitize(d.contractor_document||'Documento a informar')}<br>${sanitize(d.contractor_address||'Endereço a informar')}</p>
 <h2>Prestador de serviços</h2><p>${sanitize(d.provider_legal_name||'Planetário ANTARES')} · ${sanitize(d.provider_document||'Documento a informar')}<br>${sanitize(d.provider_address||'Endereço a informar')}<br>Representante: ${sanitize(d.provider_representative||'A informar')}</p>
