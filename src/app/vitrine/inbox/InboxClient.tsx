@@ -6,6 +6,7 @@ import styles from './inbox.module.css';
 import ProposalComposer from './ProposalComposer';
 import ClientAcceptance from './ClientAcceptance';
 import RenewValidity from './RenewValidity';
+import ServiceBooking,{type ServiceBookingData,type ServiceReservation} from './ServiceBooking';
 type Lead={id:string;responsible_name:string;institution:string;city:string;phone:string;
  audience:string;attendees:number|null;desired_date:string|null;notes:string;status:string;created_at:string;converted_client_id:string|null;converted_proposal_id:string|null;proposal_status:string|null;proposal_valid_until:string|null;proposal_expired:boolean|null};
 const label:Record<string,string>={pending:'Novo pedido',reviewing:'Em análise',converted:'Proposta criada',archived:'Arquivado'};
@@ -16,15 +17,19 @@ function statusLabel(lead:Lead){
  return statuses[String(lead.proposal_status||'')]||'Proposta criada';
 }
 /** Linha de acompanhamento: somente fatos já confirmados; reserva e conclusão exigem consulta própria. */
-function ServiceTimeline({lead}:{lead:Lead}){
+function ServiceTimeline({lead,reservation,operationalKnown}:{
+ lead:Lead;reservation:ServiceReservation|null;operationalKnown:boolean
+}){
+ const bookingDone=Boolean(reservation&&reservation.status!=='cancelled');
+ const finished=Boolean(reservation?.status==='completed');
  const hasProposal=lead.status==='converted'&&Boolean(lead.converted_proposal_id);
  const accepted=hasProposal&&lead.proposal_status==='accepted';
  const steps=[
   {name:'Contato',done:true,active:!hasProposal},
   {name:'Proposta',done:hasProposal,active:hasProposal&&!accepted},
   {name:'Aceite',done:accepted,active:false},
-  {name:'Reserva',done:false,active:accepted},
-  {name:'Conclusão',done:false,active:false}
+  {name:'Reserva',done:bookingDone,active:accepted&&operationalKnown&&!bookingDone},
+  {name:'Conclusão',done:finished,active:bookingDone&&!finished}
  ];
  return <div aria-label="Etapas do atendimento" style={{margin:'12px 0 8px',padding:'14px 12px',background:'#f5f9ff',border:'1px solid #cbdcf7',borderRadius:12}}>
   <ol style={{display:'grid',gridTemplateColumns:'repeat(5,minmax(0,1fr))',listStyle:'none',margin:0,padding:0,gap:4}}>
@@ -36,11 +41,14 @@ function ServiceTimeline({lead}:{lead:Lead}){
    </li>)}
   </ol>
   <p style={{margin:'10px 0 0',fontSize:12,color:'#365780'}}>
-   {accepted?'Próxima ação: conferir disponibilidade e organizar a reserva. Contrato escrito é opcional.':
+   {finished?'Apresentação concluída conforme o registro operacional. Confira os recebimentos no Financeiro.':
+    bookingDone?'Reserva registrada para '+(reservation?.starts_at?dateTime(reservation.starts_at):'data a confirmar')+'. Acompanhe a apresentação e o financeiro.':
+    accepted&&!operationalKnown?'Aceite registrado. O estado das reservas não pôde ser consultado. Atualize a Central.':
+    accepted?'Próxima ação: organizar a reserva. Contrato escrito é opcional.':
     hasProposal?'Próxima ação: revisar a proposta e registrar o aceite real da instituição.':
     'Próxima ação: conversar com a instituição e preparar a proposta.'}
   </p>
-  {accepted&&<p style={{margin:'4px 0 0',fontSize:11,color:'#64748b'}}>Reserva e conclusão serão confirmadas pelo registro operacional, não apenas pelo aceite.</p>}
+  {accepted&&<p style={{margin:'4px 0 0',fontSize:11,color:'#64748b'}}>O Financeiro é acompanhado separadamente e não impede a reserva.</p>}
  </div>;
 }
 function matchesFilter(lead:Lead,key:string){
@@ -49,6 +57,9 @@ function matchesFilter(lead:Lead,key:string){
  return lead.status===key;
 }
 const date=(value:string|null)=>value?new Date(value.slice(0,10)+'T12:00:00').toLocaleDateString('pt-BR'):'A combinar';
+const dateTime=(value:string)=>new Intl.DateTimeFormat('pt-BR',{
+ dateStyle:'short',timeStyle:'short',timeZone:'America/Sao_Paulo'
+}).format(new Date(value));
 function whatsAppMessage(lead:Lead){
  if(['approved_internal','legacy_accepted'].includes(String(lead.proposal_status)))
   return 'Olá, '+lead.responsible_name+'! A proposta do planetário para '+lead.institution+' está pronta. Vou encaminhar o PDF para sua avaliação. Aguardo seu retorno!';
@@ -72,7 +83,7 @@ function LeadObservations({notes}:{notes:string|null}){
  </>;
 }
 
-export default function Inbox({conversionEnabled}:{conversionEnabled:boolean}){
+export default function Inbox({conversionEnabled,bookingWritesEnabled}:{conversionEnabled:boolean;bookingWritesEnabled:boolean}){
  const [leads,setLeads]=useState<Lead[]>([]);
  const [clients,setClients]=useState<{id:string;name:string;kind:string}[]>([]);
  const kindOf=(audience:string)=>({Escola:'school',Empresa:'company',Associação:'association','Evento particular':'private'} as Record<string,string>)[audience]||'private';
@@ -81,9 +92,27 @@ export default function Inbox({conversionEnabled}:{conversionEnabled:boolean}){
  const [composerLeadId,setComposerLeadId]=useState<string|null>(null);
  const [acceptLeadId,setAcceptLeadId]=useState<string|null>(null);
  const [renewLeadId,setRenewLeadId]=useState<string|null>(null);
+ const [bookingLeadId,setBookingLeadId]=useState<string|null>(null);
+ const [bookingData,setBookingData]=useState<ServiceBookingData|null>(null);
+ const [bookingError,setBookingError]=useState('');
+ const refreshBookings=useCallback(async()=>{
+  try{
+   const r=await fetch('/api/agenda/reservas',{cache:'no-store'});
+   const v=await r.json();
+   if(!r.ok)throw Error(v.error||'Consulta de reservas indisponível.');
+   if(!Array.isArray(v.links)||!Array.isArray(v.proposals)||!Array.isArray(v.domes))
+    throw Error('Informações incompletas das reservas.');
+   setBookingData(v as ServiceBookingData);setBookingError('');
+  }catch(e){
+   setBookingData(null);setBookingError(e instanceof Error?e.message:'Reservas indisponíveis.');
+  }
+ },[]);
+ const reservationFor=(lead:Lead)=>bookingData?.links.find(r=>
+  r.proposal_id===lead.converted_proposal_id&&r.status!=='cancelled')||null;
  const activeLead=composerLeadId?leads.find(l=>l.id===composerLeadId):undefined;
  const acceptedLead=acceptLeadId?leads.find(l=>l.id===acceptLeadId):undefined;
  const renewLead=renewLeadId?leads.find(l=>l.id===renewLeadId):undefined;
+ const bookingLead=bookingLeadId?leads.find(l=>l.id===bookingLeadId):undefined;
  const load=useCallback(async()=>{setLoading(true);
   try{const r=await fetch('/api/vitrine/inbox',{cache:'no-store'});const data=await r.json();
    if(!r.ok)throw Error(data.error||'Não foi possível carregar.');
@@ -92,6 +121,7 @@ export default function Inbox({conversionEnabled}:{conversionEnabled:boolean}){
   }catch(e){setError(e instanceof Error?e.message:'Erro ao consultar');}
   finally{setLoading(false);}
  },[]);
+ useEffect(()=>{void refreshBookings();},[refreshBookings]);
  useEffect(()=>{void load();if(conversionEnabled){fetch('/api/crm/clientes',{cache:'no-store'}).then(r=>r.json()).then(d=>setClients(d.clients||[])).catch(()=>setNotice('Lista de clientes indisponível.'));}},[load,conversionEnabled]);
  const shown=useMemo(()=>leads.filter(x=>matchesFilter(x,filter)),[leads,filter]);
  function openComposer(id:string){
@@ -119,7 +149,7 @@ export default function Inbox({conversionEnabled}:{conversionEnabled:boolean}){
      <p>Acompanhe cada instituição, da conversa à apresentação, sem perder o histórico.</p>
     </div>
    </div>
-   <button type="button" className={styles.refresh} disabled={loading} onClick={()=>void load()}>
+   <button type="button" className={styles.refresh} disabled={loading} onClick={()=>{void load();void refreshBookings();}}>
     <RefreshCw size={15} aria-hidden="true"/> {loading?'Atualizando...':'Atualizar lista'}
    </button>
   </header>
@@ -138,6 +168,7 @@ export default function Inbox({conversionEnabled}:{conversionEnabled:boolean}){
   </div>
   {error&&<p role="alert" className={[styles.notification,styles.error].join(' ')}>{error}</p>}
   {notice&&<p role="status" className={styles.notification}>{notice}</p>}
+  {bookingError&&<p role="status" className={styles.notification}>Situação operacional indisponível: {bookingError}</p>}
   {loading?<div className={styles.empty} role="status">Carregando solicitações...</div>:
    !error&&shown.length===0?<div className={styles.empty}>Nenhuma solicitação nesta categoria.</div>:null}
   <div className={styles.list}>
@@ -164,7 +195,7 @@ export default function Inbox({conversionEnabled}:{conversionEnabled:boolean}){
      <span><Users size={14} aria-hidden="true"/>{lead.attendees??'A combinar'} participantes</span>
      <span><CalendarDays size={14} aria-hidden="true"/>{date(lead.desired_date)}</span>
     </div>
-    <ServiceTimeline lead={lead}/>
+    <ServiceTimeline lead={lead} reservation={reservationFor(lead)} operationalKnown={Boolean(bookingData)}/>
     {lead.status==='converted'&&lead.proposal_expired&&lead.proposal_status!=='accepted'&&<p role="status" style={{margin:'9px 0',padding:'10px 12px',background:'#fff4e4',border:'1px solid #e6bd72',borderRadius:8,color:'#805014',fontSize:13,fontWeight:650}}>Proposta vencida{lead.proposal_valid_until?' em '+date(lead.proposal_valid_until):''}. Renove a validade antes de registrar o aceite da escola.</p>}
     <details className={styles.leadDetails}>
      <summary>Ver informações do pedido <ChevronDown size={15} aria-hidden="true"/></summary>
@@ -195,8 +226,9 @@ export default function Inbox({conversionEnabled}:{conversionEnabled:boolean}){
        ? <Link href={'/vitrine/proposta/'+lead.converted_proposal_id+'?visualizar=1'} target="_blank" rel="noopener noreferrer"
          className={styles.actionPrimary}><FileText size={16}/>Visualizar proposta PDF</Link>
        : lead.proposal_status==='accepted'
-       ? <Link href={'/agenda/reservas?proposalId='+encodeURIComponent(lead.converted_proposal_id)} className={styles.actionPrimary}>
-         <CalendarDays size={16}/>Organizar reserva</Link>
+       ? <button type="button" className={styles.actionPrimary} disabled={Boolean(busy)}
+          onClick={()=>setBookingLeadId(lead.id)}>
+          <CalendarDays size={16}/>{reservationFor(lead)?'Ver reserva':'Organizar reserva'}</button>
        : <Link href={'/vitrine/proposta/'+lead.converted_proposal_id+'?visualizar=1'} className={styles.actionPrimary}>
          <FileText size={16}/>Visualizar / Salvar PDF</Link>)}
      {lead.status==='archived'&&
@@ -237,6 +269,14 @@ export default function Inbox({conversionEnabled}:{conversionEnabled:boolean}){
     clientOptions={clients.filter(c=>c.kind===kindOf(activeLead.audience)).slice().sort((a,b)=>a.name.localeCompare(b.name,'pt-BR')).map(c=>({id:c.id,name:c.name}))}
     onClose={()=>setComposerLeadId(null)}
     onSaved={()=>{void load();}}
+  />}
+  {bookingLead&&bookingLead.converted_proposal_id&&<ServiceBooking
+    key={bookingLead.id}
+    institution={bookingLead.institution}
+    proposalId={bookingLead.converted_proposal_id}
+    enabled={bookingWritesEnabled}
+    onClose={()=>setBookingLeadId(null)}
+    onSaved={()=>{setBookingLeadId(null);setNotice('Reserva registrada. A Central foi atualizada.');void refreshBookings();void load();}}
   />}
   {renewLead&&renewLead.converted_proposal_id&&<RenewValidity
     key={renewLead.id}
