@@ -5,6 +5,7 @@ import {Archive,ArrowLeft,Building2,CalendarDays,CheckCircle2,ChevronDown,Clock3
 import styles from './inbox.module.css';
 import ProposalComposer from './ProposalComposer';
 import ClientAcceptance from './ClientAcceptance';
+import RenewValidity from './RenewValidity';
 type Lead={id:string;responsible_name:string;institution:string;city:string;phone:string;
  audience:string;attendees:number|null;desired_date:string|null;notes:string;status:string;created_at:string;converted_client_id:string|null;converted_proposal_id:string|null;proposal_status:string|null;proposal_valid_until:string|null;proposal_expired:boolean|null};
 const label:Record<string,string>={pending:'Novo pedido',reviewing:'Em análise',converted:'Proposta criada',archived:'Arquivado'};
@@ -51,8 +52,10 @@ export default function Inbox({conversionEnabled}:{conversionEnabled:boolean}){
  const [loading,setLoading]=useState(true);const [notice,setNotice]=useState('');
  const [composerLeadId,setComposerLeadId]=useState<string|null>(null);
  const [acceptLeadId,setAcceptLeadId]=useState<string|null>(null);
+ const [renewLeadId,setRenewLeadId]=useState<string|null>(null);
  const activeLead=composerLeadId?leads.find(l=>l.id===composerLeadId):undefined;
  const acceptedLead=acceptLeadId?leads.find(l=>l.id===acceptLeadId):undefined;
+ const renewLead=renewLeadId?leads.find(l=>l.id===renewLeadId):undefined;
  const load=useCallback(async()=>{setLoading(true);
   try{const r=await fetch('/api/vitrine/inbox',{cache:'no-store'});const data=await r.json();
    if(!r.ok)throw Error(data.error||'Não foi possível carregar.');
@@ -133,7 +136,7 @@ export default function Inbox({conversionEnabled}:{conversionEnabled:boolean}){
      <span><Users size={14} aria-hidden="true"/>{lead.attendees??'A combinar'} participantes</span>
      <span><CalendarDays size={14} aria-hidden="true"/>{date(lead.desired_date)}</span>
     </div>
-    {lead.status==='converted'&&lead.proposal_expired&&lead.proposal_status!=='accepted'&&<p role="status" style={{margin:'9px 0',padding:'10px 12px',background:'#fff4e4',border:'1px solid #e6bd72',borderRadius:8,color:'#805014',fontSize:13,fontWeight:650}}>Validade encerrada{lead.proposal_valid_until?' em '+date(lead.proposal_valid_until):''}. O aceite está bloqueado pelo banco. Solicite a renovação formal da proposta antes de registrar a confirmação da escola.</p>}
+    {lead.status==='converted'&&lead.proposal_expired&&lead.proposal_status!=='accepted'&&<p role="status" style={{margin:'9px 0',padding:'10px 12px',background:'#fff4e4',border:'1px solid #e6bd72',borderRadius:8,color:'#805014',fontSize:13,fontWeight:650}}>Proposta vencida{lead.proposal_valid_until?' em '+date(lead.proposal_valid_until):''}. Renove a validade antes de registrar o aceite da escola.</p>}
     <details className={styles.leadDetails}>
      <summary>Ver informações do pedido <ChevronDown size={15} aria-hidden="true"/></summary>
      <div className={styles.details}>
@@ -173,6 +176,8 @@ export default function Inbox({conversionEnabled}:{conversionEnabled:boolean}){
      {lead.status==='converted'&&!lead.proposal_expired&&lead.converted_proposal_id&&['approved_internal','legacy_accepted'].includes(String(lead.proposal_status))&&
       <button type="button" disabled={Boolean(busy)||!conversionEnabled} onClick={()=>setAcceptLeadId(lead.id)}
        className={styles.actionSecondary}><CheckCircle2 size={16}/>Registrar aceite real</button>}
+     {conversionEnabled&&lead.status==='converted'&&lead.converted_proposal_id&&lead.proposal_expired&&['approved_internal','legacy_accepted'].includes(String(lead.proposal_status))&&
+      <button type="button" disabled={Boolean(busy)} className={styles.actionPrimary} onClick={()=>setRenewLeadId(lead.id)}><CalendarDays size={16}/>Renovar validade</button>}
      <a className={styles.actionWhatsApp}
       href={'https://wa.me/'+lead.phone.replace(/\D/g,'')+'?text='+encodeURIComponent(whatsAppMessage(lead))}
       target="_blank" rel="noopener noreferrer"><MessageCircle size={16}/>WhatsApp</a>
@@ -203,6 +208,14 @@ export default function Inbox({conversionEnabled}:{conversionEnabled:boolean}){
     clientOptions={clients.filter(c=>c.kind===kindOf(activeLead.audience)).slice().sort((a,b)=>a.name.localeCompare(b.name,'pt-BR')).map(c=>({id:c.id,name:c.name}))}
     onClose={()=>setComposerLeadId(null)}
     onSaved={()=>{void load();}}
+  />}
+  {renewLead&&renewLead.converted_proposal_id&&<RenewValidity
+    key={renewLead.id}
+    proposalId={renewLead.converted_proposal_id}
+    institution={renewLead.institution}
+    previousValidUntil={renewLead.proposal_valid_until}
+    onClose={()=>setRenewLeadId(null)}
+    onSaved={()=>{setRenewLeadId(null);setNotice('Validade renovada. Solicite a confirmação da escola antes de registrar o aceite.');void load();}}
   />}
   {acceptedLead&&acceptedLead.converted_proposal_id&&<ClientAcceptance
     key={acceptedLead.id}
