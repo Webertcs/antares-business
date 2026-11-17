@@ -34,6 +34,7 @@ export default function ServiceBooking({
  const [data,setData]=useState<ServiceBookingData|null>(null);
  const [loading,setLoading]=useState(true);
  const [busy,setBusy]=useState(false);
+ const [confirmLink,setConfirmLink]=useState(false);
  const [error,setError]=useState('');
  const [domeId,setDomeId]=useState('');
  const [start,setStart]=useState('');
@@ -79,7 +80,7 @@ export default function ServiceBooking({
 
  async function linkClient(){
   if(!enabled||busy||!proposal)return;
-  if(!window.confirm('Vincular esta instituição à operação? O vínculo será salvo no banco. Confirme apenas para instituição real.'))return;
+  if(!confirmLink)return;
   setBusy(true);setError('');
   try{
    const response=await fetch('/api/agenda/preparar',{
@@ -89,6 +90,7 @@ export default function ServiceBooking({
    const json=await response.json();
    if(!response.ok)throw Error(json.error||'Não foi possível vincular a instituição.');
    await load();
+   setConfirmLink(false);
   }catch(e){setError(e instanceof Error?e.message:'Falha ao vincular instituição.');}
   finally{setBusy(false);}
  }
@@ -142,10 +144,21 @@ export default function ServiceBooking({
    {!loading&&!reservation&&!proposal&&<p role="alert">Proposta não habilitada para reserva. Verifique o aceite e a situação da instituição.</p>}
    {!loading&&!reservation&&proposal&&!proposal.mapped&&<div style={{padding:14,border:'1px solid #efd3a3',background:'#fff7e8',borderRadius:10}}>
     <p style={{margin:'0 0 10px'}}>Antes da reserva, esta instituição precisa ser vinculada à operação.</p>
-    <button type="button" disabled={!enabled||busy} onClick={()=>void linkClient()} style={secondary}>
-     {busy?'Vinculando...':'Vincular instituição'}
-    </button>
-    <p style={{margin:'9px 0 0',fontSize:12}}>Esta ação grava um vínculo permanente. Não utilize dados fictícios em operação real.</p>
+    {!confirmLink?<button type="button" disabled={!enabled||busy}
+     onClick={()=>setConfirmLink(true)} style={secondary}>Vincular instituição</button>:
+     <div role="group" aria-label="Confirmação do vínculo operacional"
+      style={{border:'1px solid #b8d3f3',background:'#f0f7ff',borderRadius:10,padding:12,display:'grid',gap:10}}>
+      <strong style={{fontSize:13}}>Confirmar vínculo operacional?</strong>
+      <p style={{margin:0,fontSize:12}}>A instituição <strong>{institution}</strong> será vinculada à operação.
+       O vínculo ficará salvo no banco e não será removido automaticamente. Confirme somente se for uma instituição real.</p>
+      <div style={{display:'flex',gap:8,flexWrap:'wrap',justifyContent:'flex-end'}}>
+       <button type="button" disabled={busy} onClick={()=>setConfirmLink(false)} style={secondary}>Voltar</button>
+       <button type="button" disabled={busy} onClick={()=>void linkClient()} style={primary}>
+        {busy?'Vinculando...':'Confirmar vínculo'}
+       </button>
+      </div>
+     </div>}
+    {!confirmLink&&<p style={{margin:'9px 0 0',fontSize:12}}>O vínculo será salvo no banco. Não utilize dados fictícios em operação real.</p>}
    </div>}
    {!loading&&!reservation&&proposal?.mapped&&<form id="service-booking-form" onSubmit={e=>void submit(e)}
     style={{display:'grid',gap:13}}>
