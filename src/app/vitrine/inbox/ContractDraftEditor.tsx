@@ -64,6 +64,16 @@ export default function ContractDraftEditor({contractId,clientId,proposal,instit
     const profile=await res.json();
     if(!res.ok)throw Error(profile.error||'Cadastro jurídico indisponível.');
     const drafts=await getDrafts();
+    // A reserva é somente leitura; indisponibilidade não impede redigir a minuta.
+    let booking:{starts_at:string;ends_at:string;dome_name:string|null}|undefined;
+    try{
+     const bookingResponse=await fetch('/api/agenda/reservas',{cache:'no-store'});
+     if(bookingResponse.ok){
+      const bookingData=await bookingResponse.json();
+      if(Array.isArray(bookingData.links))booking=bookingData.links.find(
+       (entry:{proposal_id:string;status:string})=>entry.proposal_id===proposal.id&&entry.status!=='cancelled');
+     }
+    }catch{/* Data e horário continuarão a confirmar. */}
     if(!mounted)return;
     const existing=drafts.find(d=>!d.archived_at);
     if(existing){
@@ -78,7 +88,13 @@ export default function ContractDraftEditor({contractId,clientId,proposal,instit
       object:'Apresentação do planetário móvel: '+proposal.title,
       terms:[
        '1. OBJETO — Prestação do serviço de apresentação de planetário móvel referente à proposta aceita.',
-       '2. DATA, LOCAL E HORÁRIOS — A preencher conforme o agendamento confirmado entre as partes.',
+       booking
+        ?'2. DATA, LOCAL E HORÁRIOS — Agendado para '+new Intl.DateTimeFormat('pt-BR',{
+          dateStyle:'short',timeStyle:'short',timeZone:'America/Sao_Paulo'
+         }).format(new Date(booking.starts_at))+' até '+new Intl.DateTimeFormat('pt-BR',{
+          timeStyle:'short',timeZone:'America/Sao_Paulo'
+         }).format(new Date(booking.ends_at))+(booking.dome_name?' · Cúpula: '+booking.dome_name:'')+'. Local/endereço: conferir com a instituição.'
+        :'2. DATA, LOCAL E HORÁRIOS — A preencher conforme o agendamento confirmado entre as partes.',
        '3. VALOR E PAGAMENTO — Valor total: '+money(Number(proposal.total||0))+'.'+(count>0?' Público previsto: '+count+' participantes.':''),
        ...(proposal.payment_terms?.trim()?['Condições de pagamento: '+proposal.payment_terms.trim()]:[]),
        '4. RESPONSABILIDADES — A instituição disponibilizará o espaço e a infraestrutura acordados; o prestador executará o serviço conforme as condições definidas.',
