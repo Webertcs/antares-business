@@ -15,6 +15,34 @@ function statusLabel(lead:Lead){
  const statuses:Record<string,string>={draft:'Rascunho da proposta',approved_internal:'Proposta aprovada',legacy_accepted:'Aceite a confirmar',accepted:'Aceite registrado'};
  return statuses[String(lead.proposal_status||'')]||'Proposta criada';
 }
+/** Linha de acompanhamento: somente fatos já confirmados; reserva e conclusão exigem consulta própria. */
+function ServiceTimeline({lead}:{lead:Lead}){
+ const hasProposal=lead.status==='converted'&&Boolean(lead.converted_proposal_id);
+ const accepted=hasProposal&&lead.proposal_status==='accepted';
+ const steps=[
+  {name:'Contato',done:true,active:!hasProposal},
+  {name:'Proposta',done:hasProposal,active:hasProposal&&!accepted},
+  {name:'Aceite',done:accepted,active:false},
+  {name:'Reserva',done:false,active:accepted},
+  {name:'Conclusão',done:false,active:false}
+ ];
+ return <div aria-label="Etapas do atendimento" style={{margin:'12px 0 8px',padding:'14px 12px',background:'#f5f9ff',border:'1px solid #cbdcf7',borderRadius:12}}>
+  <ol style={{display:'grid',gridTemplateColumns:'repeat(5,minmax(0,1fr))',listStyle:'none',margin:0,padding:0,gap:4}}>
+   {steps.map((step,i)=><li key={step.name} style={{display:'flex',flexDirection:'column',alignItems:'center',gap:5,textAlign:'center',minWidth:0}}>
+    <span aria-hidden="true" style={{width:29,height:29,borderRadius:'50%',display:'grid',placeItems:'center',fontSize:13,fontWeight:800,color:step.done||step.active?'#fff':'#50698d',background:step.done?'#15803d':step.active?'#1d4ed8':'#e1eaf7'}}>
+     {step.done?'✓':i+1}
+    </span>
+    <span style={{fontSize:11,fontWeight:step.active?800:650,color:step.active?'#164d9d':'#365780'}}>{step.name}</span>
+   </li>)}
+  </ol>
+  <p style={{margin:'10px 0 0',fontSize:12,color:'#365780'}}>
+   {accepted?'Próxima ação: conferir disponibilidade e organizar a reserva. Contrato escrito é opcional.':
+    hasProposal?'Próxima ação: revisar a proposta e registrar o aceite real da instituição.':
+    'Próxima ação: conversar com a instituição e preparar a proposta.'}
+  </p>
+  {accepted&&<p style={{margin:'4px 0 0',fontSize:11,color:'#64748b'}}>Reserva e conclusão serão confirmadas pelo registro operacional, não apenas pelo aceite.</p>}
+ </div>;
+}
 function matchesFilter(lead:Lead,key:string){
  if(key==='all')return true;
  if(key==='open')return lead.status!=='archived'&&!(lead.status==='converted'&&lead.proposal_status==='accepted');
@@ -80,15 +108,15 @@ export default function Inbox({conversionEnabled}:{conversionEnabled:boolean}){
  }
  return <main className={styles.page}>
   <nav aria-label="Navegação" className={styles.breadcrumb}>
-   <ArrowLeft size={14}/><Link href="/clientes">Clientes e eventos</Link><span aria-hidden="true">›</span><span>Oportunidades</span>
+   <ArrowLeft size={14}/><Link href="/clientes">Clientes e eventos</Link><span aria-hidden="true">›</span><span>Central de Atendimento</span>
   </nav>
   <header className={styles.hero}>
    <div className={styles.heroTitle}>
     <span className={styles.heroIcon}><FileText size={26} aria-hidden="true"/></span>
     <div>
      <span className={styles.eyebrow}>ANTARES BUSINESS · VITRINE</span>
-     <h1>Oportunidades</h1>
-     <p>Pedidos da vitrine, propostas e confirmações em um só lugar.</p>
+     <h1>Central de Atendimento</h1>
+     <p>Acompanhe cada instituição, da conversa à apresentação, sem perder o histórico.</p>
     </div>
    </div>
    <button type="button" className={styles.refresh} disabled={loading} onClick={()=>void load()}>
@@ -136,6 +164,7 @@ export default function Inbox({conversionEnabled}:{conversionEnabled:boolean}){
      <span><Users size={14} aria-hidden="true"/>{lead.attendees??'A combinar'} participantes</span>
      <span><CalendarDays size={14} aria-hidden="true"/>{date(lead.desired_date)}</span>
     </div>
+    <ServiceTimeline lead={lead}/>
     {lead.status==='converted'&&lead.proposal_expired&&lead.proposal_status!=='accepted'&&<p role="status" style={{margin:'9px 0',padding:'10px 12px',background:'#fff4e4',border:'1px solid #e6bd72',borderRadius:8,color:'#805014',fontSize:13,fontWeight:650}}>Proposta vencida{lead.proposal_valid_until?' em '+date(lead.proposal_valid_until):''}. Renove a validade antes de registrar o aceite da escola.</p>}
     <details className={styles.leadDetails}>
      <summary>Ver informações do pedido <ChevronDown size={15} aria-hidden="true"/></summary>
