@@ -29,14 +29,14 @@ export default function DocumentoClient({doc}:{doc:D}){
  <label><input type="checkbox" checked={showNotes} onChange={e=>setShowNotes(e.target.checked)}/> Incluir observações da proposta após revisão (podem conter dados internos)</label>
  </section>
  <article className="document" style={{maxWidth:850,margin:'auto',background:'white',padding:'26px clamp(20px,4vw,42px)',borderRadius:8,boxShadow:'0 5px 25px #1e3c7020'}}>
- <header className="document-header" style={{background:'linear-gradient(115deg,#102b62 0%,#1454aa 75%,#1768bc 100%)',borderRadius:12,padding:'24px 28px',display:'flex',alignItems:'center',justifyContent:'space-between',gap:24,flexWrap:'wrap',color:'#fff',breakInside:'avoid'}}>
+ <header className="document-header" style={{background:'linear-gradient(112deg,#102d68 0%,#164c95 56%,#287bd2 100%)',borderRadius:12,padding:'24px 28px',display:'flex',alignItems:'center',justifyContent:'space-between',gap:24,flexWrap:'wrap',color:'#fff',breakInside:'avoid'}}>
  <div style={{background:'#fff',padding:'10px 16px',borderRadius:10,display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',minWidth:205,minHeight:94}}>
- <img src="/images/logo-antares.png" alt="Logomarca oficial ANTARES" style={{width:205,maxWidth:'100%',height:68,objectFit:'contain'}}/><span style={{fontSize:10,fontWeight:800,letterSpacing:'.7px',color:'#102b62',textAlign:'center',marginTop:2}}>PLANETÁRIO MÓVEL DIGITAL</span>
+ <img src="/antares-logo-horizontal.png" alt="Logomarca oficial ANTARES" style={{width:205,maxWidth:'100%',height:68,objectFit:'contain'}}/><span style={{fontSize:10,fontWeight:800,letterSpacing:'.7px',color:'#102b62',textAlign:'center',marginTop:2}}>PLANETÁRIO MÓVEL DIGITAL</span>
  </div>
  <div style={{textAlign:'right',flex:'1 1 190px'}}>
- <div style={{fontSize:11,letterSpacing:2,fontWeight:700,opacity:.85}}>ANTARES · PLANETÁRIO MÓVEL DIGITAL</div>
+ <div style={{fontSize:11,letterSpacing:2,fontWeight:700,opacity:.85}}>ANTARES BUSINESS</div>
  <div style={{fontSize:20,fontWeight:800,marginTop:8}}>{mode==='proposal'?'PROPOSTA COMERCIAL':'MINUTA DE CONTRATO'}</div>
- <div style={{fontSize:12,opacity:.85,marginTop:6}}>Documento para apresentação à instituição</div>
+ <div style={{fontSize:11,opacity:.85,letterSpacing:1.3,marginTop:6}}>PLANETÁRIO MÓVEL DIGITAL</div>
  </div>
  </header>
  <h1 style={{fontSize:22,marginTop:28,marginBottom:14,color:'#123f83'}}>{mode==='proposal'?'Proposta de experiência educacional':'Minuta de prestação de serviços'}</h1>
