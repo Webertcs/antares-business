@@ -272,7 +272,7 @@ export default function Inbox({conversionEnabled,bookingWritesEnabled,contractWr
      {lead.status==='converted'&&lead.proposal_status==='accepted'&&lead.converted_proposal_id&&
        <button type="button" className={styles.actionSecondary} disabled={Boolean(busy)}
         onClick={()=>setContractLeadId(lead.id)}>
-        <FileText size={16}/>{contractData?.contracts.some(c=>c.proposal_id===lead.converted_proposal_id)?'Consultar contrato':'Contrato opcional'}
+        <FileText size={16}/>{contractData?.contracts.some(c=>c.proposal_id===lead.converted_proposal_id)?'Elaborar documento':'Criar contrato (opcional)'}
        </button>}
      {lead.converted_client_id&&
        <Link href={'/clientes/'+lead.converted_client_id} className={styles.actionSecondary}>
