@@ -1,5 +1,5 @@
 import {NextRequest,NextResponse} from 'next/server';
-import {requireOwner,getTeamWriteDb} from '@/lib/equipe/auth';
+import {requireOwner,getDb,getTeamWriteDb} from '@/lib/equipe/auth';
 export const runtime='nodejs';
 export const dynamic='force-dynamic';
 const deny=(error:string,status=403)=>NextResponse.json({error},{status,headers:{'Cache-Control':'no-store'}});
@@ -60,6 +60,14 @@ export async function POST(request:NextRequest){
   }
   if(body.action==='contract'){
    if(!uuid(body.proposalId))return deny('Proposta inválida.',400);
+   const readDb=getDb();
+   const proposal=await readDb`SELECT p.client_accepted_at,
+    EXISTS(SELECT 1 FROM public.vitrine_leads l
+     WHERE l.organization_id=p.organization_id AND l.converted_proposal_id=p.id) AS from_vitrine
+    FROM public.business_proposals p
+    WHERE p.id=${body.proposalId}::uuid AND p.organization_id=${owner.organizationId} LIMIT 1`;
+   if(proposal[0]?.from_vitrine&&!proposal[0]?.client_accepted_at)
+    return deny('Registre primeiro o aceite real da escola em Oportunidades.',409);
    const result=await db`SELECT public.business_create_contract(
      ${owner.user.id},${uuid(body.proposalId)}::uuid,
      ${str(body.mode,30)},${str(body.terms,8000)}) AS id`;
