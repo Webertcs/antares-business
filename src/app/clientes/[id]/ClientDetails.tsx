@@ -42,6 +42,7 @@ export default function ClientDetails({id,writesEnabled,proposalWritesEnabled,co
  const relationshipBenefits:Record<string,string>={'Bronze':'5% na segunda visita e acompanhamento','Prata':'10% e prioridade de agenda','Ouro':'15%, sessão extra a cada 5 visitas e material exclusivo','Diamante':'20%, sessão gratuita anual e selo Escola Parceira'};
  const pendingRelationship=relationship.actions.filter(a=>!a.archived&&a.status!=='completed'&&a.status!=='dismissed'&&a.due_date).sort((a,b)=>(a.due_date||'').localeCompare(b.due_date||''));
  const [activeTab,setActiveTab]=useState<'propostas'|'contratos'|'alunos'|'eventos'|'financeiro'|'fidelizacao'|'historico'|'observacoes'>('propostas');
+ useEffect(()=>{if(new URLSearchParams(window.location.search).get('aba')==='contratos')setActiveTab('contratos');},[]);
  const [eventView,setEventView]=useState<'active'|'archived'>('active');
  const [commercial,setCommercial]=useState<{proposals:Record<string,unknown>[];contracts:Record<string,unknown>[];unavailable:string[]}|null>(null);
  const [commercialError,setCommercialError]=useState('');
