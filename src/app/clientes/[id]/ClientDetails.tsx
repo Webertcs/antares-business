@@ -283,22 +283,30 @@ export default function ClientDetails({id,writesEnabled,proposalWritesEnabled,co
   const line=(value:string)=>escapeHtml(normalizeContractBreaks(value)).replace(/\n/g,'<br>');
   const page=window.open('','_blank');
   if(!page){setDocumentNotice('Permita a abertura de janelas para visualizar o contrato.');return;}
-  const logo=new URL('/antares-logo-pdf.png',window.location.origin).href;
+  const logo=new URL('/antares-logo-horizontal.png',window.location.origin).href;
   page.document.open();
   page.document.write(`<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><title>${escapeHtml(draft.title)} - ANTARES</title><style>
-  @page{size:A4;margin:15mm 16mm}*{box-sizing:border-box}body{font:10.5pt/1.42 Arial,sans-serif;color:#18304e;margin:0;background:#f0f4fa}
-  main{max-width:210mm;margin:20px auto;padding:20mm 17mm;background:#fff;min-height:270mm;box-shadow:0 4px 20px #ccd4df}
-  header{display:block;width:100%;padding-bottom:6px;margin-bottom:14px}
-  header img{display:block;width:100%;height:auto;max-width:100%;object-fit:contain}
-  .brand{display:none}h1{font-size:19pt;text-align:center;color:#102b50;margin:0 0 16px;padding:9px 10px;background:#edf3fb;border-left:4px solid #174b91;letter-spacing:.5px}
-  h2{font-size:10pt;color:#123c70;text-transform:uppercase;letter-spacing:1px;margin:15px 0 6px;padding-bottom:4px;border-bottom:1px solid #d6e1ef}
-  p{margin:0 0 9px;overflow-wrap:anywhere}.text{white-space:normal}.signatures{display:flex;gap:32px;margin-top:34px;padding-top:18px}
-  .signature{flex:1;text-align:center;border-top:1px solid #526985;padding-top:10px;font-size:10pt;color:#183b66;break-inside:avoid}
-  footer{margin-top:38px;border-top:1px solid #d7e2f1;padding-top:10px;color:#536780;font-size:9pt}
-  .toolbar{max-width:210mm;margin:18px auto;display:flex;gap:10px}.toolbar button{background:#145ac3;color:#fff;border:0;border-radius:8px;padding:12px 20px;cursor:pointer}
-  @media print{body{background:#fff}main{margin:0;padding:0;min-height:0;box-shadow:none}.toolbar{display:none}header img{width:100%;height:auto;max-width:100%}h1,h2{break-after:avoid}.signatures{break-inside:avoid;page-break-inside:avoid}p{orphans:3;widows:3}}
+  @page{size:A4;margin:12mm}*{box-sizing:border-box}
+  body{font:10.5pt/1.5 Arial,Helvetica,sans-serif;color:#143563;background:#eaf1f9;margin:0}
+  main{max-width:190mm;margin:18px auto;padding:17mm;background:#fff;min-height:255mm;box-shadow:0 5px 20px #c3d2e7}
+  .doc-header{display:flex;align-items:center;justify-content:space-between;gap:16px;background:linear-gradient(112deg,#102d68 0%,#164c95 56%,#287bd2 100%);color:#fff;padding:18px 20px;border-radius:10px;break-inside:avoid}
+  .doc-logo{background:#fff;border:1px solid #d9e8ff;border-radius:9px;width:170px;height:76px;flex-shrink:0;display:grid;place-items:center;padding:7px}
+  .doc-logo img{max-width:100%;max-height:100%;object-fit:contain}
+  .doc-heading{text-align:right;display:grid;gap:5px}
+  .doc-heading span{font-size:9pt;font-weight:800;letter-spacing:1.5px;color:#d4eaff}
+  .doc-heading strong{font-size:17pt;line-height:1.2;color:#fff}
+  .doc-heading small{font-size:8pt;letter-spacing:1.3px;color:#d4eaff}
+  h1{font-size:17pt;color:#103c77;line-height:1.3;margin:23px 0 18px;overflow-wrap:anywhere}
+  h2{font-size:11pt;color:#164987;margin:20px 0 7px;padding-bottom:6px;border-bottom:1px solid #d5e4f5;break-after:avoid}
+  p{margin:7px 0 10px;overflow-wrap:anywhere}.text{white-space:normal}
+  .signatures{display:flex;gap:28px;margin-top:54px;break-inside:avoid}
+  .signature{flex:1;border-top:1px solid #28496f;text-align:center;padding-top:10px;font-size:10pt}
+  .toolbar{max-width:190mm;margin:18px auto}.toolbar button{padding:11px 18px;background:#165abc;color:#fff;border:0;border-radius:8px;cursor:pointer}
+  @media(max-width:580px){.doc-header{flex-wrap:wrap}.doc-heading{text-align:left}}
+  @media print{body{background:#fff!important;-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}
+  main{margin:0;padding:0;min-height:0;max-width:none;box-shadow:none}.toolbar{display:none}h1,h2{break-after:avoid}p{orphans:3;widows:3}}
   </style></head><body><div class="toolbar"><button onclick="window.print()">Imprimir / Salvar em PDF</button></div><main>
-  <header><img src="${escapeHtml(logo)}" alt="ANTARES" onerror="this.style.display='none'"></header>
+  <header class="doc-header"><div class="doc-logo"><img src="${escapeHtml(logo)}" alt="Logomarca ANTARES"></div><div class="doc-heading"><span>ANTARES BUSINESS</span><strong>MINUTA DE CONTRATO</strong><small>PLANETÁRIO MÓVEL DIGITAL</small></div></header>
   <h1>${escapeHtml(draft.title)}</h1>
   ${draft.terms.startsWith(customContractPrefix)?'<h2>Contrato personalizado</h2><p class="text">'+line(draft.terms.slice(customContractPrefix.length))+'</p>':`<h2>Instituição contratante</h2><p>${escapeHtml(draft.institution)}</p>
   <h2>Representante da instituição</h2><p>${escapeHtml(draft.responsible||'Não informado')}</p>
