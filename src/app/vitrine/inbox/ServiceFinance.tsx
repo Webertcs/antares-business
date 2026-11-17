@@ -12,7 +12,7 @@ type Pending=
  |{kind:'create';id:string;amount:number;description:string;due:string}
  |{kind:'pay';id:string;receivableId:string;description:string;amount:number;paidOn:string};
 const fmt=(n:number)=>new Intl.NumberFormat('pt-BR',{style:'currency',currency:'BRL'}).format(n);
-const dateBR=(s:string)=>/^\d{4}-\d{2}-\d{2}$/.test(s)?s.split('-').reverse().join('/'):s;
+const dateBR=(s:string)=>/^\d{4}-\d{2}-\d{2}(?:T.*)?$/.test(s)?s.slice(0,10).split('-').reverse().join('/'):s;
 const today=()=>new Date().toLocaleDateString('en-CA',{timeZone:'America/Sao_Paulo'});
 const parseMoney=(raw:string)=>{
  const v=raw.trim().replace(/\s/g,'');
