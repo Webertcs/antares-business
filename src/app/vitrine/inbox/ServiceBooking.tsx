@@ -165,8 +165,8 @@ export default function ServiceBooking({
    {!loading&&reservation&&<div style={{background:reservationCancelled?'#fff4e5':'#e4f9ee',border:'1px solid '+(reservationCancelled?'#edcb92':'#a7e4bc'),padding:14,borderRadius:10,display:'grid',gap:10}}>
     <strong><CheckCircle2 size={16} style={{display:'inline',verticalAlign:'middle'}}/> {reservationCancelled?'Apresentação cancelada':reservationClosed?'Apresentação concluída':'Reserva confirmada'}</strong>
     <p style={{margin:0,fontSize:13}}>Cúpula: {reservation.dome_name||'A definir'} · {fmt(reservation.starts_at)} até {fmt(reservation.ends_at)}.</p>
-    {reservationCancelled?<p style={{margin:0,fontSize:12}}>Atendimento arquivado. A reserva foi cancelada, sem registrar alunos atendidos. Histórico e pagamentos permanecem disponíveis.</p>:
-     reservationClosed?<p style={{margin:0,fontSize:12}}>Apresentação encerrada. Consulte a conclusão e o histórico.</p>:
+    {reservationCancelled?<p style={{margin:0,fontSize:12}}>Reserva cancelada. Histórico e financeiro disponíveis.</p>:
+     reservationClosed?<p style={{margin:0,fontSize:12}}>Apresentação concluída. Histórico disponível.</p>:
      <div style={{display:'grid',gap:10}}>
       {canManage&&!action&&<div style={{display:'flex',gap:8,flexWrap:'wrap'}}>
        <button type="button" style={secondary} onClick={()=>{setAction('edit');setDomeId(reservation.dome_id||'');setStart(localInput(reservation.starts_at));setEnd(localInput(reservation.ends_at));setConfirmCancel(false);setError('');}}>Reagendar</button>
