@@ -27,8 +27,10 @@ export default async function Page({searchParams}:{searchParams:Promise<Params>}
  const total=Number(totalRows[0]?.total||0);
  const pages=Math.max(1,Math.ceil(total/10));
  const current=Math.min(page,pages);
- const rows=await db`SELECT e.id,e.title,e.event_date,e.status,e.expected_attendees,e.archived_at,c.name AS client_name
+ const rows=await db`SELECT e.id,e.title,e.event_date,e.start_time,e.end_time,e.status,e.expected_attendees,e.archived_at,c.name AS client_name,d.name AS dome_name,a.actual_students
  FROM public.crm_events e JOIN public.crm_clients c ON c.id=e.client_id AND c.organization_id=e.organization_id
+ LEFT JOIN public.antares_domes d ON d.id=e.dome_id AND d.organization_id=e.organization_id
+ LEFT JOIN public.antares_event_attendance a ON a.event_id=e.id AND a.organization_id=e.organization_id
  WHERE e.organization_id=${ctx.organizationId} AND (${view}='history' OR e.archived_at IS NULL)
  AND (${year}='all' OR EXTRACT(YEAR FROM e.event_date)::text=${year})
  AND (${status}='all' OR e.status=${status} OR (${status}='cancelled' AND e.status='canceled'))
@@ -45,7 +47,7 @@ export default async function Page({searchParams}:{searchParams:Promise<Params>}
  CASE WHEN e.event_date IS NULL THEN c.name END ASC,
  e.created_at DESC,e.id ASC
  LIMIT 10 OFFSET ${(current-1)*10}`;
- const events=rows.map(r=>({id:String(r.id),title:String(r.title),date:r.event_date?(r.event_date instanceof Date?r.event_date.toISOString().slice(0,10):/^\d{4}-\d{2}-\d{2}/.test(String(r.event_date))?String(r.event_date).slice(0,10):new Date(String(r.event_date)).toISOString().slice(0,10)):null,status:String(r.status||''),attendees:r.expected_attendees==null?null:Number(r.expected_attendees),client:String(r.client_name),archived:!!r.archived_at}));
+ const events=rows.map(r=>({id:String(r.id),title:String(r.title),date:r.event_date?(r.event_date instanceof Date?r.event_date.toISOString().slice(0,10):/^\d{4}-\d{2}-\d{2}/.test(String(r.event_date))?String(r.event_date).slice(0,10):new Date(String(r.event_date)).toISOString().slice(0,10)):null,status:String(r.status||''),attendees:r.expected_attendees==null?null:Number(r.expected_attendees),client:String(r.client_name),archived:!!r.archived_at,startTime:r.start_time==null?null:String(r.start_time),endTime:r.end_time==null?null:String(r.end_time),dome:r.dome_name==null?null:String(r.dome_name),actualStudents:r.actual_students==null?null:Number(r.actual_students)}));
  return <RelationshipShell title="Eventos"><main className="antares-events-page" style={{maxWidth:1100,margin:'0 auto',padding:'18px clamp(14px,2.5vw,26px)',color:'#163968'}}>
  <header className="antares-events-hero" style={{marginBottom:12,padding:'15px clamp(16px,2.5vw,24px)',borderRadius:14,background:'linear-gradient(110deg,#0d2455 0%,#0c3c91 60%,#0860ba 100%)',boxShadow:'0 5px 14px rgba(11,47,111,.14)'}}>
   <p style={{fontSize:11,fontWeight:700,letterSpacing:'1.3px',color:'#b9dfff',margin:'0 0 8px'}}>GESTÃO DE EVENTOS · ANTARES</p>
