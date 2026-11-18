@@ -3,27 +3,24 @@ import RelationshipShell from '../RelationshipShell';
 import {requireMember,getDb} from '@/lib/equipe/auth';
 import EventsList from './EventsList';
 export const dynamic='force-dynamic';
-type Params={page?:string;year?:string;status?:string;q?:string;view?:string};
+type Params={page?:string;status?:string;q?:string};
 export default async function Page({searchParams}:{searchParams:Promise<Params>}){
  const ctx=await requireMember();if(!ctx)redirect('/sem-acesso');
  const params=await searchParams;
  const page=Math.max(1,Math.min(100000,Number.parseInt(params.page||'1',10)||1));
- const year=/^\d{4}$/.test(params.year||'')?params.year!:'all';
  const status=['lead','quoted','reserved','confirmed','completed','cancelled'].includes(params.status||'')?params.status!:'all';
- const view=['upcoming','history','all'].includes(params.view||'')?params.view!:'all';
  const q=(params.q||'').trim().slice(0,120);
  const db=getDb();
  const counts=await db`SELECT COUNT(*)::int AS total,
  COUNT(*) FILTER (WHERE e.status='confirmed')::int AS confirmed,
  COUNT(*) FILTER (WHERE e.status='lead')::int AS opportunities
  FROM public.crm_events e JOIN public.crm_clients c ON c.id=e.client_id AND c.organization_id=e.organization_id
- WHERE e.organization_id=${ctx.organizationId} AND e.archived_at IS NULL`;
- const yearsRows=await db`SELECT DISTINCT EXTRACT(YEAR FROM event_date)::int AS year FROM public.crm_events WHERE organization_id=${ctx.organizationId} AND event_date IS NOT NULL ORDER BY year DESC`;
- const totalRows=await db`SELECT COUNT(*)::int AS total FROM public.crm_events e JOIN public.crm_clients c ON c.id=e.client_id AND c.organization_id=e.organization_id WHERE e.organization_id=${ctx.organizationId} AND (${view}='history' OR e.archived_at IS NULL)
- AND (${year}='all' OR EXTRACT(YEAR FROM e.event_date)::text=${year})
+ WHERE e.organization_id=${ctx.organizationId}`;
+ const totalRows=await db`SELECT COUNT(*)::int AS total
+ FROM public.crm_events e JOIN public.crm_clients c ON c.id=e.client_id AND c.organization_id=e.organization_id
+ WHERE e.organization_id=${ctx.organizationId}
  AND (${status}='all' OR e.status=${status} OR (${status}='cancelled' AND e.status='canceled'))
- AND (${q}='' OR e.title ILIKE ${'%'+q+'%'} OR c.name ILIKE ${'%'+q+'%'})
- AND (${view}='all' OR (${view}='upcoming' AND (e.event_date>=CURRENT_DATE OR e.event_date IS NULL) AND e.status NOT IN ('completed','cancelled','canceled')) OR (${view}='history' AND (e.archived_at IS NOT NULL OR e.event_date<CURRENT_DATE OR e.status IN ('completed','cancelled','canceled'))))`;
+ AND (${q}='' OR e.title ILIKE ${'%'+q+'%'} OR c.name ILIKE ${'%'+q+'%'})`;
  const total=Number(totalRows[0]?.total||0);
  const pages=Math.max(1,Math.ceil(total/10));
  const current=Math.min(page,pages);
@@ -31,19 +28,13 @@ export default async function Page({searchParams}:{searchParams:Promise<Params>}
  FROM public.crm_events e JOIN public.crm_clients c ON c.id=e.client_id AND c.organization_id=e.organization_id
  LEFT JOIN public.antares_domes d ON d.id=e.dome_id AND d.organization_id=e.organization_id
  LEFT JOIN public.antares_event_attendance a ON a.event_id=e.id AND a.organization_id=e.organization_id
- WHERE e.organization_id=${ctx.organizationId} AND (${view}='history' OR e.archived_at IS NULL)
- AND (${year}='all' OR EXTRACT(YEAR FROM e.event_date)::text=${year})
+ WHERE e.organization_id=${ctx.organizationId}
  AND (${status}='all' OR e.status=${status} OR (${status}='cancelled' AND e.status='canceled'))
  AND (${q}='' OR e.title ILIKE ${'%'+q+'%'} OR c.name ILIKE ${'%'+q+'%'})
- AND (${view}='all' OR (${view}='upcoming' AND (e.event_date>=CURRENT_DATE OR e.event_date IS NULL) AND e.status NOT IN ('completed','cancelled','canceled')) OR (${view}='history' AND (e.archived_at IS NOT NULL OR e.event_date<CURRENT_DATE OR e.status IN ('completed','cancelled','canceled'))))
  ORDER BY
- CASE WHEN ${view}='all' THEN
-  CASE WHEN e.event_date IS NULL THEN 2
-       WHEN e.event_date>=CURRENT_DATE AND e.status NOT IN ('completed','cancelled','canceled') AND e.archived_at IS NULL THEN 0
-       ELSE 1 END
- ELSE 0 END ASC,
- CASE WHEN ${view}='upcoming' OR (${view}='all' AND e.event_date>=CURRENT_DATE AND e.status NOT IN ('completed','cancelled','canceled') AND e.archived_at IS NULL) THEN e.event_date END ASC NULLS LAST,
- CASE WHEN ${view}='history' OR (${view}='all' AND (e.event_date<CURRENT_DATE OR e.status IN ('completed','cancelled','canceled') OR e.archived_at IS NOT NULL)) THEN e.event_date END DESC NULLS LAST,
+ CASE WHEN e.event_date>=CURRENT_DATE AND e.status NOT IN ('completed','cancelled','canceled') AND e.archived_at IS NULL THEN 0 WHEN e.event_date IS NULL THEN 2 ELSE 1 END ASC,
+ CASE WHEN e.event_date>=CURRENT_DATE AND e.status NOT IN ('completed','cancelled','canceled') AND e.archived_at IS NULL THEN e.event_date END ASC NULLS LAST,
+ CASE WHEN e.event_date<CURRENT_DATE OR e.status IN ('completed','cancelled','canceled') OR e.archived_at IS NOT NULL THEN e.event_date END DESC NULLS LAST,
  CASE WHEN e.event_date IS NULL THEN c.name END ASC,
  e.created_at DESC,e.id ASC
  LIMIT 10 OFFSET ${(current-1)*10}`;
@@ -54,6 +45,6 @@ export default async function Page({searchParams}:{searchParams:Promise<Params>}
   <h1 style={{fontSize:'clamp(23px,2.5vw,30px)',fontWeight:750,lineHeight:1.2,margin:'0 0 6px',color:'#fff'}}>Eventos</h1>
   
  </header>
- <EventsList events={events} total={total} page={current} pages={pages} years={yearsRows.map(r=>Number(r.year))} counts={{total:Number(counts[0]?.total||0),confirmed:Number(counts[0]?.confirmed||0),opportunities:Number(counts[0]?.opportunities||0)}} filters={{year,status,view,q}}/>
+ <EventsList events={events} total={total} page={current} pages={pages} counts={{total:Number(counts[0]?.total||0),confirmed:Number(counts[0]?.confirmed||0),opportunities:Number(counts[0]?.opportunities||0)}} filters={{status,q}}/>
  </main></RelationshipShell>;
 }
