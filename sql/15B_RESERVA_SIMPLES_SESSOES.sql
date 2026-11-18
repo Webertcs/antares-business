@@ -58,7 +58,7 @@ SET search_path=pg_catalog,public,pg_temp AS $fn$
 DECLARE
  v_status text;v_event uuid;v_event_status text;v_old_start timestamptz;
  v_old_end timestamptz;v_old_equipment uuid;v_old_dome uuid;
- v_new_equipment uuid;v_capacity integer;
+ v_new_equipment uuid;v_capacity integer;v_expected integer;
  BEGIN
  IF NOT EXISTS(SELECT 1 FROM public.team_members WHERE auth_subject=p_subject
       AND organization_id=p_org AND active AND role='owner')
@@ -66,8 +66,8 @@ DECLARE
  IF p_action IS NULL OR p_action NOT IN ('cancel','edit') OR length(btrim(coalesce(p_reason,''))) NOT BETWEEN 5 AND 500
  THEN RAISE EXCEPTION 'Acao ou motivo invalido';END IF;
 
- SELECT p.status,p.starts_at,p.ends_at,p.dome_id
- INTO v_status,v_old_start,v_old_end,v_old_equipment
+ SELECT p.status,p.starts_at,p.ends_at,p.dome_id,b.expected_attendees
+ INTO v_status,v_old_start,v_old_end,v_old_equipment,v_expected
  FROM public.antares_proposal_reservations r
  JOIN public.presentations p ON p.id=r.presentation_id AND p.organization_id=r.organization_id
  JOIN public.business_proposals b ON b.id=r.proposal_id AND b.organization_id=r.organization_id
@@ -129,7 +129,9 @@ DECLARE
    AND p.starts_at<p_end AND p.ends_at>p_start)
  THEN RAISE EXCEPTION 'Horario indisponivel';END IF;
 
- UPDATE public.presentations SET dome_id=v_new_equipment,starts_at=p_start,ends_at=p_end
+ UPDATE public.presentations SET dome_id=v_new_equipment,starts_at=p_start,ends_at=p_end,
+   expected_students=CASE WHEN v_expected IS NOT NULL AND v_expected>0
+    THEN LEAST(v_expected,COALESCE(v_capacity,v_expected)) ELSE NULL END
  WHERE id=p_presentation AND organization_id=p_org;
  IF v_event IS NOT NULL THEN
   UPDATE public.crm_events SET
