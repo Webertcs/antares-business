@@ -243,6 +243,23 @@ REVOKE ALL ON FUNCTION public.antares_manage_proposal_reservation(text,uuid,uuid
 GRANT EXECUTE ON FUNCTION public.antares_link_reservation_event(text,uuid,uuid) TO antares_team_runtime;
 GRANT EXECUTE ON FUNCTION public.antares_book_and_link_proposal(text,uuid,uuid,uuid,timestamptz,timestamptz) TO antares_team_runtime;
 GRANT EXECUTE ON FUNCTION public.antares_manage_proposal_reservation(text,uuid,uuid,text,uuid,timestamptz,timestamptz,text) TO antares_team_runtime;
+-- Consulta do historico por funcao controlada: tabela continua sem SELECT direto.
+CREATE OR REPLACE FUNCTION public.antares_reservation_history(p_subject text,p_org uuid)
+RETURNS TABLE(presentation_id uuid,action text,reason text,old_start timestamptz,
+ old_end timestamptz,new_start timestamptz,new_end timestamptz,changed_at timestamptz)
+LANGUAGE plpgsql SECURITY DEFINER SET search_path=pg_catalog,public,pg_temp AS $fn$
+BEGIN
+ IF NOT EXISTS(SELECT 1 FROM public.team_members m WHERE m.auth_subject=p_subject
+   AND m.organization_id=p_org AND m.active AND m.role='owner')
+ THEN RAISE EXCEPTION 'Acesso negado';END IF;
+ RETURN QUERY SELECT h.presentation_id,h.action,h.reason,h.old_start,h.old_end,
+   h.new_start,h.new_end,h.changed_at
+ FROM public.antares_reservation_changes h
+ WHERE h.organization_id=p_org ORDER BY h.changed_at DESC LIMIT 200;
+END $fn$;
+REVOKE ALL ON FUNCTION public.antares_reservation_history(text,uuid) FROM PUBLIC;
+GRANT EXECUTE ON FUNCTION public.antares_reservation_history(text,uuid) TO antares_team_runtime;
+
 COMMIT;
 
 -- POS-IMPLANTACAO: consultar estrutura e permissao antes de liberar na interface.
