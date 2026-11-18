@@ -147,7 +147,7 @@ export default function ServiceBooking({
    <div style={{display:'flex',gap:10,alignItems:'center'}}>
     <CalendarCheck2 size={24} aria-hidden="true"/>
     <div><div style={{fontSize:11,opacity:.8,fontWeight:700}}>CENTRAL DE ATENDIMENTO</div>
-     <h2 id="service-booking-title" style={{margin:0,fontSize:21,color:'#fff'}}>Organizar reserva</h2>
+     <h2 id="service-booking-title" style={{margin:0,fontSize:21,color:'#fff'}}>{reservationCancelled?'Ver cancelamento':reservation?'Ver reserva':'Organizar reserva'}</h2>
     </div>
    </div>
    <button type="button" aria-label="Fechar reserva" disabled={busy} onClick={onClose}
