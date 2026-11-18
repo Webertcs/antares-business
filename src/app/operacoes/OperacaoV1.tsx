@@ -112,7 +112,7 @@ export default function OperacaoV1({writesEnabled,contractWritesEnabled}:{writes
  <Link className="operations-back" href="/?section=operacao">← Voltar</Link>
  <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',gap:12,flexWrap:'wrap'}}>
  <div><h1 style={{fontSize:22,fontWeight:800,margin:'5px 0 2px'}}>Gestão Operacional</h1>
- <p style={{fontSize:12,margin:'0',color:'#60769a'}}>Organize cúpulas, apresentações e atividades do planetário.</p></div>
+ </div>
  {tab!=='agenda'&&<Link href="/clientes" style={{background:'#2563eb',color:'white',padding:'8px 11px',fontSize:12,borderRadius:8,textDecoration:'none'}}>Abrir cadastro de clientes</Link>}</div>
  {loading&&<p role="status">Carregando informações do planetário...</p>}
  {error&&<div role="alert" style={{...base,borderColor:'#b45309',marginTop:20}}>Não foi possível consultar todas as informações. {error} Consulte os dados disponíveis antes de realizar novas operações.</div>}
@@ -141,7 +141,7 @@ export default function OperacaoV1({writesEnabled,contractWritesEnabled}:{writes
  <button key={k} onClick={()=>setTab(k)} aria-current={tab===k?'page':undefined}
  style={{padding:'7px 10px',borderRadius:8,border:'1px solid '+(tab===k?'#2558d7':'#c2d7f6'),background:tab===k?'#2458d3':'#f8fbff',color:tab===k?'#fff':'#2352a0',fontWeight:700,fontSize:12,cursor:'pointer'}}>{l}</button>)}</nav>
  {selectedClientId&&<p style={{marginTop:12}}>Cliente selecionado: <strong>{String(data.clients.find(c=>String(c.id)===selectedClientId)?.name||'Não encontrado')}</strong> · <Link href={`/clientes/${encodeURIComponent(selectedClientId)}`}>Voltar à ficha</Link></p>}
- {tab==='comercial'&&<section style={base}><h2 style={{fontSize:21,fontWeight:650}}>Propostas e orçamentos</h2>{writesEnabled&&<button onClick={()=>openForm('proposal')} style={{padding:10,background:'#2563eb',color:'#fff',borderRadius:8}}>+ Nova proposta</button>}<p>Valores previstos, negociação e condições comerciais por cliente.</p>
+ {tab==='comercial'&&<section style={base}><h2 style={{fontSize:21,fontWeight:650}}>Propostas e orçamentos</h2>{writesEnabled&&<button onClick={()=>openForm('proposal')} style={{padding:10,background:'#2563eb',color:'#fff',borderRadius:8}}>+ Nova proposta</button>}
   <input aria-label="Pesquisar proposta" placeholder="Pesquisar proposta ou cliente" value={term} onChange={e=>setTerm(e.target.value)} style={{padding:11,border:'1px solid #94a3b8',borderRadius:8,width:'100%',margin:'10px 0'}}/>
   <Rows heads={['Proposta','Cliente','Total','Situação','Validade']}
    rows={filtered.map(p=>[p.title,p.client_name,money(p.total),p.status,date(p.valid_until)])}/>
@@ -150,8 +150,8 @@ export default function OperacaoV1({writesEnabled,contractWritesEnabled}:{writes
  </div></section>}
  {tab==='contratos'&&<section style={base}>
  <h2 style={{fontSize:21,fontWeight:650}}>Contratos e confirmações</h2>
- <p>Vinculados às propostas aprovadas, com modalidades formal, verbal ou WhatsApp.</p>
- <p>Documentos não assinados podem ser consultados na aba Propostas. Uma confirmação registrada exige acordo real com o cliente.</p>
+ 
+ <p>Registre a confirmação somente após o aceite real do cliente.</p>
  {!contractWritesEnabled&&<p role="status" style={{padding:12,background:'#fff4df',borderRadius:8}}>Novos contratos estão temporariamente indisponíveis. Você ainda pode consultar os registros.</p>}
  <Rows heads={['Proposta','Modalidade','Situação','Confirmação']}
  rows={visibleContracts.map(c=>[c.proposal_title,c.confirmation_mode,c.status,dateTime(c.confirmed_at)])}/>
@@ -167,7 +167,7 @@ export default function OperacaoV1({writesEnabled,contractWritesEnabled}:{writes
  <button disabled={busy} type="submit" style={{padding:12,background:'#1d4ed8',color:'#fff',borderRadius:8}}>Registrar contrato</button>
  </form>}
  </section>}
- {tab==='agenda'&&<section className="operations-dome-panel" style={base}><div className="operations-dome-head"><div><h2 style={{fontSize:21,fontWeight:700,margin:0}}>Cúpulas e apresentações</h2><p>Estrutura e programação das sessões.</p></div><Link className="operations-dome-action" href="/agenda/reservas">Gerenciar reservas ↗</Link></div><div className="operations-dome-kpis"><div><span>Cúpulas cadastradas</span><strong>{data.domes.length}</strong></div><div><span>Reservas registradas</span><strong>{data.bookings.length}</strong></div><div><span>Próximas apresentações</span><strong>{nextBookings.length}</strong></div></div>{writesEnabled&&<div style={{display:'flex',gap:8,marginTop:12}}><button onClick={()=>openForm('dome')}>+ Cúpula</button><button onClick={()=>openForm('booking')}>+ Reserva</button></div>}
+ {tab==='agenda'&&<section className="operations-dome-panel" style={base}><div className="operations-dome-head"><div><h2 style={{fontSize:21,fontWeight:700,margin:0}}>Cúpulas e apresentações</h2></div><Link className="operations-dome-action" href="/agenda/reservas">Gerenciar reservas ↗</Link></div><div className="operations-dome-kpis"><div><span>Cúpulas cadastradas</span><strong>{data.domes.length}</strong></div><div><span>Reservas registradas</span><strong>{data.bookings.length}</strong></div><div><span>Próximas apresentações</span><strong>{nextBookings.length}</strong></div></div>{writesEnabled&&<div style={{display:'flex',gap:8,marginTop:12}}><button onClick={()=>openForm('dome')}>+ Cúpula</button><button onClick={()=>openForm('booking')}>+ Reserva</button></div>}
   <div className="operations-dome-list"><h3>Cúpulas</h3>{data.domes.length?<div className="operations-dome-chips">{data.domes.map(d=><span key={String(d.id)}>{String(d.name)}</span>)}</div>:<p>Nenhuma cúpula cadastrada.</p>}</div>{eventError&&<p role="alert">{eventError}</p>}
   <h3 className="operations-dome-table-title">Apresentações</h3><Rows heads={['Apresentação','Cúpula','Início','Término','Situação']}
   rows={data.bookings.map(b=>[b.event_title,b.dome_name,dateTime(b.starts_at),dateTime(b.ends_at),b.status])}/></section>}
@@ -177,7 +177,7 @@ export default function OperacaoV1({writesEnabled,contractWritesEnabled}:{writes
    rows={data.ledger.map(x=>[date(x.occurred_on),x.description,x.category,money(x.amount),x.status])}/></section>}
  {tab==='balanco'&&<section style={base}>
   <h2 style={{fontSize:21,fontWeight:650}}>Balanço financeiro mensal</h2>
-  <p>Separação entre valores realizados e previstos; até 36 meses de histórico.</p>
+  
   {balanceError&&<p role="status">{balanceError}</p>}
   <Rows heads={['Mês','Recebido','Despesas pagas','A receber','A pagar','Saldo realizado']}
    rows={(balance?.monthly||[]).map(m=>[date(m.mes),money(m.recebido),money(m.despesas),
@@ -193,7 +193,7 @@ export default function OperacaoV1({writesEnabled,contractWritesEnabled}:{writes
   <Rows heads={['Tipo','Quantidade']} rows={(balance?.clients||[]).map(c=>[c.kind,c.quantidade])}/>
  </section>}
  {tab==='auditoria'&&<section style={base}><h2 style={{fontSize:21,fontWeight:650}}>Trilha de auditoria</h2>
-  <p>Registros de alterações, disponíveis para conferência do proprietário.</p>
+  
   <Rows heads={['Quando','Ação','Entidade','ID']}
   rows={data.audit.map(x=>[dateTime(x.created_at),x.action,x.entity_type,x.entity_id])}/></section>}
  </>}
