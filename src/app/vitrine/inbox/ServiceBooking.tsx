@@ -18,6 +18,11 @@ const fmt=(value:string)=>new Intl.DateTimeFormat('pt-BR',{
  dateStyle:'short',timeStyle:'short',timeZone:'America/Sao_Paulo'
 }).format(new Date(value));
 const normal=(value:string)=>{const dt=new Date(value);return Number.isFinite(dt.getTime())?dt:null;};
+const localInput=(value:string)=>{
+ const parts=new Intl.DateTimeFormat('en-GB',{timeZone:'America/Sao_Paulo',year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',hourCycle:'h23'}).formatToParts(new Date(value));
+ const get=(type:string)=>parts.find(p=>p.type===type)?.value||'';
+ return get('year')+'-'+get('month')+'-'+get('day')+'T'+get('hour')+':'+get('minute');
+};
 const field:React.CSSProperties={width:'100%',minHeight:42,border:'1px solid #b4cdf0',
  borderRadius:9,padding:'9px 11px',color:'#173e79',background:'#fff',fontSize:14};
 const secondary:React.CSSProperties={padding:'10px 16px',border:'1px solid #aac8ee',
@@ -29,7 +34,7 @@ const primary:React.CSSProperties={padding:'10px 16px',border:'1px solid #174f9b
 export default function ServiceBooking({
  proposalId,institution,enabled,onClose,onSaved
 }:{
- proposalId:string;institution:string;enabled:boolean;onClose:()=>void;onSaved:()=>void;
+ proposalId:string;institution:string;enabled:boolean;onClose:()=>void;onSaved:(result:'reserved'|'rescheduled'|'cancelled'|'linked')=>void;
 }){
  const dialog=useRef<HTMLDialogElement>(null);
  const [data,setData]=useState<ServiceBookingData|null>(null);
@@ -40,6 +45,10 @@ export default function ServiceBooking({
  const [domeId,setDomeId]=useState('');
  const [start,setStart]=useState('');
  const [end,setEnd]=useState('');
+ const [action,setAction]=useState<'edit'|'cancel'|null>(null);
+ const [reason,setReason]=useState('');
+ const [confirmCancel,setConfirmCancel]=useState(false);
+ const [confirmOperational,setConfirmOperational]=useState(false);
 
  async function load(){
   const result=await fetch('/api/agenda/reservas',{cache:'no-store'});
@@ -68,14 +77,17 @@ export default function ServiceBooking({
  },[]);
 
  const proposal=data?.proposals.find(p=>p.id===proposalId);
- const reservation=data?.links.find(r=>r.proposal_id===proposalId&&r.status!=='cancelled');
+ const reservation=data?.links.find(r=>r.proposal_id===proposalId);
+ const reservationCancelled=reservation?.status==='cancelled'||reservation?.crm_event_status==='cancelled';
+ const reservationClosed=reservation?.status==='completed'||reservation?.crm_event_status==='completed';
+ const canManage=enabled&&!busy&&Boolean(reservation)&&!reservationCancelled&&!reservationClosed;
  const domes=data?.domes.filter(d=>d.mapped)||[];
  const selectedDome=domes.find(d=>d.id===domeId);
  const capacityOk=!selectedDome||!proposal?.expected_attendees||selectedDome.capacity==null||Number(proposal.expected_attendees)<=Number(selectedDome.capacity);
  const startDate=normal(start),endDate=normal(end);
  const validDates=Boolean(startDate&&endDate&&endDate.getTime()>startDate.getTime()&&startDate.getTime()>Date.now());
  const conflicting=Boolean(validDates&&domeId&&data?.links.some(r=>
-  r.status!=='cancelled'&&r.dome_id===domeId&&
+  r.status!=='cancelled'&&r.presentation_id!==reservation?.presentation_id&&r.dome_id===domeId&&
   new Date(r.starts_at).getTime()<endDate!.getTime()&&new Date(r.ends_at).getTime()>startDate!.getTime()));
  const canSave=enabled&&!busy&&Boolean(proposal?.mapped)&&Boolean(selectedDome)&&validDates&&!conflicting&&capacityOk&&!reservation;
 
@@ -107,8 +119,41 @@ export default function ServiceBooking({
    });
    const json=await response.json();
    if(!response.ok)throw Error(json.error||'Reserva recusada.');
-   onSaved();
+   onSaved('reserved');
   }catch(e){setError(e instanceof Error?e.message:'Não foi possível registrar a reserva.');}
+  finally{setBusy(false);}
+ }
+
+ async function manageReservation(){
+  if(!reservation||!canManage||!action)return;
+  if(action==='cancel'&&(!confirmCancel||reason.trim().length<5||reason.trim().length>500)){
+   setError('Informe o motivo do cancelamento (5 a 500 caracteres) e confirme.');return;
+  }
+  if(action==='edit'&&(!validDates||!selectedDome||!capacityOk||conflicting)){
+   setError('Confira a nova cúpula, as datas e a disponibilidade.');return;
+  }
+  setBusy(true);setError('');
+  try{
+   const body=action==='cancel'
+    ?{presentationId:reservation.presentation_id,action:'cancel',confirm:'CANCELAR',reason:reason.trim()}
+    :{presentationId:reservation.presentation_id,action:'edit',domeId,start:startDate!.toISOString(),end:endDate!.toISOString(),reason:'Reagendamento solicitado pela instituição'};
+   const response=await fetch('/api/agenda/reservas',{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+   const json=await response.json();
+   if(!response.ok)throw Error(json.error||'Não foi possível atualizar a apresentação.');
+   onSaved(action==='cancel'?'cancelled':'rescheduled');
+  }catch(e){setError(e instanceof Error?e.message:'Não foi possível atualizar a reserva.');}
+  finally{setBusy(false);}
+ }
+
+ async function linkOperationalEvent(){
+  if(!reservation||reservationCancelled||reservationClosed||!confirmOperational||busy)return;
+  setBusy(true);setError('');
+  try{
+   const response=await fetch('/api/agenda/reservas/vincular',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({presentationId:reservation.presentation_id})});
+   const json=await response.json();
+   if(!response.ok)throw Error(json.error||'Não foi possível vincular o evento.');
+   onSaved('linked');
+  }catch(e){setError(e instanceof Error?e.message:'Não foi possível vincular o evento.');}
   finally{setBusy(false);}
  }
 
@@ -138,10 +183,58 @@ export default function ServiceBooking({
    {error&&<p role="alert" style={{margin:0,padding:11,color:'#9b1c32',
     background:'#fff1f3',border:'1px solid #fecdd3',borderRadius:9}}>{error}</p>}
    {loading&&<p role="status">Consultando cúpulas e reservas existentes...</p>}
-   {!loading&&reservation&&<div role="status" style={{background:'#e4f9ee',border:'1px solid #a7e4bc',padding:14,borderRadius:10}}>
-    <strong><CheckCircle2 size={16} style={{display:'inline',verticalAlign:'middle'}}/> Reserva já registrada</strong>
-    <p style={{margin:'7px 0 0'}}>Cúpula: {reservation.dome_name||'A definir'} · {fmt(reservation.starts_at)} até {fmt(reservation.ends_at)}.</p>
-    <p style={{margin:'7px 0 0',fontSize:12}}>Para alterar ou cancelar, utilize a Agenda, que preserva o histórico operacional.</p>
+   {!loading&&reservation&&<div style={{background:reservationCancelled?'#fff4e5':'#e4f9ee',border:'1px solid '+(reservationCancelled?'#edcb92':'#a7e4bc'),padding:14,borderRadius:10,display:'grid',gap:10}}>
+    <strong><CheckCircle2 size={16} style={{display:'inline',verticalAlign:'middle'}}/> {reservationCancelled?'Apresentação cancelada':reservationClosed?'Apresentação concluída':'Reserva confirmada'}</strong>
+    <p style={{margin:0,fontSize:13}}>Cúpula: {reservation.dome_name||'A definir'} · {fmt(reservation.starts_at)} até {fmt(reservation.ends_at)}.</p>
+    {reservationCancelled?<p style={{margin:0,fontSize:12}}>Atendimento arquivado. A reserva foi cancelada, sem registrar alunos atendidos. Histórico e pagamentos permanecem disponíveis.</p>:
+     reservationClosed?<p style={{margin:0,fontSize:12}}>Apresentação encerrada. Consulte a conclusão e o histórico.</p>:
+     <div style={{display:'grid',gap:10}}>
+      {canManage&&!action&&<div style={{display:'flex',gap:8,flexWrap:'wrap'}}>
+       <button type="button" style={secondary} onClick={()=>{setAction('edit');setDomeId(reservation.dome_id||'');setStart(localInput(reservation.starts_at));setEnd(localInput(reservation.ends_at));setConfirmCancel(false);setError('');}}>Reagendar</button>
+       <button type="button" style={{...secondary,color:'#9f1d35',borderColor:'#e7bac4',background:'#fff1f3'}} onClick={()=>{setAction('cancel');setReason('');setConfirmCancel(false);setError('');}}>Cancelar apresentação</button>
+      </div>}
+      {action==='edit'&&<div style={{display:'grid',gap:10,background:'#fff',padding:12,borderRadius:9,border:'1px solid #c1d7f0'}}>
+       <strong>Escolher nova data e cúpula</strong>
+       <label>Cúpula
+        <select style={field} value={domeId} disabled={busy} onChange={e=>setDomeId(e.target.value)}>
+         <option value="">Selecionar cúpula</option>
+         {domes.map(d=><option key={d.id} value={d.id}>{d.name}{d.capacity?' · até '+d.capacity+' pessoas':''}</option>)}
+        </select>
+       </label>
+       <label>Início<input type="datetime-local" style={field} value={start} disabled={busy} onChange={e=>setStart(e.target.value)}/></label>
+       <label>Término<input type="datetime-local" style={field} value={end} disabled={busy} onChange={e=>setEnd(e.target.value)}/></label>
+       {!validDates&&<p role="status" style={{fontSize:12,margin:0}}>Escolha horários futuros e término posterior ao início.</p>}
+       {conflicting&&<p role="alert" style={{fontSize:12,color:'#a02135',margin:0}}>Conflito de horário nessa cúpula.</p>}
+       {!capacityOk&&<p role="alert" style={{fontSize:12,color:'#a02135',margin:0}}>Capacidade insuficiente.</p>}
+       <div style={{display:'flex',gap:8,justifyContent:'flex-end'}}>
+        <button type="button" style={secondary} disabled={busy} onClick={()=>setAction(null)}>Voltar</button>
+        <button type="button" style={primary} disabled={busy||!validDates||!selectedDome||conflicting||!capacityOk} onClick={()=>void manageReservation()}>{busy?'Salvando...':'Confirmar reagendamento'}</button>
+       </div>
+      </div>}
+      {action==='cancel'&&<div style={{display:'grid',gap:10,background:'#fff',padding:12,borderRadius:9,border:'1px solid #e7bac4'}}>
+       <strong>Cancelar a apresentação</strong>
+       <label>Motivo informado pela escola
+        <textarea rows={3} maxLength={500} value={reason} disabled={busy} onChange={e=>{setReason(e.target.value);setConfirmCancel(false);}} style={{...field,resize:'vertical'}} placeholder="Informe o motivo para o histórico"/>
+       </label>
+       <label style={{fontSize:12,display:'flex',gap:8,alignItems:'flex-start'}}>
+        <input type="checkbox" checked={confirmCancel} onChange={e=>setConfirmCancel(e.target.checked)} disabled={busy}/>
+        Confirmo o cancelamento da reserva. O horário será liberado; pagamentos não serão alterados.
+       </label>
+       <div style={{display:'flex',gap:8,justifyContent:'flex-end'}}>
+        <button type="button" style={secondary} disabled={busy} onClick={()=>setAction(null)}>Voltar</button>
+        <button type="button" style={{...primary,background:'#ad2540'}} disabled={busy||!confirmCancel||reason.trim().length<5} onClick={()=>void manageReservation()}>{busy?'Cancelando...':'Confirmar cancelamento'}</button>
+       </div>
+      </div>}
+      {!reservation.crm_event_id&&!action&&<div style={{padding:12,border:'1px solid #e7ce96',background:'#fff8e9',borderRadius:9,display:'grid',gap:8}}>
+       <strong style={{fontSize:13}}>Evento operacional ainda não vinculado</strong>
+       <p style={{fontSize:12,margin:0}}>A reserva está salva. Vincule-a ao evento antes de registrar a conclusão, sem duplicar a apresentação.</p>
+       {!confirmOperational?<button type="button" style={secondary} onClick={()=>setConfirmOperational(true)} disabled={busy}>Preparar vínculo operacional</button>:
+        <div style={{display:'flex',gap:8,justifyContent:'flex-end',flexWrap:'wrap'}}>
+         <button type="button" style={secondary} disabled={busy} onClick={()=>setConfirmOperational(false)}>Voltar</button>
+         <button type="button" style={primary} disabled={busy} onClick={()=>void linkOperationalEvent()}>{busy?'Vinculando...':'Confirmar vínculo'}</button>
+        </div>}
+      </div>}
+     </div>}
    </div>}
    {!loading&&!reservation&&!proposal&&<p role="alert">Proposta não habilitada para reserva. Verifique o aceite e a situação da instituição.</p>}
    {!loading&&!reservation&&proposal&&!proposal.mapped&&<div style={{padding:14,border:'1px solid #efd3a3',background:'#fff7e8',borderRadius:10}}>
