@@ -44,7 +44,7 @@ export default async function HistoricoPage(){
  }catch{error=true}
  return <main className="operation-detail operation-history">
   <Link className="operation-detail-back" href="/?section=operacao">← Voltar</Link>
-  <header className="operation-detail-head"><div><h1>Histórico operacional</h1><p>Acompanhe as alterações registradas no seu planetário.</p></div></header>
+  <header className="operation-detail-head"><div><h1>Histórico operacional</h1></div></header>
   <section className="operation-detail-panel">
    <div className="operation-history-heading"><h2>Atividades recentes</h2><span>{error?'Indisponível':entries.length+' registro(s)'}</span></div>
    {error?<p role="alert" className="operation-detail-warning">Histórico indisponível no momento.</p>:
