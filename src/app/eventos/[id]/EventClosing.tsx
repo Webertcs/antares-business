@@ -1,81 +1,116 @@
 'use client';
 import {useCallback,useEffect,useState} from 'react';
-type Closing={status:string;attendance:{actual_students:number;closed_at:string}|null;canClose:boolean;canCorrect?:boolean;diagnostics?:{checks:{owner:boolean;confirmed:boolean;datePresent:boolean;dateEligible:boolean;featureEnabled:boolean};eventDate:string;today:string}};
-export default function EventClosing({eventId}:{eventId:string}){
- const [editing,setEditing]=useState(false);
- const [data,setData]=useState<Closing|null>(null),[error,setError]=useState(''),[open,setOpen]=useState(false),[students,setStudents]=useState(''),[busy,setBusy]=useState(false),[message,setMessage]=useState('');
+import type {FormEvent} from 'react';
+
+type Attendance={actual_students:number;closed_at:string};
+type Closing={status:string;attendance:Attendance|null;canClose:boolean;canCorrect?:boolean};
+
+const fieldStyle:React.CSSProperties={width:'100%',maxWidth:260,minHeight:43,padding:'9px 12px',border:'1px solid #95b6e4',borderRadius:9,background:'#fff',color:'#173668',fontSize:17,fontWeight:750};
+const primaryStyle:React.CSSProperties={minHeight:43,padding:'10px 16px',border:0,borderRadius:9,background:'#1758b6',color:'#fff',fontWeight:750,cursor:'pointer'};
+
+export default function EventClosing({eventId,eventDate}:{eventId:string;eventDate:string|null}){
+ const [data,setData]=useState<Closing|null>(null);
+ const [students,setStudents]=useState('');
+ const [correcting,setCorrecting]=useState(false);
+ const [busy,setBusy]=useState(false);
+ const [error,setError]=useState('');
+ const [message,setMessage]=useState('');
  const load=useCallback(async(signal?:AbortSignal)=>{
-  const r=await fetch('/api/eventos/'+encodeURIComponent(eventId)+'/encerramento',{cache:'no-store',signal});
-  const d=await r.json();if(!r.ok)throw Error(d.error||'Consulta indisponível');return d as Closing;
+  const response=await fetch('/api/eventos/'+encodeURIComponent(eventId)+'/encerramento',{cache:'no-store',signal});
+  const result=await response.json();
+  if(!response.ok)throw Error(result.error||'Não foi possível consultar a contagem.');
+  return result as Closing;
  },[eventId]);
- useEffect(()=>{const ctrl=new AbortController();load(ctrl.signal).then(d=>{if(!ctrl.signal.aborted)setData(d)}).catch(e=>{if(!ctrl.signal.aborted)setError(e instanceof Error?e.message:'Consulta indisponível')});return()=>ctrl.abort()},[load]);
- async function correctAttendance(){
-  const n=Number(students);
-  if(!/^\d+$/.test(students)||!Number.isSafeInteger(n)||n>100000||n===data?.attendance?.actual_students)return;
-  setBusy(true);setMessage('');
-  try{
-   const r=await fetch('/api/eventos/'+encodeURIComponent(eventId)+'/encerramento/corrigir',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({students:n})});
-   const d=await r.json();if(!r.ok)throw Error(d.error||'Correção não realizada');
-   setData(await load());setEditing(false);setMessage('Quantidade corrigida. Histórico de auditoria preservado.');
-  }catch(e){setMessage(e instanceof Error?e.message:'Erro na correção')}finally{setBusy(false)}
+
+ useEffect(()=>{
+  const controller=new AbortController();
+  void load(controller.signal).then(result=>{
+   if(!controller.signal.aborted)setData(result);
+  }).catch(cause=>{
+   if(!controller.signal.aborted)setError(cause instanceof Error?cause.message:'Consulta indisponível.');
+  });
+  return ()=>controller.abort();
+ },[load]);
+
+ const today=new Intl.DateTimeFormat('en-CA',{timeZone:'America/Sao_Paulo',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date());
+ const upcoming=!!eventDate&&eventDate>today;
+ const cancelled=data?.status==='cancelled'||data?.status==='canceled';
+ const recorded=!!data?.attendance;
+ const allowed=!!data?.canClose&&!recorded;
+ const valid=/^\d+$/.test(students)&&Number.isSafeInteger(Number(students))&&Number(students)<=100000&&
+  (!correcting||Number(students)!==data?.attendance?.actual_students);
+ let situation='Consultando evento…';
+ if(data){
+  if(recorded)situation='Concluído';
+  else if(cancelled)situation='Cancelado';
+  else if(data.status==='completed')situation='Realizado';
+  else if(allowed)situation='Pronto para concluir';
+  else if(upcoming)situation='Agendado';
+  else if(data.status==='confirmed'||data.status==='reserved')situation='Aguardando encerramento';
+  else situation='Aguardando confirmação';
  }
- async function closeEvent(){
-  const n=Number(students);if(!/^\d+$/.test(students)||!Number.isSafeInteger(n)||n>100000)return;
-  setBusy(true);setMessage('');
+
+ async function submit(event:FormEvent<HTMLFormElement>){
+  event.preventDefault();
+  if(busy||!valid||(!allowed&&!correcting)||(correcting&&!data?.canCorrect))return;
+  setBusy(true);setError('');setMessage('');
   try{
-   const r=await fetch('/api/eventos/'+encodeURIComponent(eventId)+'/encerramento',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({students:n})});
-   const d=await r.json();if(!r.ok)throw Error(d.error||'Não foi possível encerrar');
-   setData(await load());setOpen(false);setMessage('Evento concluído. Total de alunos salvo.');
-  }catch(e){setMessage(e instanceof Error?e.message:'Erro no encerramento')}finally{setBusy(false)}
+   const suffix=correcting?'/corrigir':'';
+   const response=await fetch('/api/eventos/'+encodeURIComponent(eventId)+'/encerramento'+suffix,{
+    method:'POST',headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({students:Number(students)})
+   });
+   const result=await response.json();
+   if(!response.ok)throw Error(result.error||(correcting?'Não foi possível corrigir.':'Não foi possível concluir.'));
+   const updated=await load();
+   setData(updated);
+   setCorrecting(false);
+   setStudents('');
+   setMessage(correcting?'Contagem corrigida. Histórico preservado.':'Evento concluído. Alunos registrados.');
+  }catch(cause){
+   setError(cause instanceof Error?cause.message:'Não foi possível salvar a contagem.');
+  }finally{
+   setBusy(false);
+  }
  }
- return <section className="antares-event-center-closing" aria-label="Fechamento operacional e controle de público" style={{border:'1px solid #8cb7f3',borderRadius:16,overflow:'hidden',background:'linear-gradient(145deg,#f1f7ff,#ffffff)',color:'#173668',boxShadow:'0 10px 26px rgba(16,67,145,.12)'}}>
-  <div style={{background:'linear-gradient(110deg,#09265f,#1353a5 72%,#1769bf)',padding:'14px 17px',color:'#fff',display:'flex',alignItems:'center',gap:11}}>
-   <span aria-hidden="true" style={{fontSize:23,background:'rgba(255,255,255,.15)',borderRadius:11,padding:'7px 10px'}}>📊</span>
-   <div><strong style={{fontSize:17,display:'block'}}>Registrar alunos atendidos</strong><span style={{fontSize:12,color:'#d7eaff'}}>Uma contagem ao final de cada evento</span></div>
-  </div>
-  <div style={{padding:'15px 17px',display:'grid',gap:13}}>
-   <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',gap:14,flexWrap:'wrap'}}>
-    <div style={{display:'grid',gap:5}}>
-     <span style={{fontSize:12,fontWeight:800,color:'#3565a5',letterSpacing:'.04em'}}>SITUAÇÃO</span>
-     <strong style={{fontSize:18,color:data?.attendance?'#136b4b':'#173668'}}>{data?.attendance?'✓ Evento encerrado · Presença registrada':data?.status==='completed'?'Evento realizado · Presença pendente':'Aguardando encerramento do evento'}</strong>
-     <span style={{fontSize:13,color:'#45648a',maxWidth:560}}>Informe quantos alunos participaram do evento.</span>
+
+ return <section className="antares-event-center-closing" aria-label="Contagem final de alunos" style={{border:'1px solid #bfd6f5',borderRadius:14,overflow:'hidden',background:'#f8fbff',color:'#173668'}}>
+  <header style={{padding:'13px 17px',background:'linear-gradient(110deg,#103b86,#1763b8)',color:'#fff'}}>
+   <strong style={{fontSize:16}}>Alunos atendidos</strong>
+  </header>
+  <div style={{padding:'17px',display:'grid',gap:14}}>
+   <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',gap:12,flexWrap:'wrap'}}>
+    <div>
+     <div style={{fontSize:12,fontWeight:750,color:'#4c6b97',marginBottom:3}}>Situação</div>
+     <strong style={{fontSize:18,color:recorded?'#166747':'#173668'}}>{situation}</strong>
     </div>
-    {data?.attendance?<div style={{display:'flex',alignItems:'center',gap:12,flexWrap:'wrap'}}>
-      <div style={{padding:'9px 16px',background:'#e2f5ee',border:'1px solid #a9dcc8',borderRadius:12,textAlign:'center',minWidth:135}}><strong style={{display:'block',fontSize:26,lineHeight:1.2,color:'#126345'}}>{data.attendance.actual_students}</strong><span style={{fontSize:12,fontWeight:750,color:'#126345'}}>Alunos atendidos</span></div>
-      {data.canCorrect&&<button className="antares-event-secondary" type="button" disabled={busy} onClick={()=>{setStudents(String(data.attendance?.actual_students??''));setMessage('');setEditing(true)}} style={{padding:'10px 15px',border:'1px solid #1554b0',borderRadius:9,color:'#1554b0',background:'#fff',fontWeight:800}}>Editar contagem</button>}
-     </div>:<button type="button" disabled={!data?.canClose||busy||data.status==='completed'} onClick={()=>setOpen(true)} style={{padding:'13px 19px',border:0,borderRadius:10,color:'#fff',background:data?.canClose?'linear-gradient(110deg,#1252ac,#2075d4)':'#7088ad',fontWeight:800,boxShadow:data?.canClose?'0 5px 14px rgba(21,84,176,.25)':'none',cursor:data?.canClose?'pointer':'not-allowed'}}>Registrar alunos e concluir</button>}
-   </div>
-   {data?.status==='completed'&&!data.attendance&&<p style={{fontSize:13,margin:0}}>Evento já marcado como realizado. O registro de presença requer conferência antes de qualquer atualização.</p>}
-   {!data?.canClose&&!data?.attendance&&<p style={{fontSize:12,color:'#526888',margin:0}}>{data?.diagnostics&&!data.diagnostics.checks.confirmed?'Para registrar o público, o evento precisa estar confirmado.':data?.diagnostics&&!data.diagnostics.checks.dateEligible?'O registro fica disponível na data do evento ou depois dela.':data?.diagnostics&&!data.diagnostics.checks.featureEnabled?'Contagem ainda indisponível.':'Contagem ainda indisponível.'}</p>}
-   {error&&<p role="status" style={{fontSize:12,margin:0}}>{error}</p>}{message&&<p role="status" style={{margin:0}}>{message}</p>}
-  </div>
-  {editing&&<div role="presentation" style={{position:'fixed',inset:0,zIndex:1000,display:'grid',placeItems:'center',background:'rgba(5,22,54,.72)',padding:20}}>
-   <div role="dialog" aria-modal="true" aria-labelledby="correct-title" style={{background:'linear-gradient(160deg,#eef5ff 0%,#f8fbff 65%,#e9f2ff 100%)',color:'#163968',border:'1px solid #8fb6ed',borderRadius:18,width:'min(100%,470px)',boxShadow:'0 24px 70px #041e4c70',overflow:'hidden'}}>
-    <div style={{background:'linear-gradient(110deg,#103c85,#1764c3)',color:'#fff',padding:'19px 24px',borderBottom:'3px solid #74b4ff'}}>
-     <h2 id="correct-title" style={{margin:0,fontSize:21,fontWeight:800}}>Editar quantidade de alunos</h2>
-     
-    </div>
-    <div style={{padding:'20px 24px 22px'}}>
-     <label style={{display:'grid',gap:7,fontWeight:750,fontSize:14}}>Quantidade correta<input autoFocus type="number" min="0" max="100000" step="1" value={students} onChange={e=>setStudents(e.target.value)} style={{padding:'12px 13px',background:'#fff',color:'#173668',border:'1.5px solid #8fb6e8',borderRadius:10,fontSize:17,fontWeight:700,outlineOffset:2}}/></label>
-     {message&&<p role="alert" style={{color:'#a52a37',fontWeight:650}}>{message}</p>}
-     <div style={{display:'flex',justifyContent:'flex-end',alignItems:'center',gap:10,marginTop:22,paddingTop:16,borderTop:'1px solid #c4d9f4'}}>
-      <button className="antares-event-secondary" type="button" disabled={busy} onClick={()=>{setEditing(false);setMessage('')}} style={{padding:'10px 14px',border:'1px solid #a5c4ec',borderRadius:9,background:'#fff',color:'#1a4d90',fontWeight:700}}>Cancelar</button>
-      <button type="button" disabled={busy||!/^\d+$/.test(students)||Number(students)>100000||Number(students)===data?.attendance?.actual_students} onClick={()=>void correctAttendance()} style={{background:'linear-gradient(110deg,#1252ac,#2075d4)',color:'#fff',padding:'11px 19px',border:'1px solid #1554b0',borderRadius:9,fontWeight:800,boxShadow:'0 3px 9px #1458ac30',opacity:busy||!/^\d+$/.test(students)||Number(students)>100000||Number(students)===data?.attendance?.actual_students?0.6:1}}>{busy?'Salvando…':'Confirmar'}</button>
+    {recorded&&!correcting&&<div style={{display:'flex',alignItems:'center',gap:12,flexWrap:'wrap'}}>
+     <div style={{background:'#e9f7f0',border:'1px solid #b7dfc9',padding:'8px 14px',borderRadius:10,textAlign:'center'}}>
+      <strong style={{display:'block',fontSize:25,color:'#146640',lineHeight:1.15}}>{data?.attendance?.actual_students}</strong>
+      <span style={{fontSize:12,color:'#146640'}}>Alunos registrados</span>
      </div>
-    </div>
+     {data?.canCorrect&&<button type="button" className="antares-event-secondary" onClick={()=>{
+      setStudents(String(data.attendance?.actual_students??''));setCorrecting(true);setError('');setMessage('');
+     }} style={{padding:'9px 12px',borderRadius:8,border:'1px solid #abc5e9',background:'#fff',color:'#1854a0',fontWeight:700}}>Corrigir contagem</button>}
+    </div>}
    </div>
-  </div>}
-  {open&&<div role="presentation" style={{position:'fixed',inset:0,zIndex:1000,display:'grid',placeItems:'center',background:'rgba(5,22,54,.65)',padding:20}}>
-   <div role="dialog" aria-modal="true" aria-labelledby="closing-title" style={{background:'#fff',padding:24,borderRadius:16,width:'min(100%,460px)',boxShadow:'0 20px 60px #0005'}}>
-    <h2 id="closing-title" style={{margin:'0 0 8px',fontSize:21}}>Concluir evento</h2>
-    <p>Quantos alunos participaram do evento?</p>
-    <label style={{display:'grid',gap:6,fontWeight:700}}>Alunos atendidos<input autoFocus type="number" min="0" max="100000" step="1" required value={students} onChange={e=>setStudents(e.target.value)} style={{padding:12,border:'1px solid #94add5',borderRadius:8}}/></label>
-    {message&&<p role="alert">{message}</p>}
-    <div style={{display:'flex',justifyContent:'flex-end',gap:10,marginTop:18}}>
-     <button className="antares-event-secondary" type="button" disabled={busy} onClick={()=>{setOpen(false);setMessage('')}}>Cancelar</button>
-     <button type="button" disabled={busy||!/^\d+$/.test(students)||Number(students)>100000} onClick={()=>void closeEvent()} style={{background:'#1554b0',color:'#fff',padding:'10px 14px',border:0,borderRadius:9,fontWeight:700}}>{busy?'Salvando…':'Confirmar encerramento'}</button>
-    </div>
-   </div>
-  </div>}
- </section>
+   {(allowed||correcting)&&<form onSubmit={submit} style={{display:'flex',alignItems:'end',gap:10,flexWrap:'wrap'}}>
+    <label style={{display:'grid',gap:6,flex:'1 1 170px',maxWidth:260,fontSize:13,fontWeight:700,color:'#315989'}}>
+     Quantidade de alunos
+     <input aria-label="Quantidade de alunos atendidos" autoFocus={correcting} type="number" min="0" max="100000" step="1" required placeholder="Ex.: 450" value={students} onChange={event=>setStudents(event.target.value)} style={fieldStyle}/>
+    </label>
+    <button type="submit" disabled={busy||!valid} style={{...primaryStyle,opacity:busy||!valid?.55:1,cursor:busy||!valid?'not-allowed':'pointer'}}>
+     {busy?'Salvando…':correcting?'Salvar correção':'Concluir evento'}
+    </button>
+    {correcting&&<button type="button" disabled={busy} onClick={()=>{setCorrecting(false);setStudents('');setError('');}} className="antares-event-secondary" style={{padding:'10px 12px',minHeight:43,border:'1px solid #bad0ee',borderRadius:9,background:'#fff',color:'#315989'}}>Voltar</button>}
+   </form>}
+   {!recorded&&!allowed&&!correcting&&data&&(
+    <p style={{fontSize:13,margin:0,color:'#4c668b'}}>
+     {cancelled?'Este evento foi cancelado.':data.status==='completed'?'Este evento já foi realizado. A contagem precisa de conferência.':upcoming?'A contagem será liberada depois do evento.':'O registro da contagem ainda não está disponível.'}
+    </p>
+   )}
+   {error&&<p role="alert" style={{fontSize:13,margin:0,color:'#a33333'}}>{error}</p>}
+   {message&&<p role="status" style={{fontSize:13,margin:0,color:'#176647'}}>{message}</p>}
+  </div>
+ </section>;
 }
