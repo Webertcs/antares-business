@@ -131,7 +131,7 @@ export default function ServiceContract({
    />:<>
    <div style={{padding:13,background:'#e9f2ff',border:'1px solid #c8dcf7',borderRadius:11}}>
     <strong>{institution}</strong>
-    <p style={{margin:'6px 0 0',fontSize:12}}>O contrato escrito não é necessário para reservar a cúpula.</p>
+    
    </div>
    {notice&&<p role="status" style={{margin:0,padding:10,background:'#eaf8f0',border:'1px solid #b4e5c7',borderRadius:8,color:'#17653b'}}>{notice}</p>}
    {loading&&<p role="status">Consultando a proposta e os contratos...</p>}
@@ -141,7 +141,7 @@ export default function ServiceContract({
     <strong>Contrato já cadastrado</strong>
     <p style={{margin:0,fontSize:13}}>Situação: {contract.status==='confirmed'?'Confirmado':contract.status==='pending'?'Pendente de confirmação':contract.status}</p>
     <p style={{margin:0,fontSize:13}}>Modalidade: {contract.confirmation_mode==='written'?'Formal por escrito':contract.confirmation_mode==='verbal'?'Verbal':'WhatsApp'}</p>
-    <p style={{margin:0,fontSize:12,color:'#496a97'}}>O cadastro não substitui a confirmação real do cliente.</p>
+    
     {proposal?.client_id&&<button type="button" onClick={()=>setEditingDocument(true)} style={button}>Elaborar documento</button>}
    </div>}
    {!loading&&!contract&&proposal&&accepted&&<form onSubmit={e=>void save(e)} style={{display:'grid',gap:13}}>
@@ -159,7 +159,7 @@ export default function ServiceContract({
      <textarea required minLength={8} maxLength={8000} rows={5} disabled={!enabled||busy}
       value={terms} onChange={e=>setTerms(e.target.value)} style={field}/>
     </label>
-    <p style={{margin:0,fontSize:12,color:'#496a97'}}>Os dados comerciais foram aproveitados da proposta. Revise e registre somente as condições realmente acordadas. Salvar não confirma o contrato nem cria reserva.</p>
+    <p style={{margin:0,fontSize:12,color:'#496a97'}}>Salvar registra o documento, mas não confirma aceite nem cria reserva.</p>
     {!enabled&&<p role="status">Cadastro de contratos indisponível no momento.</p>}
     <div style={{display:'flex',justifyContent:'flex-end',gap:9,flexWrap:'wrap'}}>
      <button type="button" disabled={busy} onClick={onClose} style={secondary}>Cancelar</button>
