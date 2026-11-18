@@ -1,4 +1,4 @@
--- ANTARES 15B | Reserva simples: lotacao por sessao, nao por evento.
+-- ANTARES 15B | Reserva simples: um evento, publico total e contagem final.
 -- Aplicar APENAS apos homologacao. Nao altera as reservas existentes.
 -- Atualiza somente funcoes de reserva, sem modificar tabelas financeiras,
 -- horarios das apresentacoes, agendas ja registradas nem dados de propostas.
@@ -33,15 +33,14 @@ BEGIN
  JOIN public.equipment e ON e.id=l.equipment_id AND e.organization_id=l.organization_id
  WHERE l.organization_id=p_org AND l.antares_dome_id=p_dome AND d.active AND e.active AND e.category='dome';
  IF v_equipment IS NULL THEN RAISE EXCEPTION 'Cupula nao vinculada ou inativa';END IF;
- -- O total contratado pode envolver varias sessoes; lotacao pertence a cada sessao.
- -- Preserva o total em business_proposals e registra na apresentacao
- -- o maximo previsto para uma sessao, sem exceder a capacidade da cupula.
+ -- A capacidade fisica e informativa neste cadastro de evento.
+ -- O publico total contratado nao representa ocupacao simultanea da cupula.
+ -- O evento e unico; a contagem real de alunos e feita no encerramento.
  IF EXISTS(SELECT 1 FROM public.antares_proposal_reservations
  WHERE organization_id=p_org AND proposal_id=p_proposal)
  THEN RAISE EXCEPTION 'Proposta ja possui reserva';END IF;
  INSERT INTO public.presentations(organization_id,client_id,dome_id,dome_category,title,starts_at,ends_at,status,expected_students)
- VALUES(p_org,v_legacy,v_equipment,'dome',v_title,p_start,p_end,'reserved',
- CASE WHEN v_students IS NOT NULL AND v_students>0 THEN LEAST(v_students,COALESCE(v_capacity,v_students)) ELSE NULL END)
+ VALUES(p_org,v_legacy,v_equipment,'dome',v_title,p_start,p_end,'reserved',NULLIF(v_students,0))
  RETURNING id INTO v_presentation;
  INSERT INTO public.antares_proposal_reservations(organization_id,proposal_id,presentation_id)
  VALUES(p_org,p_proposal,v_presentation);
@@ -58,7 +57,7 @@ SET search_path=pg_catalog,public,pg_temp AS $fn$
 DECLARE
  v_status text;v_event uuid;v_event_status text;v_old_start timestamptz;
  v_old_end timestamptz;v_old_equipment uuid;v_old_dome uuid;
- v_new_equipment uuid;v_capacity integer;v_expected integer;
+ v_new_equipment uuid;v_capacity integer;
  BEGIN
  IF NOT EXISTS(SELECT 1 FROM public.team_members WHERE auth_subject=p_subject
       AND organization_id=p_org AND active AND role='owner')
@@ -66,8 +65,8 @@ DECLARE
  IF p_action IS NULL OR p_action NOT IN ('cancel','edit') OR length(btrim(coalesce(p_reason,''))) NOT BETWEEN 5 AND 500
  THEN RAISE EXCEPTION 'Acao ou motivo invalido';END IF;
 
- SELECT p.status,p.starts_at,p.ends_at,p.dome_id,b.expected_attendees
- INTO v_status,v_old_start,v_old_end,v_old_equipment,v_expected
+ SELECT p.status,p.starts_at,p.ends_at,p.dome_id
+ INTO v_status,v_old_start,v_old_end,v_old_equipment
  FROM public.antares_proposal_reservations r
  JOIN public.presentations p ON p.id=r.presentation_id AND p.organization_id=r.organization_id
  JOIN public.business_proposals b ON b.id=r.proposal_id AND b.organization_id=r.organization_id
@@ -119,7 +118,7 @@ DECLARE
  WHERE l.organization_id=p_org AND l.antares_dome_id=p_dome
    AND d.active AND e.active AND e.category='dome';
  IF v_new_equipment IS NULL THEN RAISE EXCEPTION 'Cupula indisponivel';END IF;
- -- Publico total da proposta nao e lotacao de sessao.
+ -- Publico total nao bloqueia o agendamento pela capacidade fisica.
  -- Continua obrigatorio selecionar cupula ativa e sem conflito de horarios.
  -- Serializa concorrentes na mesma cupula. Exclusion constraint 08 e a protecao final.
  PERFORM pg_advisory_xact_lock(hashtextextended(p_org::text||':'||v_new_equipment::text,0));
@@ -129,9 +128,7 @@ DECLARE
    AND p.starts_at<p_end AND p.ends_at>p_start)
  THEN RAISE EXCEPTION 'Horario indisponivel';END IF;
 
- UPDATE public.presentations SET dome_id=v_new_equipment,starts_at=p_start,ends_at=p_end,
-   expected_students=CASE WHEN v_expected IS NOT NULL AND v_expected>0
-    THEN LEAST(v_expected,COALESCE(v_capacity,v_expected)) ELSE NULL END
+ UPDATE public.presentations SET dome_id=v_new_equipment,starts_at=p_start,ends_at=p_end
  WHERE id=p_presentation AND organization_id=p_org;
  IF v_event IS NOT NULL THEN
   UPDATE public.crm_events SET
