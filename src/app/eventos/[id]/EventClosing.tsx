@@ -1,5 +1,6 @@
 'use client';
 import {useCallback,useEffect,useState} from 'react';
+import {useRouter} from 'next/navigation';
 import type {FormEvent} from 'react';
 
 type Attendance={actual_students:number;closed_at:string};
@@ -9,6 +10,7 @@ const fieldStyle:React.CSSProperties={width:'100%',maxWidth:260,minHeight:43,pad
 const primaryStyle:React.CSSProperties={minHeight:43,padding:'10px 16px',border:0,borderRadius:9,background:'#1758b6',color:'#fff',fontWeight:750,cursor:'pointer'};
 
 export default function EventClosing({eventId,eventDate}:{eventId:string;eventDate:string|null}){
+ const router=useRouter();
  const [data,setData]=useState<Closing|null>(null);
  const [students,setStudents]=useState('');
  const [correcting,setCorrecting]=useState(false);
@@ -39,7 +41,7 @@ export default function EventClosing({eventId,eventDate}:{eventId:string;eventDa
  const allowed=!!data?.canClose&&!recorded;
  const valid=/^\d+$/.test(students)&&Number.isSafeInteger(Number(students))&&Number(students)<=100000&&
   (!correcting||Number(students)!==data?.attendance?.actual_students);
- let situation='Consultando evento…';
+ let situation=error&&!data?'Contagem indisponível':'Consultando evento…';
  if(data){
   if(recorded)situation='Concluído';
   else if(cancelled)situation='Cancelado';
@@ -64,6 +66,7 @@ export default function EventClosing({eventId,eventDate}:{eventId:string;eventDa
    if(!response.ok)throw Error(result.error||(correcting?'Não foi possível corrigir.':'Não foi possível concluir.'));
    const updated=await load();
    setData(updated);
+   router.refresh();
    setCorrecting(false);
    setStudents('');
    setMessage(correcting?'Contagem corrigida. Histórico preservado.':'Evento concluído. Alunos registrados.');
