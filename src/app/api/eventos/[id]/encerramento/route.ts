@@ -113,7 +113,8 @@ export async function POST(req:NextRequest,{params}:{params:Promise<{id:string}>
    'Evento sem data valida ou no futuro':'A data do evento ainda não permite a conclusão.',
    'A apresentacao nao terminou ou foi cancelada':'A apresentação ainda não terminou ou foi cancelada.',
    'Aguarde o horario de termino do evento':'Aguarde o horário de término da apresentação.',
-   'Evento nao atualizado':'O evento não foi atualizado. Confira o estado atual.'
+   'Evento nao atualizado':'O evento não foi atualizado. Confira o estado atual.',
+   'Evento vinculado: altere a reserva para sincronizar':'A proteção do banco ainda impede a conclusão de eventos vinculados. É necessário atualizar o gatilho de encerramento.'
   };
   const knownRule=Object.entries(rules).find(([key])=>msg.includes(key));
   const error=knownRule?.[1]||
