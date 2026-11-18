@@ -25,34 +25,34 @@ export default function EventClosing({eventId}:{eventId:string}){
   try{
    const r=await fetch('/api/eventos/'+encodeURIComponent(eventId)+'/encerramento',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({students:n})});
    const d=await r.json();if(!r.ok)throw Error(d.error||'Não foi possível encerrar');
-   setData(await load());setOpen(false);setMessage('Evento encerrado e presença registrada.');
+   setData(await load());setOpen(false);setMessage('Evento concluído. Total de alunos salvo.');
   }catch(e){setMessage(e instanceof Error?e.message:'Erro no encerramento')}finally{setBusy(false)}
  }
  return <section className="antares-event-center-closing" aria-label="Fechamento operacional e controle de público" style={{border:'1px solid #8cb7f3',borderRadius:16,overflow:'hidden',background:'linear-gradient(145deg,#f1f7ff,#ffffff)',color:'#173668',boxShadow:'0 10px 26px rgba(16,67,145,.12)'}}>
   <div style={{background:'linear-gradient(110deg,#09265f,#1353a5 72%,#1769bf)',padding:'14px 17px',color:'#fff',display:'flex',alignItems:'center',gap:11}}>
    <span aria-hidden="true" style={{fontSize:23,background:'rgba(255,255,255,.15)',borderRadius:11,padding:'7px 10px'}}>📊</span>
-   <div><strong style={{fontSize:17,display:'block'}}>Fechamento operacional · Controle de público</strong><span style={{fontSize:12,color:'#d7eaff'}}>Registro oficial de alunos atendidos por evento</span></div>
+   <div><strong style={{fontSize:17,display:'block'}}>Registrar alunos atendidos</strong><span style={{fontSize:12,color:'#d7eaff'}}>Uma contagem ao final de cada evento</span></div>
   </div>
   <div style={{padding:'15px 17px',display:'grid',gap:13}}>
    <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',gap:14,flexWrap:'wrap'}}>
     <div style={{display:'grid',gap:5}}>
-     <span style={{fontSize:12,fontWeight:800,color:'#3565a5',letterSpacing:'.04em'}}>SITUAÇÃO DO REGISTRO</span>
+     <span style={{fontSize:12,fontWeight:800,color:'#3565a5',letterSpacing:'.04em'}}>SITUAÇÃO</span>
      <strong style={{fontSize:18,color:data?.attendance?'#136b4b':'#173668'}}>{data?.attendance?'✓ Evento encerrado · Presença registrada':data?.status==='completed'?'Evento realizado · Presença pendente':'Aguardando encerramento do evento'}</strong>
-     <span style={{fontSize:13,color:'#45648a',maxWidth:560}}>A contagem registrada alimenta automaticamente a ficha da instituição, o Controle de Público geral e os relatórios de gestão.</span>
+     <span style={{fontSize:13,color:'#45648a',maxWidth:560}}>Informe quantos alunos participaram do evento.</span>
     </div>
     {data?.attendance?<div style={{display:'flex',alignItems:'center',gap:12,flexWrap:'wrap'}}>
       <div style={{padding:'9px 16px',background:'#e2f5ee',border:'1px solid #a9dcc8',borderRadius:12,textAlign:'center',minWidth:135}}><strong style={{display:'block',fontSize:26,lineHeight:1.2,color:'#126345'}}>{data.attendance.actual_students}</strong><span style={{fontSize:12,fontWeight:750,color:'#126345'}}>Alunos atendidos</span></div>
       {data.canCorrect&&<button className="antares-event-secondary" type="button" disabled={busy} onClick={()=>{setStudents(String(data.attendance?.actual_students??''));setMessage('');setEditing(true)}} style={{padding:'10px 15px',border:'1px solid #1554b0',borderRadius:9,color:'#1554b0',background:'#fff',fontWeight:800}}>Editar contagem</button>}
-     </div>:<button type="button" disabled={!data?.canClose||busy||data.status==='completed'} onClick={()=>setOpen(true)} style={{padding:'13px 19px',border:0,borderRadius:10,color:'#fff',background:data?.canClose?'linear-gradient(110deg,#1252ac,#2075d4)':'#7088ad',fontWeight:800,boxShadow:data?.canClose?'0 5px 14px rgba(21,84,176,.25)':'none',cursor:data?.canClose?'pointer':'not-allowed'}}>Encerrar evento e registrar alunos</button>}
+     </div>:<button type="button" disabled={!data?.canClose||busy||data.status==='completed'} onClick={()=>setOpen(true)} style={{padding:'13px 19px',border:0,borderRadius:10,color:'#fff',background:data?.canClose?'linear-gradient(110deg,#1252ac,#2075d4)':'#7088ad',fontWeight:800,boxShadow:data?.canClose?'0 5px 14px rgba(21,84,176,.25)':'none',cursor:data?.canClose?'pointer':'not-allowed'}}>Registrar alunos e concluir</button>}
    </div>
    {data?.status==='completed'&&!data.attendance&&<p style={{fontSize:13,margin:0}}>Evento já marcado como realizado. O registro de presença requer conferência antes de qualquer atualização.</p>}
-   {!data?.canClose&&!data?.attendance&&<p style={{fontSize:12,color:'#526888',margin:0}}>{data?.diagnostics&&!data.diagnostics.checks.confirmed?'Para registrar o público, o evento precisa estar confirmado.':data?.diagnostics&&!data.diagnostics.checks.dateEligible?'O registro fica disponível na data do evento ou depois dela.':data?.diagnostics&&!data.diagnostics.checks.featureEnabled?'Registro de público aguardando ativação segura no ambiente.':'Encerramento protegido: aguardando liberação segura no Neon.'}</p>}
+   {!data?.canClose&&!data?.attendance&&<p style={{fontSize:12,color:'#526888',margin:0}}>{data?.diagnostics&&!data.diagnostics.checks.confirmed?'Para registrar o público, o evento precisa estar confirmado.':data?.diagnostics&&!data.diagnostics.checks.dateEligible?'O registro fica disponível na data do evento ou depois dela.':data?.diagnostics&&!data.diagnostics.checks.featureEnabled?'Contagem ainda indisponível.':'Contagem ainda indisponível.'}</p>}
    {error&&<p role="status" style={{fontSize:12,margin:0}}>{error}</p>}{message&&<p role="status" style={{margin:0}}>{message}</p>}
   </div>
   {editing&&<div role="presentation" style={{position:'fixed',inset:0,zIndex:1000,display:'grid',placeItems:'center',background:'rgba(5,22,54,.72)',padding:20}}>
    <div role="dialog" aria-modal="true" aria-labelledby="correct-title" style={{background:'linear-gradient(160deg,#eef5ff 0%,#f8fbff 65%,#e9f2ff 100%)',color:'#163968',border:'1px solid #8fb6ed',borderRadius:18,width:'min(100%,470px)',boxShadow:'0 24px 70px #041e4c70',overflow:'hidden'}}>
     <div style={{background:'linear-gradient(110deg,#103c85,#1764c3)',color:'#fff',padding:'19px 24px',borderBottom:'3px solid #74b4ff'}}>
-     <h2 id="correct-title" style={{margin:0,fontSize:21,fontWeight:800}}>Corrigir alunos atendidos</h2>
+     <h2 id="correct-title" style={{margin:0,fontSize:21,fontWeight:800}}>Editar quantidade de alunos</h2>
      
     </div>
     <div style={{padding:'20px 24px 22px'}}>
@@ -67,8 +67,8 @@ export default function EventClosing({eventId}:{eventId:string}){
   </div>}
   {open&&<div role="presentation" style={{position:'fixed',inset:0,zIndex:1000,display:'grid',placeItems:'center',background:'rgba(5,22,54,.65)',padding:20}}>
    <div role="dialog" aria-modal="true" aria-labelledby="closing-title" style={{background:'#fff',padding:24,borderRadius:16,width:'min(100%,460px)',boxShadow:'0 20px 60px #0005'}}>
-    <h2 id="closing-title" style={{margin:'0 0 8px',fontSize:21}}>Encerrar apresentação</h2>
-    <p>Informe o total de alunos que realmente participaram neste evento, sem contar a mesma pessoa duas vezes.</p>
+    <h2 id="closing-title" style={{margin:'0 0 8px',fontSize:21}}>Concluir evento</h2>
+    <p>Quantos alunos participaram do evento?</p>
     <label style={{display:'grid',gap:6,fontWeight:700}}>Alunos atendidos<input autoFocus type="number" min="0" max="100000" step="1" required value={students} onChange={e=>setStudents(e.target.value)} style={{padding:12,border:'1px solid #94add5',borderRadius:8}}/></label>
     {message&&<p role="alert">{message}</p>}
     <div style={{display:'flex',justifyContent:'flex-end',gap:10,marginTop:18}}>
