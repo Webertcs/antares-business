@@ -66,7 +66,7 @@ export default function NotificationsClient(){
     <span className="notificacoes-hero-icon"><Bell size={26}/></span>
     <div><span className="notificacoes-eyebrow">ANTARES BUSINESS · NOTIFICAÇÕES</span>
      <h1>Central de Notificações</h1>
-     <p>Acompanhe os avisos e resolva suas pendências em um só lugar.</p>
+     
     </div>
    </div>
    <button type="button" className="notificacoes-refresh" onClick={()=>void refresh()} disabled={loading}>
@@ -105,7 +105,7 @@ export default function NotificationsClient(){
    </div>
 
    {(error||readError)&&<p className="notificacoes-message notificacoes-message--error" role="status">{error||readError}</p>}
-   {feed&&!feed.readPersistenceAvailable&&<p className="notificacoes-message" role="status">No momento, a confirmação de leitura não fica salva depois que a página é recarregada. Os avisos continuam disponíveis.</p>}
+   {feed&&!feed.readPersistenceAvailable&&<p className="notificacoes-message" role="status">A marcação de leitura não é preservada ao recarregar a página.</p>}
    {feed&&feed.unavailable.length>0&&
     <p className="notificacoes-message" role="status">
      Não foi possível consultar: {feed.unavailable.map(x=>categoryNames[x]).join(', ')}. As demais pendências continuam disponíveis.
@@ -119,7 +119,7 @@ export default function NotificationsClient(){
    </div>}
    {shown.length>0&&<div className="notificacoes-list">{shown.map(n=><Item key={n.id} data={n} onRead={confirmRead} readEnabled={Boolean(feed?.readPersistenceAvailable)}/>)}</div>}
    <footer className="notificacoes-footer">
-    <p>Marcar um aviso como lido retira o destaque, mas a pendência continua até ser resolvida.</p>
+    <p>Marcar como lido não resolve a pendência.</p>
     <Link href="/vitrine/inbox"><BriefcaseBusiness size={16}/> Abrir Oportunidades</Link>
    </footer>
   </section>
