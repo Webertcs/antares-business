@@ -36,36 +36,51 @@ export async function POST(req:NextRequest){
  AND p.status NOT IN ('cancelled') AND p.starts_at<${end.toISOString()}::timestamptz
  AND p.ends_at>${start.toISOString()}::timestamptz LIMIT 1`;
  if(conflicts.length)return fail('Esta cúpula já possui apresentação no período selecionado. Escolha outro horário ou cúpula.',409);
- const rows=await db`SELECT public.antares_book_proposal(${owner.user.id},${owner.organizationId}::uuid,
+ const safe=await db`SELECT p.prosecdef AND pg_get_userbyid(p.proowner)='neondb_owner'
+   AND has_function_privilege(current_user,p.oid,'EXECUTE')
+   AND NOT EXISTS(SELECT 1 FROM aclexplode(coalesce(p.proacl,acldefault('f',p.proowner))) x WHERE x.grantee=0 AND x.privilege_type='EXECUTE') AS ok
+   FROM pg_proc p WHERE p.oid=to_regprocedure('public.antares_book_and_link_proposal(text,uuid,uuid,uuid,timestamptz,timestamptz)')`;
+ if(!safe[0]?.ok)return fail('Integração da reserva e do evento aguardando homologação no Neon.',503);
+ const rows=await db`SELECT public.antares_book_and_link_proposal(${owner.user.id},${owner.organizationId}::uuid,
  ${v.proposalId}::uuid,${v.domeId}::uuid,${start.toISOString()}::timestamptz,${end.toISOString()}::timestamptz) AS id`;
  return NextResponse.json({id:rows[0]?.id},{status:201});
  }catch{return fail('Reserva não realizada: confira os vínculos, horários e a situação da proposta',409);}
 }
 
-/** Edição/cancelamento: fail-closed até existir a função transacional auditável no Neon. */
+/** Reagendamento e cancelamento: transação no banco, sem apagar histórico ou financeiro. */
 export async function PATCH(req:NextRequest){
  const owner=await requireOwner();if(!owner)return fail('Somente proprietário',403);
  const denied=await assertAgendaWriteAllowed(req);if(denied)return denied;
+ if(Number(req.headers.get('content-length')||0)>2500)return fail('Requisição grande demais.',413);
  try{
-  const v=await req.json();
+  const raw=await req.text();if(raw.length>2500)return fail('Requisição grande demais.',413);
+  const v=JSON.parse(raw) as Record<string,unknown>;
   const uuid=/^[0-9a-f]{8}(-[0-9a-f]{4}){3}-[0-9a-f]{12}$/i;
-  if(!v||!uuid.test(v.presentationId)||!['edit','cancel'].includes(v.action))return fail('Operação inválida',400);
+  if(!v||typeof v.presentationId!=='string'||!uuid.test(v.presentationId)||!['edit','cancel'].includes(String(v.action)))
+   return fail('Operação inválida.',400);
+  const reason=typeof v.reason==='string'?v.reason.trim():'';
+  if(reason.length<5||reason.length>500)return fail('Informe o motivo (5 a 500 caracteres).',400);
   let domeId:string|null=null,start:string|null=null,end:string|null=null;
   if(v.action==='edit'){
-   if(!uuid.test(v.domeId)||typeof v.start!=='string'||typeof v.end!=='string')return fail('Dados de edição inválidos',400);
+   if(typeof v.domeId!=='string'||!uuid.test(v.domeId)||typeof v.start!=='string'||typeof v.end!=='string')
+    return fail('Dados de reagendamento inválidos.',400);
    const a=new Date(v.start),b=new Date(v.end);
-   if(!Number.isFinite(a.getTime())||!Number.isFinite(b.getTime())||b<=a)return fail('Horários inválidos',400);
+   if(!Number.isFinite(a.getTime())||!Number.isFinite(b.getTime())||b<=a||a<=new Date())
+    return fail('Escolha uma nova data futura e um período válido.',400);
    domeId=v.domeId;start=a.toISOString();end=b.toISOString();
-  }else if(v.confirm!=='CANCELAR')return fail('Confirmação de cancelamento obrigatória',400);
+  }else if(v.confirm!=='CANCELAR')return fail('Confirmação de cancelamento obrigatória.',400);
   const db=getTeamWriteDb();
-  const safety=await db`SELECT p.prosecdef AND pg_get_userbyid(p.proowner)='neondb_owner'
-   AND has_function_privilege(current_user,p.oid,'EXECUTE')
-   AND NOT EXISTS(SELECT 1 FROM aclexplode(coalesce(p.proacl,acldefault('f',p.proowner))) x WHERE x.grantee=0 AND x.privilege_type='EXECUTE') AS safe
-   FROM pg_proc p WHERE p.oid=to_regprocedure('public.antares_change_proposal_reservation(text,uuid,uuid,text,uuid,timestamptz,timestamptz)')`;
-  if(!safety[0]?.safe)return fail('Edição e cancelamento aguardam a função transacional auditável no Neon.',503);
-  const result=await db`SELECT public.antares_change_proposal_reservation(
-   ${owner.user.id},${owner.organizationId}::uuid,${v.presentationId}::uuid,${v.action},
-   ${domeId}::uuid,${start}::timestamptz,${end}::timestamptz) AS id`;
+  const safe=await db`SELECT current_user='antares_team_runtime' AND NOT r.rolsuper AND NOT r.rolbypassrls AS role_ok,
+    p.prosecdef AND pg_get_userbyid(p.proowner)='neondb_owner'
+    AND has_function_privilege(current_user,p.oid,'EXECUTE')
+    AND NOT EXISTS(SELECT 1 FROM aclexplode(coalesce(p.proacl,acldefault('f',p.proowner))) x
+      WHERE x.grantee=0 AND x.privilege_type='EXECUTE') AS function_ok
+    FROM pg_roles r CROSS JOIN pg_proc p WHERE r.rolname=current_user
+    AND p.oid=to_regprocedure('public.antares_manage_proposal_reservation(text,uuid,uuid,text,uuid,timestamptz,timestamptz,text)')`;
+  if(!safe[0]?.role_ok||!safe[0]?.function_ok)return fail('Alterações de reservas aguardam homologação no Neon.',503);
+  const result=await db`SELECT public.antares_manage_proposal_reservation(
+    ${owner.user.id},${owner.organizationId}::uuid,${v.presentationId}::uuid,${v.action},
+    ${domeId}::uuid,${start}::timestamptz,${end}::timestamptz,${reason}) AS id`;
   return NextResponse.json({ok:true,id:result[0]?.id},{headers:{'Cache-Control':'no-store'}});
- }catch{return fail('Operação não concluída: verifique conflitos, situação da reserva e permissões.',409);}
+ }catch{return fail('Não foi possível alterar a reserva. Verifique os vínculos, a data e as permissões.',409);}
 }
