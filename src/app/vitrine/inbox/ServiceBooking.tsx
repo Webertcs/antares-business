@@ -86,7 +86,7 @@ export default function ServiceBooking({
  const conflicting=Boolean(validDates&&domeId&&data?.links.some(r=>
   r.status!=='cancelled'&&r.presentation_id!==reservation?.presentation_id&&r.dome_id===domeId&&
   new Date(r.starts_at).getTime()<endDate!.getTime()&&new Date(r.ends_at).getTime()>startDate!.getTime()));
- const canSave=enabled&&!busy&&Boolean(proposal?.mapped)&&Boolean(selectedDome)&&validDates&&!conflicting&&!reservation;
+ const canSave=enabled&&!busy&&Boolean(selectedDome)&&validDates&&!conflicting&&!reservation;
 
  async function submit(e:FormEvent<HTMLFormElement>){
   e.preventDefault();
