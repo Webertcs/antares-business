@@ -45,7 +45,6 @@ export default function ServiceBooking({
  const [data,setData]=useState<ServiceBookingData|null>(null);
  const [loading,setLoading]=useState(true);
  const [busy,setBusy]=useState(false);
- const [confirmLink,setConfirmLink]=useState(false);
  const [error,setError]=useState('');
  const [domeId,setDomeId]=useState('');
  const [start,setStart]=useState('');
@@ -54,14 +53,6 @@ export default function ServiceBooking({
  const [reason,setReason]=useState('');
  const [confirmCancel,setConfirmCancel]=useState(false);
 
- async function load(){
-  const result=await fetch('/api/agenda/reservas',{cache:'no-store'});
-  const json=await result.json();
-  if(!result.ok)throw Error(json.error||'Não foi possível consultar as reservas.');
-  if(!Array.isArray(json.proposals)||!Array.isArray(json.domes)||!Array.isArray(json.links))
-   throw Error('Consulta de reservas incompleta.');
-  setData(json as ServiceBookingData);
- }
  useEffect(()=>{
   const current=dialog.current;
   if(current&&!current.open)current.showModal();
@@ -88,30 +79,14 @@ export default function ServiceBooking({
  const canManage=enabled&&!busy&&Boolean(reservation)&&!reservationCancelled&&!reservationClosed;
  const domes=data?.domes.filter(d=>d.mapped)||[];
  const selectedDome=domes.find(d=>d.id===domeId);
- const capacityOk=!selectedDome||!proposal?.expected_attendees||selectedDome.capacity==null||Number(proposal.expected_attendees)<=Number(selectedDome.capacity);
+ const estimatedSessions=selectedDome?.capacity&&Number(selectedDome.capacity)>0&&proposal?.expected_attendees&&Number(proposal.expected_attendees)>0
+  ?Math.ceil(Number(proposal.expected_attendees)/Number(selectedDome.capacity)):null;
  const startDate=normal(start),endDate=normal(end);
  const validDates=Boolean(startDate&&endDate&&endDate.getTime()>startDate.getTime()&&startDate.getTime()>Date.now());
  const conflicting=Boolean(validDates&&domeId&&data?.links.some(r=>
   r.status!=='cancelled'&&r.presentation_id!==reservation?.presentation_id&&r.dome_id===domeId&&
   new Date(r.starts_at).getTime()<endDate!.getTime()&&new Date(r.ends_at).getTime()>startDate!.getTime()));
- const canSave=enabled&&!busy&&Boolean(proposal?.mapped)&&Boolean(selectedDome)&&validDates&&!conflicting&&capacityOk&&!reservation;
-
- async function linkClient(){
-  if(!enabled||busy||!proposal)return;
-  if(!confirmLink)return;
-  setBusy(true);setError('');
-  try{
-   const response=await fetch('/api/agenda/preparar',{
-    method:'POST',headers:{'Content-Type':'application/json'},
-    body:JSON.stringify({action:'link-client',proposalId})
-   });
-   const json=await response.json();
-   if(!response.ok)throw Error(json.error||'Não foi possível vincular a instituição.');
-   await load();
-   setConfirmLink(false);
-  }catch(e){setError(e instanceof Error?e.message:'Falha ao vincular instituição.');}
-  finally{setBusy(false);}
- }
+ const canSave=enabled&&!busy&&Boolean(proposal?.mapped)&&Boolean(selectedDome)&&validDates&&!conflicting&&!reservation;
 
  async function submit(e:FormEvent<HTMLFormElement>){
   e.preventDefault();
@@ -134,7 +109,7 @@ export default function ServiceBooking({
   if(action==='cancel'&&(!confirmCancel||reason.trim().length<5||reason.trim().length>500)){
    setError('Informe o motivo do cancelamento (5 a 500 caracteres) e confirme.');return;
   }
-  if(action==='edit'&&(!validDates||!selectedDome||!capacityOk||conflicting)){
+  if(action==='edit'&&(!validDates||!selectedDome||conflicting)){
    setError('Confira a nova cúpula, as datas e a disponibilidade.');return;
   }
   setBusy(true);setError('');
@@ -210,10 +185,9 @@ export default function ServiceBooking({
        <label>Término<input type="datetime-local" style={field} value={end} disabled={busy} onChange={e=>setEnd(e.target.value)}/></label>
        {!validDates&&<p role="status" style={{fontSize:12,margin:0}}>Escolha horários futuros e término posterior ao início.</p>}
        {conflicting&&<p role="alert" style={{fontSize:12,color:'#a02135',margin:0}}>Conflito de horário nessa cúpula.</p>}
-       {!capacityOk&&<p role="alert" style={{fontSize:12,color:'#a02135',margin:0}}>Capacidade insuficiente.</p>}
        <div style={{display:'flex',gap:8,justifyContent:'flex-end'}}>
         <button type="button" style={secondary} disabled={busy} onClick={()=>setAction(null)}>Voltar</button>
-        <button type="button" style={primary} disabled={busy||!validDates||!selectedDome||conflicting||!capacityOk} onClick={()=>void manageReservation()}>{busy?'Salvando...':'Confirmar reagendamento'}</button>
+        <button type="button" style={primary} disabled={busy||!validDates||!selectedDome||conflicting} onClick={()=>void manageReservation()}>{busy?'Salvando...':'Confirmar reagendamento'}</button>
        </div>
       </div>}
       {action==='cancel'&&<div style={{display:'grid',gap:10,background:'#fff',padding:12,borderRadius:9,border:'1px solid #e7bac4'}}>
@@ -248,47 +222,31 @@ export default function ServiceBooking({
     </ol>
    </details>}
    {!loading&&!reservation&&!proposal&&<p role="alert">Proposta não habilitada para reserva. Verifique o aceite e a situação da instituição.</p>}
-   {!loading&&!reservation&&proposal&&!proposal.mapped&&<div style={{padding:14,border:'1px solid #efd3a3',background:'#fff7e8',borderRadius:10}}>
-    <p style={{margin:'0 0 10px'}}>Antes da reserva, esta instituição precisa ser vinculada à operação.</p>
-    {!confirmLink?<button type="button" disabled={!enabled||busy}
-     onClick={()=>setConfirmLink(true)} style={secondary}>Vincular instituição</button>:
-     <div role="group" aria-label="Confirmação do vínculo operacional"
-      style={{border:'1px solid #b8d3f3',background:'#f0f7ff',borderRadius:10,padding:12,display:'grid',gap:10}}>
-      <strong style={{fontSize:13}}>Confirmar vínculo operacional?</strong>
-      <p style={{margin:0,fontSize:12}}>A instituição <strong>{institution}</strong> será vinculada à operação.
-       O vínculo ficará salvo no banco e não será removido automaticamente. Confirme somente se for uma instituição real.</p>
-      <div style={{display:'flex',gap:8,flexWrap:'wrap',justifyContent:'flex-end'}}>
-       <button type="button" disabled={busy} onClick={()=>setConfirmLink(false)} style={secondary}>Voltar</button>
-       <button type="button" disabled={busy} onClick={()=>void linkClient()} style={primary}>
-        {busy?'Vinculando...':'Confirmar vínculo'}
-       </button>
-      </div>
-     </div>}
-    {!confirmLink&&<p style={{margin:'9px 0 0',fontSize:12}}>O vínculo será salvo no banco. Não utilize dados fictícios em operação real.</p>}
-   </div>}
-   {!loading&&!reservation&&proposal?.mapped&&<form id="service-booking-form" onSubmit={e=>void submit(e)}
+   {!loading&&!reservation&&proposal&&<form id="service-booking-form" onSubmit={e=>void submit(e)}
     style={{display:'grid',gap:13}}>
-    <label style={{fontSize:13,fontWeight:750}}>Cúpula disponível
+    <label style={{fontSize:13,fontWeight:750}}>Cúpula do evento
      <select required disabled={!enabled||busy} value={domeId} onChange={e=>setDomeId(e.target.value)}
       style={{...field,marginTop:5}}>
       <option value="">Selecionar cúpula</option>
-      {domes.map(d=><option key={d.id} value={d.id} disabled={Boolean(proposal?.expected_attendees&&d.capacity!=null&&Number(proposal.expected_attendees)>Number(d.capacity))}>{d.name}{d.capacity?' · até '+d.capacity+' pessoas':''}</option>)}
+      {domes.map(d=><option key={d.id} value={d.id}>{d.name}{d.capacity?' · até '+d.capacity+' por sessão':''}</option>)}
      </select>
     </label>
+    {selectedDome&&estimatedSessions&&<p style={{margin:'0',fontSize:12,color:'#33577f'}}>
+     Público total: <strong>{proposal.expected_attendees}</strong> alunos. Cúpula: <strong>até {selectedDome.capacity} por sessão</strong>. Estimativa: <strong>{estimatedSessions} sessões</strong> com lotação completa. Os horários de cada sessão serão organizados no evento.
+    </p>}
     {domes.length===0&&<p role="status" style={{color:'#92400e',fontSize:12}}>
      Nenhuma cúpula ativa vinculada à operação. Confira o cadastro de cúpulas.
     </p>}
     <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(195px,1fr))',gap:12}}>
-     <label style={{fontSize:13,fontWeight:750}}>Início da apresentação
+     <label style={{fontSize:13,fontWeight:750}}>Início do período reservado
       <input type="datetime-local" required disabled={!enabled||busy}
        value={start} onChange={e=>setStart(e.target.value)} style={{...field,marginTop:5}}/>
      </label>
-     <label style={{fontSize:13,fontWeight:750}}>Término da apresentação
+     <label style={{fontSize:13,fontWeight:750}}>Fim do período reservado
       <input type="datetime-local" required disabled={!enabled||busy}
        value={end} onChange={e=>setEnd(e.target.value)} style={{...field,marginTop:5}}/>
      </label>
     </div>
-    {!capacityOk&&<p role="alert" style={{margin:0,color:'#a02135',fontSize:12}}>Esta cúpula não comporta o público previsto. Selecione outra cúpula.</p>}
     {conflicting&&<p role="alert" style={{margin:0,color:'#a02135',fontSize:12}}>
      Esta cúpula já possui apresentação no intervalo escolhido. Selecione outro horário ou cúpula.
     </p>}
@@ -308,7 +266,7 @@ export default function ServiceBooking({
      </button>
     </div>
    </form>}
-   {!loading&&(!proposal?.mapped||reservation)&&
+   {!loading&&(!proposal||reservation)&&
     <button type="button" disabled={busy} onClick={onClose} style={secondary}>Fechar</button>}
   </div>
  </dialog>;
