@@ -100,5 +100,32 @@ export async function POST(req:NextRequest,{params}:{params:Promise<{id:string}>
   if(!safety[0]?.safe_role||!safety[0]?.safe_function)return unavailable();
   await sql`SELECT public.antares_close_event(${ctx.user.id},${id}::uuid,${students}::integer)`;
   return NextResponse.json({ok:true},{headers:{'Cache-Control':'no-store'}});
- }catch{return NextResponse.json({error:'Encerramento não realizado. Confira permissões, situação e data do evento.'},{status:409})}
+ }catch(cause){
+  const pg=cause as {code?:unknown;message?:unknown};
+  const code=typeof pg?.code==='string'?pg.code:'unknown';
+  const msg=typeof pg?.message==='string'?pg.message:'';
+  // Diagnóstico técnico somente no servidor, sem credenciais nem payloads.
+  console.error('[ANTARES] Falha no encerramento do evento:',{code,message:msg});
+  const rules:Record<string,string>={
+   'Dados de encerramento invalidos':'Quantidade inválida para conclusão.',
+   'Evento reservado sem proposta aceita e reserva vinculada':'A reserva não possui uma proposta aceita e vinculada.',
+   'Situacao do evento impede encerramento':'A situação atual do evento impede a conclusão.',
+   'Evento sem data valida ou no futuro':'A data do evento ainda não permite a conclusão.',
+   'A apresentacao nao terminou ou foi cancelada':'A apresentação ainda não terminou ou foi cancelada.',
+   'Aguarde o horario de termino do evento':'Aguarde o horário de término da apresentação.',
+   'Evento nao atualizado':'O evento não foi atualizado. Confira o estado atual.'
+  };
+  const knownRule=Object.entries(rules).find(([key])=>msg.includes(key));
+  const error=knownRule?.[1]||
+   (code==='23505'?'Este evento já possui contagem registrada. Atualize a Central de Atendimento.':
+    code==='42501'?'O banco recusou a gravação por falta de permissão (RLS ou função).':
+    code==='23503'?'O banco recusou o vínculo da contagem com este evento.':
+    code==='23514'?'Uma regra de integridade do banco impediu a gravação.':
+    code==='42P01'||code==='42703'?'A estrutura de registro de alunos ainda não está compatível com o banco.':
+    code==='42883'?'A função de conclusão ainda não está disponível no banco.':
+    code==='P0002'?'Evento ou proprietário não encontrado no banco.':
+    msg.includes('DATABASE_URL_TEAM_RUNTIME')?'Conexão operacional de gravação não configurada.':
+    'O banco recusou o encerramento. Confira no terminal o diagnóstico técnico.');
+  return NextResponse.json({error,diagnostic:code},{status:code==='42501'?503:409,headers:{'Cache-Control':'no-store'}});
+ }
 }
