@@ -99,7 +99,7 @@ export default function EventClosing({eventId,eventDate}:{eventId:string;eventDa
      Quantidade de alunos
      <input aria-label="Quantidade de alunos atendidos" autoFocus={correcting} type="number" min="0" max="100000" step="1" required placeholder="Ex.: 450" value={students} onChange={event=>setStudents(event.target.value)} style={fieldStyle}/>
     </label>
-    <button type="submit" disabled={busy||!valid} style={{...primaryStyle,opacity:busy||!valid?.55:1,cursor:busy||!valid?'not-allowed':'pointer'}}>
+    <button type="submit" disabled={busy||!valid} style={{...primaryStyle,opacity:(busy||!valid)?0.55:1,cursor:busy||!valid?'not-allowed':'pointer'}}>
      {busy?'Salvando…':correcting?'Salvar correção':'Concluir evento'}
     </button>
     {correcting&&<button type="button" disabled={busy} onClick={()=>{setCorrecting(false);setStudents('');setError('');}} className="antares-event-secondary" style={{padding:'10px 12px',minHeight:43,border:'1px solid #bad0ee',borderRadius:9,background:'#fff',color:'#315989'}}>Voltar</button>}
