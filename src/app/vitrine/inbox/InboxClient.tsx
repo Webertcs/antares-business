@@ -313,8 +313,8 @@ export default function Inbox({conversionEnabled,bookingWritesEnabled,contractWr
      {lead.status==='converted'&&lead.proposal_status==='accepted'&&lead.converted_proposal_id&&
       <button type="button" className={reservationFor(lead)?styles.actionSecondary:styles.actionPrimary}
        disabled={Boolean(busy)} onClick={()=>setBookingLeadId(lead.id)}
-       title={reservationFor(lead)?'Ver reserva de cúpula':'Organizar reserva de cúpula'}>
-       <CalendarDays size={15}/>{reservationFor(lead)?'Ver reserva':'Reservar'}
+       title={isCancelled(reservationFor(lead))?'Consultar apresentação cancelada':reservationFor(lead)?'Ver reserva de cúpula':'Organizar reserva de cúpula'}>
+       <CalendarDays size={15}/>{isCancelled(reservationFor(lead))?'Ver cancelamento':reservationFor(lead)?'Ver reserva':'Reservar'}
       </button>}
      {lead.status==='converted'&&lead.proposal_status==='accepted'&&lead.converted_proposal_id&&lead.converted_client_id&&
       <button type="button" className={styles.actionSecondary} disabled={Boolean(busy)}
