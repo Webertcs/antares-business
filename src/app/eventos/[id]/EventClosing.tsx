@@ -4,7 +4,7 @@ import {useRouter} from 'next/navigation';
 import type {FormEvent} from 'react';
 
 type Attendance={actual_students:number;closed_at:string};
-type Closing={status:string;attendance:Attendance|null;canClose:boolean;canCorrect?:boolean};
+type Closing={status:string;attendance:Attendance|null;canClose:boolean;canCorrect?:boolean;blockedReason?:string};
 
 const fieldStyle:React.CSSProperties={width:'100%',maxWidth:260,minHeight:43,padding:'9px 12px',border:'1px solid #95b6e4',borderRadius:9,background:'#fff',color:'#173668',fontSize:17,fontWeight:750};
 const primaryStyle:React.CSSProperties={minHeight:43,padding:'10px 16px',border:0,borderRadius:9,background:'#1758b6',color:'#fff',fontWeight:750,cursor:'pointer'};
@@ -109,7 +109,7 @@ export default function EventClosing({eventId,eventDate}:{eventId:string;eventDa
    </form>}
    {!recorded&&!allowed&&!correcting&&data&&(
     <p style={{fontSize:13,margin:0,color:'#4c668b'}}>
-     {cancelled?'Este evento foi cancelado.':data.status==='completed'?'Este evento já foi realizado. A contagem precisa de conferência.':upcoming?'A contagem será liberada depois do evento.':'O registro da contagem ainda não está disponível.'}
+     {cancelled?'Este evento foi cancelado.':data.status==='completed'?'Este evento já foi realizado. A contagem precisa de conferência.':data.blockedReason|| (upcoming?'A contagem será liberada depois do evento.':'O registro da contagem ainda não está disponível.')}
     </p>
    )}
    {error&&<p role="alert" style={{fontSize:13,margin:0,color:'#a33333'}}>{error}</p>}
