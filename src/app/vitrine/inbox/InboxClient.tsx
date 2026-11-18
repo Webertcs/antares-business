@@ -57,11 +57,11 @@ function ServiceTimeline({lead,reservation,operationalKnown,finance}:{
    </li>)}
   </ol>
   <p style={{margin:'10px 0 0',fontSize:12,color:'#365780'}}>
-   {cancelled?'Apresentação cancelada. Atendimento arquivado imediatamente, com reserva, documentos e financeiro preservados.':
-    finished?'Apresentação concluída e arquivada para consulta. Quantidade de alunos registrada na operação. Confira eventuais recebimentos no Financeiro.':
+   {cancelled?'Cancelada e arquivada. Histórico e financeiro preservados.':
+    finished?'Concluída e arquivada. Público registrado; pagamentos no Financeiro.':
     bookingDone?'Reserva registrada para '+(reservation?.starts_at?dateTime(reservation.starts_at):'data a confirmar')+'. Acompanhe a apresentação e o financeiro.':
     accepted&&!operationalKnown?'Aceite registrado. O estado das reservas não pôde ser consultado. Atualize a Central.':
-    accepted?'Próxima ação: organizar a reserva. Contrato escrito é opcional.':
+    accepted?'Próxima ação: reservar a apresentação.':
     hasProposal&&lead.proposal_status==='draft'?'Finalize o rascunho e aprove a proposta antes de solicitar o aceite da escola.':
      hasProposal?'Aguarde o aceite real da escola para continuar.':
     'Próxima ação: conversar com a instituição e preparar a proposta.'}
@@ -199,7 +199,7 @@ export default function Inbox({conversionEnabled,bookingWritesEnabled,contractWr
     <div>
      <span className={styles.eyebrow}>ANTARES BUSINESS · VITRINE</span>
      <h1>Central de Atendimento</h1>
-     <p>Acompanhe cada instituição, da conversa à apresentação, sem perder o histórico.</p>
+     
     </div>
    </div>
    <button type="button" className={styles.refresh} disabled={loading} onClick={()=>{void load();void refreshBookings();void refreshContracts();void refreshFinance();}}>
@@ -230,7 +230,6 @@ export default function Inbox({conversionEnabled,bookingWritesEnabled,contractWr
      <div className={styles.leadIcon}><Building2 size={24} aria-hidden="true"/></div>
      <div className={styles.leadTitle}>
       <h2>{lead.institution}</h2>
-      <div className={styles.leadSubtitle}>Pedido recebido pelo site</div>
      </div>
      <span className={[styles.status,
       isCancelled(reservationFor(lead))?styles.statusArchived:
