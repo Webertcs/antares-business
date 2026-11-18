@@ -275,7 +275,8 @@ BEGIN
   to_regprocedure('public.antares_reservation_history(text,uuid)')
  ) AND p.prosecdef AND pg_get_userbyid(p.proowner)='neondb_owner'
  AND has_function_privilege('antares_team_runtime',p.oid,'EXECUTE')
- AND NOT has_function_privilege('public',p.oid,'EXECUTE');
+ AND NOT EXISTS(SELECT 1 FROM aclexplode(coalesce(p.proacl,acldefault('f',p.proowner))) acl
+  WHERE acl.grantee=0 AND acl.privilege_type='EXECUTE');
  IF v_funcs<>4 THEN RAISE EXCEPTION 'Falha na verificacao de permissoes: % / 4',v_funcs;END IF;
  IF NOT EXISTS(SELECT 1 FROM pg_class c
   WHERE c.oid='public.antares_reservation_changes'::regclass AND c.relrowsecurity)
