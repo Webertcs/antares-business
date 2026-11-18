@@ -25,7 +25,7 @@ export default function NovaCupula({enabled}:{enabled:boolean}){
    <label>Nome da cúpula<input ref={nameInput} required maxLength={100} minLength={2} value={name} onChange={e=>setName(e.target.value)} placeholder="Ex.: Cúpula Principal"/></label>
    <label>Código<input required maxLength={30} value={code} onChange={e=>setCode(e.target.value)} placeholder="Ex.: CUP-01"/></label>
    <label>Capacidade por sessão<input required type="number" min={1} max={500} value={capacity} onChange={e=>setCapacity(e.target.value)}/></label>
-   {!enabled&&<p className="dome-create-notice">Cadastro preparado para operação. A gravação será liberada após a validação final do ambiente e das permissões.</p>}
+   {!enabled&&<p className="dome-create-notice">Cadastro temporariamente indisponível.</p>}
    <div className="dome-create-actions"><button type="button" onClick={()=>setOpen(false)}>Cancelar</button><button type="submit" disabled={!enabled||!valid||saving}>{saving?'Salvando...':'Cadastrar cúpula'}</button></div>
   </form></div>}
   {message&&<p role="status" className="dome-create-message">{message}</p>}
