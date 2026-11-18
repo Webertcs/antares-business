@@ -177,7 +177,7 @@ export default function ProposalComposer({lead,clientOptions,onClose,onSaved}:Pr
      <small>{selectedClientId?'A proposta será vinculada ao cadastro escolhido, sem criar outro cliente.':'Se a instituição já estiver na lista, selecione seu cadastro para evitar duplicidade.'}</small>
     </div>}
    {loading&&<p role="status" className={styles.note}>Carregando dados da proposta...</p>}
-   {status!=='draft'&&!loading&&<p className={styles.note}>Esta proposta já foi concluída e não pode ser editada. Consulte o documento para visualizar ou imprimir.</p>}
+   {status!=='draft'&&!loading&&<p className={styles.note}>Proposta aprovada. Documento protegido.</p>}
    {loadError&&<p role="alert" className={styles.error}>{loadError}</p>}
    {error&&<p role="alert" className={styles.error}>{error}</p>}
    {notice&&<p role="status" className={styles.success}><CheckCircle2 size={17}/>{notice}</p>}
@@ -217,7 +217,6 @@ export default function ProposalComposer({lead,clientOptions,onClose,onSaved}:Pr
        onChange={e=>{setTerms(e.target.value);mark();}}/></div>
     </div>
    </fieldset>
-   <p className={styles.safe}><ShieldCheck size={17}/>O rascunho fica salvo para revisão. Nada é enviado à instituição nesta etapa.</p>
    {proposalId&&status==='draft'&&!loading&&!dirty&&(!validUntil||terms.trim().length<10||(model!=='complimentary'&&total<=0))&&
     <p className={styles.approvalHint}>Para aprovar, informe a validade e descreva as condições comerciais. Confira os valores e salve as alterações.</p>}
   </div>
