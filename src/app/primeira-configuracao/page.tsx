@@ -21,7 +21,7 @@ export default async function Page(){
   <header className="antares-setup__hero">
    <span className="antares-setup__eyebrow">ANTARES BUSINESS · CONFIGURAÇÃO</span>
    <h1>Primeira configuração</h1>
-   <p>Prepare o planetário em três passos.</p>
+   
   </header>
   <SetupReadiness/>
   <h2 className="antares-setup__sectiontitle">Etapas de implantação</h2>
