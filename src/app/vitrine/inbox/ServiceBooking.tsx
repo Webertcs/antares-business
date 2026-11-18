@@ -147,7 +147,7 @@ export default function ServiceBooking({
    <div style={{display:'flex',gap:10,alignItems:'center'}}>
     <CalendarCheck2 size={24} aria-hidden="true"/>
     <div><div style={{fontSize:11,opacity:.8,fontWeight:700}}>CENTRAL DE ATENDIMENTO</div>
-     <h2 id="service-booking-title" style={{margin:0,fontSize:21,color:'#fff'}}>{reservationCancelled?'Ver cancelamento':reservation?'Ver reserva':'Organizar reserva'}</h2>
+     <h2 id="service-booking-title" style={{margin:0,fontSize:21,color:'#fff'}}>{reservationCancelled?'Ver cancelamento':reservation?'Ver reserva':'Nova reserva'}</h2>
     </div>
    </div>
    <button type="button" aria-label="Fechar reserva" disabled={busy} onClick={onClose}
@@ -157,7 +157,7 @@ export default function ServiceBooking({
   <div style={{padding:20,display:'grid',gap:14}}>
    <div style={{background:'#e8f2ff',border:'1px solid #c6dcfa',borderRadius:11,padding:13}}>
     <strong>{institution}</strong>
-    <div style={{fontSize:12,marginTop:4}}>Proposta aceita. Contrato escrito opcional.</div>
+    
    </div>
    {error&&<p role="alert" style={{margin:0,padding:11,color:'#9b1c32',
     background:'#fff1f3',border:'1px solid #fecdd3',borderRadius:9}}>{error}</p>}
@@ -223,7 +223,7 @@ export default function ServiceBooking({
    {!loading&&!reservation&&!proposal&&<p role="alert">Proposta não habilitada para reserva. Verifique o aceite e a situação da instituição.</p>}
    {!loading&&!reservation&&proposal&&<form id="service-booking-form" onSubmit={e=>void submit(e)}
     style={{display:'grid',gap:13}}>
-    <label style={{fontSize:13,fontWeight:750}}>Cúpula do evento
+    <label style={{fontSize:13,fontWeight:750}}>Cúpula
      <select required disabled={!enabled||busy} value={domeId} onChange={e=>setDomeId(e.target.value)}
       style={{...field,marginTop:5}}>
       <option value="">Selecionar cúpula</option>
@@ -231,18 +231,17 @@ export default function ServiceBooking({
      </select>
     </label>
     {proposal.expected_attendees!=null&&<p style={{margin:0,fontSize:13,color:'#33577f'}}>
-     Público previsto para o evento: <strong>{proposal.expected_attendees} alunos</strong>.
-     A quantidade realmente atendida será registrada ao concluir o evento.
+     <strong>{proposal.expected_attendees} alunos previstos</strong>
     </p>}
     {domes.length===0&&<p role="status" style={{color:'#92400e',fontSize:12}}>
      Nenhuma cúpula ativa vinculada à operação. Confira o cadastro de cúpulas.
     </p>}
     <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(195px,1fr))',gap:12}}>
-     <label style={{fontSize:13,fontWeight:750}}>Início do evento
+     <label style={{fontSize:13,fontWeight:750}}>Início
       <input type="datetime-local" required disabled={!enabled||busy}
        value={start} onChange={e=>setStart(e.target.value)} style={{...field,marginTop:5}}/>
      </label>
-     <label style={{fontSize:13,fontWeight:750}}>Término do evento
+     <label style={{fontSize:13,fontWeight:750}}>Término
       <input type="datetime-local" required disabled={!enabled||busy}
        value={end} onChange={e=>setEnd(e.target.value)} style={{...field,marginTop:5}}/>
      </label>
@@ -253,11 +252,6 @@ export default function ServiceBooking({
     {start&&end&&!validDates&&<p role="status" style={{margin:0,color:'#9a661e',fontSize:12}}>
      O término deve ser posterior ao início e a apresentação precisa ser futura.
     </p>}
-    {validDates&&selectedDome&&!conflicting&&<div style={{background:'#e8f2ff',border:'1px solid #c9ddf7',padding:12,borderRadius:10}}>
-     <strong>Confira antes de salvar</strong>
-     <p style={{margin:'6px 0 0',fontSize:12}}>{institution} · {selectedDome.name}</p>
-     <p style={{margin:'3px 0 0',fontSize:12}}>{fmt(startDate!.toISOString())} até {fmt(endDate!.toISOString())}</p>
-    </div>}
     {!enabled&&<p role="alert">A gravação de reservas não está habilitada no momento.</p>}
     <div style={{display:'flex',gap:9,justifyContent:'flex-end',flexWrap:'wrap'}}>
      <button type="button" onClick={onClose} disabled={busy} style={secondary}>Cancelar</button>
