@@ -21,7 +21,15 @@ export async function GET(_req:NextRequest,{params}:{params:Promise<{id:string}>
     ? String(rawDate).slice(0,10)
     : '';
   const today = new Intl.DateTimeFormat('en-CA',{timeZone:'America/Sao_Paulo',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date());
+  const linked=await db`SELECT p.ends_at,p.status FROM public.antares_presentation_event_links l
+   JOIN public.presentations p ON p.id=l.presentation_id AND p.organization_id=l.organization_id
+   WHERE l.organization_id=${ctx.organizationId}::uuid AND l.event_id=${id}::uuid LIMIT 1`;
+  const afterEnd=linked.length===0||
+   (linked[0].status!=='cancelled'&&linked[0].status!=='canceled'&&
+    Number.isFinite(new Date(String(linked[0].ends_at)).getTime())&&
+    new Date(String(linked[0].ends_at)).getTime()<=Date.now());
   const checks = {
+   afterPresentation:afterEnd,
    owner:ctx.role==='owner',
    confirmed:event[0].status==='confirmed',
    datePresent:!!eventDate,
@@ -41,6 +49,17 @@ export async function POST(req:NextRequest,{params}:{params:Promise<{id:string}>
  if(process.env.ANTARES_EVENT_CLOSING_WRITES_ENABLED!=='true')return unavailable();
  const ctx=await requireOwner();if(!ctx)return NextResponse.json({error:'Somente proprietário'},{status:403});
  const {id}=await params;if(!uuid.test(id))return NextResponse.json({error:'Evento inválido'},{status:400});
+ try{
+  const readDb=getDb();
+  const linked=await readDb`SELECT p.ends_at,p.status FROM public.antares_presentation_event_links l
+   JOIN public.presentations p ON p.id=l.presentation_id AND p.organization_id=l.organization_id
+   WHERE l.organization_id=${ctx.organizationId}::uuid AND l.event_id=${id}::uuid LIMIT 1`;
+  if(linked.length&&
+    (linked[0].status==='cancelled'||linked[0].status==='canceled'||
+     !Number.isFinite(new Date(String(linked[0].ends_at)).getTime())||
+     new Date(String(linked[0].ends_at)).getTime()>Date.now()))
+   return NextResponse.json({error:'A apresentação ainda não terminou ou foi cancelada.'},{status:409});
+ }catch{return unavailable();}
  let origin='';try{origin=new URL(process.env.ANTARES_APP_ORIGIN||'').origin}catch{return unavailable()}
  if(req.headers.get('origin')!==origin||req.headers.get('content-type')?.split(';')[0]?.trim().toLowerCase()!=='application/json')
   return NextResponse.json({error:'Origem ou conteúdo inválido'},{status:403});
