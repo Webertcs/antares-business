@@ -14,7 +14,7 @@ type Lead={id:string;responsible_name:string;institution:string;city:string;phon
  audience:string;attendees:number|null;desired_date:string|null;notes:string;status:string;created_at:string;converted_client_id:string|null;converted_proposal_id:string|null;proposal_status:string|null;proposal_valid_until:string|null;proposal_expired:boolean|null};
 const label:Record<string,string>={pending:'Novo pedido',reviewing:'Em análise',converted:'Proposta criada',archived:'Arquivado'};
 const isCompleted=(reservation:ServiceReservation|null)=>reservation?.crm_event_status==='completed'||reservation?.status==='completed';
-const isCancelled=(reservation:ServiceReservation|null)=>reservation?.crm_event_status==='cancelled'||reservation?.status==='cancelled';
+const isCancelled=(reservation:ServiceReservation|null)=>reservation?.crm_event_status==='cancelled'||reservation?.crm_event_status==='canceled'||reservation?.status==='cancelled'||reservation?.status==='canceled';
 function statusLabel(lead:Lead,reservation:ServiceReservation|null){
  if(isCancelled(reservation))return 'Cancelada · arquivada';
  if(isCompleted(reservation))return 'Concluída · arquivada';
@@ -30,7 +30,7 @@ function ServiceTimeline({lead,reservation,operationalKnown,finance}:{
  finance:{charged:number;paid:number}|null
 }){
  const cancelled=isCancelled(reservation);
- const bookingDone=Boolean(reservation&&reservation.status!=='cancelled');
+ const bookingDone=Boolean(reservation);
  const finished=isCompleted(reservation);
  const hasProposal=lead.status==='converted'&&Boolean(lead.converted_proposal_id);
  const accepted=hasProposal&&lead.proposal_status==='accepted';
@@ -230,6 +230,7 @@ export default function Inbox({conversionEnabled,bookingWritesEnabled,contractWr
       <div className={styles.leadSubtitle}>Pedido recebido pelo site</div>
      </div>
      <span className={[styles.status,
+      isCancelled(reservationFor(lead))?styles.statusArchived:
       lead.status==='converted'&&lead.proposal_status==='accepted'?styles.statusConverted:
       lead.status==='converted'&&lead.proposal_expired?styles.statusPending:
       lead.status==='converted'?styles.statusReviewing:
