@@ -17,7 +17,7 @@ export async function GET(_req:NextRequest,{params}:{params:Promise<{id:string}>
   const rawDate = event[0].event_date;
   const eventDate = rawDate instanceof Date
    ? new Intl.DateTimeFormat('en-CA',{timeZone:'UTC',year:'numeric',month:'2-digit',day:'2-digit'}).format(rawDate)
-   : /^\\d{4}-\\d{2}-\\d{2}$/.test(String(rawDate ?? '').slice(0,10))
+   : /^\d{4}-\d{2}-\d{2}$/.test(String(rawDate ?? '').slice(0,10))
     ? String(rawDate).slice(0,10)
     : '';
   const today = new Intl.DateTimeFormat('en-CA',{timeZone:'America/Sao_Paulo',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date());
