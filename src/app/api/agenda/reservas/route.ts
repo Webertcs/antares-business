@@ -49,9 +49,9 @@ export async function POST(req:NextRequest){
  const safe=await db`SELECT p.prosecdef AND pg_get_userbyid(p.proowner)='neondb_owner'
    AND has_function_privilege(current_user,p.oid,'EXECUTE')
    AND NOT EXISTS(SELECT 1 FROM aclexplode(coalesce(p.proacl,acldefault('f',p.proowner))) x WHERE x.grantee=0 AND x.privilege_type='EXECUTE') AS ok
-   FROM pg_proc p WHERE p.oid=to_regprocedure('public.antares_book_and_link_proposal(text,uuid,uuid,uuid,timestamptz,timestamptz)')`;
+   FROM pg_proc p WHERE p.oid=to_regprocedure('public.antares_book_ready_proposal(text,uuid,uuid,uuid,timestamptz,timestamptz)')`;
  if(!safe[0]?.ok)return fail('Integração da reserva e do evento aguardando homologação no Neon.',503);
- const rows=await db`SELECT public.antares_book_and_link_proposal(${owner.user.id},${owner.organizationId}::uuid,
+ const rows=await db`SELECT public.antares_book_ready_proposal(${owner.user.id},${owner.organizationId}::uuid,
  ${v.proposalId}::uuid,${v.domeId}::uuid,${start.toISOString()}::timestamptz,${end.toISOString()}::timestamptz) AS id`;
  return NextResponse.json({id:rows[0]?.id},{status:201});
  }catch{return fail('Reserva não realizada: confira os vínculos, horários e a situação da proposta',409);}
