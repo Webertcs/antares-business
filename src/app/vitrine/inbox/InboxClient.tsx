@@ -14,7 +14,9 @@ type Lead={id:string;responsible_name:string;institution:string;city:string;phon
  audience:string;attendees:number|null;desired_date:string|null;notes:string;status:string;created_at:string;converted_client_id:string|null;converted_proposal_id:string|null;proposal_status:string|null;proposal_valid_until:string|null;proposal_expired:boolean|null};
 const label:Record<string,string>={pending:'Novo pedido',reviewing:'Em análise',converted:'Proposta criada',archived:'Arquivado'};
 const isCompleted=(reservation:ServiceReservation|null)=>reservation?.crm_event_status==='completed'||reservation?.status==='completed';
+const isCancelled=(reservation:ServiceReservation|null)=>reservation?.crm_event_status==='cancelled'||reservation?.status==='cancelled';
 function statusLabel(lead:Lead,reservation:ServiceReservation|null){
+ if(isCancelled(reservation))return 'Cancelada · arquivada';
  if(isCompleted(reservation))return 'Concluída · arquivada';
  if(reservation&&reservation.status!=='cancelled')return 'Reserva registrada';
  if(lead.status==='converted'&&lead.proposal_expired&&lead.proposal_status!=='accepted')return 'Proposta vencida';
@@ -27,6 +29,7 @@ function ServiceTimeline({lead,reservation,operationalKnown,finance}:{
  lead:Lead;reservation:ServiceReservation|null;operationalKnown:boolean;
  finance:{charged:number;paid:number}|null
 }){
+ const cancelled=isCancelled(reservation);
  const bookingDone=Boolean(reservation&&reservation.status!=='cancelled');
  const finished=isCompleted(reservation);
  const hasProposal=lead.status==='converted'&&Boolean(lead.converted_proposal_id);
@@ -36,7 +39,7 @@ function ServiceTimeline({lead,reservation,operationalKnown,finance}:{
   {name:'Proposta',done:hasProposal,active:hasProposal&&!accepted},
   {name:'Aceite',done:accepted,active:false},
   {name:'Reserva',done:bookingDone,active:accepted&&operationalKnown&&!bookingDone},
-  {name:'Conclusão',done:finished,active:bookingDone&&!finished}
+  {name:'Conclusão',done:finished,active:bookingDone&&!finished&&!cancelled}
  ];
  return <div aria-label="Etapas do atendimento" style={{margin:'12px 0 8px',padding:'14px 12px',background:'#f5f9ff',border:'1px solid #cbdcf7',borderRadius:12}}>
   <ol style={{display:'grid',gridTemplateColumns:'repeat(5,minmax(0,1fr))',listStyle:'none',margin:0,padding:0,gap:4}}>
@@ -48,7 +51,8 @@ function ServiceTimeline({lead,reservation,operationalKnown,finance}:{
    </li>)}
   </ol>
   <p style={{margin:'10px 0 0',fontSize:12,color:'#365780'}}>
-   {finished?'Apresentação concluída e arquivada para consulta. Quantidade de alunos registrada na operação. Confira eventuais recebimentos no Financeiro.':
+   {cancelled?'Apresentação cancelada. Atendimento arquivado imediatamente, com reserva, documentos e financeiro preservados.':
+    finished?'Apresentação concluída e arquivada para consulta. Quantidade de alunos registrada na operação. Confira eventuais recebimentos no Financeiro.':
     bookingDone?'Reserva registrada para '+(reservation?.starts_at?dateTime(reservation.starts_at):'data a confirmar')+'. Acompanhe a apresentação e o financeiro.':
     accepted&&!operationalKnown?'Aceite registrado. O estado das reservas não pôde ser consultado. Atualize a Central.':
     accepted?'Próxima ação: organizar a reserva. Contrato escrito é opcional.':
@@ -63,10 +67,10 @@ function ServiceTimeline({lead,reservation,operationalKnown,finance}:{
  </div>;
 }
 function matchesFilter(lead:Lead,key:string,reservation:ServiceReservation|null){
- const completed=isCompleted(reservation);
+ const terminal=isCompleted(reservation)||isCancelled(reservation);
  if(key==='all')return true;
- if(key==='open')return lead.status!=='archived'&&!completed;
- if(key==='archived')return lead.status==='archived'||completed;
+ if(key==='open')return lead.status!=='archived'&&!terminal;
+ if(key==='archived')return lead.status==='archived'||terminal;
  return lead.status===key;
 }
 const money=(n:number)=>new Intl.NumberFormat('pt-BR',{style:'currency',currency:'BRL'}).format(n);
@@ -151,7 +155,7 @@ export default function Inbox({conversionEnabled,bookingWritesEnabled,contractWr
   }
  },[]);
  const reservationFor=(lead:Lead)=>bookingData?.links.find(r=>
-  r.proposal_id===lead.converted_proposal_id&&r.status!=='cancelled')||null;
+  r.proposal_id===lead.converted_proposal_id)||null;
  const activeLead=composerLeadId?leads.find(l=>l.id===composerLeadId):undefined;
  const acceptedLead=acceptLeadId?leads.find(l=>l.id===acceptLeadId):undefined;
  const renewLead=renewLeadId?leads.find(l=>l.id===renewLeadId):undefined;
@@ -315,7 +319,7 @@ export default function Inbox({conversionEnabled,bookingWritesEnabled,contractWr
        <Wallet size={15}/>Financeiro
       </button>}
      {lead.status==='converted'&&lead.proposal_status==='accepted'&&
-      (reservationFor(lead)?
+      (reservationFor(lead)&&!isCancelled(reservationFor(lead))?
        <button type="button" className={(reservationFor(lead)?.crm_event_status==='completed'||reservationFor(lead)?.status==='completed')?styles.actionSecondary:styles.actionPrimary}
         disabled={Boolean(busy)} onClick={()=>setClosingLeadId(lead.id)}
         title={(reservationFor(lead)?.crm_event_status==='completed'||reservationFor(lead)?.status==='completed')?'Ver encerramento':'Acompanhar conclusão da apresentação'}>
@@ -375,7 +379,12 @@ export default function Inbox({conversionEnabled,bookingWritesEnabled,contractWr
     proposalId={bookingLead.converted_proposal_id}
     enabled={bookingWritesEnabled}
     onClose={()=>setBookingLeadId(null)}
-    onSaved={()=>{setBookingLeadId(null);setNotice('Reserva registrada. A Central foi atualizada.');void refreshBookings();void load();}}
+    onSaved={result=>{setBookingLeadId(null);if(result==='cancelled')setFilter('open');
+     setNotice(result==='cancelled'?'Apresentação cancelada. Atendimento movido para Arquivadas, com histórico e financeiro preservados.':
+      result==='rescheduled'?'Apresentação reagendada. Nova data e cúpula registradas.':
+      result==='linked'?'Evento operacional vinculado à reserva.':
+      'Reserva registrada. A Central foi atualizada.');
+     void refreshBookings();void refreshFinance();void load();}}
   />}
   {renewLead&&renewLead.converted_proposal_id&&<RenewValidity
     key={renewLead.id}
