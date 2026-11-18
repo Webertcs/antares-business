@@ -53,7 +53,6 @@ export default function ServiceBooking({
  const [action,setAction]=useState<'edit'|'cancel'|null>(null);
  const [reason,setReason]=useState('');
  const [confirmCancel,setConfirmCancel]=useState(false);
- const [confirmOperational,setConfirmOperational]=useState(false);
 
  async function load(){
   const result=await fetch('/api/agenda/reservas',{cache:'no-store'});
@@ -152,7 +151,7 @@ export default function ServiceBooking({
  }
 
  async function linkOperationalEvent(){
-  if(!reservation||reservationCancelled||reservationClosed||!confirmOperational||busy)return;
+  if(!reservation||reservationCancelled||reservationClosed||busy)return;
   setBusy(true);setError('');
   try{
    const response=await fetch('/api/agenda/reservas/vincular',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({presentationId:reservation.presentation_id})});
@@ -232,13 +231,9 @@ export default function ServiceBooking({
        </div>
       </div>}
       {!reservation.crm_event_id&&!action&&<div style={{padding:12,border:'1px solid #e7ce96',background:'#fff8e9',borderRadius:9,display:'grid',gap:8}}>
-       <strong style={{fontSize:13}}>Evento operacional ainda não vinculado</strong>
-       <p style={{fontSize:12,margin:0}}>A reserva está salva. Vincule-a ao evento antes de registrar a conclusão, sem duplicar a apresentação.</p>
-       {!confirmOperational?<button type="button" style={secondary} onClick={()=>setConfirmOperational(true)} disabled={busy}>Preparar vínculo operacional</button>:
-        <div style={{display:'flex',gap:8,justifyContent:'flex-end',flexWrap:'wrap'}}>
-         <button type="button" style={secondary} disabled={busy} onClick={()=>setConfirmOperational(false)}>Voltar</button>
-         <button type="button" style={primary} disabled={busy} onClick={()=>void linkOperationalEvent()}>{busy?'Vinculando...':'Confirmar vínculo'}</button>
-        </div>}
+       <strong style={{fontSize:13}}>Ajuste necessário nesta reserva antiga</strong>
+       <p style={{fontSize:12,margin:0}}>Esta reserva foi criada antes da integração automática. Regularize-a uma única vez para permitir a conclusão.</p>
+       <button type="button" style={primary} disabled={busy} onClick={()=>void linkOperationalEvent()}>{busy?'Regularizando...':'Regularizar reserva antiga'}</button>
       </div>}
      </div>}
    </div>}
