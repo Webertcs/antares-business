@@ -50,7 +50,7 @@ export default async function Page({searchParams}:{searchParams:Promise<Params>}
  <header className="antares-events-hero" style={{marginBottom:12,padding:'15px clamp(16px,2.5vw,24px)',borderRadius:14,background:'linear-gradient(110deg,#0d2455 0%,#0c3c91 60%,#0860ba 100%)',boxShadow:'0 5px 14px rgba(11,47,111,.14)'}}>
   <p style={{fontSize:11,fontWeight:700,letterSpacing:'1.3px',color:'#b9dfff',margin:'0 0 8px'}}>GESTÃO DE EVENTOS · ANTARES</p>
   <h1 style={{fontSize:'clamp(23px,2.5vw,30px)',fontWeight:750,lineHeight:1.2,margin:'0 0 6px',color:'#fff'}}>Eventos</h1>
-  <p style={{fontSize:14,lineHeight:1.5,margin:0,color:'#e1efff'}}>Acompanhe seus eventos e registre os alunos atendidos.</p>
+  
  </header>
  <EventsList events={events} total={total} page={current} pages={pages} years={yearsRows.map(r=>Number(r.year))} counts={{total:Number(counts[0]?.total||0),confirmed:Number(counts[0]?.confirmed||0),opportunities:Number(counts[0]?.opportunities||0)}} filters={{year,status,view,q}}/>
  </main></RelationshipShell>;
