@@ -42,6 +42,17 @@
 - `sql/15A_TESTE_ROLLBACK_PRODUCAO.sql`: simulação transacional, com ROLLBACK.
 - `sql/15A_DIAGNOSTICO_SOMENTE_LEITURA.sql`: diagnóstico original.
 
+
+## Decisao de produto (18/11/2026) — evento unico, sem sessoes
+- O proprietario NAO cadastra sessoes. Agenda UM evento com instituicao, data/horario e cupula.
+- `business_proposals.expected_attendees` e `crm_events.expected_attendees` representam o publico TOTAL previsto do evento (pode ser 450).
+- Capacidade nominal da cupula nao deve bloquear uma proposta de centenas de alunos; nao representa publico simultaneo.
+- A quantidade real de alunos e contada UMA vez ao concluir o evento, no fluxo ja existente `antares_close_event` e no registro `antares_event_attendance`.
+- Nao criar checklists, sessoes, vinculos de cliente ou tarefas obrigatorias para o proprietario: compatibilidade interna e automatica.
+- Manter a protecao de conflitos de horario por cupula, autenticacao, auditoria, motivos de cancelamento e separacao do Financeiro.
+- O codigo em `src/app/eventos/[id]/page.tsx` passa a exibir apenas resumo, evento programado e contagem ao fim.
+- O SQL `15B_RESERVA_SIMPLES_SESSOES.sql` (nome historico do arquivo) atualiza a reserva para o modelo de evento unico; **ainda NAO executado no Neon** ate verificacao/implantacao.
+
 ## Pendente
 - Rodar simulação 15A no Neon e conferir resultado do ROLLBACK e contagens.
 - Implantar 15A na produção **apenas se simulação e revisão final forem aprovadas**.
