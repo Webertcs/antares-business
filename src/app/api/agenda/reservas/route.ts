@@ -15,7 +15,16 @@ export async function GET(){
  ORDER BY p.created_at DESC`,
  db`SELECT d.id,d.name,d.capacity, (l.equipment_id IS NOT NULL) AS mapped FROM public.antares_domes d LEFT JOIN public.antares_dome_links l ON l.organization_id=d.organization_id AND l.antares_dome_id=d.id WHERE d.organization_id=${owner.organizationId} AND d.active ORDER BY d.name`,
  db`SELECT r.proposal_id,r.presentation_id,p.starts_at,p.ends_at,p.status,l.antares_dome_id AS dome_id,e.name AS dome_name, pel.event_id AS crm_event_id,ce.status AS crm_event_status FROM public.antares_proposal_reservations r JOIN public.presentations p ON p.id=r.presentation_id AND p.organization_id=r.organization_id LEFT JOIN public.equipment e ON e.id=p.dome_id AND e.organization_id=p.organization_id LEFT JOIN public.antares_dome_links l ON l.organization_id=p.organization_id AND l.equipment_id=p.dome_id LEFT JOIN public.antares_presentation_event_links pel ON pel.organization_id=r.organization_id AND pel.presentation_id=r.presentation_id LEFT JOIN public.crm_events ce ON ce.organization_id=pel.organization_id AND ce.id=pel.event_id WHERE r.organization_id=${owner.organizationId}`
- ]);return NextResponse.json({proposals,domes,links},{headers:{'Cache-Control':'private, no-store'}});}
+ ]);
+ let history:unknown[]=[];
+ try{
+  const exists=await db`SELECT to_regclass('public.antares_reservation_changes') IS NOT NULL AS ready`;
+  if(exists[0]?.ready)history=await db`SELECT presentation_id,action,reason,old_start,old_end,new_start,new_end,changed_at
+   FROM public.antares_reservation_changes WHERE organization_id=${owner.organizationId}::uuid
+   ORDER BY changed_at DESC LIMIT 200`;
+ }catch{history=[];}
+ return NextResponse.json({proposals,domes,links,history},{headers:{'Cache-Control':'private, no-store'}});
+}
  catch{return fail('Agenda de propostas indisponível até a migração 14E',503);}
 }
 export async function POST(req:NextRequest){
