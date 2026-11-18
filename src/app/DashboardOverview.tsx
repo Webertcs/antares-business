@@ -67,12 +67,12 @@ export default function DashboardOverview({cash,receivable,proposals,upcoming,ca
    })}
   </div>
   <div className="owner-main-grid">
-   <section className="owner-tile owner-relationship"><div className="owner-tile-head"><span className="owner-tile-icon"><Users size={20}/></span><div><h2>Inteligência de relacionamento</h2><p>Alertas e lembretes comerciais</p></div></div>
+   <section className="owner-tile owner-relationship"><div className="owner-tile-head"><span className="owner-tile-icon"><Users size={20}/></span><div><h2>Inteligência de relacionamento</h2></div></div>
     <Link href="/fidelizacao#agenda-relacionamento" className="owner-insight"><Clock3 size={16}/><strong>{remindersAvailable?overdue:'—'} atrasados</strong><ChevronRight size={16}/></Link>
     <Link href="/fidelizacao#agenda-relacionamento" className="owner-insight"><CalendarDays size={16}/><strong>{remindersAvailable?today:'—'} para hoje</strong><ChevronRight size={16}/></Link>
     <Link href="/fidelizacao#agenda-relacionamento" className="owner-insight"><Bell size={16}/><strong>{remindersAvailable?pending.length:'—'} em aberto</strong><ChevronRight size={16}/></Link>
    </section>
-   <section className="owner-tile"><div className="owner-tile-head"><span className="owner-tile-icon"><CalendarDays size={20}/></span><div><h2>Próximas apresentações</h2><p>Compromissos agendados</p></div><button className="owner-inline" onClick={()=>onNavigate('agenda')}>Ver agenda <ArrowUpRight size={15}/></button></div>
+   <section className="owner-tile"><div className="owner-tile-head"><span className="owner-tile-icon"><CalendarDays size={20}/></span><div><h2>Próximas apresentações</h2></div><button className="owner-inline" onClick={()=>onNavigate('agenda')}>Ver agenda <ArrowUpRight size={15}/></button></div>
      <div className="owner-upcoming">{upcoming.slice(0,2).map(b=><button className="owner-event" key={b.id} onClick={()=>onAgendaDate(dateKey(new Date(b.starts_at)))} aria-label={'Ver apresentações em '+new Date(b.starts_at).toLocaleDateString('pt-BR')}><span className="owner-date">{formatDate(new Date(b.starts_at))}</span><span><strong>{b.event_title}</strong><small>{sessionTime(b)} · {b.dome_name||'Cúpula a confirmar'}</small></span><ChevronRight size={16}/></button>)}{upcoming.length===0&&<div className="owner-empty">{agendaAvailable?'Nenhuma apresentação futura cadastrada.':'Agenda temporariamente indisponível.'}</div>}</div>
    </section>
    <section className="owner-tile"><div className="owner-tile-head"><span className="owner-tile-icon"><ClipboardCheck size={20}/></span><div><h2>Preparação da próxima sessão</h2><p>{nextBooking?nextBooking.event_title:'Aguardando sessão agendada'}</p></div></div>
@@ -91,7 +91,7 @@ export default function DashboardOverview({cash,receivable,proposals,upcoming,ca
    <section className="owner-tile owner-priorities">
     <div className="owner-tile-head">
      <span className="owner-tile-icon"><Bell size={20}/></span>
-     <div><h2>Prioridades do dia</h2><p>Pendências que precisam de atenção</p></div>
+     <div><h2>Prioridades do dia</h2></div>
      <Link href="/notificacoes" className="owner-inline" aria-label="Ver todas as notificações">Ver todas <ArrowUpRight size={15}/></Link>
     </div>
     <div className="owner-priorities-list">
@@ -109,7 +109,7 @@ export default function DashboardOverview({cash,receivable,proposals,upcoming,ca
     {notifications&&notifications.unavailable.length>0&&<p className="owner-priorities-warning">Alguns módulos estão temporariamente indisponíveis.</p>}
    </section>
    <div className="owner-right-column">
-    <section className="owner-tile owner-summary"><div className="owner-tile-head"><span className="owner-tile-icon"><BarChart3 size={20}/></span><div><h2>Resumo operacional</h2><p>Visão geral do planetário</p></div></div>
+    <section className="owner-tile owner-summary"><div className="owner-tile-head"><span className="owner-tile-icon"><BarChart3 size={20}/></span><div><h2>Resumo operacional</h2></div></div>
     <button type="button" className="owner-summary-row owner-summary-action" onClick={()=>onOpenOperation('cupulas')} aria-label="Abrir cúpulas cadastradas"><span>Cúpulas cadastradas</span><strong>{operational?.domes??'—'}</strong><ChevronRight size={15}/></button>
     <button type="button" className="owner-summary-row owner-summary-action" onClick={()=>onOpenOperation('reservas')} aria-label="Abrir reservas vinculadas"><span>Reservas vinculadas</span><strong>{operational?.booked??'—'}</strong><ChevronRight size={15}/></button>
     </section>
