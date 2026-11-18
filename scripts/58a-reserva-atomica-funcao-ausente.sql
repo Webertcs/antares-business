@@ -1,4 +1,6 @@
--- ANTARES 58A — restaurar somente a funcao ausente de reserva atomica.
+-- ANTARES 58A — OBSOLETO. NAO EXECUTAR.
+-- SUBSTITUIDO por scripts/58b-reserva-unica-sem-bloqueio-capacidade.sql
+-- 58A isolado nao remove a regra antiga de capacidade total.
 -- Pre-requisito: 15A e 14F instalados e concilidados no Neon.
 -- NAO executa reserva, alteracao de agenda, backfill, nem modifica dados.
 -- So executar apos conferir em SOMENTE LEITURA as funcoes dependentes.
