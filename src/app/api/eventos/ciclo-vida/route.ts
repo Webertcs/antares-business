@@ -1,5 +1,5 @@
 import {NextRequest,NextResponse} from 'next/server';
-import {requireMember,getTeamWriteDb} from '@/lib/equipe/auth';
+import {requireMember,getDb,getTeamWriteDb} from '@/lib/equipe/auth';
 export const runtime='nodejs';
 const uuid=/^[0-9a-f]{8}(-[0-9a-f]{4}){3}-[0-9a-f]{12}$/i;
 export async function POST(req:NextRequest){
@@ -13,6 +13,15 @@ export async function POST(req:NextRequest){
   if(typeof body.eventId!=='string'||!uuid.test(body.eventId)||!['cancel','archive','restore'].includes(body.action)||typeof body.reason!=='string'||body.reason.length>1000)
    return NextResponse.json({error:'Dados inválidos.'},{status:400});
   if(body.action==='cancel'&&body.reason.trim().length<5)return NextResponse.json({error:'Informe o motivo do cancelamento.'},{status:400});
+  if(body.action==='cancel'||body.action==='archive'){
+   const linked=await getDb()`SELECT p.status FROM public.antares_presentation_event_links l
+    JOIN public.presentations p ON p.id=l.presentation_id AND p.organization_id=l.organization_id
+    WHERE l.organization_id=${ctx.organizationId}::uuid AND l.event_id=${body.eventId}::uuid LIMIT 1`;
+   if(linked.length&&(body.action==='cancel'||!['cancelled','canceled','completed'].includes(String(linked[0].status))))
+    return NextResponse.json(
+     {error:'Este evento tem reserva vinculada. Para cancelar e liberar a cúpula, use Ver reserva na Central de Atendimento.'},
+     {status:409,headers:{'Cache-Control':'no-store'}});
+  }
   const sql=getTeamWriteDb();
   const safety=await sql`SELECT current_user='antares_team_runtime' AND NOT r.rolsuper AND NOT r.rolbypassrls AS safe,
   p.prosecdef AND pg_get_userbyid(p.proowner)='neondb_owner' AND has_function_privilege(current_user,p.oid,'EXECUTE') AS allowed
