@@ -20,7 +20,7 @@ const canOpenClosing=(r:ServiceReservation|null)=>Boolean(r&&!isCancelled(r)&&
 const closingHint=(r:ServiceReservation|null)=>!r?'Disponível após a reserva':
  isCancelled(r)?'Apresentação cancelada, sem conclusão de alunos':
  isCompleted(r)?'Consultar encerramento registrado':
- !r.crm_event_id?'Em Ver reserva, prepare primeiro o vínculo operacional':
+ !r.crm_event_id?'Em Ver reserva, regularize a apresentação antiga':
  new Date(r.ends_at).getTime()>Date.now()?'Liberado após o horário de término da apresentação':'Encerrar e registrar o número real de alunos';
 function statusLabel(lead:Lead,reservation:ServiceReservation|null){
  if(isCancelled(reservation))return 'Cancelada · arquivada';
@@ -43,13 +43,12 @@ function ServiceTimeline({lead,reservation,operationalKnown,finance}:{
  const accepted=hasProposal&&lead.proposal_status==='accepted';
  const steps=[
   {name:'Contato',done:true,active:!hasProposal},
-  {name:'Proposta',done:hasProposal,active:hasProposal&&!accepted},
-  {name:'Aceite',done:accepted,active:false},
+  {name:'Proposta',done:accepted,active:hasProposal&&!accepted},
   {name:'Reserva',done:bookingDone,active:accepted&&operationalKnown&&!bookingDone},
   {name:'Conclusão',done:finished,active:bookingDone&&!finished&&!cancelled}
  ];
  return <div aria-label="Etapas do atendimento" style={{margin:'12px 0 8px',padding:'14px 12px',background:'#f5f9ff',border:'1px solid #cbdcf7',borderRadius:12}}>
-  <ol style={{display:'grid',gridTemplateColumns:'repeat(5,minmax(0,1fr))',listStyle:'none',margin:0,padding:0,gap:4}}>
+  <ol style={{display:'grid',gridTemplateColumns:'repeat(4,minmax(0,1fr))',listStyle:'none',margin:0,padding:0,gap:4}}>
    {steps.map((step,i)=><li key={step.name} style={{display:'flex',flexDirection:'column',alignItems:'center',gap:5,textAlign:'center',minWidth:0}}>
     <span aria-hidden="true" style={{width:29,height:29,borderRadius:'50%',display:'grid',placeItems:'center',fontSize:13,fontWeight:800,color:step.done||step.active?'#fff':'#50698d',background:step.done?'#15803d':step.active?'#1d4ed8':'#e1eaf7'}}>
      {step.done?'✓':i+1}
@@ -66,11 +65,7 @@ function ServiceTimeline({lead,reservation,operationalKnown,finance}:{
     hasProposal?'Próxima ação: revisar a proposta e registrar o aceite real da instituição.':
     'Próxima ação: conversar com a instituição e preparar a proposta.'}
   </p>
-  {accepted&&<p style={{margin:'4px 0 0',fontSize:11,color:'#64748b'}}>
-   {finance&&finance.charged>0
-    ?'Financeiro: '+money(finance.paid)+' recebidos de '+money(finance.charged)+' cobrados. Pagamento não impede a reserva.'
-    :'Financeiro separado do atendimento. A proposta aceita não comprova recebimento.'}
-  </p>}
+  {accepted&&finance&&finance.charged>0&&<p style={{margin:'4px 0 0',fontSize:11,color:'#64748b'}}>Recebido: {money(finance.paid)} de {money(finance.charged)}.</p>}
  </div>;
 }
 function matchesFilter(lead:Lead,key:string,reservation:ServiceReservation|null){
