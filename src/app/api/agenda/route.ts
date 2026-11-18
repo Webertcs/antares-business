@@ -53,6 +53,11 @@ export async function PATCH(request:Request){
   const dome=body.dome_id===''||body.dome_id==null?null:String(body.dome_id);
   if(dome&&!uuid.test(dome))return NextResponse.json({error:'Cúpula inválida.'},{status:400});
   const db=getDb();
+  const linked=await db`SELECT 1 FROM public.antares_presentation_event_links
+   WHERE organization_id=${ctx.organizationId}::uuid AND event_id=${id}::uuid LIMIT 1`;
+  if(linked.length)return NextResponse.json(
+   {error:'Esta apresentação possui reserva vinculada. Reagende pelo botão Ver reserva para manter a cúpula sincronizada.'},
+   {status:409,headers:{'Cache-Control':'no-store'}});
   if(dome){
    const valid=await db`SELECT id FROM public.antares_domes WHERE id=${dome} AND organization_id=${ctx.organizationId} AND active=true LIMIT 1`;
    if(!valid.length)return NextResponse.json({error:'Cúpula indisponível.'},{status:400});
