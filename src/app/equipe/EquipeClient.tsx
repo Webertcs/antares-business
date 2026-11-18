@@ -88,7 +88,7 @@ export default function EquipeClient({ writesEnabled }: { writesEnabled: boolean
     finally { setSending(false); }
   }
   return <main className="team-refined team-premium">
-    <header className="team-premium-header"><span className="team-premium-eyebrow">GESTÃO DE ACESSOS</span><h1>Equipe e permissões</h1><p>Gerencie os acessos do planetário em um só lugar.</p></header>
+    <header className="team-premium-header"><span className="team-premium-eyebrow">GESTÃO DE ACESSOS</span><h1>Equipe e permissões</h1></header>
     <div className="team-premium-body">
     <div className="team-premium-summary"><div><strong>{members.length}</strong><span>Integrantes</span></div><div><strong>{members.filter(m=>m.active).length}</strong><span>Ativos</span></div><div><strong>{invitations.length}</strong><span>Convites pendentes</span></div></div>
     <h2 className="team-section-title">Pessoas com acesso</h2>
@@ -100,7 +100,7 @@ export default function EquipeClient({ writesEnabled }: { writesEnabled: boolean
     <section className="team-panel team-premium-panel">
       <h2>Convidar colaborador</h2>
       {!canWrite && <p role="status" style={{color:'#92400e',fontWeight:700}}>{checkingSecurity ? 'Verificando permissões de segurança...' : 'Não é possível enviar convites neste momento.'}</p>}
-      <p>O convidado precisa entrar com o mesmo e-mail e confirmar a conta. Não é possível convidar outro proprietário.</p>
+      <p>O colaborador deve aceitar o convite com o mesmo e-mail.</p>
       <form onSubmit={invite} className="team-invite-form">
         <label>Nome completo<input disabled={!canWrite} required minLength={2} maxLength={160} value={name} onChange={e=>setName(e.target.value)} style={{display:'block',width:'100%',padding:10,color:'#111',background:'#fff'}}/></label>
         <label>E-mail do colaborador<input disabled={!canWrite} required type="email" maxLength={254} value={email} onChange={e=>setEmail(e.target.value)} style={{display:'block',width:'100%',padding:10,color:'#111',background:'#fff'}}/></label>
