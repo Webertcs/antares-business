@@ -2,7 +2,7 @@
 import {useCallback,useEffect,useMemo,useState} from 'react';
 import EventOperations from '../../eventos/[id]/EventOperations';
 
-function ChecklistTemplateEditor(){
+export function ChecklistTemplateEditor(){
  const [items,setItems]=useState<string[]>([]);
  const [saved,setSaved]=useState<string[]>([]);
  const [newItem,setNewItem]=useState('');
