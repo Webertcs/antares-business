@@ -43,7 +43,9 @@ CREATE TABLE IF NOT EXISTS public.antares_reservation_changes (
 CREATE INDEX IF NOT EXISTS antares_reservation_changes_history_15a
  ON public.antares_reservation_changes(organization_id,presentation_id,changed_at DESC);
 ALTER TABLE public.antares_reservation_changes ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.antares_reservation_changes FORCE ROW LEVEL SECURITY;
+-- SECURITY DEFINER sob neondb_owner precisa gravar o diario sem abrir privilegios a runtime.
+-- ENABLE sem FORCE: o dono da tabela e as funcoes DEFINER podem acessar;
+-- antares_team_runtime continua sem privilegios diretos (REVOKE abaixo).
 REVOKE ALL ON public.antares_reservation_changes FROM PUBLIC,antares_team_runtime;
 
 -- Vincula uma apresentacao ja reservada ao evento CRM, reaproveitando
@@ -139,16 +141,15 @@ DECLARE
  v_status text;v_event uuid;v_event_status text;v_old_start timestamptz;
  v_old_end timestamptz;v_old_equipment uuid;v_old_dome uuid;
  v_new_equipment uuid;v_capacity integer;v_expected integer;
- v_source_event uuid;v_client uuid;
-BEGIN
+ BEGIN
  IF NOT EXISTS(SELECT 1 FROM public.team_members WHERE auth_subject=p_subject
       AND organization_id=p_org AND active AND role='owner')
  THEN RAISE EXCEPTION 'Proprietario nao autorizado';END IF;
- IF p_action NOT IN ('cancel','edit') OR length(btrim(coalesce(p_reason,''))) NOT BETWEEN 5 AND 500
+ IF p_action IS NULL OR p_action NOT IN ('cancel','edit') OR length(btrim(coalesce(p_reason,''))) NOT BETWEEN 5 AND 500
  THEN RAISE EXCEPTION 'Acao ou motivo invalido';END IF;
 
- SELECT p.status,p.starts_at,p.ends_at,p.dome_id,b.expected_attendees,b.event_id,b.client_id
- INTO v_status,v_old_start,v_old_end,v_old_equipment,v_expected,v_source_event,v_client
+ SELECT p.status,p.starts_at,p.ends_at,p.dome_id,b.expected_attendees
+ INTO v_status,v_old_start,v_old_end,v_old_equipment,v_expected
  FROM public.antares_proposal_reservations r
  JOIN public.presentations p ON p.id=r.presentation_id AND p.organization_id=r.organization_id
  JOIN public.business_proposals b ON b.id=r.proposal_id AND b.organization_id=r.organization_id
@@ -161,17 +162,10 @@ BEGIN
  WHERE l.organization_id=p_org AND l.equipment_id=v_old_equipment;
  SELECT event_id INTO v_event FROM public.antares_presentation_event_links
  WHERE organization_id=p_org AND presentation_id=p_presentation;
- -- Propostas antigas podem referenciar evento real antes da ponte existir.
- -- Reutiliza somente se pertence ao mesmo cliente e nao esta ligado a outra reserva.
- IF v_event IS NULL AND v_source_event IS NOT NULL THEN
-  SELECT e.id INTO v_event FROM public.crm_events e
-   WHERE e.id=v_source_event AND e.organization_id=p_org AND e.client_id=v_client
-   AND NOT EXISTS(SELECT 1 FROM public.antares_presentation_event_links l
-    WHERE l.organization_id=p_org AND l.event_id=e.id AND l.presentation_id<>p_presentation)
-   FOR UPDATE;
-  IF v_event IS NULL THEN RAISE EXCEPTION 'Evento existente inconsistente';END IF;
-  INSERT INTO public.antares_presentation_event_links(organization_id,presentation_id,event_id)
-  VALUES(p_org,p_presentation,v_event);
+ -- Antes de alterar a reserva, garante a existencia do evento operacional.
+ -- Se algo falhar, cancela/reagenda NADA: a transacao inteira e revertida.
+ IF v_event IS NULL THEN
+  v_event:=public.antares_link_reservation_event(p_subject,p_org,p_presentation);
  END IF;
  IF v_event IS NOT NULL THEN
   SELECT status INTO v_event_status FROM public.crm_events
