@@ -34,7 +34,7 @@ export default function EducacionalClient({writesEnabled}:{writesEnabled:boolean
  </div>
  <section style={{background:'#f8fbff',border:'1px solid #cbdcf5',borderRadius:13,overflow:'hidden'}}>
  <div style={{background:'#e4efff',padding:'13px 16px',borderBottom:'1px solid #c8dbf7',display:'flex',alignItems:'center',justifyContent:'space-between',gap:12}}>
- <div><h2 style={{fontSize:17,margin:0,color:'#174987'}}>Turmas cadastradas</h2><p style={{margin:'4px 0 0',fontSize:12,color:'#52719b'}}>Escolas, séries, professores e quantidade de alunos</p></div>
+ <div><h2 style={{fontSize:17,margin:0,color:'#174987'}}>Turmas cadastradas</h2></div>
  <span style={{background:'#2058c5',color:'#fff',borderRadius:20,padding:'5px 10px',fontSize:12,whiteSpace:'nowrap'}}>{selectedSchool?visibleGroups.length:groups.length} na lista</span>
  </div>
  <div style={{padding:14}}>
@@ -47,7 +47,7 @@ export default function EducacionalClient({writesEnabled}:{writesEnabled:boolean
  {loading?<p>Carregando...</p>:error?<p role="alert">{error}</p>:null}
  {!selectedSchool?<div style={{textAlign:'center',padding:'25px 12px',background:'#edf5ff',border:'1px dashed #b9d3f6',borderRadius:10}}><strong style={{color:'#164985'}}>Selecione uma escola para consultar suas turmas e professores.</strong></div>:visibleGroups.length===0?<div style={{textAlign:'center',padding:'25px 12px',background:'#edf5ff',border:'1px dashed #b9d3f6',borderRadius:10}}>
  <div aria-hidden="true" style={{fontSize:28}}>📚</div><strong style={{display:'block',marginTop:6,color:'#164985'}}>Nenhuma turma cadastrada</strong>
- <p style={{margin:'5px 0 0',fontSize:13,color:'#52719b'}}>Quando houver turmas registradas, elas aparecerão aqui.</p>
+ 
  </div>:
  <div style={{overflowX:'auto'}}><table style={{width:'100%',borderCollapse:'separate',borderSpacing:'0 5px',textAlign:'left',fontSize:13}}>
  <thead><tr>{['Escola','Turma','Série','Alunos','Professor','Contato'].map(t=><th key={t} style={{padding:'9px 10px',background:'#dceaff',color:'#174987',fontSize:12}}>{t}</th>)}</tr></thead>
