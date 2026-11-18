@@ -67,10 +67,10 @@ export default async function Page({params}:{params:Promise<{id:string}>}){
    </div>)}
   </section>
 
-  <EventClosing eventId={id}/>
+  <EventClosing eventId={id} eventDate={event.event_date?(event.event_date instanceof Date?event.event_date.toISOString().slice(0,10):String(event.event_date).slice(0,10)):null}/>
 
   {hasReservation&&<p style={{fontSize:13,color:'#4c668b',margin:0}}>
-   Precisa mudar a data, o horário ou a cúpula? Faça isso em <Link href="/vitrine/inbox" style={{color:'#175bb1',fontWeight:750}}>Central de Atendimento → Ver reserva</Link>.
+   Para alterar data, horário ou cúpula, acesse <Link href="/vitrine/inbox" style={{color:'#175bb1',fontWeight:750}}>Central de Atendimento</Link>.
   </p>}
 
   {canManage&&<details style={{border:'1px solid #c8d9f5',background:'#f5f9ff',borderRadius:12,padding:13}}>
