@@ -62,7 +62,8 @@ function ServiceTimeline({lead,reservation,operationalKnown,finance}:{
     bookingDone?'Reserva registrada para '+(reservation?.starts_at?dateTime(reservation.starts_at):'data a confirmar')+'. Acompanhe a apresentação e o financeiro.':
     accepted&&!operationalKnown?'Aceite registrado. O estado das reservas não pôde ser consultado. Atualize a Central.':
     accepted?'Próxima ação: organizar a reserva. Contrato escrito é opcional.':
-    hasProposal?'Próxima ação: revisar a proposta e registrar o aceite real da instituição.':
+    hasProposal&&lead.proposal_status==='draft'?'Finalize o rascunho e aprove a proposta antes de solicitar o aceite da escola.':
+     hasProposal?'Aguarde o aceite real da escola para continuar.':
     'Próxima ação: conversar com a instituição e preparar a proposta.'}
   </p>
   {accepted&&finance&&finance.charged>0&&<p style={{margin:'4px 0 0',fontSize:11,color:'#64748b'}}>Recebido: {money(finance.paid)} de {money(finance.charged)}.</p>}
@@ -222,7 +223,7 @@ export default function Inbox({conversionEnabled,bookingWritesEnabled,contractWr
   {notice&&<p role="status" className={styles.notification}>{notice}</p>}
   {bookingError&&<p role="status" className={styles.notification}>Situação operacional indisponível: {bookingError}</p>}
   {loading?<div className={styles.empty} role="status">Carregando solicitações...</div>:
-   !error&&shown.length===0?<div className={styles.empty}>Nenhuma solicitação nesta categoria.</div>:null}
+   !error&&shown.length===0?<div className={styles.empty}>{filter==='open'?'Nenhum atendimento em andamento. Novas solicitações aparecerão aqui.':'Nenhuma solicitação nesta categoria.'}</div>:null}
   <div className={styles.list}>
    {!loading&&shown.map(lead=><article key={lead.id} className={styles.lead}>
     <div className={styles.leadHead}>
