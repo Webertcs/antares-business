@@ -65,9 +65,9 @@ export default function ReceberClient(){
  return <main style={{minHeight:'100%',background:'#f2f6fd',color:'#102a56',padding:'clamp(16px,3vw,32px)',fontFamily:'inherit'}}>
  <div style={{maxWidth:1180,margin:'auto'}}>
  
- <header style={{background:'linear-gradient(110deg,#173f83,#2871c4)',color:'#fff',borderRadius:14,padding:'24px 28px',marginBottom:22,boxShadow:'0 8px 24px rgba(23,63,131,.12)'}}><div style={{fontSize:11,fontWeight:700,letterSpacing:'0.12em',opacity:.85,marginBottom:8}}>FINANCEIRO · ANTARES BUSINESS</div><h1 style={{fontSize:27,fontWeight:750,margin:'0 0 7px'}}>Contas a receber</h1><p style={{margin:0,fontSize:14,opacity:.9}}>Acompanhe títulos, vencimentos e pagamentos em um só lugar.</p></header>
+ <header style={{background:'linear-gradient(110deg,#173f83,#2871c4)',color:'#fff',borderRadius:14,padding:'24px 28px',marginBottom:22,boxShadow:'0 8px 24px rgba(23,63,131,.12)'}}><div style={{fontSize:11,fontWeight:700,letterSpacing:'0.12em',opacity:.85,marginBottom:8}}>FINANCEIRO · ANTARES BUSINESS</div><h1 style={{fontSize:27,fontWeight:750,margin:'0 0 7px'}}>Contas a receber</h1></header>
  {status&&<p role="status" style={{padding:12,background:'#e9effc',borderRadius:8}}>{status}</p>}
- {!writesEnabled&&<p role="status" style={{padding:14,background:'#fff4e5',border:'1px solid #efc991',borderRadius:9,color:'#864413'}}>Novos lançamentos estão temporariamente indisponíveis. Você ainda pode consultar os títulos e recebimentos existentes.</p>}
+ {!writesEnabled&&<p role="status" style={{padding:14,background:'#fff4e5',border:'1px solid #efc991',borderRadius:9,color:'#864413'}}>Novos lançamentos indisponíveis. Consultas liberadas.</p>}
  <section style={box}><h2 style={{fontSize:19,fontWeight:800,color:'#174987',margin:'0 0 20px',paddingBottom:15,borderBottom:'2px solid #d9e8fa'}}>Novo título</h2>
  <style>{`
  .antares-title-grid{display:grid;grid-template-columns:minmax(165px,1.35fr) minmax(170px,1.55fr) minmax(100px,.72fr) minmax(142px,.9fr) auto;gap:12px;align-items:end}
