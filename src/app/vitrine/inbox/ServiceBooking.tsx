@@ -90,7 +90,7 @@ export default function ServiceBooking({
 
  async function submit(e:FormEvent<HTMLFormElement>){
   e.preventDefault();
-  if(!canSave||!startDate||!endDate){setError('Verifique cúpula, horário, disponibilidade e vínculo da instituição.');return;}
+  if(!canSave||!startDate||!endDate){setError('Confira a cúpula, o período e a disponibilidade.');return;}
   setBusy(true);setError('');
   try{
    const response=await fetch('/api/agenda/reservas',{
@@ -232,7 +232,7 @@ export default function ServiceBooking({
      </select>
     </label>
     {selectedDome&&estimatedSessions&&<p style={{margin:'0',fontSize:12,color:'#33577f'}}>
-     Público total: <strong>{proposal.expected_attendees}</strong> alunos. Cúpula: <strong>até {selectedDome.capacity} por sessão</strong>. Estimativa: <strong>{estimatedSessions} sessões</strong> com lotação completa. Os horários de cada sessão serão organizados no evento.
+     Público total: <strong>{proposal.expected_attendees}</strong> alunos. Cúpula: <strong>até {selectedDome.capacity} por sessão</strong>. Estimativa: <strong>{estimatedSessions} sessões</strong> com lotação completa. Esta é apenas uma estimativa: a programação das sessões ainda precisa ser definida.
     </p>}
     {domes.length===0&&<p role="status" style={{color:'#92400e',fontSize:12}}>
      Nenhuma cúpula ativa vinculada à operação. Confira o cadastro de cúpulas.
