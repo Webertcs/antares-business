@@ -45,7 +45,7 @@ export default function ChecklistEditor(){
  return <section className="operation-premium-checklist" style={{background:'#eef5ff',border:'1px solid #c9dcf7',borderRadius:14,padding:18,marginTop:12}}>
   <h2 style={{fontSize:19,fontWeight:750,margin:'0 0 8px'}}>Modelo padrão do planetário</h2>
   {loading?<p>Carregando modelo...</p>:<>
-   {items.length===0&&<p style={{padding:14,background:'#fff',borderRadius:8}}>Nenhum item cadastrado. Comece adicionando a primeira tarefa.</p>}
+   {items.length===0&&<p style={{padding:14,background:'#fff',borderRadius:8}}>Nenhuma tarefa cadastrada.</p>}
    <div style={{display:'grid',gap:6}}>
     {items.map((item,index)=><div className="operation-premium-checklist-row" key={index} style={{display:'flex',alignItems:'center',gap:8,background:'#fff',border:'1px solid #d4e2f5',borderRadius:10,padding:5}}>
      <span style={{minWidth:22,fontWeight:700,color:'#5276a3'}}>{index+1}.</span>
