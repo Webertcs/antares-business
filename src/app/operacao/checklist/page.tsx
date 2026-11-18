@@ -15,7 +15,7 @@ export default async function ChecklistOperacional() {
     <Link href='/?section=operacao' style={{color:'#2563c9',fontWeight:700,textDecoration:'none'}}>← Voltar à Central operacional</Link>
     <header style={{background:'linear-gradient(115deg,#153c78,#1765bd)',color:'white',borderRadius:14,padding:'22px 26px',marginTop:16}}>
       <h1 style={{fontSize:25,fontWeight:800,margin:0}}>Checklist operacional</h1>
-      <p style={{margin:'8px 0 0',color:'#dcecff'}}>Modelo padrão para preparar as apresentações.</p>
+      
     </header>
     <ChecklistEditor/>
   </main>;
