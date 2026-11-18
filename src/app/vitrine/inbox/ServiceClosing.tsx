@@ -1,7 +1,6 @@
 'use client';
 
 import {useEffect,useRef,useState} from 'react';
-import Link from 'next/link';
 import {CheckCircle2,ClipboardCheck,X} from 'lucide-react';
 import type {ServiceReservation} from './ServiceBooking';
 
@@ -26,7 +25,6 @@ export default function ServiceClosing({reservation,institution,onClose,onSaved}
  const [error,setError]=useState('');
  const [busy,setBusy]=useState(false);
  const [students,setStudents]=useState('');
- const [confirm,setConfirm]=useState(false);
  const [notice,setNotice]=useState('');
  const eventId=reservation.crm_event_id;
  const completed=reservation.crm_event_status==='completed'||reservation.status==='completed';
@@ -47,14 +45,8 @@ export default function ServiceClosing({reservation,institution,onClose,onSaved}
   return()=>{live=false;if(el?.open)el.close();};
  },[eventId]);
 
- function requestClose(){
-  if(busy||!state?.canClose||confirm||!/^\d+$/.test(students))return;
-  const count=Number(students);
-  if(!Number.isSafeInteger(count)||count<0||count>100000){setError('Informe o número real de alunos atendidos.');return;}
-  setConfirm(true);setError('');
- }
  async function close(){
-  if(busy||!eventId||!confirm||!state?.canClose)return;
+  if(busy||!eventId||!state?.canClose)return;
   const count=Number(students);
   if(!/^\d+$/.test(students)||!Number.isSafeInteger(count)||count<0||count>100000)return;
   setBusy(true);setError('');setNotice('');
@@ -68,7 +60,7 @@ export default function ServiceClosing({reservation,institution,onClose,onSaved}
    const newState=await check.json();
    if(!check.ok||newState.status!=='completed'||!newState.attendance)
     throw Error('Encerramento enviado, mas ainda não foi possível confirmar no histórico. Confira a Central do Evento antes de repetir.');
-   setState(newState as ClosingState);setConfirm(false);
+   setState(newState as ClosingState);
    setNotice('Apresentação encerrada. Quantidade real de alunos registrada no histórico operacional.');
    onSaved();
   }catch(e){setError(e instanceof Error?e.message:'Encerramento recusado.');}
@@ -76,7 +68,6 @@ export default function ServiceClosing({reservation,institution,onClose,onSaved}
  }
  function dismiss(){
   if(busy)return;
-  if(confirm){setConfirm(false);return;}
   onClose();
  }
 
@@ -100,17 +91,15 @@ export default function ServiceClosing({reservation,institution,onClose,onSaved}
     <strong>{institution}</strong>
     <p style={{fontSize:12,margin:'5px 0 0'}}>Apresentação prevista: {dateTime(reservation.starts_at)} · Cúpula: {reservation.dome_name||'Não informada'}</p>
    </div>
-   {loading&&<p role="status">Consultando o encerramento operacional...</p>}
+   {loading&&<p role="status">Carregando dados do evento...</p>}
    {error&&<p role="alert" style={{margin:0,padding:11,border:'1px solid #fecaca',background:'#fff1f2',color:'#9b123a',borderRadius:9}}>{error}</p>}
    {notice&&<p role="status" style={{margin:0,padding:11,border:'1px solid #b5e4c6',background:'#f0fdf4',color:'#166534',borderRadius:9}}>{notice}</p>}
    {!loading&&!eventId&&<div style={{background:'#fff7e8',border:'1px solid #ebcd94',borderRadius:10,padding:14}}>
-    <strong>Vínculo operacional pendente</strong>
+    <strong>Reserva antiga pendente</strong>
     <p style={{margin:'8px 0 0',fontSize:13}}>
-     Esta reserva está na Agenda, mas ainda não possui um evento operacional vinculado.
-     A conclusão exige um evento real confirmado e o registro de alunos atendidos.
-     Nenhum evento será criado ou encerrado automaticamente.
+     A reserva precisa ser regularizada antes de registrar os alunos.
     </p>
-    <p style={{margin:'8px 0 0',fontSize:12}}>É necessário finalizar a integração entre a reserva e o evento antes de habilitar o encerramento nesta tela.</p>
+    <p style={{margin:'8px 0 0',fontSize:12}}>Use Ver reserva para regularizar este registro antigo.</p>
    </div>}
    {!loading&&eventId&&(completed||state?.attendance)&&<div role="status" style={{background:'#e9f9ef',border:'1px solid #b5e4c6',padding:14,borderRadius:10,color:'#17633b'}}>
     <CheckCircle2 size={18} style={{display:'inline',verticalAlign:'middle',marginRight:7}}/>
@@ -118,17 +107,10 @@ export default function ServiceClosing({reservation,institution,onClose,onSaved}
     {state?.attendance&&<p style={{margin:'7px 0 0',fontSize:13}}>Alunos realmente atendidos: <strong>{state.attendance.actual_students}</strong></p>}
    </div>}
    {!loading&&eventId&&!completed&&!state?.attendance&&<div style={{display:'grid',gap:11}}>
-    <div style={{padding:12,border:'1px solid #c8dcf4',borderRadius:9,background:'#fff'}}>
-     <strong style={{fontSize:13}}>Regras de encerramento</strong>
-     <p style={{margin:'7px 0 0',fontSize:12,color:'#4d6e98'}}>
-      Somente o proprietário pode concluir. O evento deve estar confirmado e na data da apresentação ou depois.
-      A contagem será registrada na operação, não no Financeiro.
-     </p>
-    </div>
     {state?.canClose?
      <label style={{fontSize:13,fontWeight:750}}>Número real de alunos atendidos
       <input type="number" min={0} max={100000} step={1} required
-       value={students} onChange={e=>{setStudents(e.target.value);setConfirm(false);}}
+       value={students} onChange={e=>setStudents(e.target.value)}
        placeholder="Informe a quantidade" disabled={busy}
        style={{marginTop:5,width:'100%',padding:'11px 12px',border:'1px solid #aac6ea',borderRadius:9,background:'#fff',color:'#174779'}}/>
      </label>:
@@ -137,20 +119,14 @@ export default function ServiceClosing({reservation,institution,onClose,onSaved}
        ?'Este evento ainda não pode ser concluído. O encerramento só é liberado na data da apresentação ou depois, conforme as permissões existentes.'
        :'O evento precisa estar confirmado e autorizado para encerramento.'}
      </p>}
-    {state?.canClose&&!confirm&&<button type="button" disabled={busy||!/^\d+$/.test(students)||Number(students)>100000}
-      onClick={requestClose} style={{...mainButton,opacity:(busy||!/^\d+$/.test(students)||Number(students)>100000)?0.55:1}}>
-      Conferir encerramento
-     </button>}
-    {confirm&&<div role="group" aria-label="Confirmar encerramento" style={{border:'1px solid #e8c486',background:'#fff7e8',borderRadius:10,padding:14,display:'grid',gap:10}}>
-     <strong>Confirmar conclusão real?</strong>
-     <p style={{margin:0,fontSize:13}}>Serão registrados <strong>{students} alunos atendidos</strong> e a conclusão do evento. Esta operação mantém histórico e auditoria.</p>
-     <div style={{display:'flex',justifyContent:'flex-end',gap:8,flexWrap:'wrap'}}>
-      <button type="button" disabled={busy} onClick={()=>setConfirm(false)} style={secondary}>Voltar</button>
-      <button type="button" disabled={busy} onClick={()=>void close()} style={mainButton}>{busy?'Encerrando...':'Confirmar conclusão'}</button>
-     </div>
+    {state?.canClose&&<div style={{display:'flex',justifyContent:'flex-end',gap:9,flexWrap:'wrap'}}>
+     <button type="button" disabled={busy} onClick={dismiss} style={secondary}>Voltar</button>
+     <button type="button" disabled={busy||!/^\\d+$/.test(students)||Number(students)>100000}
+       onClick={()=>void close()} style={{...mainButton,opacity:(busy||!/^\\d+$/.test(students)||Number(students)>100000)?0.55:1}}>
+       {busy?'Salvando...':'Registrar alunos e concluir'}
+     </button>
     </div>}
    </div>}
-   {eventId&&<Link href={'/eventos/'+encodeURIComponent(eventId)} style={{...secondary,textAlign:'center',textDecoration:'none'}}>Abrir Central do Evento</Link>}
    <button type="button" disabled={busy} onClick={dismiss} style={secondary}>Fechar</button>
   </div>
  </dialog>;
