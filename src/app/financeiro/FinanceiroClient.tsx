@@ -182,14 +182,14 @@ export default function FinanceiroClient(){
  </div>
  <div className="finance-receivable-section finance-receivable-charges">
   <div className="finance-receivable-heading">
-   <div><h3>Extrato de cobranças</h3><p>Valores cadastrados, vencimentos e saldos pendentes.</p></div>
+   <div><h3>Extrato de cobranças</h3></div>
    <span className="finance-receivable-count">{receivables.titles.length} {receivables.titles.length===1?'título':'títulos'}</span>
   </div>
   <div className="finance-receivable-scroll"><table className="finance-receivable-table" style={{width:'100%',minWidth:700,borderCollapse:'collapse',textAlign:'left',fontSize:13}}><thead><tr>{['Instituição','Descrição','Vencimento','Total','Recebido','Pendente'].map(h=><th key={h}>{h}</th>)}</tr></thead><tbody>{receivables.titles.map(t=><tr key={t.id}><td>{t.client_name}</td><td>{t.description}</td><td>{String(t.due_on).slice(0,10).split('-').reverse().join('/')}</td><td>{brl(Number(t.total))}</td><td>{brl(Number(t.paid))}</td><td style={{fontWeight:750}}>{brl(Math.max(0,Number(t.total)-Number(t.paid)))}</td></tr>)}</tbody></table>{receivables.titles.length===0&&<p>Nenhuma cobrança cadastrada.</p>}</div>
  </div>
  <div className="finance-receivable-section finance-receivable-payments">
   <div className="finance-receivable-heading">
-   <div><h3>Extrato de recebimentos por instituição</h3><p>Pagamentos efetivamente registrados no caixa.</p></div>
+   <div><h3>Extrato de recebimentos por instituição</h3></div>
    <span className="finance-receivable-count">{receivables.payments.length} {receivables.payments.length===1?'recebimento':'recebimentos'}</span>
   </div>
   <div className="finance-receivable-scroll"><table className="finance-receivable-table" style={{width:'100%',minWidth:620,borderCollapse:'collapse',textAlign:'left',fontSize:13}}><thead><tr>{['Data','Instituição','Descrição','Valor recebido'].map(h=><th key={h}>{h}</th>)}</tr></thead><tbody>{receivables.payments.map(p=><tr key={p.id}><td>{String(p.occurred_on).slice(0,10).split('-').reverse().join('/')}</td><td>{p.client_name}</td><td>{p.description}</td><td style={{fontWeight:750,color:'#11754e'}}>+ {brl(Number(p.amount))}</td></tr>)}</tbody></table>{receivables.payments.length===0&&<p>Nenhum recebimento vinculado.</p>}</div>
@@ -205,7 +205,7 @@ export default function FinanceiroClient(){
  <label>Apresentação (opcional)<select value={presentation} onChange={e=>{setPresentation(e.target.value);setPendingId(null);}} style={{display:'block',width:'100%',padding:'11px 12px',marginTop:6,border:'1px solid #b7cdeb',borderRadius:9,background:'#fff',color:'#173e73',outlineColor:'#2868c8'}}><option value="">Sem vínculo</option>{data.presentations.map(p=><option value={p.id} key={p.id}>{p.title}</option>)}</select></label>
  </div>
  <label style={{display:'block',marginTop:16}}>Descrição<input value={description} maxLength={500} onChange={e=>{setDescription(e.target.value);setPendingId(null);}} placeholder="Ex.: recebimento da apresentação / combustível" style={{display:'block',width:'100%',padding:'11px 12px',marginTop:6,border:'1px solid #b7cdeb',borderRadius:9,background:'#fff',color:'#173e73',outlineColor:'#2868c8'}}/></label>
- {data.writesEnabled===false&&<p role="status" style={{background:'#fff7ed',padding:12,borderRadius:9,color:'#8a4618'}}>Novos lançamentos estão temporariamente indisponíveis. Você ainda pode consultar o extrato e os relatórios.</p>}
+ {data.writesEnabled===false&&<p role="status" style={{background:'#fff7ed',padding:12,borderRadius:9,color:'#8a4618'}}>Lançamentos indisponíveis. A consulta continua ativa.</p>}
  <div style={{display:'flex',justifyContent:'flex-end',gap:8,marginTop:16}}><button type="button" onClick={closeEntry} disabled={saving} style={{padding:'10px 15px',borderRadius:8,background:'#e9f2ff',border:0,color:'#17457f'}}>Cancelar</button><button type="button" disabled={saving||!data.writesEnabled} onClick={saveEntry} style={{background:'linear-gradient(110deg,#1754b0,#3479e4)',color:'white',padding:'10px 15px',borderRadius:9,border:0,fontWeight:700,boxShadow:'0 3px 9px #1b57a833'}}>{saving?'Registrando...':'Confirmar lançamento'}</button></div>
  {notice&&<p role="status">{notice}</p>}
  
