@@ -580,8 +580,8 @@ export default function ClientDetails({id,writesEnabled,proposalWritesEnabled,co
  {documentMode==='custom'&&<section style={{padding:14,background:'#f7fbff',border:'2px solid #7eb5fa',borderRadius:12,display:'grid',gap:10}}><strong style={{color:'#123c80'}}>Contrato livre · escreva seu documento</strong><label style={formLabel}>Texto completo do contrato<textarea autoFocus style={{...formInput,fontWeight:400,lineHeight:1.7,minHeight:360}} rows={18} placeholder="Digite aqui o contrato completo, com as cláusulas e condições que desejar." value={documentDraft.terms.startsWith(customContractPrefix)?documentDraft.terms.slice(customContractPrefix.length):documentDraft.terms} onChange={e=>setDocumentDraft(v=>({...v,terms:customContractPrefix+e.target.value}))}/></label><div style={{display:'flex',gap:8,flexWrap:'wrap'}}>
  <button type="button" disabled={documentBusy||documentDraft.title.trim().length<3||documentDraft.institution.trim().length<2||documentDraft.terms.slice(customContractPrefix.length).trim().length===0} style={{...actionLink,background:'#16803c'}} onClick={()=>void saveDocument(contractId)}>{documentBusy?'Salvando…':'Salvar contrato livre'}</button>
  <button type="button" disabled={documentBusy||!savedDrafts.some(d=>d.id===documentSavedId&&!d.archived_at)} style={{...actionLink,background:'#145ac3'}} onClick={printSavedContract}>Visualizar / PDF salvo</button>
- </div><p style={{margin:0,fontSize:12,color:'#42658d'}}>O título, a instituição e os dados jurídicos continuam editáveis abaixo. Após salvar, visualize o PDF.</p></section>}
- <p style={{margin:0,fontSize:12}}>Edite os campos e clique em Salvar rascunho. Documentos arquivados permanecem disponíveis para reativação. O envio direto do documento ainda não está disponível.</p>
+ </div></section>}
+ <p style={{margin:0,fontSize:12}}>Documentos arquivados podem ser reativados. O envio direto ainda não está disponível.</p>
  {savedDrafts.length>0&&<div style={{display:'grid',gap:8,padding:12,background:'#f7fbff',border:'1px solid #b4d1f4',borderRadius:10}}>
  <strong style={{color:'#174987'}}>Minutas salvas ({savedDrafts.length})</strong>
  {savedDrafts.map(d=><div key={d.id} style={{display:'flex',alignItems:'center',justifyContent:'space-between',flexWrap:'wrap',gap:8,padding:9,borderRadius:8,background:d.archived_at?'#edf1f7':'#e5f0ff'}}>
@@ -637,7 +637,7 @@ export default function ClientDetails({id,writesEnabled,proposalWritesEnabled,co
  {status==='pending'&&<div style={{marginTop:10}}>
  {confirmContractId===contractId?<form onSubmit={e=>{e.preventDefault();void confirmContract(contractId)}} style={{display:'grid',gap:10,maxWidth:540}}>
  <label style={formLabel}>Nome de quem confirmou o acordo<input required minLength={3} maxLength={180} style={formInput} value={contractResponsible} onChange={e=>setContractResponsible(e.target.value)} placeholder="Nome do responsável pela confirmação"/></label>
- <p style={{fontSize:12,margin:0}}>A data e a hora serão registradas pelo servidor. Confirme somente após o aceite real do cliente.</p>
+ <p style={{fontSize:12,margin:0}}>Confirme somente após o aceite real do cliente.</p>
  <div style={{display:'flex',gap:8,flexWrap:'wrap'}}><button type="submit" disabled={confirmBusy||contractResponsible.trim().length<3} style={{...actionLink,border:0}}>{confirmBusy?'Confirmando…':'Confirmar contrato'}</button><button type="button" disabled={confirmBusy} onClick={()=>setConfirmContractId(null)} style={{...actionLink,background:'#526e96',border:0}}>Cancelar</button></div></form>:
  <button type="button" onClick={()=>{setConfirmContractId(contractId);setContractResponsible('');setCommercialFeedback('')}} style={{...actionLink,border:0}}>Registrar confirmação</button>}</div>}
  </div>})}
@@ -680,13 +680,13 @@ export default function ClientDetails({id,writesEnabled,proposalWritesEnabled,co
  <p style={{margin:0}}>Total estimado: <strong>{proposalDraft.model?money(Math.max(0,(proposalDraft.model==='per_student'?Number(proposalDraft.attendees)*Number(proposalDraft.unitPrice):proposalDraft.model==='fixed'?Number(proposalDraft.fixedPrice):0)-Number(proposalDraft.discount))):'—'}</strong></p>
 </div>}
  {commercialForm==='contract'&&<>
- <p style={{margin:0,fontSize:12,color:'#365c8d',lineHeight:1.5}}>Contrato opcional. A reserva não depende dele. Confira os dados da proposta e complete apenas as condições realmente acordadas.</p>
+ <p style={{margin:0,fontSize:12,color:'#365c8d',lineHeight:1.5}}>Contrato opcional. Registre apenas as condições acordadas.</p>
  <div style={formLabel}>Proposta aceita
   <div style={{...formInput,background:'#eaf3ff',marginTop:5}}>{String(proposals.find(p=>String(p.id)===contractDraft.proposalId)?.title||'Proposta não selecionada')} · {money(proposals.find(p=>String(p.id)===contractDraft.proposalId)?.total||0)}</div>
   </div>
  <label style={formLabel}>Modalidade<select style={formInput} value={contractDraft.mode} onChange={e=>setContractDraft(v=>({...v,mode:e.target.value}))}><option value="written">Formal por escrito</option><option value="verbal">Acordo verbal</option><option value="whatsapp">WhatsApp</option></select></label>
  <label style={formLabel}>Condições acordadas<textarea required minLength={8} maxLength={8000} rows={4} style={formInput} value={contractDraft.terms} onChange={e=>setContractDraft(v=>({...v,terms:e.target.value}))}/></label>
- <p style={{fontSize:12,margin:0,color:'#496a97'}}>Salvar este cadastro não registra um novo aceite da escola nem cria reserva. O documento escrito pode ser elaborado depois.</p>
+ <p style={{fontSize:12,margin:0,color:'#496a97'}}>Salvar não registra aceite nem cria reserva.</p>
  </>}
  {commercialForm==='contract'&&commercialFeedback&&<p role="alert" style={{color:'#9f1239',fontSize:13}}>{commercialFeedback}</p>}
  <div style={{display:'flex',justifyContent:'flex-end',gap:10}}><button type="button" disabled={commercialBusy} onClick={()=>setCommercialForm(null)} style={{...actionLink,background:'#eaf3ff',color:'#174987'}}>Cancelar</button><button type="submit" disabled={commercialBusy||commercialForm==='contract'&&!proposals.some(p=>isConfirmedForContract(p)&&!contracts.some(c=>String(c.proposal_id)===String(p.id)))} style={actionLink}>{commercialBusy?'Salvando…':'Salvar'}</button></div>
