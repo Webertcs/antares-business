@@ -15,12 +15,8 @@ DECLARE
  v_link oid := to_regprocedure('public.antares_book_and_link_proposal(text,uuid,uuid,uuid,timestamptz,timestamptz)');
  v_book_def text;
  v_manage_def text;
- v_book_pattern text := $pattern$
-   IF[[:space:]]+v_students[[:space:]]+IS[[:space:]]+NOT[[:space:]]+NULL[[:space:]]+AND[[:space:]]+v_students[[:space:]]*>[[:space:]]*0[[:space:]]+AND[[:space:]]+v_capacity[[:space:]]+IS[[:space:]]+NOT[[:space:]]+NULL[[:space:]]+AND[[:space:]]+v_students[[:space:]]*>[[:space:]]*v_capacity[[:space:]]+THEN[[:space:]]+RAISE[[:space:]]+EXCEPTION[[:space:]]+'Capacidade insuficiente';[[:space:]]*END[[:space:]]+IF;
- $pattern$;
- v_manage_pattern text := $pattern$
-   IF[[:space:]]+v_expected[[:space:]]*>[[:space:]]*0[[:space:]]+AND[[:space:]]+v_capacity[[:space:]]+IS[[:space:]]+NOT[[:space:]]+NULL[[:space:]]+AND[[:space:]]+v_expected[[:space:]]*>[[:space:]]*v_capacity[[:space:]]+THEN[[:space:]]+RAISE[[:space:]]+EXCEPTION[[:space:]]+'Capacidade insuficiente';[[:space:]]*END[[:space:]]+IF;
- $pattern$;
+ v_book_pattern text := $pattern$IF[[:space:]]+v_students[[:space:]]+IS[[:space:]]+NOT[[:space:]]+NULL[[:space:]]+AND[[:space:]]+v_students[[:space:]]*>[[:space:]]*0[[:space:]]+AND[[:space:]]+v_capacity[[:space:]]+IS[[:space:]]+NOT[[:space:]]+NULL[[:space:]]+AND[[:space:]]+v_students[[:space:]]*>[[:space:]]*v_capacity[[:space:]]+THEN[[:space:]]+RAISE[[:space:]]+EXCEPTION[[:space:]]+'Capacidade insuficiente';[[:space:]]*END[[:space:]]+IF;$pattern$;
+ v_manage_pattern text := $pattern$IF[[:space:]]+v_expected[[:space:]]*>[[:space:]]*0[[:space:]]+AND[[:space:]]+v_capacity[[:space:]]+IS[[:space:]]+NOT[[:space:]]+NULL[[:space:]]+AND[[:space:]]+v_expected[[:space:]]*>[[:space:]]*v_capacity[[:space:]]+THEN[[:space:]]+RAISE[[:space:]]+EXCEPTION[[:space:]]+'Capacidade insuficiente';[[:space:]]*END[[:space:]]+IF;$pattern$;
  v_count int;
 BEGIN
  IF current_user <> 'neondb_owner' THEN
