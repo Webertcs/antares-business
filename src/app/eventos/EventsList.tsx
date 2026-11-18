@@ -1,8 +1,7 @@
 'use client';
 import {useState} from 'react';
-import Link from 'next/link';
 import {useRouter} from 'next/navigation';
-type EventItem={id:string;title:string;date:string|null;status:string;attendees:number|null;client:string;archived:boolean};
+type EventItem={id:string;title:string;date:string|null;status:string;attendees:number|null;client:string;archived:boolean;startTime:string|null;endTime:string|null;dome:string|null;actualStudents:number|null};
 const statusNames:Record<string,string>={lead:'Oportunidade',quoted:'Orçado',reserved:'Reservado',confirmed:'Confirmado',completed:'Realizado',cancelled:'Cancelado',canceled:'Cancelado'};
 const statusStyles:Record<string,{background:string;color:string;border:string}>={
  lead:{background:'#edf3ff',color:'#24569b',border:'#c9daf8'},
@@ -22,6 +21,7 @@ type Filters={year:string;status:string;view:string;q:string};
 export default function EventsList({events,total,page,pages,years,counts,filters}:{events:EventItem[];total:number;page:number;pages:number;years:number[];counts:{total:number;confirmed:number;opportunities:number};filters:Filters}){
  const router=useRouter();
  const [query,setQuery]=useState(filters.q);
+ const [selected,setSelected]=useState<EventItem|null>(null);
  const filtered=events;
  const navigate=(changes:Partial<Filters>&{page?:number})=>{
   const next={...filters,...changes};
@@ -64,9 +64,25 @@ export default function EventsList({events,total,page,pages,years,counts,filters
       {e.attendees!==null&&<span aria-label={e.attendees+' participantes previstos'}>👥 {e.attendees} participantes</span>}
      </div>
     </div>
-    <div style={{display:'flex',alignItems:'center',justifyContent:'flex-end',gap:8,flexWrap:'wrap',flex:'0 1 auto'}}><Link className="antares-events-open" href={'/eventos/'+e.id} aria-label={'Ver evento '+e.title} style={{display:'inline-flex',alignItems:'center',justifyContent:'center',minHeight:34,padding:'7px 12px',borderRadius:8,background:'#2058cb',color:'#fff',fontSize:12,fontWeight:700,textDecoration:'none',whiteSpace:'nowrap'}}>Ver evento</Link></div>
+    <div style={{display:'flex',alignItems:'center',justifyContent:'flex-end',gap:8,flexWrap:'wrap',flex:'0 1 auto'}}><button type="button" className="antares-events-open" onClick={()=>setSelected(e)} aria-label={'Detalhes do evento '+e.title} style={{display:'inline-flex',alignItems:'center',justifyContent:'center',minHeight:34,padding:'7px 12px',borderRadius:8,background:'#2058cb',color:'#fff',fontSize:12,fontWeight:700,border:0,cursor:'pointer',whiteSpace:'nowrap'}}>Detalhes</button></div>
    </article></div>)}
   </div>}
   {pages>1&&<nav className="antares-events-pagination" aria-label="Paginação dos eventos" style={{display:'flex',justifyContent:'center',alignItems:'center',gap:12,marginTop:14}}><button type="button" className="antares-events-page-button" disabled={page<=1} onClick={()=>navigate({page:page-1})} style={{padding:'8px 12px',borderRadius:8,border:'1px solid #c5d6ee',background:'#eaf3ff',color:'#153d76',opacity:page<=1?.5:1}}>Anterior</button><span style={{fontSize:13,color:'#365e94'}}>{page} / {pages}</span><button type="button" className="antares-events-page-button" disabled={page>=pages} onClick={()=>navigate({page:page+1})} style={{padding:'8px 12px',borderRadius:8,border:'1px solid #c5d6ee',background:'#eaf3ff',color:'#153d76',opacity:page>=pages?.5:1}}>Próxima</button></nav>}
- </section></>;
+ </section>
+ {selected&&<div role="presentation" onMouseDown={e=>{if(e.target===e.currentTarget)setSelected(null)}} style={{position:'fixed',inset:0,zIndex:1100,display:'grid',placeItems:'center',padding:16,background:'rgba(7,24,55,.65)'}}>
+  <section role="dialog" aria-modal="true" aria-labelledby="antares-event-detail-title" onKeyDown={e=>{if(e.key==='Escape')setSelected(null)}} style={{width:'min(100%,570px)',maxHeight:'90vh',overflowY:'auto',background:'#f8fbff',borderRadius:16,boxShadow:'0 22px 65px rgba(0,0,0,.3)',color:'#153d76'}}>
+   <header style={{background:'linear-gradient(110deg,#103875,#2066c2)',color:'#fff',padding:'16px 20px',display:'flex',justifyContent:'space-between',alignItems:'center',gap:12}}>
+    <div><div style={{fontSize:11,letterSpacing:1,fontWeight:700,opacity:.8}}>ANTARES · EVENTOS</div><h2 id="antares-event-detail-title" style={{fontSize:20,fontWeight:750,color:'#fff',margin:0}}>Detalhes da apresentação</h2></div>
+    <button type="button" autoFocus aria-label="Fechar detalhes" onClick={()=>setSelected(null)} style={{border:'1px solid #9bc2fa',borderRadius:8,padding:'7px 11px',background:'#eaf3ff',color:'#174985',cursor:'pointer'}}>✕</button>
+   </header>
+   <div style={{padding:20,display:'grid',gap:14}}>
+    <div><strong style={{fontSize:18,overflowWrap:'anywhere'}}>{selected.title}</strong><div style={{fontSize:13,color:'#52719b',marginTop:3}}>{selected.client}</div><span style={{display:'inline-block',marginTop:8,borderRadius:30,padding:'4px 10px',background:statusStyles[selected.status]?.background||'#e9f0fb',color:statusStyles[selected.status]?.color||'#305781',border:'1px solid '+(statusStyles[selected.status]?.border||'#c9d8eb'),fontSize:12,fontWeight:700}}>{selected.archived?'Arquivado':statusNames[selected.status]||selected.status}</span></div>
+    <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(180px,1fr))',gap:10}}>
+     {([['Data',formatDate(selected.date)],['Horário',selected.startTime?selected.startTime.slice(0,5)+(selected.endTime?' às '+selected.endTime.slice(0,5):''):'A definir'],['Cúpula',selected.dome||'A definir'],['Alunos previstos',selected.attendees==null?'A definir':String(selected.attendees)],...(selected.actualStudents==null?[]:[['Alunos atendidos',String(selected.actualStudents)]])] as string[][]).map(([label,value])=><div key={label} style={{background:'#eaf2ff',border:'1px solid #cadcf7',borderRadius:10,padding:12}}><div style={{fontSize:12,color:'#50709c',marginBottom:4}}>{label}</div><strong style={{fontSize:16,color:'#153d76'}}>{value}</strong></div>)}
+    </div>
+    <button type="button" onClick={()=>setSelected(null)} style={{width:'100%',minHeight:42,border:'1px solid #b7d0f3',borderRadius:9,background:'#e6f0ff',color:'#164b91',fontWeight:700,cursor:'pointer'}}>Fechar</button>
+   </div>
+  </section>
+ </div>}
+</>;
 }
