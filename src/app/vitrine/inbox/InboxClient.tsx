@@ -15,6 +15,13 @@ type Lead={id:string;responsible_name:string;institution:string;city:string;phon
 const label:Record<string,string>={pending:'Novo pedido',reviewing:'Em análise',converted:'Proposta criada',archived:'Arquivado'};
 const isCompleted=(reservation:ServiceReservation|null)=>reservation?.crm_event_status==='completed'||reservation?.status==='completed';
 const isCancelled=(reservation:ServiceReservation|null)=>reservation?.crm_event_status==='cancelled'||reservation?.crm_event_status==='canceled'||reservation?.status==='cancelled'||reservation?.status==='canceled';
+const canOpenClosing=(r:ServiceReservation|null)=>Boolean(r&&!isCancelled(r)&&
+ (isCompleted(r)||(r.crm_event_id&&Number.isFinite(new Date(r.ends_at).getTime())&&new Date(r.ends_at).getTime()<=Date.now())));
+const closingHint=(r:ServiceReservation|null)=>!r?'Disponível após a reserva':
+ isCancelled(r)?'Apresentação cancelada, sem conclusão de alunos':
+ isCompleted(r)?'Consultar encerramento registrado':
+ !r.crm_event_id?'Em Ver reserva, prepare primeiro o vínculo operacional':
+ new Date(r.ends_at).getTime()>Date.now()?'Liberado após o horário de término da apresentação':'Encerrar e registrar o número real de alunos';
 function statusLabel(lead:Lead,reservation:ServiceReservation|null){
  if(isCancelled(reservation))return 'Cancelada · arquivada';
  if(isCompleted(reservation))return 'Concluída · arquivada';
@@ -321,9 +328,9 @@ export default function Inbox({conversionEnabled,bookingWritesEnabled,contractWr
       </button>}
      {lead.status==='converted'&&lead.proposal_status==='accepted'&&
       (reservationFor(lead)&&!isCancelled(reservationFor(lead))?
-       <button type="button" className={(reservationFor(lead)?.crm_event_status==='completed'||reservationFor(lead)?.status==='completed')?styles.actionSecondary:styles.actionPrimary}
-        disabled={Boolean(busy)} onClick={()=>setClosingLeadId(lead.id)}
-        title={(reservationFor(lead)?.crm_event_status==='completed'||reservationFor(lead)?.status==='completed')?'Ver encerramento':'Acompanhar conclusão da apresentação'}>
+       <button type="button" className={isCompleted(reservationFor(lead))?styles.actionSecondary:canOpenClosing(reservationFor(lead))?styles.actionPrimary:styles.actionMuted}
+        disabled={Boolean(busy)||!canOpenClosing(reservationFor(lead))} onClick={()=>setClosingLeadId(lead.id)}
+        title={closingHint(reservationFor(lead))}>
         <CheckCircle2 size={15}/>Conclusão
        </button>:
        <button type="button" disabled className={styles.actionMuted}
