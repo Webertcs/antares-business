@@ -19,9 +19,10 @@ export async function GET(){
  let history:unknown[]=[];
  try{
   const exists=await db`SELECT to_regclass('public.antares_reservation_changes') IS NOT NULL AS ready`;
-  if(exists[0]?.ready)history=await db`SELECT presentation_id,action,reason,old_start,old_end,new_start,new_end,changed_at
-   FROM public.antares_reservation_changes WHERE organization_id=${owner.organizationId}::uuid
-   ORDER BY changed_at DESC LIMIT 200`;
+  if(exists[0]?.ready){
+   const read=getTeamWriteDb();
+   history=await read`SELECT * FROM public.antares_reservation_history(${owner.user.id},${owner.organizationId}::uuid)`;
+  }
  }catch{history=[];}
  return NextResponse.json({proposals,domes,links,history},{headers:{'Cache-Control':'private, no-store'}});
 }
