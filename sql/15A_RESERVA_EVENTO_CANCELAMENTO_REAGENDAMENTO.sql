@@ -15,24 +15,13 @@ BEGIN
  THEN RAISE EXCEPTION 'Pre-requisitos do ANTARES 15A nao instalados'; END IF;
 END $guard$;
 
--- Ponte 1:1 (a mesma reserva NAO pode gerar dois eventos).
-CREATE TABLE IF NOT EXISTS public.antares_presentation_event_links (
- organization_id uuid NOT NULL,
- presentation_id uuid NOT NULL,
- event_id uuid NOT NULL,
- created_at timestamptz NOT NULL DEFAULT now(),
- PRIMARY KEY (organization_id,presentation_id),
- UNIQUE (organization_id,event_id),
- FOREIGN KEY (presentation_id,organization_id) REFERENCES public.presentations(id,organization_id),
- FOREIGN KEY (event_id,organization_id) REFERENCES public.crm_events(id,organization_id)
-);
-CREATE UNIQUE INDEX IF NOT EXISTS antares_presentation_event_one_per_presentation_15a
- ON public.antares_presentation_event_links(organization_id,presentation_id);
-CREATE UNIQUE INDEX IF NOT EXISTS antares_presentation_event_one_per_event_15a
- ON public.antares_presentation_event_links(organization_id,event_id);
-ALTER TABLE public.antares_presentation_event_links ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.antares_presentation_event_links FORCE ROW LEVEL SECURITY;
-REVOKE ALL ON public.antares_presentation_event_links FROM PUBLIC,antares_team_runtime;
+-- Ponte existente (14E) ja possui PK, UNIQUE e FKs verificadas no Neon.
+-- Nao recriar nem modificar sua politica RLS nesta migracao.
+DO $guard$
+BEGIN
+ IF to_regclass('public.antares_presentation_event_links') IS NULL
+ THEN RAISE EXCEPTION 'Ponte 14E ausente'; END IF;
+END $guard$;
 
 -- Diario imutavel de desfechos; nunca altera lancamentos de pagamento.
 CREATE TABLE IF NOT EXISTS public.antares_reservation_changes (
@@ -68,9 +57,7 @@ DECLARE
  v_title text;v_expected integer;v_model text;v_unit numeric;v_fixed numeric;
  v_start timestamptz;v_end timestamptz;v_status text;v_dome uuid;
 BEGIN
- IF (SELECT count(*) FROM public.team_members WHERE auth_subject=p_subject
-      AND active AND role IN ('owner','collaborator'))<>1
-    OR NOT EXISTS(SELECT 1 FROM public.team_members WHERE auth_subject=p_subject
+ IF NOT EXISTS(SELECT 1 FROM public.team_members WHERE auth_subject=p_subject
       AND organization_id=p_org AND active AND role='owner')
  THEN RAISE EXCEPTION 'Proprietario nao autorizado';END IF;
 
@@ -154,9 +141,7 @@ DECLARE
  v_new_equipment uuid;v_capacity integer;v_expected integer;
  v_source_event uuid;v_client uuid;
 BEGIN
- IF (SELECT count(*) FROM public.team_members WHERE auth_subject=p_subject
-      AND active AND role IN ('owner','collaborator'))<>1
-    OR NOT EXISTS(SELECT 1 FROM public.team_members WHERE auth_subject=p_subject
+ IF NOT EXISTS(SELECT 1 FROM public.team_members WHERE auth_subject=p_subject
       AND organization_id=p_org AND active AND role='owner')
  THEN RAISE EXCEPTION 'Proprietario nao autorizado';END IF;
  IF p_action NOT IN ('cancel','edit') OR length(btrim(coalesce(p_reason,''))) NOT BETWEEN 5 AND 500
@@ -199,7 +184,7 @@ BEGIN
   UPDATE public.presentations SET status='cancelled'
     WHERE id=p_presentation AND organization_id=p_org;
   IF v_event IS NOT NULL THEN
-   UPDATE public.crm_events SET status='cancelled',archived_at=now()
+   UPDATE public.crm_events SET status='cancelled',archived_at=now(),cancellation_reason=btrim(p_reason)
     WHERE id=v_event AND organization_id=p_org;
   END IF;
   INSERT INTO public.antares_reservation_changes
