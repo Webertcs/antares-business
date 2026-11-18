@@ -10,8 +10,13 @@ export type ServiceReservation={
  status:string;dome_id:string|null;dome_name:string|null;
  crm_event_id:string|null;crm_event_status:string|null
 };
+export type ServiceReservationChange={
+ presentation_id:string;action:'cancelled'|'rescheduled';reason:string;changed_at:string;
+ old_start:string;old_end:string;new_start:string|null;new_end:string|null
+};
 export type ServiceBookingData={
- proposals:ServiceProposal[];domes:ServiceDome[];links:ServiceReservation[]
+ proposals:ServiceProposal[];domes:ServiceDome[];links:ServiceReservation[];
+ history?:ServiceReservationChange[]
 };
 
 const fmt=(value:string)=>new Intl.DateTimeFormat('pt-BR',{
@@ -80,6 +85,7 @@ export default function ServiceBooking({
  const reservation=data?.links.find(r=>r.proposal_id===proposalId);
  const reservationCancelled=reservation?.status==='cancelled'||reservation?.crm_event_status==='cancelled';
  const reservationClosed=reservation?.status==='completed'||reservation?.crm_event_status==='completed';
+ const history=(data?.history||[]).filter(entry=>entry.presentation_id===reservation?.presentation_id);
  const canManage=enabled&&!busy&&Boolean(reservation)&&!reservationCancelled&&!reservationClosed;
  const domes=data?.domes.filter(d=>d.mapped)||[];
  const selectedDome=domes.find(d=>d.id===domeId);
@@ -236,6 +242,16 @@ export default function ServiceBooking({
       </div>}
      </div>}
    </div>}
+   {!loading&&reservation&&history.length>0&&<details style={{padding:12,border:'1px solid #c1d7f0',borderRadius:10,background:'#fff'}}>
+    <summary style={{fontWeight:750,cursor:'pointer'}}>Histórico da reserva ({history.length})</summary>
+    <ol style={{paddingLeft:20,fontSize:12,display:'grid',gap:10}}>
+     {history.map((entry,i)=><li key={entry.changed_at+':'+i}>
+      <strong>{entry.action==='cancelled'?'Cancelamento':'Reagendamento'} · {fmt(entry.changed_at)}</strong>
+      <p style={{margin:'5px 0'}}>Motivo: {entry.reason}</p>
+      {entry.action==='rescheduled'&&entry.new_start&&<p style={{margin:0}}>De {fmt(entry.old_start)} para {fmt(entry.new_start)}</p>}
+     </li>)}
+    </ol>
+   </details>}
    {!loading&&!reservation&&!proposal&&<p role="alert">Proposta não habilitada para reserva. Verifique o aceite e a situação da instituição.</p>}
    {!loading&&!reservation&&proposal&&!proposal.mapped&&<div style={{padding:14,border:'1px solid #efd3a3',background:'#fff7e8',borderRadius:10}}>
     <p style={{margin:'0 0 10px'}}>Antes da reserva, esta instituição precisa ser vinculada à operação.</p>
