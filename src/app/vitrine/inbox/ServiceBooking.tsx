@@ -79,8 +79,7 @@ export default function ServiceBooking({
  const canManage=enabled&&!busy&&Boolean(reservation)&&!reservationCancelled&&!reservationClosed;
  const domes=data?.domes.filter(d=>d.mapped)||[];
  const selectedDome=domes.find(d=>d.id===domeId);
- const estimatedSessions=selectedDome?.capacity&&Number(selectedDome.capacity)>0&&proposal?.expected_attendees&&Number(proposal.expected_attendees)>0
-  ?Math.ceil(Number(proposal.expected_attendees)/Number(selectedDome.capacity)):null;
+
  const startDate=normal(start),endDate=normal(end);
  const validDates=Boolean(startDate&&endDate&&endDate.getTime()>startDate.getTime()&&startDate.getTime()>Date.now());
  const conflicting=Boolean(validDates&&domeId&&data?.links.some(r=>
@@ -228,21 +227,22 @@ export default function ServiceBooking({
      <select required disabled={!enabled||busy} value={domeId} onChange={e=>setDomeId(e.target.value)}
       style={{...field,marginTop:5}}>
       <option value="">Selecionar cúpula</option>
-      {domes.map(d=><option key={d.id} value={d.id}>{d.name}{d.capacity?' · até '+d.capacity+' por sessão':''}</option>)}
+      {domes.map(d=><option key={d.id} value={d.id}>{d.name}</option>)}
      </select>
     </label>
-    {selectedDome&&estimatedSessions&&<p style={{margin:'0',fontSize:12,color:'#33577f'}}>
-     Público total: <strong>{proposal.expected_attendees}</strong> alunos. Cúpula: <strong>até {selectedDome.capacity} por sessão</strong>. Estimativa: <strong>{estimatedSessions} sessões</strong> com lotação completa. Esta é apenas uma estimativa: a programação das sessões ainda precisa ser definida.
+    {proposal.expected_attendees!=null&&<p style={{margin:0,fontSize:13,color:'#33577f'}}>
+     Público previsto para o evento: <strong>{proposal.expected_attendees} alunos</strong>.
+     A quantidade realmente atendida será registrada ao concluir o evento.
     </p>}
     {domes.length===0&&<p role="status" style={{color:'#92400e',fontSize:12}}>
      Nenhuma cúpula ativa vinculada à operação. Confira o cadastro de cúpulas.
     </p>}
     <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(195px,1fr))',gap:12}}>
-     <label style={{fontSize:13,fontWeight:750}}>Início do período reservado
+     <label style={{fontSize:13,fontWeight:750}}>Início do evento
       <input type="datetime-local" required disabled={!enabled||busy}
        value={start} onChange={e=>setStart(e.target.value)} style={{...field,marginTop:5}}/>
      </label>
-     <label style={{fontSize:13,fontWeight:750}}>Fim do período reservado
+     <label style={{fontSize:13,fontWeight:750}}>Término do evento
       <input type="datetime-local" required disabled={!enabled||busy}
        value={end} onChange={e=>setEnd(e.target.value)} style={{...field,marginTop:5}}/>
      </label>
