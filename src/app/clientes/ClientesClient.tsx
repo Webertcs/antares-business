@@ -204,7 +204,7 @@ export default function ClientsPage({ writesEnabled }: { writesEnabled: boolean 
    {selectedContacts.length===0?<p>Sem contatos cadastrados.</p>:
     <ul>{selectedContacts.map(c=><li key={c.id}>{c.full_name}{c.position?' · '+c.position:''}
      {c.is_primary?' · Principal':''} · {c.phone||c.email||'Sem contato'}</li>)}</ul>}
-   <h3 style={{fontSize:18,marginTop:20}}>Apresentações e oportunidades ({selectedEvents.length}) {writesEnabled&&<button onClick={()=>openForm('event')}>+ Evento</button>}</h3>
+   <h3 style={{fontSize:18,marginTop:20}}>Apresentações e oportunidades ({selectedEvents.length})</h3>
    {selectedEvents.length===0?<p>Sem eventos registrados.</p>:
     <ul>{selectedEvents.map(e=><li key={e.id} style={linkedEventId===e.id?{border:'2px solid #2563eb',borderRadius:10,background:'#dbeafe',boxShadow:'0 0 0 4px rgba(37,99,235,.13), 0 4px 16px rgba(37,99,235,.16)',padding:'12px 14px',color:'#123c7a',fontWeight:700}:undefined}>{linkedEventId===e.id&&<span style={{display:'block',fontSize:12,color:'#1d4ed8',marginBottom:5}}>🚀 Evento localizado pela Agenda</span>}{e.title} · {formatDateBR(e.event_date)} · {eventStatuses[e.status]||e.status}
     {e.expected_attendees!=null?' · '+e.expected_attendees+' participantes':''}</li>)}</ul>}
