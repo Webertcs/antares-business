@@ -1,5 +1,5 @@
 import {NextResponse} from 'next/server';
-import {requireMember,getDb} from '@/lib/equipe/auth';
+import {requireMember,requireOwner,getDb} from '@/lib/equipe/auth';
 export const runtime='nodejs';
 export const dynamic='force-dynamic';
 export async function GET(){
@@ -38,10 +38,22 @@ export async function GET(){
 }
 
 export async function PATCH(request:Request){
+ const ctx=await requireOwner();
+ if(!ctx)return NextResponse.json({error:'Somente proprietário.'},{status:403});
+ let allowed='';
+ try{allowed=new URL(process.env.ANTARES_APP_ORIGIN||'').origin;}catch{
+  return NextResponse.json({error:'Origem não configurada.'},{status:503});
+ }
+ if(request.headers.get('origin')!==allowed)return NextResponse.json({error:'Origem não autorizada.'},{status:403});
+ if(request.headers.get('content-type')?.split(';')[0]?.trim().toLowerCase()!=='application/json')
+  return NextResponse.json({error:'Formato inválido.'},{status:415});
+ if(Number(request.headers.get('content-length')||0)>2500)
+  return NextResponse.json({error:'Requisição excessiva.'},{status:413});
  try{
-  const ctx=await requireMember();
-  if(!ctx)return NextResponse.json({error:'Acesso não autorizado.'},{status:403});
-  const body=await request.json();
+  const raw=await request.text();
+  if(raw.length>2500)return NextResponse.json({error:'Requisição excessiva.'},{status:413});
+  const body=JSON.parse(raw) as Record<string,unknown>;
+  if(!body||typeof body!=='object'||Array.isArray(body))return NextResponse.json({error:'Dados inválidos.'},{status:400});
   const id=String(body.id||'');
   const uuid=/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
   if(!uuid.test(id))return NextResponse.json({error:'Evento inválido.'},{status:400});
