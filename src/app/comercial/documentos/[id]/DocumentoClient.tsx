@@ -74,7 +74,7 @@ export default function DocumentoClient({doc}:{doc:D}){
  <div style={{borderTop:'1px solid #263c62',paddingTop:10,textAlign:'center'}}>Representante do planetário</div>
  </section>
  <footer style={{borderTop:'1px solid #d3deec',marginTop:46,paddingTop:12,fontSize:11,color:'#60708c'}}>
- Gerado em {today}. Documento para conferência. Situação da proposta no CRM: {statusLabel[doc.status]||doc.status}.
+ Gerado em {today}. Documento para conferência. Situação da proposta: {statusLabel[doc.status]||doc.status}.
  </footer>
  </article>
  </main>;
