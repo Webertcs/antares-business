@@ -1,5 +1,6 @@
 'use client';
-import {useEffect,useState} from 'react';
+import {useActionState,useEffect,useRef,useState} from 'react';
+import {alterarMinhaSenha} from './alterar-senha';
 import {signOutAction} from './actions';
 import {Camera,UserRound,LogOut} from 'lucide-react';
 type Props={email:string;name:string;role:string;profileKey:string};
@@ -8,6 +9,9 @@ export default function ProfileClient({email,name,role,profileKey}:Props){
  const [alias,setAlias]=useState(name);
  const [photo,setPhoto]=useState('');
  const [message,setMessage]=useState('');
+ const [passwordState,passwordAction,passwordPending]=useActionState(alterarMinhaSenha,null);
+ const passwordForm=useRef<HTMLFormElement>(null);
+ useEffect(()=>{if(passwordState?.ok)passwordForm.current?.reset()},[passwordState?.ok]);
  useEffect(()=>{let live=true;fetch('/api/perfil',{cache:'no-store'}).then(r=>r.json()).then(v=>{if(!live)return;if(v.profile){setAlias(v.profile.display_name||name);setPhoto(v.profile.photo_data||'');return}try{const raw=localStorage.getItem(storageKey);if(raw){const d=JSON.parse(raw);if(typeof d.alias==='string')setAlias(d.alias);if(typeof d.photo==='string')setPhoto(d.photo)}}catch{}}).catch(()=>{});return()=>{live=false}},[storageKey,name]);
  async function save(){if(!alias.trim()||alias.length>120){setMessage('Informe um nome de até 120 caracteres.');return}try{localStorage.setItem(storageKey,JSON.stringify({alias:alias.trim(),photo}));window.dispatchEvent(new CustomEvent('antares:profile-updated',{detail:{profileKey,alias:alias.trim(),photo}}));const response=await fetch('/api/perfil',{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({alias:alias.trim(),photo})});const result=await response.json();setMessage(response.ok?'Perfil sincronizado para toda a equipe.':(result.error||'Salvo apenas neste navegador; sincronização pendente.'));}catch{setMessage('Não foi possível salvar neste navegador. Tente uma foto menor.');}}
  async function handleFile(file?:File){if(!file)return; if(!['image/jpeg','image/png','image/webp'].includes(file.type)){setMessage('Use JPEG, PNG ou WebP.');return}if(file.size>2*1024*1024){setMessage('Escolha uma imagem de até 2 MB.');return}
@@ -19,5 +23,14 @@ export default function ProfileClient({email,name,role,profileKey}:Props){
  ctx.drawImage(bitmap,x,y,crop,crop,0,0,160,160);bitmap.close();
  setPhoto(canvas.toDataURL('image/webp',.8));setMessage('Foto preparada. Clique em Salvar preferências para guardar neste navegador.');
  }catch{setMessage('Não foi possível processar a imagem.')}}
- return <main className="profile-page"><section className="profile-panel"><header className="profile-header"><p className="profile-eyebrow">MINHA CONTA</p><h1>Meu perfil</h1></header><div className="profile-form-layout"><div className="profile-photo-area">{photo?<img alt="Sua foto de perfil" src={photo}/>:<span aria-hidden="true"><UserRound size={55}/></span>}<label className="profile-photo-button"><Camera size={16}/> Escolher foto<input type="file" accept="image/jpeg,image/png,image/webp" onChange={e=>void handleFile(e.target.files?.[0])}/></label></div><div className="profile-fields"><label>Nome de exibição<input value={alias} onChange={e=>setAlias(e.target.value)} maxLength={120}/></label><label>E-mail da conta<input value={email} disabled readOnly/></label><label>Tipo de acesso<input value={role==='developer'?'Administrador técnico':role==='owner'?'Proprietário':'Colaborador'} disabled readOnly/></label><button type="button" className="primary-button" onClick={save}>Salvar preferências visuais</button>{message&&<p role="status" className="profile-feedback">{message}</p>}<form action={signOutAction} style={{marginTop:20,paddingTop:16,borderTop:'1px solid #cbdcf2'}}><button type="submit" style={{display:'inline-flex',alignItems:'center',gap:8,padding:'11px 16px',border:'1px solid #93bdf2',borderRadius:10,background:'#e0efff',color:'#154e99',fontWeight:700,cursor:'pointer'}}><LogOut size={17}/> Sair da conta</button></form></div></div></section></main>;
+ return <main className="profile-page"><section className="profile-panel"><header className="profile-header"><p className="profile-eyebrow">MINHA CONTA</p><h1>Meu perfil</h1></header><div className="profile-form-layout"><div className="profile-photo-area">{photo?<img alt="Sua foto de perfil" src={photo}/>:<span aria-hidden="true"><UserRound size={55}/></span>}<label className="profile-photo-button"><Camera size={16}/> Escolher foto<input type="file" accept="image/jpeg,image/png,image/webp" onChange={e=>void handleFile(e.target.files?.[0])}/></label></div><div className="profile-fields"><label>Nome de exibição<input value={alias} onChange={e=>setAlias(e.target.value)} maxLength={120}/></label><label>E-mail da conta<input value={email} disabled readOnly/></label><label>Tipo de acesso<input value={role==='developer'?'Administrador técnico':role==='owner'?'Proprietário':'Colaborador'} disabled readOnly/></label><button type="button" className="primary-button" onClick={save}>Salvar preferências visuais</button>{message&&<p role="status" className="profile-feedback">{message}</p>}<section style={{marginTop:20,paddingTop:16,borderTop:'1px solid #cbdcf2'}}>
+ <h2 style={{fontSize:17,fontWeight:750,marginBottom:10}}>Alterar senha</h2>
+ <form ref={passwordForm} action={passwordAction} style={{display:'grid',gap:12}}>
+  <label>Senha atual<input type="password" name="currentPassword" autoComplete="current-password" required minLength={1} maxLength={128}/></label>
+  <label>Nova senha (mínimo de 8 caracteres)<input type="password" name="newPassword" autoComplete="new-password" required minLength={8} maxLength={128}/></label>
+  <label>Confirmar nova senha<input type="password" name="confirmPassword" autoComplete="new-password" required minLength={8} maxLength={128}/></label>
+  <button type="submit" className="primary-button" disabled={passwordPending}>{passwordPending?'Alterando senha…':'Salvar nova senha'}</button>
+  {passwordState?.ok && <p role="status" style={{color:'#166534'}}>Senha alterada com sucesso. As outras sessões foram encerradas.</p>}
+  {passwordState?.error && <p role="alert" style={{color:'#9f1239'}}>{passwordState.error}</p>}
+ </form></section><form action={signOutAction} style={{marginTop:20,paddingTop:16,borderTop:'1px solid #cbdcf2'}}><button type="submit" style={{display:'inline-flex',alignItems:'center',gap:8,padding:'11px 16px',border:'1px solid #93bdf2',borderRadius:10,background:'#e0efff',color:'#154e99',fontWeight:700,cursor:'pointer'}}><LogOut size={17}/> Sair da conta</button></form></div></div></section></main>;
 }
