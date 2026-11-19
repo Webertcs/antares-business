@@ -10,8 +10,14 @@ export async function GET(){
 }
 export async function PUT(req:Request){
  const ctx=await requireMember();if(!ctx)return reply({error:'Nao autorizado'},403);
+ let allowed='';
+ try{allowed=new URL(process.env.ANTARES_APP_ORIGIN||'').origin;}catch{return reply({error:'Origem não configurada.'},503);}
+ if(req.headers.get('origin')!==allowed)return reply({error:'Origem não autorizada.'},403);
+ if(req.headers.get('content-type')?.split(';')[0]?.trim().toLowerCase()!=='application/json')return reply({error:'Formato inválido.'},415);
+ if(Number(req.headers.get('content-length')||0)>220000)return reply({error:'Arquivo excessivo.'},413);
  try{
-  const body=await req.json();const name=body?.alias,photo=body?.photo;
+  const raw=await req.text();if(raw.length>220000)return reply({error:'Arquivo excessivo.'},413);
+  const body=JSON.parse(raw);const name=body?.alias,photo=body?.photo;
   if(typeof name!=='string'||!name.trim()||name.trim().length>120||typeof photo!=='string'||photo.length>180000||(photo!==''&&!/^data:image\/webp;base64,[A-Za-z0-9+/=]+$/.test(photo)))return reply({error:'Nome ou foto invalidos'},400);
   const db=getTeamWriteDb();
   const safe=await db`SELECT p.prosecdef AND pg_get_userbyid(p.proowner)='neondb_owner' AND has_function_privilege(current_user,p.oid,'EXECUTE') AND NOT EXISTS(SELECT 1 FROM aclexplode(coalesce(p.proacl,acldefault('f',p.proowner))) x WHERE x.grantee=0 AND x.privilege_type='EXECUTE') AS safe FROM pg_proc p WHERE p.oid=to_regprocedure('public.antares_save_member_profile(text,uuid,uuid,text,text)')`;
