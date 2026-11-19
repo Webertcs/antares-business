@@ -1,7 +1,7 @@
 name: ANTARES - segurança e build
 on:
   push:
-    branches: [main, feature/bloco-02d-seguranca]
+    branches: [main, feature/bloco-02d-seguranca, feature/entrega-proprietario-20261119]
   pull_request:
     branches: [main]
 permissions:
