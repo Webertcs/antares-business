@@ -93,7 +93,7 @@ export default function ServiceContract({
    if(!refresh.ok||!Array.isArray(updated.contracts)||!Array.isArray(updated.proposals))
     throw Error('Contrato gravado. Atualize a Central para consultar o documento.');
    setData(updated as CentralContractData);
-   setNotice('Contrato cadastrado. A confirmação da escola é registrada separadamente.');
+   setNotice('Contrato cadastrado.');
    if(mode==='written')setEditingDocument(true);
    onSaved();
   }catch(e){setError(e instanceof Error?e.message:'Não foi possível registrar o contrato.');}
@@ -167,7 +167,7 @@ export default function ServiceContract({
      </button>
     </div>
    </form>}
-   {!loading&&!contract&&(!proposal||!accepted)&&<p role="alert">Registre primeiro o aceite verdadeiro da proposta.</p>}
+   {!loading&&!contract&&(!proposal||!accepted)&&<p role="alert">Confirme o aceite da instituição antes de cadastrar o contrato.</p>}
    {(!proposal||contract)&&<button type="button" disabled={busy} onClick={onClose} style={secondary}>Fechar</button>}
    </>}
   </div>
