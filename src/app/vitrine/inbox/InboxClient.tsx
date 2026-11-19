@@ -1,7 +1,7 @@
 'use client';
 import {useCallback,useEffect,useMemo,useState} from 'react';
 import Link from 'next/link';
-import {Archive,ArrowLeft,Building2,CalendarDays,CheckCircle2,ChevronDown,Clock3,FileText,Layers,MapPin,MessageCircle,Phone,RefreshCw,UserRound,Users,Wallet} from 'lucide-react';
+import {Archive,Building2,CalendarDays,CheckCircle2,ChevronDown,Clock3,FileText,Layers,MapPin,MessageCircle,Phone,RefreshCw,UserRound,Users,Wallet} from 'lucide-react';
 import styles from './inbox.module.css';
 import ProposalComposer from './ProposalComposer';
 import ClientAcceptance from './ClientAcceptance';
@@ -190,9 +190,6 @@ export default function Inbox({conversionEnabled,bookingWritesEnabled,contractWr
   finally{setBusy('');}
  }
  return <main className={styles.page}>
-  <nav aria-label="Navegação" className={styles.breadcrumb}>
-   <ArrowLeft size={14}/><Link href="/clientes">Clientes e eventos</Link><span aria-hidden="true">›</span><span>Central de Atendimento</span>
-  </nav>
   <header className={styles.hero}>
    <div className={styles.heroTitle}>
     <span className={styles.heroIcon}><FileText size={26} aria-hidden="true"/></span>
