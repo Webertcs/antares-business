@@ -36,7 +36,6 @@ thead{display:table-header-group}th{text-align:left;background:#dfeeff;color:#16
 th,td{padding:8px 9px;border-bottom:1px solid #d7e4f5;vertical-align:middle}
 tbody tr:nth-child(even){background:#edf5ff}tbody tr:nth-child(odd){background:#fafcff}
 tr{break-inside:avoid;page-break-inside:avoid}td strong{color:#174887}
-footer{margin-top:20px;border-top:1px solid #b7d0f2;padding-top:10px;font-size:9px;color:#55759c;text-align:center}
 .actions{max-width:880px;margin:16px auto;display:flex;align-items:center;gap:10px;justify-content:space-between;padding:0 8px}
 .actions span{font-size:12px;color:#1a477f}.actions a{background:linear-gradient(110deg,#286fd1,#0e468e);color:#fff;border:1px solid #1956a5;border-radius:9px;padding:11px 17px;font-weight:800;text-decoration:none;box-shadow:0 3px 10px #144b9333}
 @media(max-width:600px){.sheet{padding:12px}.header{flex-wrap:wrap}.issue{margin-left:auto}.logo-tile{flex-basis:120px}.stat strong{font-size:18px}th,td{padding:6px 4px}}
@@ -47,5 +46,5 @@ footer{margin-top:20px;border-top:1px solid #b7d0f2;padding-top:10px;font-size:9
  <div className="stats"><div className="stat">Alunos atendidos<strong>{fmt(total)}</strong></div><div className="stat">Eventos contabilizados<strong>{fmt(filtered.length)}</strong></div><div className="stat">Instituições atendidas<strong>{fmt(new Set(filtered.map(r=>String(r.client_id))).size)}</strong></div></div>
  <h2>Resumo por instituição</h2><table><thead><tr><th>Instituição</th><th>Eventos</th><th>Alunos atendidos</th></tr></thead><tbody>{summary.map(r=><tr key={r.id}><td>{r.name}</td><td>{fmt(r.events)}</td><td><strong>{fmt(r.students)}</strong></td></tr>)}{!summary.length&&<tr><td colSpan={3}>Nenhum atendimento registrado.</td></tr>}</tbody></table>
  <h2>Histórico por evento</h2><table><thead><tr><th>Data</th><th>Instituição</th><th>Evento</th><th>Previstos</th><th>Atendidos</th></tr></thead><tbody>{filtered.map(r=><tr key={String(r.id)}><td>{date(r.event_date)}</td><td>{String(r.client_name)}</td><td>{String(r.title)}</td><td>{r.expected_attendees==null?'—':fmt(Number(r.expected_attendees))}</td><td><strong>{fmt(Number(r.actual_students||0))}</strong></td></tr>)}{!filtered.length&&<tr><td colSpan={5}>Nenhum atendimento registrado.</td></tr>}</tbody></table>
- <footer>ANTARES · Relatório de público. Somente atendimentos efetivamente registrados são contabilizados.</footer></main></>;
+ </main></>;
 }
