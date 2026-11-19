@@ -3,7 +3,7 @@ import {useEffect,useRef} from 'react';
 
 type ConsultedEvent={
  id:string;title:string;event_date:string|null;status:string;expected_attendees:number|null;
- start_time?:string|null;end_time?:string|null;venue?:string|null;notes?:string|null;archived_at?:string|null;
+ start_time?:string|null;end_time?:string|null;dome_name?:string|null;venue?:string|null;notes?:string|null;archived_at?:string|null;
 };
 type AttendanceSummary={id:string;actual_students:number};
 const statusNames:Record<string,string>={
@@ -54,6 +54,7 @@ export default function EventReadOnlyDialog({event,attendance,onClose}:{
      {([
       ['Data',dateLabel(event.event_date)],
       ['Horário',hours],
+      ['Cúpula',event.dome_name||'Não informada'],
       ['Alunos previstos',predicted==null?'Não informado':predicted.toLocaleString('pt-BR')],
       ['Alunos atendidos',actual==null?'Ainda não registrados':actual.toLocaleString('pt-BR')]
      ] as const).map(([label,value])=><div key={label} style={informationCard}><div style={{fontSize:12,color:'#55749b',marginBottom:4}}>{label}</div><strong style={{fontSize:15}}>{value}</strong></div>)}
