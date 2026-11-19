@@ -6,11 +6,19 @@ export async function POST(request:Request){
  if(!owner)return NextResponse.json({error:'Acesso exclusivo do proprietário.'},{status:403});
  const origin=request.headers.get('origin'),host=request.headers.get('host');
  if(!origin||!host||new URL(origin).host!==host)return NextResponse.json({error:'Origem inválida.'},{status:403});
+ if(request.headers.get('content-type')?.split(';')[0]?.trim().toLowerCase()!=='application/json')
+  return NextResponse.json({error:'Formato inválido.'},{status:415});
+ if(Number(request.headers.get('content-length')||0)>1200)
+  return NextResponse.json({error:'Requisição excessiva.'},{status:413});
  if(process.env.ANTARES_FINANCE_WRITES_ENABLED!=='true')return NextResponse.json({error:'Gravação bloqueada.'},{status:503});
  const secret=process.env.ANTARES_FINANCE_CAPABILITY;
  if(!secret||!/^[a-f0-9]{64}$/i.test(secret))return NextResponse.json({error:'Não é possível realizar o estorno neste momento.'},{status:503});
  let body;
- try{body=await request.json();}catch{return NextResponse.json({error:'Dados inválidos.'},{status:400});}
+ try{
+  const raw=await request.text();
+  if(raw.length>1200)return NextResponse.json({error:'Requisição excessiva.'},{status:413});
+  body=JSON.parse(raw);
+ }catch{return NextResponse.json({error:'Dados inválidos.'},{status:400});}
  if(typeof body.original_id!=='string'||!/^[a-f0-9-]{36}$/i.test(body.original_id)
    ||typeof body.reason!=='string'||body.reason.trim().length<8||body.reason.length>400)
  return NextResponse.json({error:'Informe lançamento e justificativa de pelo menos 8 caracteres.'},{status:400});
