@@ -39,6 +39,25 @@ Validar:
 
 **Atenção:** executar SELECT com usuário administrador NÃO prova que um usuário restrito não consegue ler dados de outra organização. Esse teste exige identidade/credencial de teste e tentativa de acesso negativa em **branch Neon de homologação**, sem alterar produção.
 
+## 3A. Evidências de produção informadas pelo operador (19/11/2026)
+
+**Consulta 1 — roles (SELECT somente leitura):**
+- `antares_team_runtime`: LOGIN=true, SUPERUSER=false, BYPASSRLS=false — conforme esperado;
+- `neondb_owner`: LOGIN=true, SUPERUSER=false, BYPASSRLS=true — privilegiado, não usar como conexão operacional comum.
+
+**Consulta 2 — grants e RLS em seis tabelas:**
+`business_proposals`, `crm_clients`, `ledger_entries`, `presentations`, `team_members`, `vitrine_leads`: RLS=true e `antares_team_runtime` sem SELECT/INSERT/UPDATE/DELETE direto. **Amostra aprovada; não extrapolar para outras tabelas.**
+
+**Consulta 3 — funções PostgreSQL:** o relatório `SELECT` listou quatro funções com `PUBLIC EXECUTE` efetivo:
+- `antares_guard_audit` — SECURITY DEFINER=false;
+- `antares_guard_ledger` — SECURITY DEFINER=false;
+- `antares_guard_linked_event_changes` — SECURITY DEFINER=true;
+- `antares_sync_presentation_event` — SECURITY DEFINER=true.
+
+Todas pertencem a `neondb_owner`. A presença de `PUBLIC EXECUTE` por si só **não demonstra exploração**: funções de trigger podem não ser diretamente executáveis por chamadas SQL normais. **Próxima consulta somente leitura:** verificar `pg_get_function_result`, `pg_get_function_identity_arguments` e `proconfig` nessas quatro funções; depois revisar seus corpos e acionadores, sem revogar grants ou alterar triggers em produção.
+
+**Status:** diagnóstico parcial; pendente verificar permissões efetivas por outras roles e isolamento A/B no banco.
+
 ## 4. Testes automáticos
 
 `npm run test:seguranca` verifica invariantes textuais essenciais de sessão, autorização técnica, aceite, recebimento público e financeiro. Esses testes não substituem ensaio de invasão, autorização real nem validação de RLS. O CI também executa build e auditoria de dependências.
