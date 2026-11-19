@@ -4,7 +4,7 @@ import Link from 'next/link';
 import EventReadOnlyDialog from './EventReadOnlyDialog';
 type Client={id:string;kind:string;name:string;email:string|null;phone:string|null;phone_secondary:string|null;city:string|null;status:string;notes:string|null};
 type Contact={id:string;client_id:string;full_name:string;position:string|null;phone:string|null;email:string|null;is_primary:boolean};
-type Event={id:string;client_id:string;title:string;event_date:string|null;status:string;expected_attendees:number|null;start_time?:string|null;end_time?:string|null;venue?:string|null;notes?:string|null;archived_at?:string|null};
+type Event={id:string;client_id:string;title:string;event_date:string|null;status:string;expected_attendees:number|null;start_time?:string|null;end_time?:string|null;dome_name?:string|null;venue?:string|null;notes?:string|null;archived_at?:string|null};
 type Attendance={id:string;title:string;event_date:string|null;expected_attendees:number|null;actual_students:number};
 type Group={id:string;client_id:string;label:string;grade_level:string;student_count:number;teacher_name:string;teacher_contact:string};
 const kinds:Record<string,string>={school:'Escola',company:'Empresa',association:'Associação',private:'Particular',other:'Cliente'};
