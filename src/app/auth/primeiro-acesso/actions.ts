@@ -7,7 +7,7 @@ export async function criarConta(_previous: State, form: FormData): Promise<Stat
  const password=String(form.get('password')||'');
  const confirm=String(form.get('confirm')||'');
  if(name.length<2||name.length>120||!/^\S+@\S+\.\S+$/.test(email))return {error:'Confira o nome e o e-mail.'};
- if(password.length<12||password.length>128)return {error:'A senha precisa ter de 12 a 128 caracteres.'};
+ if(password.length<8||password.length>128)return {error:'A senha precisa ter de 8 a 128 caracteres.'};
  if(password!==confirm)return {error:'As senhas não coincidem.'};
  try {
   const {error}=await auth.signUp.email({name,email,password});
