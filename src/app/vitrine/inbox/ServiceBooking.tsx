@@ -204,9 +204,9 @@ export default function ServiceBooking({
        </div>
       </div>}
       {!reservation.crm_event_id&&!action&&<div style={{padding:12,border:'1px solid #e7ce96',background:'#fff8e9',borderRadius:9,display:'grid',gap:8}}>
-       <strong style={{fontSize:13}}>Ajuste necessário nesta reserva antiga</strong>
-       <p style={{fontSize:12,margin:0}}>Esta reserva foi criada antes da integração automática. Regularize-a uma única vez para permitir a conclusão.</p>
-       <button type="button" style={primary} disabled={busy} onClick={()=>void linkOperationalEvent()}>{busy?'Regularizando...':'Regularizar reserva antiga'}</button>
+       <strong style={{fontSize:13}}>Vincular reserva à apresentação</strong>
+       <p style={{fontSize:12,margin:0}}>Esta reserva precisa ser vinculada à apresentação para permitir o encerramento.</p>
+       <button type="button" style={primary} disabled={busy} onClick={()=>void linkOperationalEvent()}>{busy?'Vinculando...':'Vincular apresentação'}</button>
       </div>}
      </div>}
    </div>}
