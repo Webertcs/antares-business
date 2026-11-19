@@ -40,6 +40,13 @@ const worlds=[
  {id:'netuno',name:'Netuno',icon:'🔷',fact:'Netuno é o planeta mais distante do Sol e possui ventos extremamente rápidos.',duration:88}
 ] as const;
 type World=typeof worlds[number];
+type Speaker='Astro'|'Lunna'|'PIXEL';
+// Cada astro tem uma narração gravada e um apresentador fixo.
+const planetPresenters:Record<World['id'],Speaker>={
+ sol:'Astro',terra:'Astro',saturno:'Astro',
+ mercurio:'Lunna',marte:'Lunna',urano:'Lunna',
+ venus:'PIXEL',jupiter:'PIXEL',netuno:'PIXEL'
+};
 const journeys={
  '6–7 anos':[['☀️','Olá, Sistema Solar!','Sol, Terra, Lua e os primeiros passos pelo espaço.'],['🌟','Histórias no céu','Estrelas, formas e constelações.']],
  '8–9 anos':[['🚀','Exploradores espaciais','Foguetes, astronautas e os planetas vizinhos.'],['🪐','Mundos gigantes','Saturno, Júpiter e suas luas curiosas.']],
@@ -117,11 +124,10 @@ export default function PremiumVitrine(){
  const [paused,setPaused]=useState(false);
  const [mute,setMute]=useState(true);
  const [age,setAge]=useState<Age>('6–7 anos');
- const [voiceAvailable,setVoiceAvailable]=useState(false);
+ const voiceAvailable=true;
  const [mascot,setMascot]=useState<'Astro'|'Lunna'|'PIXEL'>('Astro');
  const [showSpeech,setShowSpeech]=useState(false);
  const [speechMode,setSpeechMode]=useState<'intro'|'planet'>('intro');
- const presenterTurn=useRef(0);
  const characterAudio=useRef<HTMLAudioElement|null>(null);
  const [formStatus,setFormStatus]=useState('');
  const [leadSending,setLeadSending]=useState(false);
@@ -136,56 +142,51 @@ export default function PremiumVitrine(){
  const orbitSvg=useRef<SVGSVGElement|null>(null);
  // O modo experimental foi promovido a padrão; não há dependência de query string.
  useEffect(()=>{if(!reactBitsPreview)return;try{const canvas=document.createElement('canvas');setGalleryAvailable(Boolean(canvas.getContext('webgl2')));}catch{setGalleryAvailable(false);}},[reactBitsPreview]);
- useEffect(()=>{setReduce(window.matchMedia('(prefers-reduced-motion: reduce)').matches);setVoiceAvailable(true);const d=new Date();setToday([d.getFullYear(),String(d.getMonth()+1).padStart(2,'0'),String(d.getDate()).padStart(2,'0')].join('-'));return()=>{window.speechSynthesis?.cancel();characterAudio.current?.pause();characterAudio.current=null;};},[]);
+ useEffect(()=>{setReduce(window.matchMedia('(prefers-reduced-motion: reduce)').matches);const d=new Date();setToday([d.getFullYear(),String(d.getMonth()+1).padStart(2,'0'),String(d.getDate()).padStart(2,'0')].join('-'));return()=>{characterAudio.current?.pause();characterAudio.current=null;};},[]);
  function stopNarration(){
-  window.speechSynthesis?.cancel();
-  if(characterAudio.current){characterAudio.current.pause();characterAudio.current.currentTime=0;characterAudio.current=null;}
+  if(characterAudio.current){
+   characterAudio.current.pause();
+   characterAudio.current.currentTime=0;
+   characterAudio.current=null;
+  }
  }
- function playIntroduction(speaker:'Astro'|'Lunna'|'PIXEL'){
+ function playClip(src:string){
   stopNarration();
-  const filenames={Astro:'astro_apresentacao.MP3',Lunna:'lunna_apresentacao.MP3',PIXEL:'pixel_apresentacao.MP3'};
-  const audio=new Audio(`/audio/${filenames[speaker]}`);
+  const audio=new Audio(src);
   characterAudio.current=audio;
   audio.onended=()=>{if(characterAudio.current===audio)characterAudio.current=null;};
   audio.onerror=()=>{if(characterAudio.current===audio)characterAudio.current=null;};
   void audio.play().catch(()=>{if(characterAudio.current===audio)characterAudio.current=null;});
  }
- function speakFact(fact:string,speaker:'Astro'|'Lunna'|'PIXEL',mode:'intro'|'planet'='planet'){
-  if(mute)return;
-  if(mode==='intro'){playIntroduction(speaker);return;}
-  stopNarration();
-  if(!('speechSynthesis' in window))return;
-  const synth=window.speechSynthesis;
-  const utter=new SpeechSynthesisUtterance(fact);
-  utter.lang='pt-BR';
-  utter.rate=.93;
-  // O mesmo mecanismo e a mesma voz de base para os três mascotes.
-  // O motor do navegador pode não disponibilizar vozes distintas.
-  utter.pitch=speaker==='Lunna'?1.12:speaker==='PIXEL'?1.18:1;
-  const voices=synth.getVoices();
-  utter.voice=voices.find(v=>v.lang.toLowerCase()==='pt-br')||voices.find(v=>v.lang.toLowerCase().startsWith('pt'))||null;
-  synth.speak(utter);
+ function playIntroduction(speaker:Speaker){
+  const filenames:Record<Speaker,string>={
+   Astro:'astro_apresentacao.MP3',Lunna:'lunna_apresentacao.MP3',PIXEL:'pixel_apresentacao.MP3'
+  };
+  playClip('/audio/'+filenames[speaker]);
+ }
+ function playPlanet(id:World['id']){
+  playClip('/audio/planetas/'+id+'.MP3');
  }
  function selectWorld(w:World){
-  setWorld(w);setShowSpeech(true);setSpeechMode('planet');
-  const presenters:('Astro'|'Lunna'|'PIXEL')[]=['Astro','Lunna','PIXEL'];
-  const next=presenters[presenterTurn.current%presenters.length];
-  setMascot(next);
-  presenterTurn.current+=1;
-  speakFact(w.fact,next);
+  setWorld(w);
+  setMascot(planetPresenters[w.id]);
+  setShowSpeech(true);
+  setSpeechMode('planet');
+  if(mute)stopNarration();
+  else playPlanet(w.id);
+ }
+ function selectMascot(speaker:Speaker){
+  setMascot(speaker);
+  setShowSpeech(true);
+  setSpeechMode('intro');
+  if(mute)stopNarration();
+  else playIntroduction(speaker);
  }
  function toggleSound(){
   if(!mute){stopNarration();setMute(true);return;}
   setMute(false);
-  if(speechMode==='intro'){playIntroduction(mascot);return;}
-  if(!('speechSynthesis' in window))return;
-  stopNarration();
-  const utter=new SpeechSynthesisUtterance(world.fact);
-  utter.lang='pt-BR';utter.rate=.94;
-  utter.pitch=mascot==='Lunna'?1.12:mascot==='PIXEL'?1.18:1;
-  const voices=window.speechSynthesis.getVoices().filter(v=>/^pt(-|_)/i.test(v.lang));
-  utter.voice=voices.find(v=>/pt-BR/i.test(v.lang))||voices[0]||null;
-  window.speechSynthesis.speak(utter);
+  if(speechMode==='intro')playIntroduction(mascot);
+  else playPlanet(world.id);
  }
  async function submit(e:React.FormEvent<HTMLFormElement>){
   e.preventDefault();
@@ -317,9 +318,9 @@ export default function PremiumVitrine(){
       </g>;})}
     </svg><div className="premium-universe-controls"><button onClick={()=>setPaused(v=>!v)} aria-label={paused?'Retomar órbitas':'Pausar órbitas'}>{paused?<Play size={16}/>:<Pause size={16}/>} {paused?'Continuar':'Pausar'}</button><button onClick={toggleSound} aria-label={mute?'Ativar narração':'Silenciar narração'} disabled={!voiceAvailable}>{mute?<VolumeX size={16}/>:<Volume2 size={16}/>} {mute?'Ouvir':'Silenciar'}</button></div></div>
     <div className="premium-crew"><div className="premium-crew-glow" aria-hidden="true"/>
-      <div className={"premium-crew-member"+(showSpeech&&mascot==="Astro"?" is-presenting":"")}><button className={'premium-mascot'+(mascot==='Astro'&&showSpeech?' speaking':'')} onClick={()=>{setMascot('Astro');setShowSpeech(true);setSpeechMode('intro');speakFact('', 'Astro','intro');}} aria-label="Ouvir Astro apresentar o planeta"><Image src="/mascotes/astro.png" alt="" width={115} height={150} className="premium-character-image"/><strong>ASTRO</strong></button>{showSpeech&&mascot==='Astro'&&<div className="premium-character-bubble" role="status"><button aria-label="Fechar curiosidade" className="premium-bubble-close" onClick={()=>setShowSpeech(false)}>×</button>{speechMode==="intro"?<b>Olá! Eu sou o ASTRO! 🚀</b>:<><b>ASTRO apresenta {world.name}</b><p>{world.fact}</p></>}</div>}</div>
-      <div className={"premium-crew-member"+(showSpeech&&mascot==="Lunna"?" is-presenting":"")}><button className={'premium-mascot'+(mascot==='Lunna'&&showSpeech?' speaking':'')} onClick={()=>{setMascot('Lunna');setShowSpeech(true);setSpeechMode('intro');speakFact('', 'Lunna','intro');}} type="button" aria-label="Lunna apresenta o planeta selecionado"><Image src="/mascotes/lunna.png" alt="" width={115} height={150} className="premium-character-image"/><strong>LUNNA</strong></button>{showSpeech&&mascot==='Lunna'&&<div className="premium-character-bubble" role="status"><button aria-label="Fechar curiosidade" className="premium-bubble-close" onClick={()=>setShowSpeech(false)}>×</button>{speechMode==="intro"?<b>Oi! Eu sou a LUNNA! 🌟</b>:<><b>LUNNA apresenta {world.name}</b><p>{world.fact}</p></>}</div>}</div>
-      <div className={"premium-crew-pixel premium-crew-member"+(showSpeech&&mascot==="PIXEL"?" is-presenting":"")}><button type="button" className="premium-pixel-button" aria-label="PIXEL apresenta uma curiosidade" onClick={()=>{setMascot("PIXEL");setShowSpeech(true);setSpeechMode("intro");speakFact("", "PIXEL","intro");}}><Image src="/mascotes/pixel.png" width={105} height={115} alt="PIXEL, robô companheiro"/><span className="premium-pixel-label">PIXEL</span></button>{showSpeech&&mascot==="PIXEL"&&<div className="premium-character-bubble premium-pixel-bubble" role="status"><button aria-label="Fechar curiosidade" className="premium-bubble-close" onClick={()=>setShowSpeech(false)}>×</button>{speechMode==="intro"?<b>Olá! Eu sou o PIXEL! 🤖</b>:<><b>PIXEL explica {world.name}</b><p>{world.fact}</p></>}</div>}</div>
+      <div className={"premium-crew-member"+(showSpeech&&mascot==="Astro"?" is-presenting":"")}><button className={'premium-mascot'+(mascot==='Astro'&&showSpeech?' speaking':'')} onClick={()=>selectMascot('Astro')} aria-label="Ouvir Astro apresentar o planeta"><Image src="/mascotes/astro.png" alt="" width={115} height={150} className="premium-character-image"/><strong>ASTRO</strong></button>{showSpeech&&mascot==='Astro'&&<div className="premium-character-bubble" role="status"><button aria-label="Fechar curiosidade" className="premium-bubble-close" onClick={()=>setShowSpeech(false)}>×</button>{speechMode==="intro"?<b>Olá! Eu sou o ASTRO! 🚀</b>:<><b>ASTRO apresenta {world.name}</b><p>{world.fact}</p></>}</div>}</div>
+      <div className={"premium-crew-member"+(showSpeech&&mascot==="Lunna"?" is-presenting":"")}><button className={'premium-mascot'+(mascot==='Lunna'&&showSpeech?' speaking':'')} onClick={()=>selectMascot('Lunna')} type="button" aria-label="Lunna apresenta o planeta selecionado"><Image src="/mascotes/lunna.png" alt="" width={115} height={150} className="premium-character-image"/><strong>LUNNA</strong></button>{showSpeech&&mascot==='Lunna'&&<div className="premium-character-bubble" role="status"><button aria-label="Fechar curiosidade" className="premium-bubble-close" onClick={()=>setShowSpeech(false)}>×</button>{speechMode==="intro"?<b>Oi! Eu sou a LUNNA! 🌟</b>:<><b>LUNNA apresenta {world.name}</b><p>{world.fact}</p></>}</div>}</div>
+      <div className={"premium-crew-pixel premium-crew-member"+(showSpeech&&mascot==="PIXEL"?" is-presenting":"")}><button type="button" className="premium-pixel-button" aria-label="PIXEL apresenta uma curiosidade" onClick={()=>selectMascot("PIXEL")}><Image src="/mascotes/pixel.png" width={105} height={115} alt="PIXEL, robô companheiro"/><span className="premium-pixel-label">PIXEL</span></button>{showSpeech&&mascot==="PIXEL"&&<div className="premium-character-bubble premium-pixel-bubble" role="status"><button aria-label="Fechar curiosidade" className="premium-bubble-close" onClick={()=>setShowSpeech(false)}>×</button>{speechMode==="intro"?<b>Olá! Eu sou o PIXEL! 🤖</b>:<><b>PIXEL explica {world.name}</b><p>{world.fact}</p></>}</div>}</div>
     </div>
     <div className="premium-planet-picker" aria-label="Escolha um astro para explorar"><span>EXPLORAR O SISTEMA SOLAR</span><div className="premium-planet-options">{worlds.map(w=><button key={w.id} type="button" aria-pressed={world.id===w.id} onClick={()=>selectWorld(w)}>{w.name}</button>)}</div></div>
     {!reactBitsPreview&&<p className="premium-motion-note">Oito planetas oficiais · Órbitas ilustrativas, sem escala real · Toque para descobrir curiosidades.</p>}
