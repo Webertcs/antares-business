@@ -19,10 +19,19 @@ export async function GET(_req:Request,{params}:{params:Promise<{id:string}>}){
 }
 
 export async function PUT(req:Request,{params}:{params:Promise<{id:string}>}){
+ const ctx=await requireOwner();if(!ctx)return NextResponse.json({error:'Somente proprietário'},{status:403});
+ let allowed='';
+ try{allowed=new URL(process.env.ANTARES_APP_ORIGIN||'').origin;}catch{
+  return NextResponse.json({error:'Origem não configurada.'},{status:503});
+ }
+ if(req.headers.get('origin')!==allowed)return NextResponse.json({error:'Origem não autorizada.'},{status:403});
+ if(req.headers.get('content-type')?.split(';')[0]?.trim().toLowerCase()!=='application/json')
+  return NextResponse.json({error:'Formato inválido.'},{status:415});
+ if(Number(req.headers.get('content-length')||0)>3000)return NextResponse.json({error:'Requisição excessiva.'},{status:413});
  try{
-  const ctx=await requireOwner();if(!ctx)return NextResponse.json({error:'Somente proprietário'},{status:403});
   const {id}=await params;if(!uuid.test(id))return NextResponse.json({error:'Evento inválido'},{status:400});
-  const body=await req.json();if(!Array.isArray(body.memberIds)||body.memberIds.length>30||body.memberIds.some((v:unknown)=>typeof v!=='string'||!uuid.test(v))||new Set(body.memberIds).size!==body.memberIds.length)return NextResponse.json({error:'Seleção inválida'},{status:400});
+  const raw=await req.text();if(raw.length>3000)return NextResponse.json({error:'Requisição excessiva.'},{status:413});
+  const body=JSON.parse(raw);if(!Array.isArray(body.memberIds)||body.memberIds.length>30||body.memberIds.some((v:unknown)=>typeof v!=='string'||!uuid.test(v))||new Set(body.memberIds).size!==body.memberIds.length)return NextResponse.json({error:'Seleção inválida'},{status:400});
   const db=getTeamWriteDb();
   const check=await db`SELECT p.prosecdef AND pg_get_userbyid(p.proowner)='neondb_owner' AND has_function_privilege(current_user,p.oid,'EXECUTE') AND NOT EXISTS(SELECT 1 FROM aclexplode(coalesce(p.proacl,acldefault('f',p.proowner))) x WHERE x.grantee=0 AND x.privilege_type='EXECUTE') AS safe FROM pg_proc p WHERE p.oid=to_regprocedure('public.antares_set_event_team(text,uuid,uuid,uuid[])')`;
   if(!check[0]?.safe)return NextResponse.json({error:'Gravação segura da equipe ainda não implantada no Neon.'},{status:503});
