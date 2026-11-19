@@ -1,7 +1,6 @@
 'use client';
 import {useEffect,useRef,useState} from 'react';
 import Link from 'next/link';
-import EventLifecycleActions from '../../eventos/EventLifecycleActions';
 type Client={id:string;kind:string;name:string;email:string|null;phone:string|null;phone_secondary:string|null;city:string|null;status:string;notes:string|null};
 type Contact={id:string;client_id:string;full_name:string;position:string|null;phone:string|null;email:string|null;is_primary:boolean};
 type Event={id:string;client_id:string;title:string;event_date:string|null;status:string;expected_attendees:number|null;archived_at?:string|null};
