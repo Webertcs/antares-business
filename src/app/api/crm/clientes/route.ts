@@ -14,10 +14,12 @@ export async function GET() {
       db`SELECT id,client_id,full_name,position,email,phone,whatsapp,is_primary
         FROM public.crm_contacts WHERE organization_id=${ctx.organizationId}
         ORDER BY is_primary DESC,created_at DESC LIMIT 1000`,
-      db`SELECT id,client_id,title,event_kind,event_date,start_time,end_time,expected_attendees,pricing_model,
-               price_per_person,fixed_amount,status,venue,notes,archived_at
-        FROM public.crm_events WHERE organization_id=${ctx.organizationId}
-        ORDER BY event_date DESC NULLS LAST LIMIT 500`
+      db`SELECT e.id,e.client_id,e.title,e.event_kind,e.event_date,e.start_time,e.end_time,e.expected_attendees,e.pricing_model,
+               e.price_per_person,e.fixed_amount,e.status,e.venue,e.notes,e.archived_at,d.name AS dome_name
+        FROM public.crm_events e
+        LEFT JOIN public.antares_domes d ON d.id=e.dome_id AND d.organization_id=e.organization_id
+        WHERE e.organization_id=${ctx.organizationId}
+        ORDER BY e.event_date DESC NULLS LAST LIMIT 500`
     ]);
     return NextResponse.json({ clients,contacts,events },{headers:{'Cache-Control':'no-store'}});
   } catch {
