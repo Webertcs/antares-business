@@ -133,7 +133,7 @@ export default function ContractDraftEditor({contractId,clientId,proposal,instit
    const latest=(await getDrafts()).find(d=>d.id===String(data.id)&&!d.archived_at);
    if(!latest)throw Error('Documento salvo, mas não foi possível reler a versão. Atualize antes de imprimir.');
    setSaved(latest);setSelectedId(latest.id);setForm(parseDraft(latest));
-   setDirty(false);setNotice('Minuta salva no Neon, com o histórico de versões preservado.');
+   setDirty(false);setNotice('Minuta salva. O histórico de versões foi preservado.');
   }catch(e){setError(e instanceof Error?e.message:'Não foi possível salvar.');}
   finally{setSaving(false);}
  }
