@@ -312,7 +312,7 @@ export default function ClientDetails({id,writesEnabled,proposalWritesEnabled,co
   ${draft.terms.startsWith(customContractPrefix)?'<h2>Contrato personalizado</h2><p class="text">'+line(draft.terms.slice(customContractPrefix.length))+'</p>':`<h2>Instituição contratante</h2><p>${escapeHtml(draft.institution)}</p>
   <h2>Representante da instituição</h2><p>${escapeHtml(draft.responsible||'Não informado')}</p>
   <h2>Identificação das partes</h2>\n  <p><strong>Contratante:</strong> ${escapeHtml(draft.contractor_legal_name||draft.institution)}${draft.contractor_document?' — CPF/CNPJ: '+escapeHtml(draft.contractor_document):''}${draft.contractor_address?' — Endereço: '+escapeHtml(draft.contractor_address):''}</p>\n  <p><strong>Contratada:</strong> ${escapeHtml(draft.provider_legal_name||'Planetário ANTARES')}${draft.provider_document?' — CPF/CNPJ: '+escapeHtml(draft.provider_document):''}${draft.provider_address?' — Endereço: '+escapeHtml(draft.provider_address):''}${draft.provider_representative?' — Representante: '+escapeHtml(draft.provider_representative):''}</p>\n  <h2>Objeto do contrato</h2><p class="text">${line(draft.object_text||'Não informado')}</p>
-  ${presentationLabels.some(label=>splitContractTerms(draft.terms).fields[label])?'<h2>Dados da apresentação</h2>'+presentationLabels.filter(label=>splitContractTerms(draft.terms).fields[label]).map(label=>'<p><strong>'+escapeHtml(label)+':</strong> '+escapeHtml(splitContractTerms(draft.terms).fields[label])+'</p>').join(''):''}
+  ${presentationLabels.some(label=>splitContractTerms(draft.terms).fields[label])?'<h2>Dados da apresentação</h2>'+presentationLabels.filter(label=>splitContractTerms(draft.terms).fields[label]).map(label=>'<p><strong>'+escapeHtml(label==='Horários e sessões'?'Horário da apresentação':label)+':</strong> '+escapeHtml(splitContractTerms(draft.terms).fields[label])+'</p>').join(''):''}
   <h2>Cláusulas e condições</h2><p class="text">${line(splitContractTerms(draft.terms).clauses||'Não informado')}</p>
   `}
   <div class="signatures"><div class="signature">${escapeHtml(draft.responsible||'Representante da instituição')}<br>CONTRATANTE</div>
@@ -599,7 +599,7 @@ export default function ClientDetails({id,writesEnabled,proposalWritesEnabled,co
  <strong style={{color:'#174987'}}>Dados da apresentação</strong>
  {presentationLabels.map(label=>{
  const parts=splitContractTerms(documentDraft.terms);
- return <label key={label} style={formLabel}>{label}<input style={formInput} value={parts.fields[label]||''} placeholder="A confirmar" onChange={e=>setDocumentDraft(v=>{
+ return <label key={label} style={formLabel}>{label==='Horários e sessões'?'Horário da apresentação':label}<input style={formInput} value={parts.fields[label]||''} placeholder="A confirmar" onChange={e=>setDocumentDraft(v=>{
  const previous=splitContractTerms(v.terms);
  return {...v,terms:combineContractTerms(previous.clauses,{...previous.fields,[label]:e.target.value})};
  })}/></label>;
