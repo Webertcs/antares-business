@@ -73,6 +73,10 @@ Todas pertencem a `neondb_owner`. A presença de `PUBLIC EXECUTE` por si só **n
 
 **Consulta 7 — roles com CREATE no esquema public (produção, 19/11):** apenas `cloud_admin` (LOGIN=true, BYPASSRLS=true), `neondb_owner` (LOGIN=true, BYPASSRLS=true) e `pg_database_owner` (LOGIN=false, BYPASSRLS=false) aparecem com `CREATE=true`. `antares_team_runtime` não aparece. Não há indício de concessão CREATE a papel operacional comum. **Pendente** conferir que credenciais administrativas não são usadas em fluxos operacionais e revisar corpos das funções SECURITY DEFINER.
 
+**Consulta 8 — revisão de corpos de gatilhos (19/11):** `antares_guard_linked_event_changes` usa filtros de organização e protege mudanças de status/cúpula/data/hora em eventos vinculados; exceção de conclusão exige horário final e registro de presença ligado a membro owner ativo. `antares_sync_presentation_event` atualiza `crm_events` com filtro por `organization_id` e `event_id`. Ambas usam `SECURITY DEFINER`, nomes de tabelas qualificados e `search_path=pg_catalog, public, pg_temp`. Revisão de código não equivale a teste negativo; conferir a integridade da gravação em `antares_event_attendance` e eventual bypass por outros papéis.
+
+**Consulta 9 — permissões da contagem de alunos (19/11):** tabela `public.antares_event_attendance`: `relrowsecurity=true`, `relforcerowsecurity=true`, `PUBLIC INSERT=false`, `antares_team_runtime INSERT/UPDATE/DELETE=false`. Proteção contra gravação direta pelo runtime confirmada; verificar a função `antares_close_event` e seus controles de autorização.
+
 ## 4. Testes automáticos
 
 `npm run test:seguranca` verifica invariantes textuais essenciais de sessão, autorização técnica, aceite, recebimento público e financeiro. Esses testes não substituem ensaio de invasão, autorização real nem validação de RLS. O CI também executa build e auditoria de dependências.
