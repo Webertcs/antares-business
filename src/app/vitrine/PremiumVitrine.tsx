@@ -122,6 +122,7 @@ export default function PremiumVitrine(){
  const [showSpeech,setShowSpeech]=useState(false);
  const [speechMode,setSpeechMode]=useState<'intro'|'planet'>('intro');
  const presenterTurn=useRef(0);
+ const characterAudio=useRef<HTMLAudioElement|null>(null);
  const [formStatus,setFormStatus]=useState('');
  const [leadSending,setLeadSending]=useState(false);
  const [gameInterested,setGameInterested]=useState(false);
@@ -135,11 +136,26 @@ export default function PremiumVitrine(){
  const orbitSvg=useRef<SVGSVGElement|null>(null);
  // O modo experimental foi promovido a padrão; não há dependência de query string.
  useEffect(()=>{if(!reactBitsPreview)return;try{const canvas=document.createElement('canvas');setGalleryAvailable(Boolean(canvas.getContext('webgl2')));}catch{setGalleryAvailable(false);}},[reactBitsPreview]);
- useEffect(()=>{setReduce(window.matchMedia('(prefers-reduced-motion: reduce)').matches);setVoiceAvailable('speechSynthesis'in window);const d=new Date();setToday([d.getFullYear(),String(d.getMonth()+1).padStart(2,'0'),String(d.getDate()).padStart(2,'0')].join('-'));return()=>{window.speechSynthesis?.cancel();};},[]);
+ useEffect(()=>{setReduce(window.matchMedia('(prefers-reduced-motion: reduce)').matches);setVoiceAvailable(true);const d=new Date();setToday([d.getFullYear(),String(d.getMonth()+1).padStart(2,'0'),String(d.getDate()).padStart(2,'0')].join('-'));return()=>{window.speechSynthesis?.cancel();characterAudio.current?.pause();characterAudio.current=null;};},[]);
+ function stopNarration(){
+  window.speechSynthesis?.cancel();
+  if(characterAudio.current){characterAudio.current.pause();characterAudio.current.currentTime=0;characterAudio.current=null;}
+ }
+ function playIntroduction(speaker:'Astro'|'Lunna'|'PIXEL'){
+  stopNarration();
+  const filenames={Astro:'astro_apresentacao.MP3',Lunna:'lunna_apresentacao.MP3',PIXEL:'pixel_apresentacao.MP3'};
+  const audio=new Audio(`/audio/${filenames[speaker]}`);
+  characterAudio.current=audio;
+  audio.onended=()=>{if(characterAudio.current===audio)characterAudio.current=null;};
+  audio.onerror=()=>{if(characterAudio.current===audio)characterAudio.current=null;};
+  void audio.play().catch(()=>{if(characterAudio.current===audio)characterAudio.current=null;});
+ }
  function speakFact(fact:string,speaker:'Astro'|'Lunna'|'PIXEL',mode:'intro'|'planet'='planet'){
-  if(mute||!voiceAvailable)return;
+  if(mute)return;
+  if(mode==='intro'){playIntroduction(speaker);return;}
+  stopNarration();
+  if(!('speechSynthesis' in window))return;
   const synth=window.speechSynthesis;
-  synth.cancel();
   const utter=new SpeechSynthesisUtterance(mode==='intro'?(speaker==='Lunna'?'Oi! Eu sou a Lunna!':speaker==='PIXEL'?'Olá! Eu sou o Pixel!':'Olá! Eu sou o Astro!'):fact);
   utter.lang='pt-BR';
   utter.rate=.93;
@@ -159,15 +175,16 @@ export default function PremiumVitrine(){
   speakFact(w.fact,next);
  }
  function toggleSound(){
-  if(!voiceAvailable)return;
-  if(!mute){window.speechSynthesis.cancel();setMute(true);return;}
+  if(!mute){stopNarration();setMute(true);return;}
   setMute(false);
-  const utter=new SpeechSynthesisUtterance(speechMode==='intro'?(mascot==='Lunna'?'Oi! Eu sou a Lunna!':mascot==='PIXEL'?'Olá! Eu sou o Pixel!':'Olá! Eu sou o Astro!'):world.fact);
+  if(speechMode==='intro'){playIntroduction(mascot);return;}
+  if(!('speechSynthesis' in window))return;
+  stopNarration();
+  const utter=new SpeechSynthesisUtterance(world.fact);
   utter.lang='pt-BR';utter.rate=.94;
-  utter.pitch=mascot==='Lunna'?1.4:mascot==='PIXEL'?1.65:.88;
+  utter.pitch=mascot==='Lunna'?1.12:mascot==='PIXEL'?1.18:1;
   const voices=window.speechSynthesis.getVoices().filter(v=>/^pt(-|_)/i.test(v.lang));
   utter.voice=voices.find(v=>/pt-BR/i.test(v.lang))||voices[0]||null;
-  window.speechSynthesis.cancel();
   window.speechSynthesis.speak(utter);
  }
  async function submit(e:React.FormEvent<HTMLFormElement>){
