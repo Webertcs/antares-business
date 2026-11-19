@@ -20,6 +20,13 @@ export default function ClientsPage({ writesEnabled }: { writesEnabled: boolean 
  const [kind,setKind]=useState('all');
  const restoreDialog=useRef<HTMLDialogElement>(null);
  const [restoreClient,setRestoreClient]=useState<Client|null>(null);
+ const archiveDialog=useRef<HTMLDialogElement>(null);
+ const [archiveTarget,setArchiveTarget]=useState<Client|null>(null);
+ const [archiveError,setArchiveError]=useState('');
+ useEffect(()=>{
+  if(archiveTarget&&!archiveDialog.current?.open)archiveDialog.current?.showModal();
+  else if(!archiveTarget&&archiveDialog.current?.open)archiveDialog.current.close();
+ },[archiveTarget]);
  useEffect(()=>{if(restoreClient)restoreDialog.current?.showModal();},[restoreClient]);
  const [restoreStatus,setRestoreStatus]=useState('prospect');
  const [showArchived,setShowArchived]=useState(false);
@@ -126,7 +133,7 @@ export default function ClientsPage({ writesEnabled }: { writesEnabled: boolean 
   if(!writesEnabled||saving)return;
   const archive=client.status!=='inactive';
   if(!archive&&!restoreTo){setFeedback('');setRestoreStatus('prospect');setRestoreClient(client);return;}
-  if(archive&&!window.confirm((archive?'Arquivar':'Reativar')+' o cliente '+client.name+'? O histórico, os eventos e as propostas serão preservados.'))return;
+  if(archive&&!restoreTo){setArchiveError('');setArchiveTarget(client);return;}
   setSaving(true);setFeedback('');
   try{
    const response=await fetch('/api/crm/clientes',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({
@@ -135,10 +142,13 @@ export default function ClientsPage({ writesEnabled }: { writesEnabled: boolean 
    })});
    const data=await response.json();if(!response.ok)throw Error(data.error||'Falha ao atualizar cliente');
    setFeedback(archive?'Cliente arquivado; registros e vínculos preservados.':'Cliente reativado.');
-   setRestoreClient(null);
+   setRestoreClient(null);setArchiveTarget(null);setArchiveError('');
    if(archive&&selected===client.id){setSelected(null);setForm(null);}
    setRevision(n=>n+1);
-  }catch(e){setFeedback(e instanceof Error?e.message:'Operação indisponível');}
+   }catch(e){
+   const message=e instanceof Error?e.message:'Operação indisponível';
+   setFeedback(message);if(archive)setArchiveError(message);
+  }
   finally{setSaving(false)}
  }
  const countBy=(k:string)=>clients.filter(c=>c.kind===k).length;
@@ -147,7 +157,7 @@ export default function ClientsPage({ writesEnabled }: { writesEnabled: boolean 
   <div className={styles.hero} style={{display:'flex',justifyContent:'space-between',alignItems:'center',gap:12,flexWrap:'wrap',margin:'8px 0 14px'}}>
    <div><p style={{letterSpacing:2,fontSize:12}}>ANTARES · RELACIONAMENTO</p>
     <h1 style={{fontSize:24,fontWeight:750}}>Clientes e Eventos</h1>
-    <p>Escolas, empresas, associações e apresentações em um só lugar.</p></div>
+    </div>
    {!writesEnabled&&<span className={styles.access}>Somente consulta</span>}
   </div>
   <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(160px,1fr))',gap:10,marginBottom:14}}>
@@ -155,7 +165,7 @@ export default function ClientsPage({ writesEnabled }: { writesEnabled: boolean 
     <section className={styles.metric} key={t}><div>{t}</div><strong style={{fontSize:26}}>{n}</strong></section>)}
   </div>
   <section className={styles.directory} style={{border:'1px solid #bdd6f5',borderRadius:14,padding:16,marginBottom:16}}>
-   <div className={styles.directoryHeader}><div><h2>Base de clientes</h2><p>Encontre cadastros e acompanhe o relacionamento.</p></div><div className={styles.directoryControls}><span className={styles.resultCount}>{filtered.length} na lista</span><button type="button" className={styles.directoryCreateButton} disabled={!writesEnabled||saving} onClick={()=>openForm('client')}>+ Novo cliente</button></div></div>
+   <div className={styles.directoryHeader}><div><h2>Base de clientes</h2></div><div className={styles.directoryControls}><span className={styles.resultCount}>{filtered.length} na lista</span><button type="button" className={styles.directoryCreateButton} disabled={!writesEnabled||saving} onClick={()=>openForm('client')}>+ Novo cliente</button></div></div>
    <div className={styles.filterPanel}>
     <label className={styles.filterSearch}><span>⌕ Pesquisar clientes</span>
      <input value={query} onChange={e=>setQuery(e.target.value)} placeholder="Nome, cidade ou e-mail" aria-label="Buscar clientes"/>
@@ -194,7 +204,7 @@ export default function ClientsPage({ writesEnabled }: { writesEnabled: boolean 
    {selectedContacts.length===0?<p>Sem contatos cadastrados.</p>:
     <ul>{selectedContacts.map(c=><li key={c.id}>{c.full_name}{c.position?' · '+c.position:''}
      {c.is_primary?' · Principal':''} · {c.phone||c.email||'Sem contato'}</li>)}</ul>}
-   <h3 style={{fontSize:18,marginTop:20}}>Apresentações e oportunidades ({selectedEvents.length}) {writesEnabled&&<button onClick={()=>openForm('event')}>+ Evento</button>}</h3>
+   <h3 style={{fontSize:18,marginTop:20}}>Apresentações e oportunidades ({selectedEvents.length})</h3>
    {selectedEvents.length===0?<p>Sem eventos registrados.</p>:
     <ul>{selectedEvents.map(e=><li key={e.id} style={linkedEventId===e.id?{border:'2px solid #2563eb',borderRadius:10,background:'#dbeafe',boxShadow:'0 0 0 4px rgba(37,99,235,.13), 0 4px 16px rgba(37,99,235,.16)',padding:'12px 14px',color:'#123c7a',fontWeight:700}:undefined}>{linkedEventId===e.id&&<span style={{display:'block',fontSize:12,color:'#1d4ed8',marginBottom:5}}>🚀 Evento localizado pela Agenda</span>}{e.title} · {formatDateBR(e.event_date)} · {eventStatuses[e.status]||e.status}
     {e.expected_attendees!=null?' · '+e.expected_attendees+' participantes':''}</li>)}</ul>}
@@ -234,9 +244,24 @@ export default function ClientsPage({ writesEnabled }: { writesEnabled: boolean 
     <div className={styles.formActions}><button type="submit" disabled={!writesEnabled||saving}>{saving?"Salvando...":"Salvar"}</button>
     <button type="button" disabled={saving} onClick={closeForm} style={{marginLeft:12}}>Cancelar</button></div>
    </form></dialog>}
+  {archiveTarget&&<dialog ref={archiveDialog} onCancel={e=>{if(saving){e.preventDefault();return;}setArchiveTarget(null);}} aria-labelledby="archive-client-title" className={styles.dialog}
+   style={{padding:0,width:'min(440px,94vw)',maxWidth:'94vw',border:'1px solid #b1cef5',borderRadius:16,overflow:'hidden',boxShadow:'0 26px 70px rgba(6,27,66,.35)',color:'#173965'}}>
+   <div style={{background:'linear-gradient(110deg,#123a7a,#2878cf)',padding:'18px 20px',color:'#fff'}}>
+    <h2 id="archive-client-title" style={{fontSize:20,margin:0,color:'#fff'}}>Arquivar cliente</h2>
+   </div>
+   <div style={{display:'grid',gap:14,padding:20}}>
+    <p style={{margin:0}}>Arquivar <strong>{archiveTarget.name}</strong>?</p>
+    <p style={{margin:0,fontSize:13,color:'#49698f'}}>O cadastro sairá da lista de ativos. Propostas, contratos e histórico serão preservados.</p>
+    {archiveError&&<p role="alert" style={{color:'#af2639',margin:0,fontSize:13}}>{archiveError}</p>}
+    <div style={{display:'flex',justifyContent:'flex-end',gap:8,flexWrap:'wrap'}}>
+     <button type="button" disabled={saving} onClick={()=>setArchiveTarget(null)} style={{padding:'9px 15px',border:'1px solid #b6cff1',borderRadius:8,color:'#174a90',background:'#e7f1ff',cursor:'pointer',fontWeight:700}}>Cancelar</button>
+     <button type="button" disabled={saving} onClick={()=>void archiveClient(archiveTarget,'confirmado')} style={{padding:'9px 15px',border:0,borderRadius:8,color:'#fff',background:'#175bbc',cursor:'pointer',fontWeight:700}}>{saving?'Arquivando…':'Arquivar cliente'}</button>
+    </div>
+   </div>
+  </dialog>}
   {restoreClient&&<dialog ref={restoreDialog} onCancel={e=>{if(saving)e.preventDefault();else setRestoreClient(null);}} aria-labelledby="restore-title" className={styles.dialog}>
    <h2 id="restore-title">Reativar {restoreClient.name}</h2>
-   <p>Escolha a situação comercial do cliente. O histórico e os vínculos serão mantidos.</p>
+   <p>O histórico será preservado.</p>
    <label>Situação ao reativar<select autoFocus value={restoreStatus} disabled={saving} onChange={e=>setRestoreStatus(e.target.value)}><option value="prospect">Prospecto</option><option value="active">Ativo</option></select></label>
    <p className={styles.caption}>A situação anterior ao arquivamento não foi armazenada.</p>
    <div className={styles.actions}><button disabled={saving} onClick={()=>archiveClient(restoreClient,restoreStatus)}>{saving?'Reativando...':'Confirmar reativação'}</button><button disabled={saving} onClick={()=>setRestoreClient(null)}>Cancelar</button></div>

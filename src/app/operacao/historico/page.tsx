@@ -1,7 +1,6 @@
 import Link from 'next/link';
 import {redirect} from 'next/navigation';
 import {requireOwner,getDb} from '@/lib/equipe/auth';
-import AuditDetails from './AuditDetails';
 
 export const dynamic='force-dynamic';
 export const runtime='nodejs';
@@ -21,6 +20,8 @@ const actions:Record<string,string>={
  payment_reversed:'Recebimento estornado',
  event_created:'Apresentação cadastrada',
  reservation_created:'Reserva cadastrada',
+ proposal_presentation_reserved:'Reserva registrada',
+ event_closed:'Apresentação concluída',
  client_created:'Cliente cadastrado',
  dome_updated:'Cúpula atualizada',
  dome_deactivated:'Cúpula desativada',
@@ -32,7 +33,7 @@ const areas:Record<string,string>={
  reservation:'Reservas',payment:'Financeiro',equipment:'Cúpulas',dome:'Cúpulas',vitrine_lead:'Vitrine',
  member:'Equipe',team:'Equipe'
 };
-function readable(raw:string,dict:Record<string,string>){return dict[raw]||raw.replaceAll('_',' ')}
+function readable(raw:string,dict:Record<string,string>){return dict[raw]||'Atividade operacional'}
 export default async function HistoricoPage(){
  const owner=await requireOwner();if(!owner)redirect('/sem-acesso');
  let entries:Entry[]=[];let error=false;
@@ -44,16 +45,15 @@ export default async function HistoricoPage(){
  }catch{error=true}
  return <main className="operation-detail operation-history">
   <Link className="operation-detail-back" href="/?section=operacao">← Voltar</Link>
-  <header className="operation-detail-head"><div><h1>Histórico operacional</h1><p>Acompanhe as alterações registradas no seu planetário.</p></div></header>
+  <header className="operation-detail-head"><div><h1>Histórico operacional</h1></div></header>
   <section className="operation-detail-panel">
    <div className="operation-history-heading"><h2>Atividades recentes</h2><span>{error?'Indisponível':entries.length+' registro(s)'}</span></div>
    {error?<p role="alert" className="operation-detail-warning">Histórico indisponível no momento.</p>:
    entries.length===0?<div className="operation-detail-empty"><p>Nenhuma atividade registrada até o momento.</p></div>:
-   <div className="operation-detail-table-scroll"><table><thead><tr><th>Data e hora</th><th>Atividade</th><th>Área</th><th>Detalhes</th></tr></thead><tbody>{entries.map(e=><tr key={e.id}>
+   <div className="operation-detail-table-scroll"><table><thead><tr><th>Data e hora</th><th>Atividade</th><th>Área</th></tr></thead><tbody>{entries.map(e=><tr key={e.id}>
     <td className="operation-history-date">{Number.isFinite(new Date(e.created_at).getTime())?formatter.format(new Date(e.created_at)):'—'}</td>
     <td className="operation-history-action">{readable(e.action,actions)}</td>
     <td><span className="operation-history-area">{readable(e.entity_type,areas)}</span></td>
-    <td><AuditDetails action={e.action} entityType={e.entity_type} entityId={e.entity_id}/></td>
    </tr>)}</tbody></table></div>}
    {!error&&entries.length>0&&<p className="operation-history-note">Exibindo até 100 atividades mais recentes.</p>}
   </section>

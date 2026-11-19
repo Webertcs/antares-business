@@ -1,9 +1,7 @@
 import Link from 'next/link';
+import BackToPrevious from './BackToPrevious';
 import {notFound,redirect} from 'next/navigation';
 import {requireMember,getDb} from '@/lib/equipe/auth';
-import EventClosing from './EventClosing';
-import EventDomePicker from './EventDomePicker';
-import EventLifecycleActions from '../EventLifecycleActions';
 
 export const dynamic='force-dynamic';
 const uuid=/^[0-9a-f]{8}(-[0-9a-f]{4}){3}-[0-9a-f]{12}$/i;
@@ -21,19 +19,14 @@ export default async function Page({params}:{params:Promise<{id:string}>}){
  if(!uuid.test(id))notFound();
  const db=getDb();
  const rows=await db`SELECT e.id,e.title,e.event_date,e.start_time,e.end_time,e.status,e.expected_attendees,e.dome_id,e.archived_at,
- c.name AS client_name,d.name AS dome_name
+ c.name AS client_name,d.name AS dome_name,a.actual_students AS actual_students
  FROM public.crm_events e
  JOIN public.crm_clients c ON c.id=e.client_id AND c.organization_id=e.organization_id
  LEFT JOIN public.antares_domes d ON d.id=e.dome_id AND d.organization_id=e.organization_id
+ LEFT JOIN public.antares_event_attendance a ON a.event_id=e.id AND a.organization_id=e.organization_id
  WHERE e.id=${id} AND e.organization_id=${ctx.organizationId} LIMIT 1`;
  if(!rows.length)notFound();
  const event=rows[0];
- const linked=await db`SELECT 1 FROM public.antares_presentation_event_links
- WHERE organization_id=${ctx.organizationId} AND event_id=${id} LIMIT 1`;
- const hasReservation=linked.length>0;
- const canManage=ctx.role==='owner'&&!hasReservation;
- const domes=canManage?await db`SELECT id,name,capacity FROM public.antares_domes
- WHERE organization_id=${ctx.organizationId} AND active=true ORDER BY name`:[];
  const status=String(event.status);
  const statusText:Record<string,string>={
   lead:'A organizar',quoted:'Proposta',reserved:'Reservado',confirmed:'Confirmado',
@@ -45,7 +38,7 @@ export default async function Page({params}:{params:Promise<{id:string}>}){
  const period=hour?(hour+(end?' às '+end:'')):'Horário a definir';
  return <main className="antares-event-center" style={{display:'grid',gap:14,color:'#173668',paddingBottom:24}}>
   <nav aria-label="Navegação do evento" style={{display:'flex',gap:10,alignItems:'center',flexWrap:'wrap'}}>
-   <Link href="/eventos" style={{color:'#195db3',fontSize:13,fontWeight:750,textDecoration:'none'}}>← Voltar aos eventos</Link>
+   <BackToPrevious/>
   </nav>
   <header style={{borderRadius:16,padding:'20px clamp(16px,3vw,26px)',background:'linear-gradient(110deg,#092a67,#1356b4)',color:'#fff',display:'grid',gap:9}}>
    <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',gap:10,flexWrap:'wrap'}}>
@@ -67,19 +60,13 @@ export default async function Page({params}:{params:Promise<{id:string}>}){
    </div>)}
   </section>
 
-  <EventClosing eventId={id}/>
 
-  {hasReservation&&<p style={{fontSize:13,color:'#4c668b',margin:0}}>
-   Precisa mudar a data, o horário ou a cúpula? Faça isso em <Link href="/vitrine/inbox" style={{color:'#175bb1',fontWeight:750}}>Central de Atendimento → Ver reserva</Link>.
-  </p>}
-
-  {canManage&&<details style={{border:'1px solid #c8d9f5',background:'#f5f9ff',borderRadius:12,padding:13}}>
-   <summary style={{cursor:'pointer',fontWeight:750,color:'#24548f'}}>Outras opções do evento</summary>
-   <div style={{display:'grid',gap:12,marginTop:12}}>
-    <EventDomePicker eventId={id} initialDomeId={String(event.dome_id||'')}
-     domes={domes.map(d=>({id:String(d.id),name:String(d.name),capacity:d.capacity==null?null:Number(d.capacity)}))}/>
-    <EventLifecycleActions eventId={id} status={status} archived={Boolean(event.archived_at)}/>
-   </div>
-  </details>}
+  {event.actual_students!=null&&<section aria-label="Público atendido" style={{border:'1px solid #b7dfc9',background:'#eaf8f0',borderRadius:12,padding:'14px 16px'}}>
+   <span style={{color:'#176647',fontSize:12,fontWeight:750}}>Alunos atendidos</span>
+   <strong style={{display:'block',color:'#145a3e',fontSize:26}}>{Number(event.actual_students)}</strong>
+  </section>}
+  <p style={{fontSize:13,color:'#4c668b',margin:0}}>
+   Para reservas, alterações e conclusão do atendimento, acesse a <Link href="/vitrine/inbox" style={{color:'#175bb1',fontWeight:750}}>Central de Atendimento</Link>.
+  </p>
  </main>;
 }

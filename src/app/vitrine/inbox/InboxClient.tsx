@@ -1,7 +1,7 @@
 'use client';
 import {useCallback,useEffect,useMemo,useState} from 'react';
 import Link from 'next/link';
-import {Archive,ArrowLeft,Building2,CalendarDays,CheckCircle2,ChevronDown,Clock3,FileText,Layers,MapPin,MessageCircle,Phone,RefreshCw,UserRound,Users,Wallet} from 'lucide-react';
+import {Archive,Building2,CalendarDays,CheckCircle2,ChevronDown,Clock3,FileText,Layers,MapPin,MessageCircle,Phone,RefreshCw,UserRound,Users,Wallet} from 'lucide-react';
 import styles from './inbox.module.css';
 import ProposalComposer from './ProposalComposer';
 import ClientAcceptance from './ClientAcceptance';
@@ -57,12 +57,13 @@ function ServiceTimeline({lead,reservation,operationalKnown,finance}:{
    </li>)}
   </ol>
   <p style={{margin:'10px 0 0',fontSize:12,color:'#365780'}}>
-   {cancelled?'Apresentação cancelada. Atendimento arquivado imediatamente, com reserva, documentos e financeiro preservados.':
-    finished?'Apresentação concluída e arquivada para consulta. Quantidade de alunos registrada na operação. Confira eventuais recebimentos no Financeiro.':
-    bookingDone?'Reserva registrada para '+(reservation?.starts_at?dateTime(reservation.starts_at):'data a confirmar')+'. Acompanhe a apresentação e o financeiro.':
+   {cancelled?'Cancelada e arquivada. Histórico e financeiro preservados.':
+    finished?'Concluída e arquivada. Público registrado; pagamentos no Financeiro.':
+    bookingDone?'Reserva: '+(reservation?.starts_at?dateTime(reservation.starts_at):'data a confirmar')+'.':
     accepted&&!operationalKnown?'Aceite registrado. O estado das reservas não pôde ser consultado. Atualize a Central.':
-    accepted?'Próxima ação: organizar a reserva. Contrato escrito é opcional.':
-    hasProposal?'Próxima ação: revisar a proposta e registrar o aceite real da instituição.':
+    accepted?'Próxima ação: reservar a apresentação.':
+    hasProposal&&lead.proposal_status==='draft'?'Finalize o rascunho e aprove a proposta antes de solicitar o aceite da escola.':
+     hasProposal?'Aguarde o aceite real da escola para continuar.':
     'Próxima ação: conversar com a instituição e preparar a proposta.'}
   </p>
   {accepted&&finance&&finance.charged>0&&<p style={{margin:'4px 0 0',fontSize:11,color:'#64748b'}}>Recebido: {money(finance.paid)} de {money(finance.charged)}.</p>}
@@ -189,16 +190,13 @@ export default function Inbox({conversionEnabled,bookingWritesEnabled,contractWr
   finally{setBusy('');}
  }
  return <main className={styles.page}>
-  <nav aria-label="Navegação" className={styles.breadcrumb}>
-   <ArrowLeft size={14}/><Link href="/clientes">Clientes e eventos</Link><span aria-hidden="true">›</span><span>Central de Atendimento</span>
-  </nav>
   <header className={styles.hero}>
    <div className={styles.heroTitle}>
     <span className={styles.heroIcon}><FileText size={26} aria-hidden="true"/></span>
     <div>
      <span className={styles.eyebrow}>ANTARES BUSINESS · VITRINE</span>
      <h1>Central de Atendimento</h1>
-     <p>Acompanhe cada instituição, da conversa à apresentação, sem perder o histórico.</p>
+     
     </div>
    </div>
    <button type="button" className={styles.refresh} disabled={loading} onClick={()=>{void load();void refreshBookings();void refreshContracts();void refreshFinance();}}>
@@ -222,14 +220,13 @@ export default function Inbox({conversionEnabled,bookingWritesEnabled,contractWr
   {notice&&<p role="status" className={styles.notification}>{notice}</p>}
   {bookingError&&<p role="status" className={styles.notification}>Situação operacional indisponível: {bookingError}</p>}
   {loading?<div className={styles.empty} role="status">Carregando solicitações...</div>:
-   !error&&shown.length===0?<div className={styles.empty}>Nenhuma solicitação nesta categoria.</div>:null}
+   !error&&shown.length===0?<div className={styles.empty}>{filter==='open'?'Nenhum atendimento em andamento. Novas solicitações aparecerão aqui.':'Nenhuma solicitação nesta categoria.'}</div>:null}
   <div className={styles.list}>
    {!loading&&shown.map(lead=><article key={lead.id} className={styles.lead}>
     <div className={styles.leadHead}>
      <div className={styles.leadIcon}><Building2 size={24} aria-hidden="true"/></div>
      <div className={styles.leadTitle}>
       <h2>{lead.institution}</h2>
-      <div className={styles.leadSubtitle}>Pedido recebido pelo site</div>
      </div>
      <span className={[styles.status,
       isCancelled(reservationFor(lead))?styles.statusArchived:
@@ -313,8 +310,8 @@ export default function Inbox({conversionEnabled,bookingWritesEnabled,contractWr
      {lead.status==='converted'&&lead.proposal_status==='accepted'&&lead.converted_proposal_id&&
       <button type="button" className={reservationFor(lead)?styles.actionSecondary:styles.actionPrimary}
        disabled={Boolean(busy)} onClick={()=>setBookingLeadId(lead.id)}
-       title={reservationFor(lead)?'Ver reserva de cúpula':'Organizar reserva de cúpula'}>
-       <CalendarDays size={15}/>{reservationFor(lead)?'Ver reserva':'Reservar'}
+       title={isCancelled(reservationFor(lead))?'Consultar apresentação cancelada':reservationFor(lead)?'Ver reserva de cúpula':'Organizar reserva de cúpula'}>
+       <CalendarDays size={15}/>{isCancelled(reservationFor(lead))?'Ver cancelamento':reservationFor(lead)?'Ver reserva':'Reservar'}
       </button>}
      {lead.status==='converted'&&lead.proposal_status==='accepted'&&lead.converted_proposal_id&&lead.converted_client_id&&
       <button type="button" className={styles.actionSecondary} disabled={Boolean(busy)}

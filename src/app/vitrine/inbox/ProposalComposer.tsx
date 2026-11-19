@@ -26,7 +26,6 @@ const uuid=/^[0-9a-f]{8}(-[0-9a-f]{4}){3}-[0-9a-f]{12}$/i;
 
 export default function ProposalComposer({lead,clientOptions,onClose,onSaved}:Props){
  const dialogRef=useRef<HTMLDialogElement>(null);
- const approveCancelRef=useRef<HTMLButtonElement>(null);
  const [proposalId,setProposalId]=useState<string|null>(lead.converted_proposal_id);
  const [status,setStatus]=useState('draft');
  const [loading,setLoading]=useState(Boolean(lead.converted_proposal_id));
@@ -37,7 +36,6 @@ export default function ProposalComposer({lead,clientOptions,onClose,onSaved}:Pr
  const [dirty,setDirty]=useState(false);
  const [saved,setSaved]=useState(false);
  const [confirmDiscard,setConfirmDiscard]=useState(false);
- const [confirmApprove,setConfirmApprove]=useState(false);
  const [model,setModel]=useState<Model>('per_student');
  const [attendees,setAttendees]=useState(lead.attendees??0);
  const [unit,setUnit]=useState(0);
@@ -53,8 +51,6 @@ export default function ProposalComposer({lead,clientOptions,onClose,onSaved}:Pr
   if(dialog&&!dialog.open)dialog.showModal();
   return ()=>{if(dialog?.open)dialog.close();};
  },[]);
-
- useEffect(()=>{if(confirmApprove)approveCancelRef.current?.focus();},[confirmApprove]);
 
  useEffect(()=>{
   if(!lead.converted_proposal_id)return;
@@ -92,7 +88,7 @@ export default function ProposalComposer({lead,clientOptions,onClose,onSaved}:Pr
  const readyForReview=valid&&Boolean(validUntil)&&terms.trim().length>=10&&(model==='complimentary'||total>0);
  const needsSave=!proposalId||dirty;
  const canApprove=Boolean(proposalId)&&status==='draft'&&!dirty&&!blocked&&readyForReview;
- const requestClose=()=>{if(busy)return;if(confirmApprove){setConfirmApprove(false);return;}if(dirty&&!saved){setConfirmDiscard(true);return;}onClose();};
+ const requestClose=()=>{if(busy)return;if(dirty&&!saved){setConfirmDiscard(true);return;}onClose();};
 
  async function post(url:string,body:object){
   const response=await fetch(url,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
@@ -101,7 +97,7 @@ export default function ProposalComposer({lead,clientOptions,onClose,onSaved}:Pr
   return data;
  }
 
- async function save(reviewAfterSave=false){
+ async function save(){
   if(blocked||!valid)return;
   setBusy(true);setError('');setNotice('');
   let id=proposalId;
@@ -124,8 +120,7 @@ export default function ProposalComposer({lead,clientOptions,onClose,onSaved}:Pr
     id,valid:validUntil||null,terms:terms.trim(),approve:false
    });
    setDirty(false);setSaved(true);
-   setNotice(reviewAfterSave?'Rascunho salvo. Confira os dados para aprovar.':'Rascunho salvo com sucesso. Você pode voltar e editar quando quiser.');
-   if(reviewAfterSave)setConfirmApprove(true);
+   setNotice('Rascunho salvo. Se estiver pronto, clique em Aprovar proposta.');
    onSaved();
   }catch(e){
    setError((created?'O cliente e o rascunho foram criados, mas faltou concluir o salvamento. ':'')+
@@ -146,11 +141,9 @@ export default function ProposalComposer({lead,clientOptions,onClose,onSaved}:Pr
    if(!response.ok||!data.proposal||data.proposal.status==='draft')
     throw Error('A aprovação ainda não foi confirmada. Atualize as solicitações antes de tentar novamente.');
    setStatus(String(data.proposal.status));
-   setConfirmApprove(false);
    setNotice('Proposta aprovada! Abra o PDF e encaminhe à instituição. Registre o aceite somente após a confirmação da escola.');
    onSaved();
   }catch(e){
-   setConfirmApprove(false);
    setError(e instanceof Error?e.message:'Não foi possível aprovar. Confira os dados da proposta.');
   }finally{setBusy(false);}
  }
@@ -162,7 +155,7 @@ export default function ProposalComposer({lead,clientOptions,onClose,onSaved}:Pr
    <span className={styles.icon}><FileText size={24}/></span>
    <div className={styles.heading}>
     <small>ANTARES BUSINESS · PROPOSTAS</small>
-    <h2 id="composer-title">{proposalId?'Editar proposta':'Preparar proposta'}</h2>
+    <h2 id="composer-title">{status!=='draft'?'Consultar proposta':proposalId?'Editar proposta':'Preparar proposta'}</h2>
    </div>
    <button type="button" className={styles.close} aria-label="Fechar formulário" onClick={requestClose} disabled={busy}><X size={20}/></button>
   </header>
@@ -184,7 +177,7 @@ export default function ProposalComposer({lead,clientOptions,onClose,onSaved}:Pr
      <small>{selectedClientId?'A proposta será vinculada ao cadastro escolhido, sem criar outro cliente.':'Se a instituição já estiver na lista, selecione seu cadastro para evitar duplicidade.'}</small>
     </div>}
    {loading&&<p role="status" className={styles.note}>Carregando dados da proposta...</p>}
-   {status!=='draft'&&!loading&&<p className={styles.note}>Esta proposta já foi concluída e não pode ser editada. Consulte o documento para visualizar ou imprimir.</p>}
+   {status!=='draft'&&!loading&&<p className={styles.note}>Proposta aprovada. Documento protegido.</p>}
    {loadError&&<p role="alert" className={styles.error}>{loadError}</p>}
    {error&&<p role="alert" className={styles.error}>{error}</p>}
    {notice&&<p role="status" className={styles.success}><CheckCircle2 size={17}/>{notice}</p>}
@@ -224,7 +217,6 @@ export default function ProposalComposer({lead,clientOptions,onClose,onSaved}:Pr
        onChange={e=>{setTerms(e.target.value);mark();}}/></div>
     </div>
    </fieldset>
-   <p className={styles.safe}><ShieldCheck size={17}/>O rascunho fica salvo para revisão. Nada é enviado à instituição nesta etapa.</p>
    {proposalId&&status==='draft'&&!loading&&!dirty&&(!validUntil||terms.trim().length<10||(model!=='complimentary'&&total<=0))&&
     <p className={styles.approvalHint}>Para aprovar, informe a validade e descreva as condições comerciais. Confira os valores e salve as alterações.</p>}
   </div>
@@ -236,35 +228,20 @@ export default function ProposalComposer({lead,clientOptions,onClose,onSaved}:Pr
     <button type="button" onClick={onClose}>Descartar e fechar</button></div>
   </div>}
 
-  {confirmApprove&&<div className={styles.approveConfirm} role="alertdialog"
-   aria-labelledby="approve-title" aria-describedby="approve-description" aria-modal="true">
-   <h3 id="approve-title"><CheckCircle2 size={19}/>Confirmar aprovação interna?</h3>
-   <p id="approve-description">Confira os dados antes de concluir. Depois da aprovação, este rascunho ficará protegido contra edição.</p>
-   <dl>
-    <div><dt>Instituição</dt><dd>{lead.institution}</dd></div>
-    <div><dt>Valor total</dt><dd>{money(total)}</dd></div>
-    <div><dt>Participantes</dt><dd>{attendees}</dd></div>
-    <div><dt>Validade</dt><dd>{validUntil.split('-').reverse().join('/')}</dd></div>
-    <div><dt>Condições</dt><dd>{terms.trim()}</dd></div>
-   </dl>
-   <p className={styles.approveNote}><ShieldCheck size={15}/>A aprovação é interna. Envie a proposta à instituição e registre o aceite somente após a confirmação dela.</p>
-   <div className={styles.approveActions}>
-    <button type="button" ref={approveCancelRef} className={styles.secondary} disabled={busy}
-     onClick={()=>setConfirmApprove(false)}>Voltar e editar</button>
-    <button type="button" className={styles.approveButton} disabled={busy||!canApprove}
-     onClick={()=>void approve()}>{busy?'Aprovando...':'Confirmar aprovação'}</button>
-   </div>
-  </div>}
-
   <footer className={styles.footer}>
    <button type="button" className={styles.secondary} onClick={requestClose} disabled={busy}>Fechar</button>
    {proposalId&&!dirty&&<Link className={styles.secondary} href={'/vitrine/proposta/'+proposalId+'?visualizar=1'} target="_blank" rel="noopener noreferrer">Visualizar / Salvar PDF</Link>}
-   {status==='draft'&&<button type="button" className={readyForReview?styles.approveButton:styles.primary}
-    disabled={blocked||!valid||confirmApprove||(!needsSave&&!readyForReview)}
-    onClick={()=>{setError('');if(needsSave){void save(readyForReview);}else if(readyForReview){setConfirmApprove(true);}}}>
-    {needsSave?<Save size={17}/>:<CheckCircle2 size={17}/>}
-    {busy?'Salvando...':needsSave?(readyForReview?'Salvar e revisar':'Salvar rascunho'):(readyForReview?'Revisar e aprovar':'Rascunho salvo')}
+   {status==='draft'&&needsSave&&<button type="button" className={styles.primary}
+    disabled={blocked||!valid} onClick={()=>void save()}>
+    <Save size={17}/>{busy?'Salvando...':'Salvar rascunho'}
    </button>}
+   {status==='draft'&&!needsSave&&readyForReview&&<>
+    <span className={styles.locked}><ShieldCheck size={15}/>Aprovação interna: bloqueia novas edições. Aceite da escola é separado.</span>
+    <button type="button" className={styles.approveButton}
+     disabled={!canApprove} onClick={()=>void approve()}>
+     <CheckCircle2 size={17}/>{busy?'Aprovando...':'Aprovar proposta'}
+    </button>
+   </>}
    {status!=='draft'&&<span className={styles.locked}><Info size={15}/>Documento protegido</span>}
   </footer>
  </dialog>;

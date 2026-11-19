@@ -36,7 +36,7 @@ export default function IntelligenceClient(){
    <div>
     <button type="button" className="intelligence-back" onClick={goBack}><ArrowLeft size={15}/> Voltar</button>
     <h1>ANTARES Intelligence</h1>
-    <p>Indicadores e recomendações para a gestão do seu planetário.</p>
+    
    </div>
    <div className="intelligence-head-icon" aria-hidden="true"><BarChart3 size={25}/></div>
   </header>
@@ -49,7 +49,7 @@ export default function IntelligenceClient(){
    <section className="intelligence-recommendations" aria-labelledby="intelligence-recommendations-heading">
     <div className="intelligence-section-head"><span className="intelligence-section-icon"><Lightbulb size={19}/></span><h2 id="intelligence-recommendations-heading">Recomendações gerenciais</h2></div>
     {recommendations.length?<ul>{recommendations.map(t=><li key={t}><CheckCircle2 size={16} aria-hidden="true"/><span>{t}</span></li>)}</ul>:<p>Nenhuma recomendação pendente nos indicadores disponíveis.</p>}
-    <p className="intelligence-footnote">Sugestões para avaliação do responsável. As decisões permanecem sob seu controle.</p>
+    
    </section>
    <section className="intelligence-actions" aria-labelledby="intelligence-actions-heading">
     <h2 id="intelligence-actions-heading">Acessos rápidos</h2>

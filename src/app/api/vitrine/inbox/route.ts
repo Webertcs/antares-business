@@ -11,7 +11,8 @@ export async function GET(){
   const rows=await db`SELECT l.id,l.responsible_name,l.institution,l.city,l.phone,l.audience,l.attendees,
     l.desired_date,l.notes,l.status,l.created_at,l.converted_client_id,l.converted_proposal_id,
     to_char(p.valid_until,'YYYY-MM-DD') AS proposal_valid_until,
-    (p.valid_until IS NOT NULL AND p.valid_until < CURRENT_DATE AND p.client_accepted_at IS NULL) AS proposal_expired,
+    (p.valid_until IS NOT NULL AND p.valid_until < CURRENT_DATE AND p.client_accepted_at IS NULL
+     AND (p.status <> 'draft' OR p.approved_at IS NOT NULL)) AS proposal_expired,
     CASE WHEN p.status='draft' AND p.approved_at IS NOT NULL THEN 'approved_internal'
          WHEN p.status='accepted' AND p.client_accepted_at IS NULL THEN 'legacy_accepted'
          ELSE p.status END AS proposal_status

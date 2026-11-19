@@ -29,7 +29,7 @@ export default async function CupulasPage(){
    </div>
    <section className="operation-detail-panel operation-dome-unified">
     <div className="operation-domes-heading"><h2>Suas cúpulas</h2><NovaCupula enabled={process.env.ANTARES_AGENDA_WRITES_ENABLED==='true'}/></div>
-    {domes.length===0?<div className="operation-detail-empty"><p>Nenhuma cúpula cadastrada.</p><small>O cadastro será realizado com os dados definitivos do planetário.</small></div>:
+    {domes.length===0?<div className="operation-detail-empty"><p>Nenhuma cúpula cadastrada.</p></div>:
     <div className="operation-dome-grid">{domes.map(d=><article className="operation-dome-card" key={d.id}>
      <div className="operation-dome-top"><h3>{d.name}</h3><span className={d.active?'operation-status-active':'operation-status-inactive'}>{d.active?'Ativa':'Inativa'}</span></div>
      <dl><div><dt>Código</dt><dd>{d.code||'Não informado'}</dd></div>

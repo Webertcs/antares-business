@@ -570,7 +570,7 @@ export default function FidelizacaoClient(){
  </div>
  </section>
  <section className="fidelizacao-panel fidelizacao-radar-panel">
- <h2 className="fidelizacao-section-heading">ANTARES Intelligence · Radar comercial</h2>
+ <h2 className="fidelizacao-section-heading">Radar comercial</h2>
  
  <div className="fidelizacao-radar-kpi-grid" style={{marginBottom:18}}>
  {([['Primeira visita pendente',radar.withoutVisit],['Retorno em atenção',radar.inactive],['Acompanhar',radar.attention],['Recorrentes no ano',radar.recurring],['Lembretes vencidos',radar.overdue]] as [string,number][]).map(([label,total])=><div key={label} className="fidelizacao-radar-kpi"><small>{label}</small><div style={{fontSize:25,fontWeight:800}}>{total}</div></div>)}

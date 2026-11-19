@@ -25,7 +25,7 @@ export default function DocumentoClient({doc}:{doc:D}){
  <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(180px,1fr))',gap:10,marginTop:12}}>
  {([['name','Razão social / nome'],['document','CPF / CNPJ'],['address','Endereço'],['representative','Representante']] as const).map(([key,label])=>
  <label key={key}>{label}<input value={provider[key]} onChange={e=>setProvider(v=>({...v,[key]:e.target.value}))} style={{display:'block',width:'100%',padding:9,border:'1px solid #b6c7dd',borderRadius:6}} /></label>)}
- </div><p style={{fontSize:12}}>Os dados salvos nas Configurações são carregados automaticamente, quando disponíveis. Alterações nesta tela valem apenas para a impressão. Todos os campos são obrigatórios.</p>
+ </div><p style={{fontSize:12}}>Os dados editados aqui valem somente para a impressão. Preencha os campos obrigatórios.</p>
  <label><input type="checkbox" checked={showNotes} onChange={e=>setShowNotes(e.target.checked)}/> Incluir observações da proposta após revisão (podem conter dados internos)</label>
  </section>
  <article className="document" style={{maxWidth:850,margin:'auto',background:'white',padding:'26px clamp(20px,4vw,42px)',borderRadius:8,boxShadow:'0 5px 25px #1e3c7020'}}>

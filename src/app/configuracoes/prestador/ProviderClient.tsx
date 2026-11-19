@@ -89,11 +89,11 @@ export default function ProviderClient({enabled}:{enabled:boolean}){
  return <section className="antares-provider-page">
   <header className="antares-provider-hero">
    <div className="antares-provider-hero-icon"><Building2 size={26}/></div>
-   <div><span className="antares-provider-eyebrow">ANTARES BUSINESS · CONFIGURAÇÕES</span><h1>Dados da empresa</h1><p>Informações para propostas e contratos.</p></div>
+   <div><span className="antares-provider-eyebrow">ANTARES BUSINESS · CONFIGURAÇÕES</span><h1>Dados da empresa</h1></div>
   </header>
   <section className="antares-provider-card">
    <header className="antares-provider-card-header">
-    <div><h2>Identificação da empresa</h2><p>Dados do responsável pelo planetário.</p></div>
+    <div><h2>Identificação da empresa</h2></div>
     <ShieldCheck size={21} aria-hidden="true"/>
    </header>
    {!enabled&&<p className="antares-provider-status antares-provider-status--info">Edição indisponível no momento. Os dados continuam disponíveis para consulta.</p>}

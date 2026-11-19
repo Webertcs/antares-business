@@ -67,7 +67,6 @@ export default function RenewValidity({proposalId,institution,previousValidUntil
       value={newDate} onChange={e=>setNewDate(e.target.value)}/>
     </div>
    </form>
-   <p className={styles.note}>A renovação ficará registrada. O aceite da escola deverá ser confirmado separadamente.</p>
   </div>
   <footer className={styles.footer}>
    <button type="button" className={styles.secondary} disabled={busy} onClick={onClose}>Cancelar</button>
