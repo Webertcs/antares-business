@@ -194,15 +194,15 @@ export default function ProposalComposer({lead,clientOptions,onClose,onSaved}:Pr
     </div>
     <div className={styles.grid}>
      <div className={styles.field}><label htmlFor="pc-attendees">Participantes</label>
-      <input id="pc-attendees" type="number" min="0" max="100000" step="1" value={attendees} onChange={e=>{setAttendees(e.target.value===''?NaN:Number(e.target.value));mark();}}/></div>
+      <input id="pc-attendees" type="number" min="0" max="100000" step="1" value={Number.isFinite(attendees) ? attendees : ''} onChange={e=>{setAttendees(e.target.value===''?NaN:Number(e.target.value));mark();}}/></div>
      {model==='per_student'&&<div className={styles.field}><label htmlFor="pc-unit">Preço por aluno (R$)</label>
-      <input id="pc-unit" type="number" min="0" step="0.01" value={unit} onChange={e=>{setUnit(e.target.value===''?NaN:Number(e.target.value));mark();}}/></div>}
+      <input id="pc-unit" type="number" min="0" step="0.01" value={Number.isFinite(unit) ? unit : ''} onChange={e=>{setUnit(e.target.value===''?NaN:Number(e.target.value));mark();}}/></div>}
      {model==='fixed'&&<div className={styles.field}><label htmlFor="pc-fixed">Valor fechado (R$)</label>
-      <input id="pc-fixed" type="number" min="0" step="0.01" value={fixed} onChange={e=>{setFixed(e.target.value===''?NaN:Number(e.target.value));mark();}}/></div>}
+      <input id="pc-fixed" type="number" min="0" step="0.01" value={Number.isFinite(fixed) ? fixed : ''} onChange={e=>{setFixed(e.target.value===''?NaN:Number(e.target.value));mark();}}/></div>}
      <div className={styles.field}><label htmlFor="pc-discount">Desconto (R$)</label>
-      <input id="pc-discount" type="number" min="0" step="0.01" value={discount} onChange={e=>{setDiscount(e.target.value===''?NaN:Number(e.target.value));mark();}}/></div>
+      <input id="pc-discount" type="number" min="0" step="0.01" value={Number.isFinite(discount) ? discount : ''} onChange={e=>{setDiscount(e.target.value===''?NaN:Number(e.target.value));mark();}}/></div>
      <div className={styles.field}><label htmlFor="pc-deposit">Sinal previsto (R$)</label>
-      <input id="pc-deposit" type="number" min="0" step="0.01" value={deposit} onChange={e=>{setDeposit(e.target.value===''?NaN:Number(e.target.value));mark();}}/></div>
+      <input id="pc-deposit" type="number" min="0" step="0.01" value={Number.isFinite(deposit) ? deposit : ''} onChange={e=>{setDeposit(e.target.value===''?NaN:Number(e.target.value));mark();}}/></div>
     </div>
     <div className={styles.total}><div><small>Total estimado</small><strong>{valid?money(total):'Confira os valores'}</strong></div>
      <div><small>Saldo após o sinal</small><strong>{valid?money(total-deposit):'—'}</strong></div></div>
@@ -236,7 +236,7 @@ export default function ProposalComposer({lead,clientOptions,onClose,onSaved}:Pr
     <Save size={17}/>{busy?'Salvando...':'Salvar rascunho'}
    </button>}
    {status==='draft'&&!needsSave&&readyForReview&&<>
-    <span className={styles.locked}><ShieldCheck size={15}/>Aprovação interna: bloqueia novas edições. Aceite da escola é separado.</span>
+    
     <button type="button" className={styles.approveButton}
      disabled={!canApprove} onClick={()=>void approve()}>
      <CheckCircle2 size={17}/>{busy?'Aprovando...':'Aprovar proposta'}
