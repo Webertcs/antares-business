@@ -156,7 +156,7 @@ export default function PremiumVitrine(){
   stopNarration();
   if(!('speechSynthesis' in window))return;
   const synth=window.speechSynthesis;
-  const utter=new SpeechSynthesisUtterance(mode==='intro'?(speaker==='Lunna'?'Oi! Eu sou a Lunna!':speaker==='PIXEL'?'Olá! Eu sou o Pixel!':'Olá! Eu sou o Astro!'):fact);
+  const utter=new SpeechSynthesisUtterance(fact);
   utter.lang='pt-BR';
   utter.rate=.93;
   // O mesmo mecanismo e a mesma voz de base para os três mascotes.
