@@ -41,7 +41,10 @@ export default function ServiceFinance({
  const [error,setError]=useState('');
  const [notice,setNotice]=useState('');
  const [description,setDescription]=useState('Apresentação de planetário — '+proposalTitle);
- const [total,setTotal]=useState(String(proposalTotal));
+ const [resolvedProposalTotal,setResolvedProposalTotal]=useState<number|null>(
+  Number.isFinite(proposalTotal)&&proposalTotal>0?proposalTotal:null
+ );
+ const [total,setTotal]=useState(Number.isFinite(proposalTotal)&&proposalTotal>0?String(proposalTotal):'');
  const [due,setDue]=useState(today());
  const [selected,setSelected]=useState('');
  const [amount,setAmount]=useState('');
@@ -56,6 +59,22 @@ export default function ServiceFinance({
  const dueTitles=titles.filter(t=>Math.max(0,Number(t.total)-Number(t.paid))>.009);
  const selectedTitle=dueTitles.find(t=>t.id===selected)||dueTitles[0];
  const writeOk=data?.writesEnabled===true&&!data?.limited;
+ // O valor da proposta é consultado diretamente: a lista de contratos pode ainda não ter carregado.
+ useEffect(()=>{
+  let active=true;
+  void(async()=>{
+   try{
+    const response=await fetch('/api/vitrine/proposta?id='+encodeURIComponent(proposalId),{cache:'no-store'});
+    if(!response.ok)return;
+    const result=await response.json();
+    const value=Number(result.proposal?.total);
+    if(!active||!Number.isFinite(value)||value<0)return;
+    setResolvedProposalTotal(value);
+    setTotal(current=>!current.trim()||current===String(proposalTotal)?(value>0?String(value):''):current);
+   }catch{/* A consulta financeira permanece disponível mesmo se a proposta não carregar. */}
+  })();
+  return()=>{active=false;};
+ },[proposalId,proposalTotal]);
 
  async function reload(){
   const response=await fetch('/api/financeiro/receber',{cache:'no-store'});
@@ -163,7 +182,7 @@ export default function ServiceFinance({
   <div style={{padding:19,display:'grid',gap:15}}>
    <div style={{padding:13,background:'#eaf3ff',border:'1px solid #c6dcf7',borderRadius:10}}>
     <strong>{institution}</strong>
-    <p style={{margin:'5px 0 0',fontSize:12}}>{proposalTitle}{Number.isFinite(proposalTotal)&&proposalTotal>0?' · Proposta '+fmt(proposalTotal):''}</p>
+    <p style={{margin:'5px 0 0',fontSize:12}}>{proposalTitle}{resolvedProposalTotal!==null?' · Proposta '+fmt(resolvedProposalTotal):''}</p>
    </div>
    {loading&&<p role="status">Consultando cobranças e recebimentos existentes...</p>}
    {error&&<p role="alert" style={{margin:0,padding:11,border:'1px solid #fecaca',
@@ -179,7 +198,7 @@ export default function ServiceFinance({
       </div>)}
     </div>
     {data.limited&&<p role="alert" style={{margin:0,padding:10,border:'1px solid #efce9c',background:'#fff7e8',borderRadius:8,fontSize:12}}>
-     O extrato possui mais registros do que esta consulta exibe. Para evitar cobranças duplicadas, novas gravações estão bloqueadas nesta janela.
+     O extrato completo não está disponível nesta consulta. Novas cobranças ficam bloqueadas para evitar duplicidade.
     </p>}
     {titles.length>0&&<section style={{display:'grid',gap:9}}>
      <strong style={{fontSize:14}}>Cobranças cadastradas</strong>
