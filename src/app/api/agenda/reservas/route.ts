@@ -31,8 +31,10 @@ export async function GET(){
 export async function POST(req:NextRequest){
  const owner=await requireOwner();if(!owner)return fail('Somente proprietário',403);
  const denied=await assertAgendaWriteAllowed(req);if(denied)return denied;
+ if(Number(req.headers.get('content-length')||0)>2500)return fail('Requisição excessiva.',413);
  try{
- const v=await req.json(),uuid=/^[0-9a-f]{8}(-[0-9a-f]{4}){3}-[0-9a-f]{12}$/i;
+ const raw=await req.text();if(raw.length>2500)return fail('Requisição excessiva.',413);
+ const v=JSON.parse(raw),uuid=/^[0-9a-f]{8}(-[0-9a-f]{4}){3}-[0-9a-f]{12}$/i;
  if(!v||!uuid.test(v.proposalId)||!uuid.test(v.domeId)||typeof v.start!=='string'||typeof v.end!=='string')return fail('Dados inválidos',400);
  const start=new Date(v.start),end=new Date(v.end);
  if(!Number.isFinite(start.getTime())||!Number.isFinite(end.getTime())||end<=start)return fail('Horários inválidos',400);
