@@ -295,7 +295,7 @@ export default function Inbox({conversionEnabled,bookingWritesEnabled,contractWr
      {lead.status==='converted'&&!lead.proposal_expired&&lead.converted_proposal_id&&['approved_internal','legacy_accepted'].includes(String(lead.proposal_status))&&
       <button type="button" disabled={Boolean(busy)||!conversionEnabled}
        onClick={()=>setAcceptLeadId(lead.id)} className={styles.actionPrimary}
-       title="Registrar o aceite verdadeiro da escola"><CheckCircle2 size={15}/>Registrar aceite</button>}
+       title="Registrar a confirmação da escola"><CheckCircle2 size={15}/>Registrar aceite</button>}
      {conversionEnabled&&lead.status==='converted'&&lead.converted_proposal_id&&lead.proposal_expired&&['approved_internal','legacy_accepted'].includes(String(lead.proposal_status))&&
       <button type="button" disabled={Boolean(busy)} className={styles.actionPrimary}
        onClick={()=>setRenewLeadId(lead.id)} title="Renovar validade da proposta">
@@ -371,7 +371,7 @@ export default function Inbox({conversionEnabled,bookingWritesEnabled,contractWr
     proposalId={contractLead.converted_proposal_id}
     enabled={contractWritesEnabled}
     onClose={()=>setContractLeadId(null)}
-    onSaved={()=>{setNotice('Contrato cadastrado. Ele é opcional e não altera a reserva.');void refreshContracts();}}
+    onSaved={()=>{setNotice('Contrato salvo.');void refreshContracts();}}
   />}
   {bookingLead&&bookingLead.converted_proposal_id&&<ServiceBooking
     key={bookingLead.id}
