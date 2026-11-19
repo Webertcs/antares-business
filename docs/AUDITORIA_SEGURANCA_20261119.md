@@ -71,6 +71,8 @@ Todas pertencem a `neondb_owner`. A presença de `PUBLIC EXECUTE` por si só **n
 **Consulta 6 — direitos CREATE no esquema public (produção, 19/11):**
 `PUBLIC` não possui `CREATE` no esquema `public` (`false`); a role `antares_team_runtime` também não possui `CREATE` (`false`). O teste específico passou. Ainda confirmar demais roles com `CREATE` e revisar as funções SECURITY DEFINER e seus objetos referenciados.
 
+**Consulta 7 — roles com CREATE no esquema public (produção, 19/11):** apenas `cloud_admin` (LOGIN=true, BYPASSRLS=true), `neondb_owner` (LOGIN=true, BYPASSRLS=true) e `pg_database_owner` (LOGIN=false, BYPASSRLS=false) aparecem com `CREATE=true`. `antares_team_runtime` não aparece. Não há indício de concessão CREATE a papel operacional comum. **Pendente** conferir que credenciais administrativas não são usadas em fluxos operacionais e revisar corpos das funções SECURITY DEFINER.
+
 ## 4. Testes automáticos
 
 `npm run test:seguranca` verifica invariantes textuais essenciais de sessão, autorização técnica, aceite, recebimento público e financeiro. Esses testes não substituem ensaio de invasão, autorização real nem validação de RLS. O CI também executa build e auditoria de dependências.
