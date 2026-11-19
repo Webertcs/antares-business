@@ -20,6 +20,13 @@ export default function ClientsPage({ writesEnabled }: { writesEnabled: boolean 
  const [kind,setKind]=useState('all');
  const restoreDialog=useRef<HTMLDialogElement>(null);
  const [restoreClient,setRestoreClient]=useState<Client|null>(null);
+ const archiveDialog=useRef<HTMLDialogElement>(null);
+ const [archiveTarget,setArchiveTarget]=useState<Client|null>(null);
+ const [archiveError,setArchiveError]=useState('');
+ useEffect(()=>{
+  if(archiveTarget&&!archiveDialog.current?.open)archiveDialog.current?.showModal();
+  else if(!archiveTarget&&archiveDialog.current?.open)archiveDialog.current.close();
+ },[archiveTarget]);
  useEffect(()=>{if(restoreClient)restoreDialog.current?.showModal();},[restoreClient]);
  const [restoreStatus,setRestoreStatus]=useState('prospect');
  const [showArchived,setShowArchived]=useState(false);
@@ -126,7 +133,7 @@ export default function ClientsPage({ writesEnabled }: { writesEnabled: boolean 
   if(!writesEnabled||saving)return;
   const archive=client.status!=='inactive';
   if(!archive&&!restoreTo){setFeedback('');setRestoreStatus('prospect');setRestoreClient(client);return;}
-  if(archive&&!window.confirm((archive?'Arquivar':'Reativar')+' o cliente '+client.name+'? O histórico, os eventos e as propostas serão preservados.'))return;
+  if(archive&&!restoreTo){setArchiveError('');setArchiveTarget(client);return;}
   setSaving(true);setFeedback('');
   try{
    const response=await fetch('/api/crm/clientes',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({
@@ -135,10 +142,13 @@ export default function ClientsPage({ writesEnabled }: { writesEnabled: boolean 
    })});
    const data=await response.json();if(!response.ok)throw Error(data.error||'Falha ao atualizar cliente');
    setFeedback(archive?'Cliente arquivado; registros e vínculos preservados.':'Cliente reativado.');
-   setRestoreClient(null);
+   setRestoreClient(null);setArchiveTarget(null);setArchiveError('');
    if(archive&&selected===client.id){setSelected(null);setForm(null);}
    setRevision(n=>n+1);
-  }catch(e){setFeedback(e instanceof Error?e.message:'Operação indisponível');}
+   }catch(e){
+   const message=e instanceof Error?e.message:'Operação indisponível';
+   setFeedback(message);if(archive)setArchiveError(message);
+  }
   finally{setSaving(false)}
  }
  const countBy=(k:string)=>clients.filter(c=>c.kind===k).length;
@@ -234,6 +244,21 @@ export default function ClientsPage({ writesEnabled }: { writesEnabled: boolean 
     <div className={styles.formActions}><button type="submit" disabled={!writesEnabled||saving}>{saving?"Salvando...":"Salvar"}</button>
     <button type="button" disabled={saving} onClick={closeForm} style={{marginLeft:12}}>Cancelar</button></div>
    </form></dialog>}
+  {archiveTarget&&<dialog ref={archiveDialog} onCancel={e=>{if(saving){e.preventDefault();return;}setArchiveTarget(null);}} aria-labelledby="archive-client-title" className={styles.dialog}
+   style={{padding:0,width:'min(440px,94vw)',maxWidth:'94vw',border:'1px solid #b1cef5',borderRadius:16,overflow:'hidden',boxShadow:'0 26px 70px rgba(6,27,66,.35)',color:'#173965'}}>
+   <div style={{background:'linear-gradient(110deg,#123a7a,#2878cf)',padding:'18px 20px',color:'#fff'}}>
+    <h2 id="archive-client-title" style={{fontSize:20,margin:0,color:'#fff'}}>Arquivar cliente</h2>
+   </div>
+   <div style={{display:'grid',gap:14,padding:20}}>
+    <p style={{margin:0}}>Arquivar <strong>{archiveTarget.name}</strong>?</p>
+    <p style={{margin:0,fontSize:13,color:'#49698f'}}>O cadastro sairá da lista de ativos. Propostas, contratos e histórico serão preservados.</p>
+    {archiveError&&<p role="alert" style={{color:'#af2639',margin:0,fontSize:13}}>{archiveError}</p>}
+    <div style={{display:'flex',justifyContent:'flex-end',gap:8,flexWrap:'wrap'}}>
+     <button type="button" disabled={saving} onClick={()=>setArchiveTarget(null)} style={{padding:'9px 15px',border:'1px solid #b6cff1',borderRadius:8,color:'#174a90',background:'#e7f1ff',cursor:'pointer',fontWeight:700}}>Cancelar</button>
+     <button type="button" disabled={saving} onClick={()=>void archiveClient(archiveTarget,'confirmado')} style={{padding:'9px 15px',border:0,borderRadius:8,color:'#fff',background:'#175bbc',cursor:'pointer',fontWeight:700}}>{saving?'Arquivando…':'Arquivar cliente'}</button>
+    </div>
+   </div>
+  </dialog>}
   {restoreClient&&<dialog ref={restoreDialog} onCancel={e=>{if(saving)e.preventDefault();else setRestoreClient(null);}} aria-labelledby="restore-title" className={styles.dialog}>
    <h2 id="restore-title">Reativar {restoreClient.name}</h2>
    <p>O histórico será preservado.</p>
