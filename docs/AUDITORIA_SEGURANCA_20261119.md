@@ -58,6 +58,8 @@ Todas pertencem a `neondb_owner`. A presença de `PUBLIC EXECUTE` por si só **n
 
 **Status:** diagnóstico parcial; pendente verificar permissões efetivas por outras roles e isolamento A/B no banco.
 
+**Consulta 4 — natureza das funções com PUBLIC EXECUTE (produção, 19/11):** as quatro funções anteriores retornam `trigger`, todas sem parâmetros. `antares_guard_audit` e `antares_guard_ledger` não são SECURITY DEFINER e têm `proconfig=NULL`. `antares_guard_linked_event_changes` e `antares_sync_presentation_event` são SECURITY DEFINER, com `search_path=pg_catalog, public, pg_temp`. Permissão `PUBLIC EXECUTE` nesses objetos não permite invocá-los diretamente como funções SQL comuns. Isso reduz o risco aparente de invocação direta, **mas não dispensa revisão dos gatilhos, corpo da função nem privilégios CREATE do esquema public**. Nenhum grant alterado.
+
 ## 4. Testes automáticos
 
 `npm run test:seguranca` verifica invariantes textuais essenciais de sessão, autorização técnica, aceite, recebimento público e financeiro. Esses testes não substituem ensaio de invasão, autorização real nem validação de RLS. O CI também executa build e auditoria de dependências.
