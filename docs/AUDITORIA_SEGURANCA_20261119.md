@@ -81,6 +81,8 @@ Todas pertencem a `neondb_owner`. A presença de `PUBLIC EXECUTE` por si só **n
 
 **Consulta 11 — EXECUTE de `antares_close_event` (produção, 19/11):** `PUBLIC=false`, `antares_team_runtime=true`, `neondb_owner=true`. Controle de concessão atende ao desenho previsto; não prova autenticação de ponta a ponta. **Pendente:** verificar na rota de API que `p_subject` vem exclusivamente da sessão validada e que não há credencial operacional exposta ao navegador. Nenhuma alteração em produção.
 
+**Revisão da rota de encerramento no GitHub (19/11):** arquivo `src/app/api/eventos/[id]/encerramento/route.ts` na branch `feature/entrega-proprietario-20261119`. O POST usa `requireOwner()`, extrai `ctx.user.id` do contexto autenticado e **não** aceita `p_subject` do corpo JSON; valida origem, tipo de conteúdo, UUID, número inteiro de alunos e limites; utiliza `getTeamWriteDb()` com checagem de `current_user='antares_team_runtime'` e concessão EXECUTE restrita, além de flag `ANTARES_EVENT_CLOSING_WRITES_ENABLED`. **Conclusão estática:** mitigado o risco de impersonação via parâmetro de formulário nesse endpoint. Ainda pendentes testes negativos autenticados, validação de `requireOwner` e da conexão no ambiente real, auditoria de dependências e gates de entrega.
+
 ## 4. Testes automáticos
 
 `npm run test:seguranca` verifica invariantes textuais essenciais de sessão, autorização técnica, aceite, recebimento público e financeiro. Esses testes não substituem ensaio de invasão, autorização real nem validação de RLS. O CI também executa build e auditoria de dependências.
