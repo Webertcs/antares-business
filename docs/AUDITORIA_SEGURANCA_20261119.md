@@ -68,6 +68,9 @@ Todas pertencem a `neondb_owner`. A presença de `PUBLIC EXECUTE` por si só **n
 
 **Conclusão parcial:** gatilhos vinculados e habilitados; nenhuma brecha confirmada somente pela presença de PUBLIC EXECUTE em funções `RETURNS trigger`. Necessário revisar corpos das duas SECURITY DEFINER e privilégios CREATE no esquema `public` antes de concluir. Nenhuma mudança em produção.
 
+**Consulta 6 — direitos CREATE no esquema public (produção, 19/11):**
+`PUBLIC` não possui `CREATE` no esquema `public` (`false`); a role `antares_team_runtime` também não possui `CREATE` (`false`). O teste específico passou. Ainda confirmar demais roles com `CREATE` e revisar as funções SECURITY DEFINER e seus objetos referenciados.
+
 ## 4. Testes automáticos
 
 `npm run test:seguranca` verifica invariantes textuais essenciais de sessão, autorização técnica, aceite, recebimento público e financeiro. Esses testes não substituem ensaio de invasão, autorização real nem validação de RLS. O CI também executa build e auditoria de dependências.
