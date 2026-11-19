@@ -77,6 +77,8 @@ Todas pertencem a `neondb_owner`. A presença de `PUBLIC EXECUTE` por si só **n
 
 **Consulta 9 — permissões da contagem de alunos (19/11):** tabela `public.antares_event_attendance`: `relrowsecurity=true`, `relforcerowsecurity=true`, `PUBLIC INSERT=false`, `antares_team_runtime INSERT/UPDATE/DELETE=false`. Proteção contra gravação direta pelo runtime confirmada; verificar a função `antares_close_event` e seus controles de autorização.
 
+**Consulta 10 — corpo de `antares_close_event` (produção, 19/11):** função SECURITY DEFINER, proprietária `neondb_owner`, parâmetros `p_subject text, p_event uuid, p_students integer`; valida parâmetros, procura `team_members` ativo com `role='owner'` por `auth_subject=p_subject`, restringe evento à organização, bloqueia status inválido/arquivado, data futura e apresentações ainda em andamento ou canceladas; exige proposta aceita para evento reservado; insere `antares_event_attendance`, atualiza evento para completed e grava `business_audit` na mesma função. **Risco a investigar:** não vincula `p_subject` à identidade autenticada no próprio banco. Verificar EXECUTE por PUBLIC e roles, credencial usada pela rota, derivação de `p_subject` exclusivamente da sessão e testes negativos de impersonação. Nenhuma mudança em produção.
+
 ## 4. Testes automáticos
 
 `npm run test:seguranca` verifica invariantes textuais essenciais de sessão, autorização técnica, aceite, recebimento público e financeiro. Esses testes não substituem ensaio de invasão, autorização real nem validação de RLS. O CI também executa build e auditoria de dependências.
