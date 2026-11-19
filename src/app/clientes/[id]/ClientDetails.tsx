@@ -518,35 +518,17 @@ export default function ClientDetails({id,writesEnabled,proposalWritesEnabled,co
    <button key={key} type="button" aria-current={activeTab===key?'page':undefined} onClick={()=>{setActiveTab(key);setCommercialFeedback('');}}
     style={{cursor:'pointer',border:'1px solid #a9c7ee',borderRadius:10,padding:'10px 15px',fontWeight:700,background:activeTab===key?'#155cc1':'#eaf3ff',color:activeTab===key?'#fff':'#174987'}}>{label}</button>)}
  </nav>
- {activeTab==='propostas'&&<section className="client-premium-tab" data-client-tab="propostas" style={{...panel,borderLeftColor:'#169caa'}}><h2 style={heading}>Propostas e orçamentos ({proposals.length})</h2><p style={{fontSize:13}}>Propostas comerciais vinculadas a {client.name}.</p>
- {proposalWritesEnabled&&<button type="button" style={{...actionLink,background:'#145ac3',margin:'12px 0 16px'}} onClick={()=>{setProposalDraft({...emptyProposalDraft});setCommercialForm('proposal');}}>+ Nova proposta</button>}
+ {activeTab==='propostas'&&<section className="client-premium-tab" data-client-tab="propostas" style={{...panel,borderLeftColor:'#169caa'}}><h2 style={heading}>Propostas e orçamentos ({proposals.length})</h2><div style={{margin:"10px 0 12px"}}><Link href="/vitrine/inbox" style={{...actionLink,background:"#e8f2ff",color:"#174987",boxShadow:"none"}}>Abrir Central de Atendimento</Link></div>
  <div role="group" aria-label="Filtrar propostas" style={{display:'flex',flexWrap:'wrap',gap:7,alignItems:'center',margin:'4px 0 12px'}}>
  {([['active','Ativas',proposals.length-archivedCount],['archived','Arquivadas',archivedCount],['all','Todas',proposals.length]] as const).map(([value,label,count])=><button key={value} type="button" aria-pressed={proposalFilter===value} onClick={()=>setProposalFilter(value)} style={{...actionLink,border:'1px solid #91b7e8',background:proposalFilter===value?'#145ac3':'#e6f1ff',color:proposalFilter===value?'#fff':'#174987'}}>{label} ({count})</button>)}
  </div>
  {commercialError?<p role="alert">{commercialError}</p>:!commercial?<p>Carregando informações comerciais…</p>:commercial.unavailable.includes('proposals')?<p>Propostas temporariamente indisponíveis.</p>:visibleProposals.length===0?<p>{proposalFilter==='archived'?'Nenhuma proposta arquivada.':proposalFilter==='active'?'Nenhuma proposta ativa.':'Nenhuma proposta vinculada a esta instituição.'}</p>:visibleProposals.map(p=><div key={String(p.id)} className="client-premium-entry" style={row}><strong>{String(p.title||'Proposta')}</strong> · {money(p.total)} · <strong>{proposalStatusLabel(p)}</strong>{Boolean(p.archived_at)&&<span style={{marginLeft:8,color:'#526e96',fontWeight:700}}>· Arquivada</span>}<div style={{fontSize:12}}>Criada em {dateBR(p.created_at?String(p.created_at):null)}</div>
  <div style={{display:'flex',gap:8,flexWrap:'wrap',alignItems:'center',marginTop:12}}>
-  {proposalWritesEnabled&&!p.archived_at&&!p.from_vitrine&&String(p.status)==='sent'
-   ?<button type="button" disabled={commercialActionBusy||closingBusy} onClick={()=>{setClosingProposal({id:String(p.id),title:String(p.title||'Proposta')});setClosingMode('verbal');setClosingResponsible('');setClosingTerms('');setClosingError('');setCommercialFeedback('');}} style={{...actionLink,background:'#087e73'}}>Fechar negócio</button>
-   :proposalWritesEnabled&&!p.archived_at&&isConfirmedForContract(p)&&!contracts.some(c=>String(c.proposal_id)===String(p.id))
-   ?<button type="button" onClick={()=>openContractModal(p)} style={actionLink}>Criar contrato</button>
-   :!p.archived_at&&p.from_vitrine&&p.approved_at&&!p.client_accepted_at
-   ?<Link href="/vitrine/inbox" style={actionLink}>Continuar em Oportunidades</Link>
-   :!p.archived_at&&String(p.status)==='draft'
-   ?<button type="button" onClick={()=>openProposalWhatsapp(p)} style={actionLink}>Enviar pelo WhatsApp</button>
-   :<button type="button" onClick={()=>proposalPdf(p)} style={actionLink}>Visualizar PDF</button>}
-  {(!p.archived_at&&['draft','sent'].includes(String(p.status))||!p.archived_at&&String(p.status)==='accepted'&&!contracts.some(c=>String(c.proposal_id)===String(p.id)))&&
-   <button type="button" onClick={()=>proposalPdf(p)} style={{...actionLink,background:'#e8f2ff',color:'#174987',boxShadow:'none'}}>Visualizar PDF</button>}
-  {(!p.archived_at&&String(p.status)!=='draft')&&<button type="button" onClick={()=>openProposalWhatsapp(p)} style={{...actionLink,background:'#16803c'}}>WhatsApp</button>}
-  {proposalWritesEnabled&&!p.archived_at&&['draft','sent'].includes(String(p.status))&&<>
-   <button type="button" disabled={commercialActionBusy} onClick={()=>commercialAction(String(p.id),'sent')} style={{...actionLink,background:'#e8f2ff',color:'#174987',boxShadow:'none'}}>Confirmar envio</button>
-   {String(p.status)==='draft'&&<button type="button" disabled={commercialActionBusy||closingBusy} onClick={()=>{setClosingProposal({id:String(p.id),title:String(p.title||'Proposta')});setClosingMode('verbal');setClosingResponsible('');setClosingTerms('');setClosingError('');setCommercialFeedback('');}} style={actionLink}>Fechar negócio</button>}
-   <button type="button" disabled={commercialActionBusy} onClick={()=>commercialAction(String(p.id),'rejected')} style={{...actionLink,background:'#526e96'}}>Marcar recusada</button>
-  </>}
-  {proposalWritesEnabled&&<button type="button" disabled={commercialActionBusy} onClick={()=>commercialAction(String(p.id),p.archived_at?'restore':'archive')} style={{...actionLink,background:'#526e96'}}>{p.archived_at?'Reativar proposta':'Arquivar proposta'}</button>}
+  <button type="button" onClick={()=>proposalPdf(p)} style={{...actionLink,background:'#e8f2ff',color:'#174987',boxShadow:'none'}}>Visualizar PDF</button>
  </div>
  </div>)}
 </section>}
- {activeTab==='contratos'&&<section className="client-premium-tab" data-client-tab="contratos" style={{...panel,borderLeftColor:'#3c7ad4'}}><h2 style={heading}>Contratos ({contracts.length})</h2><p style={{fontSize:13}}>Contratos vinculados a propostas aceitas de {client.name}. O cadastro não equivale à confirmação do cliente.</p>
+ {activeTab==='contratos'&&<section className="client-premium-tab" data-client-tab="contratos" style={{...panel,borderLeftColor:'#3c7ad4'}}><h2 style={heading}>Contratos ({contracts.length})</h2><div style={{margin:"10px 0 12px"}}><Link href="/vitrine/inbox" style={{...actionLink,background:"#e8f2ff",color:"#174987",boxShadow:"none"}}>Abrir Central de Atendimento</Link></div>
  {commercialError?<p role="alert">{commercialError}</p>:!commercial?<p>Carregando contratos…</p>:commercial.unavailable.includes('contracts')||commercial.unavailable.includes('proposals')?<p>Contratos temporariamente indisponíveis.</p>:contracts.length===0?<p>Nenhum contrato vinculado a esta instituição.</p>:contracts.map(c=>{
  const status=String(c.status||'pending');const contractId=String(c.id);
  const modeNames:Record<string,string>={written:'Formal por escrito',formal:'Formal por escrito',verbal:'Acordo verbal',whatsapp:'WhatsApp'};
@@ -554,7 +536,7 @@ export default function ClientDetails({id,writesEnabled,proposalWritesEnabled,co
  <div style={{fontSize:12}}>Modalidade: {modeNames[String(c.confirmation_mode)]||String(c.confirmation_mode||'Não informada')}</div>
  <div style={{fontSize:12}}>{status==='confirmed'?'Confirmado em '+dateBR(c.confirmed_at?String(c.confirmed_at):null):'Ainda não confirmado pelo cliente'}</div>
  {Boolean(c.confirmed_by_name)&&<div style={{fontSize:12}}>Responsável informado: {String(c.confirmed_by_name)}</div>}
- <div style={{marginTop:10}}><button type="button" style={actionLink} onClick={()=>{void openDocument(c,contractId);}}>Elaborar documento</button></div>
+ 
  {editingDocumentId===contractId&&<div role="presentation"
  style={{position:'fixed',inset:0,zIndex:1100,display:'grid',placeItems:'center',padding:16,background:'rgba(5,21,52,.68)'}}>
  <section role="dialog" aria-modal="true" aria-labelledby="client-contract-editor-title"
