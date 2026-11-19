@@ -14,7 +14,7 @@ export async function GET() {
       db`SELECT id,client_id,full_name,position,email,phone,whatsapp,is_primary
         FROM public.crm_contacts WHERE organization_id=${ctx.organizationId}
         ORDER BY is_primary DESC,created_at DESC LIMIT 1000`,
-      db`SELECT id,client_id,title,event_kind,event_date,expected_attendees,pricing_model,
+      db`SELECT id,client_id,title,event_kind,event_date,start_time,end_time,expected_attendees,pricing_model,
                price_per_person,fixed_amount,status,venue,notes,archived_at
         FROM public.crm_events WHERE organization_id=${ctx.organizationId}
         ORDER BY event_date DESC NULLS LAST LIMIT 500`
