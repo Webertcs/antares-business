@@ -1,7 +1,7 @@
 name: ANTARES - segurança e build
 on:
   push:
-    branches: [main, feature/bloco-02d-seguranca, feature/entrega-proprietario-20261119]
+    branches: [main, feature/bloco-02d-seguranca, feature/entrega-proprietario-20261119, audit/seguranca-neon-20261119]
   pull_request:
     branches: [main]
 permissions:
@@ -23,6 +23,8 @@ jobs:
         env:
           NEON_AUTH_BASE_URL: https://invalid.example
           NEON_AUTH_COOKIE_SECRET: non-production-ci-secret-only-not-valid
+      - name: Verificar invariantes de segurança da API
+        run: npm run test:seguranca
       - name: Gerar relatório de dependências para análise
         run: npm audit --omit=dev --json > auditoria-dependencias.json || true
       - name: Guardar relatório da auditoria
