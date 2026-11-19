@@ -8,7 +8,7 @@ function Formulario(){
  const search=useSearchParams(); const token=search.get('token'); const [password,setPassword]=useState(''); const [repeat,setRepeat]=useState(''); const [loading,setLoading]=useState(false); const [message,setMessage]=useState(''); const [done,setDone]=useState(false); const [showPassword,setShowPassword]=useState(false); const [showRepeat,setShowRepeat]=useState(false);
  async function submit(e:FormEvent<HTMLFormElement>){
   e.preventDefault(); if(!token||loading)return;
-  if(password.length<12){setMessage('Utilize uma senha com pelo menos 12 caracteres.');return}
+  if(password.length<8){setMessage('Utilize uma senha com pelo menos 8 caracteres.');return}
   if(password!==repeat){setMessage('As senhas não coincidem.');return}
   setLoading(true);setMessage('');
   try {
@@ -24,20 +24,20 @@ function Formulario(){
     <h1 id="reset-title" style={{margin:0}}>{done?'Senha atualizada!':'Criar nova senha'}</h1>
    </div>
    <p style={{color:'#d7e9ff',textAlign:'center',fontSize:15,lineHeight:1.5,margin:'4px 0 8px'}}>
-    {done?'Sua senha foi alterada. Entre com a nova senha para acessar o ANTARES.': 'Escolha uma senha com pelo menos 12 caracteres.'}
+    {done?'Sua senha foi alterada. Entre com a nova senha para acessar o ANTARES.': 'Escolha uma senha com pelo menos 8 caracteres.'}
    </p>
    {!token?<p role="alert" style={{color:'#fff',background:'#633047',padding:12,borderRadius:10}}>Link inválido. Solicite outro e-mail de recuperação.</p>:!done?
    <form onSubmit={submit} style={{display:'flex',flexDirection:'column',gap:15}}>
     <label className="antares-login-field">
      <LockKeyhole size={20} aria-hidden="true"/>
      <span className="sr-only">Nova senha</span>
-     <input type={showPassword?'text':'password'} autoComplete="new-password" placeholder="Nova senha" required minLength={12} value={password} onChange={e=>setPassword(e.target.value)} disabled={loading}/>
+     <input type={showPassword?'text':'password'} autoComplete="new-password" placeholder="Nova senha" required minLength={8} value={password} onChange={e=>setPassword(e.target.value)} disabled={loading}/>
      <button type="button" aria-label={showPassword?'Ocultar nova senha':'Mostrar nova senha'} onClick={()=>setShowPassword(v=>!v)} style={{background:'transparent',border:0,color:'#c5e8ff',display:'grid',placeItems:'center',padding:4}}>{showPassword?<EyeOff size={19}/>:<Eye size={19}/>}</button>
     </label>
     <label className="antares-login-field">
      <LockKeyhole size={20} aria-hidden="true"/>
      <span className="sr-only">Confirme a nova senha</span>
-     <input type={showRepeat?'text':'password'} autoComplete="new-password" placeholder="Confirme a senha" required minLength={12} value={repeat} onChange={e=>setRepeat(e.target.value)} disabled={loading}/>
+     <input type={showRepeat?'text':'password'} autoComplete="new-password" placeholder="Confirme a senha" required minLength={8} value={repeat} onChange={e=>setRepeat(e.target.value)} disabled={loading}/>
      <button type="button" aria-label={showRepeat?'Ocultar confirmação':'Mostrar confirmação'} onClick={()=>setShowRepeat(v=>!v)} style={{background:'transparent',border:0,color:'#c5e8ff',display:'grid',placeItems:'center',padding:4}}>{showRepeat?<EyeOff size={19}/>:<Eye size={19}/>}</button>
     </label>
     <button type="submit" className="antares-login-submit" disabled={loading}>{loading?'SALVANDO…':'SALVAR NOVA SENHA'}</button>
