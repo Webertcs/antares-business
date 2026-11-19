@@ -163,7 +163,7 @@ export default function ServiceFinance({
   <div style={{padding:19,display:'grid',gap:15}}>
    <div style={{padding:13,background:'#eaf3ff',border:'1px solid #c6dcf7',borderRadius:10}}>
     <strong>{institution}</strong>
-    <p style={{margin:'5px 0 0',fontSize:12}}>{proposalTitle} · Proposta {fmt(proposalTotal)}</p>
+    <p style={{margin:'5px 0 0',fontSize:12}}>{proposalTitle}{Number.isFinite(proposalTotal)&&proposalTotal>0?' · Proposta '+fmt(proposalTotal):''}</p>
    </div>
    {loading&&<p role="status">Consultando cobranças e recebimentos existentes...</p>}
    {error&&<p role="alert" style={{margin:0,padding:11,border:'1px solid #fecaca',
@@ -178,7 +178,6 @@ export default function ServiceFinance({
        <strong style={{display:'block',fontSize:20,marginTop:4,color:'#124985'}}>{fmt(v.value)}</strong>
       </div>)}
     </div>
-    <p style={{margin:0,fontSize:12,color:'#506f98'}}>Somente cobranças vinculadas a esta proposta aparecem aqui. O valor da proposta não representa pagamento recebido.</p>
     {data.limited&&<p role="alert" style={{margin:0,padding:10,border:'1px solid #efce9c',background:'#fff7e8',borderRadius:8,fontSize:12}}>
      O extrato possui mais registros do que esta consulta exibe. Para evitar cobranças duplicadas, novas gravações estão bloqueadas nesta janela.
     </p>}
@@ -205,7 +204,6 @@ export default function ServiceFinance({
       </label>
      </div>
      <button type="submit" disabled={busy} style={button}>Registrar cobrança</button>
-     <p style={{margin:0,fontSize:12,color:'#54729a'}}>Isso não registra pagamento nem altera a proposta.</p>
     </form>}
     {writeOk&&dueTitles.length>0&&!pending&&<form onSubmit={requestPayment} style={{display:'grid',gap:10}}>
      <strong style={{fontSize:14}}>Registrar pagamento recebido</strong>
