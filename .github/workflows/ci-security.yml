@@ -23,5 +23,13 @@ jobs:
         env:
           NEON_AUTH_BASE_URL: https://invalid.example
           NEON_AUTH_COOKIE_SECRET: non-production-ci-secret-only-not-valid
+      - name: Gerar relatório de dependências para análise
+        run: npm audit --omit=dev --json > auditoria-dependencias.json || true
+      - name: Guardar relatório da auditoria
+        uses: actions/upload-artifact@v4
+        with:
+          name: antares-auditoria-dependencias
+          path: auditoria-dependencias.json
+          retention-days: 7
       - name: Auditar dependências de produção (bloqueante)
         run: npm audit --omit=dev --audit-level=high
