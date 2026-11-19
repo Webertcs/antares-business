@@ -59,7 +59,7 @@ function ServiceTimeline({lead,reservation,operationalKnown,finance}:{
   <p style={{margin:'10px 0 0',fontSize:12,color:'#365780'}}>
    {cancelled?'Cancelada e arquivada. Histórico e financeiro preservados.':
     finished?'Concluída e arquivada. Público registrado; pagamentos no Financeiro.':
-    bookingDone?'Reserva registrada para '+(reservation?.starts_at?dateTime(reservation.starts_at):'data a confirmar')+'. Acompanhe a apresentação e o financeiro.':
+    bookingDone?'Reserva: '+(reservation?.starts_at?dateTime(reservation.starts_at):'data a confirmar')+'.':
     accepted&&!operationalKnown?'Aceite registrado. O estado das reservas não pôde ser consultado. Atualize a Central.':
     accepted?'Próxima ação: reservar a apresentação.':
     hasProposal&&lead.proposal_status==='draft'?'Finalize o rascunho e aprove a proposta antes de solicitar o aceite da escola.':
