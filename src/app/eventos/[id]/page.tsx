@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import BackToPrevious from './BackToPrevious';
 import {notFound,redirect} from 'next/navigation';
 import {requireMember,getDb} from '@/lib/equipe/auth';
 
@@ -37,7 +38,7 @@ export default async function Page({params}:{params:Promise<{id:string}>}){
  const period=hour?(hour+(end?' às '+end:'')):'Horário a definir';
  return <main className="antares-event-center" style={{display:'grid',gap:14,color:'#173668',paddingBottom:24}}>
   <nav aria-label="Navegação do evento" style={{display:'flex',gap:10,alignItems:'center',flexWrap:'wrap'}}>
-   <Link href="/eventos" style={{color:'#195db3',fontSize:13,fontWeight:750,textDecoration:'none'}}>← Voltar aos eventos</Link>
+   <BackToPrevious/>
   </nav>
   <header style={{borderRadius:16,padding:'20px clamp(16px,3vw,26px)',background:'linear-gradient(110deg,#092a67,#1356b4)',color:'#fff',display:'grid',gap:9}}>
    <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',gap:10,flexWrap:'wrap'}}>
