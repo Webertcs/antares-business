@@ -159,7 +159,6 @@ export default function ServiceContract({
      <textarea required minLength={8} maxLength={8000} rows={5} disabled={!enabled||busy}
       value={terms} onChange={e=>setTerms(e.target.value)} style={field}/>
     </label>
-    <p style={{margin:0,fontSize:12,color:'#496a97'}}>Salvar registra o documento, mas não confirma aceite nem cria reserva.</p>
     {!enabled&&<p role="status">Cadastro de contratos indisponível no momento.</p>}
     <div style={{display:'flex',justifyContent:'flex-end',gap:9,flexWrap:'wrap'}}>
      <button type="button" disabled={busy} onClick={onClose} style={secondary}>Cancelar</button>
