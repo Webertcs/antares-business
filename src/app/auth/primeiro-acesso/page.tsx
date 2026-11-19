@@ -18,8 +18,8 @@ function Form(){
  <form action={action} style={{display:'grid',gap:14}}>
  <label>Nome completo<input name="name" required minLength={2} maxLength={120} autoComplete="name" style={field}/></label>
  <label>E-mail que recebeu o convite<input name="email" type="email" required autoComplete="email" style={field}/></label>
- <label>Crie uma senha (mínimo de 12 caracteres)<input name="password" type="password" required minLength={12} maxLength={128} autoComplete="new-password" style={field}/></label>
- <label>Confirme a senha<input name="confirm" type="password" required minLength={12} maxLength={128} autoComplete="new-password" style={field}/></label>
+ <label>Crie uma senha (mínimo de 8 caracteres)<input name="password" type="password" required minLength={8} maxLength={128} autoComplete="new-password" style={field}/></label>
+ <label>Confirme a senha<input name="confirm" type="password" required minLength={8} maxLength={128} autoComplete="new-password" style={field}/></label>
  {state?.error&&<p role="alert" style={{color:'#b91c1c'}}>{state.error}</p>}
  <button disabled={pending||!valid} style={{background:'#2463e7',color:'white',padding:13,borderRadius:10,fontWeight:700,cursor:'pointer',opacity:pending||!valid?.6:1}}>{pending?'Criando conta...':'Criar meu acesso'}</button>
  </form>}
