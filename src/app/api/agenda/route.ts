@@ -1,5 +1,5 @@
 import {NextResponse} from 'next/server';
-import {requireMember,requireOwner,getDb} from '@/lib/equipe/auth';
+import {requireMember,requireOwner,getDb,getTeamWriteDb} from '@/lib/equipe/auth';
 export const runtime='nodejs';
 export const dynamic='force-dynamic';
 export async function GET(){
@@ -64,20 +64,38 @@ export async function PATCH(request:Request){
    return NextResponse.json({error:'Confira os horários de início e término.'},{status:400});
   const dome=body.dome_id===''||body.dome_id==null?null:String(body.dome_id);
   if(dome&&!uuid.test(dome))return NextResponse.json({error:'Cúpula inválida.'},{status:400});
-  const db=getDb();
-  const linked=await db`SELECT 1 FROM public.antares_presentation_event_links
-   WHERE organization_id=${ctx.organizationId}::uuid AND event_id=${id}::uuid LIMIT 1`;
-  if(linked.length)return NextResponse.json(
-   {error:'Esta apresentação possui reserva vinculada. Reagende pelo botão Ver reserva para manter a cúpula sincronizada.'},
-   {status:409,headers:{'Cache-Control':'no-store'}});
-  if(dome){
-   const valid=await db`SELECT id FROM public.antares_domes WHERE id=${dome} AND organization_id=${ctx.organizationId} AND active=true LIMIT 1`;
-   if(!valid.length)return NextResponse.json({error:'Cúpula indisponível.'},{status:400});
-  }
-  const updated=await db`UPDATE public.crm_events SET start_time=${start},end_time=${end},dome_id=${dome}
-   WHERE id=${id} AND organization_id=${ctx.organizationId}
-   RETURNING id,start_time,end_time,dome_id`;
-  if(!updated.length)return NextResponse.json({error:'Evento não encontrado.'},{status:404});
-  return NextResponse.json({ok:true,event:updated[0]},{headers:{'Cache-Control':'no-store'}});
+  // A agenda nunca grava pela conexão geral de leitura.
+  if(process.env.ANTARES_AGENDA_WRITES_ENABLED!=='true' ||
+     process.env.ANTARES_DB_RUNTIME_ROLE!=='antares_team_runtime' ||
+     !process.env.DATABASE_URL_TEAM_RUNTIME)
+    return NextResponse.json({error:'Alterações da agenda aguardando homologação.'},{status:503});
+  const db=getTeamWriteDb();
+  const checks=await db`SELECT
+    current_user='antares_team_runtime'
+    AND r.rolcanlogin AND NOT r.rolsuper AND NOT r.rolbypassrls
+    AND NOT has_table_privilege(current_user,'public.crm_events','UPDATE')
+    AND p.prosecdef AND pg_get_userbyid(p.proowner)='neondb_owner'
+    AND has_function_privilege(current_user,p.oid,'EXECUTE')
+    AND NOT EXISTS (
+      SELECT 1 FROM aclexplode(coalesce(p.proacl,acldefault('f',p.proowner))) acl
+      WHERE acl.grantee=0 AND acl.privilege_type='EXECUTE'
+    ) AS ok
+    FROM pg_roles r JOIN pg_proc p
+      ON p.oid=to_regprocedure('public.antares_update_unlinked_event_schedule(text,uuid,uuid,text,text,uuid)')
+    WHERE r.rolname=current_user`;
+  if(checks[0]?.ok!==true)
+    return NextResponse.json({error:'Gravação restrita da agenda ainda não homologada.'},{status:503});
+  const rows=await db`SELECT public.antares_update_unlinked_event_schedule(
+    ${ctx.user.id},${ctx.organizationId}::uuid,${id}::uuid,${start},${end},${dome}::uuid
+  ) AS result`;
+  const result=rows[0]?.result as {status?:string; event?:unknown}|null|undefined;
+  if(result?.status==='linked')return NextResponse.json(
+    {error:'Esta apresentação possui reserva vinculada. Reagende pelo botão Ver reserva para manter a cúpula sincronizada.'},
+    {status:409,headers:{'Cache-Control':'no-store'}});
+  if(result?.status==='dome')return NextResponse.json({error:'Cúpula indisponível.'},{status:400});
+  if(result?.status==='missing')return NextResponse.json({error:'Evento não encontrado.'},{status:404});
+  if(result?.status!=='ok'||!result.event)
+    return NextResponse.json({error:'Agenda não homologada.'},{status:503});
+  return NextResponse.json({ok:true,event:result.event},{headers:{'Cache-Control':'no-store'}});
  }catch{return NextResponse.json({error:'Não foi possível atualizar a apresentação.'},{status:503});}
 }
