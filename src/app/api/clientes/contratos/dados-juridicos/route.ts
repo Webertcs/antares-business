@@ -52,7 +52,7 @@ export async function POST(req:NextRequest){
    ${owner.user.id},${owner.organizationId}::uuid,${b.kind},${b.clientId}::uuid,
    ${b.legal_name.trim()},${b.document_number.trim()},${b.full_address.trim()},${b.representative.trim()}
  ) AS id`;
- if(!rows[0]?.id)return fail('Não foi possível salvar os dados jurídicos.',503);
+ if(!rows[0]?.id)return fail('Cliente não autorizado.',403);
  return NextResponse.json({id:rows[0].id},{headers:{'Cache-Control':'no-store'}});
  }catch(e){console.error('[ANTARES][legal-profile]',e instanceof Error?e.message:'Erro');return fail('Não foi possível salvar os dados jurídicos.',503);}
 }
