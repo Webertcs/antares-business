@@ -13,8 +13,8 @@ function Form(){
  <section style={{maxWidth:490,margin:'auto',borderRadius:18,overflow:'hidden',background:'#fff',boxShadow:'0 16px 40px #123c8026'}}>
  <header style={{padding:26,background:'linear-gradient(110deg,#12366d,#2778ec)',color:'#fff'}}><small>ANTARES BUSINESS · EQUIPE</small><h1 style={{fontSize:27,fontWeight:800,marginTop:10}}>Meu primeiro acesso</h1><p>Crie sua conta para entrar no planetário.</p></header>
  <div style={{padding:26}}>
- {!valid&&<p role="alert" style={{color:'#b45309'}}>Abra esta página pelo link de convite recebido do proprietário.</p>}
- {state?.ok?<div role="status"><h2 style={{fontWeight:750,fontSize:20}}>Conta criada!</h2><p>Confirme seu e-mail, se solicitado pelo serviço de autenticação. Depois entre com sua nova senha e volte ao convite para concluir a autorização.</p><p style={{marginTop:15}}><Link href={'/auth/verificar-email?token='+encodeURIComponent(token)} style={{color:'#1d4ed8'}}>Confirmar meu e-mail</Link></p><p style={{marginTop:15}}><Link href={'/auth/sign-in?token='+encodeURIComponent(token)} style={{color:'#1d4ed8'}}>Entrar com minha conta</Link></p></div>:
+ {!valid&&<div role="status" style={{padding:14,borderRadius:10,background:'#eff6ff',color:'#174985',lineHeight:1.6}}><p>O primeiro acesso de colaboradores exige um convite enviado pelo proprietário.</p><p style={{marginTop:10}}>Já possui cadastro? <Link href="/auth/esqueci-senha" style={{fontWeight:750,textDecoration:'underline'}}>Definir ou recuperar senha</Link>.</p></div>}
+ {state?.ok?<div role="status"><h2 style={{fontWeight:750,fontSize:20}}>Conta criada!</h2><p>Confirme seu e-mail, se solicitado pelo serviço de autenticação. Depois entre com sua nova senha e volte ao convite para concluir a autorização.</p><p style={{marginTop:15}}><Link href={'/auth/verificar-email?token='+encodeURIComponent(token)} style={{color:'#1d4ed8'}}>Confirmar meu e-mail</Link></p><p style={{marginTop:15}}><Link href={'/auth/sign-in?token='+encodeURIComponent(token)} style={{color:'#1d4ed8'}}>Entrar com minha conta</Link></p></div>:valid?
  <form action={action} style={{display:'grid',gap:14}}>
  <label>Nome completo<input name="name" required minLength={2} maxLength={120} autoComplete="name" style={field}/></label>
  <label>E-mail que recebeu o convite<input name="email" type="email" required autoComplete="email" style={field}/></label>
@@ -22,7 +22,7 @@ function Form(){
  <label>Confirme a senha<input name="confirm" type="password" required minLength={8} maxLength={128} autoComplete="new-password" style={field}/></label>
  {state?.error&&<p role="alert" style={{color:'#b91c1c'}}>{state.error}</p>}
  <button disabled={pending||!valid} style={{background:'#2463e7',color:'white',padding:13,borderRadius:10,fontWeight:700,cursor:'pointer',opacity:pending||!valid?.6:1}}>{pending?'Criando conta...':'Criar meu acesso'}</button>
- </form>}
+ </form>:null}
  <p style={{marginTop:18}}>Já possui conta? <Link href={'/auth/sign-in?token='+encodeURIComponent(token)} style={{color:'#1d4ed8'}}>Entrar</Link></p>
  <p style={{marginTop:10}}><Link href={next} style={{color:'#1d4ed8'}}>Voltar ao convite</Link></p>
  </div></section></main>;
