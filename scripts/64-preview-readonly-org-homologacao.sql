@@ -10,7 +10,7 @@ DO $install$
 DECLARE
   v_table text;
   v_role record;
-  v_org constant uuid := 'ea465e76-1e54-4e0e-8857-f6f5112a6c53';
+  v_org uuid;
   v_rel record;
   v_policy constant text := 'antares_preview_read_one_org';
   v_tables constant text[] := ARRAY[
@@ -38,14 +38,11 @@ BEGIN
      OR v_role.rolbypassrls OR v_role.rolcreatedb OR v_role.rolcreaterole THEN
     RAISE EXCEPTION 'A role de leitura deve existir sem LOGIN/privilegios.';
   END IF;
-  IF NOT EXISTS (
-    SELECT 1 FROM public.team_members
-    WHERE active AND organization_id=v_org
-  ) OR EXISTS (
-    SELECT 1 FROM public.team_members
-    WHERE active AND organization_id<>v_org
-  ) THEN
-    RAISE EXCEPTION 'Membros ativos fora da organizacao esperada na homologacao.';
+  SELECT CASE WHEN COUNT(DISTINCT organization_id)=1
+              THEN MIN(organization_id) ELSE NULL END
+    INTO v_org FROM public.team_members WHERE active;
+  IF v_org IS NULL THEN
+    RAISE EXCEPTION 'Homologacao deve ter apenas uma organizacao com membros ativos.';
   END IF;
   IF EXISTS (
     SELECT 1 FROM pg_auth_members m
