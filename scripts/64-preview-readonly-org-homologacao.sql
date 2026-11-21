@@ -38,12 +38,12 @@ BEGIN
      OR v_role.rolbypassrls OR v_role.rolcreatedb OR v_role.rolcreaterole THEN
     RAISE EXCEPTION 'A role de leitura deve existir sem LOGIN/privilegios.';
   END IF;
-  SELECT CASE WHEN COUNT(DISTINCT organization_id)=1
-              THEN MIN(organization_id) ELSE NULL END
-    INTO v_org FROM public.team_members WHERE active;
-  IF v_org IS NULL THEN
+  IF (SELECT COUNT(DISTINCT organization_id)
+      FROM public.team_members WHERE active) <> 1 THEN
     RAISE EXCEPTION 'Homologacao deve ter apenas uma organizacao com membros ativos.';
   END IF;
+  SELECT organization_id INTO v_org
+    FROM public.team_members WHERE active LIMIT 1;
   IF EXISTS (
     SELECT 1 FROM pg_auth_members m
     JOIN pg_roles r ON r.oid=m.member
