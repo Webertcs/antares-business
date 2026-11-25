@@ -21,14 +21,15 @@ function LoginFormContent(){
     <div className="antares-login-business">B U S I N E S S</div>
     <div className="antares-login-subtitle">PLANETÁRIO MÓVEL DIGITAL</div>
    </div>
-   <h1>Acesse sua conta</h1>
+   <h1>{valid?'Etapa 3 de 4 — Entrar':'Acesse sua conta'}</h1>
+   {valid&&<p style={{color:'#d7e9ff',textAlign:'center',fontSize:14}}>Use o e-mail confirmado e a senha cadastrada. Depois de entrar, você voltará ao convite para liberar seu acesso (etapa 4).</p>}
    {valid&&<input type="hidden" name="inviteToken" value={token}/>}
    <label className="antares-login-field"><Mail aria-hidden="true" size={21}/><span className="sr-only">E-mail</span><input name="email" type="email" placeholder="E-mail" required autoComplete="username"/></label>
    <label className="antares-login-field"><LockKeyhole aria-hidden="true" size={21}/><span className="sr-only">Senha</span><input name="password" type={showPassword?'text':'password'} placeholder="Senha" required autoComplete="current-password"/><button type="button" className="antares-login-eye" onClick={()=>setShowPassword(p=>!p)} aria-label={showPassword?'Ocultar senha':'Mostrar senha'} aria-pressed={showPassword}>{showPassword?<EyeOff size={22}/>:<Eye size={22}/>}</button></label>
    {state?.error&&<p role="alert" className="antares-login-error">{state.error}</p>}
-   <button className="antares-login-submit" disabled={pending} type="submit"><LogIn size={23}/>{pending?'Entrando…':'ENTRAR'}</button>
+   <button className="antares-login-submit" disabled={pending} type="submit"><LogIn size={23}/>{pending?'Entrando…':valid?'ENTRAR E CONTINUAR':'ENTRAR'}</button>
    <Link className="antares-login-forgot" href="/auth/esqueci-senha"><KeyRound size={18}/> Esqueceu a senha?</Link>
-   {valid&&<div className="antares-login-invite"><Link href={'/auth/primeiro-acesso'+query}>Ativar meu convite</Link><Link href={'/auth/verificar-email'+query}>Confirmar e-mail</Link></div>}
+   {valid&&<div className="antares-login-invite"><Link href={'/auth/primeiro-acesso'+query}>Criar conta (etapa 1)</Link><Link href={'/auth/verificar-email'+query}>Confirmar e-mail (etapa 2)</Link></div>}
   </form>
  </main>;
 }

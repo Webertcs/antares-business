@@ -83,7 +83,7 @@ export default function EquipeClient({ writesEnabled }: { writesEnabled: boolean
       if (!response.ok) throw new Error(result.error || 'Não foi possível gerar o convite');
       setLink(new URL(result.link, window.location.origin).toString());
       void refreshInvitations();
-      setFeedback('Convite gerado. Copie o link e envie somente ao endereço convidado. Válido por 48 horas.');
+      setFeedback('Convite gerado! Copie o link e envie ao colaborador por WhatsApp ou e-mail. O sistema não envia o convite automaticamente. Válido por 48 horas.');
     } catch (e) { setFeedback(e instanceof Error ? e.message : 'Falha ao gerar convite'); }
     finally { setSending(false); }
   }
@@ -100,7 +100,7 @@ export default function EquipeClient({ writesEnabled }: { writesEnabled: boolean
     <section className="team-panel team-premium-panel">
       <h2>Convidar colaborador</h2>
       {!canWrite && <p role="status" style={{color:'#92400e',fontWeight:700}}>{checkingSecurity ? 'Verificando permissões de segurança...' : 'Não é possível enviar convites neste momento.'}</p>}
-      <p>O colaborador deve aceitar o convite com o mesmo e-mail.</p>
+      <p>Informe o nome e o e-mail do colaborador. Depois, copie o link gerado e envie a ele por WhatsApp ou e-mail. O convite não é enviado automaticamente. O colaborador deverá criar ou acessar sua conta com o mesmo e-mail, confirmar o endereço e aceitar o convite.</p>
       <form onSubmit={invite} className="team-invite-form">
         <label>Nome completo<input disabled={!canWrite} required minLength={2} maxLength={160} value={name} onChange={e=>setName(e.target.value)} style={{display:'block',width:'100%',padding:10,color:'#111',background:'#fff'}}/></label>
         <label>E-mail do colaborador<input disabled={!canWrite} required type="email" maxLength={254} value={email} onChange={e=>setEmail(e.target.value)} style={{display:'block',width:'100%',padding:10,color:'#111',background:'#fff'}}/></label>
