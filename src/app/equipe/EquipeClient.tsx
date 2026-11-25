@@ -100,7 +100,7 @@ export default function EquipeClient({ writesEnabled }: { writesEnabled: boolean
     <section className="team-panel team-premium-panel">
       <h2>Convidar colaborador</h2>
       {!canWrite && <p role="status" style={{color:'#92400e',fontWeight:700}}>{checkingSecurity ? 'Verificando permissões de segurança...' : 'Não é possível enviar convites neste momento.'}</p>}
-      <p>Informe o nome e o e-mail do colaborador. Depois, copie o link gerado e envie a ele por WhatsApp ou e-mail. O convite não é enviado automaticamente. O colaborador deverá criar ou acessar sua conta com o mesmo e-mail, confirmar o endereço e aceitar o convite.</p>
+      <p>Informe o nome e o e-mail do colaborador. Depois, copie o link gerado e envie a ele por WhatsApp ou e-mail. O convite não é enviado automaticamente. O colaborador deverá usar o mesmo e-mail, confirmar o endereço e clicar em Entrar e aceitar convite. O painel abrirá após a validação.</p>
       <form onSubmit={invite} className="team-invite-form">
         <label>Nome completo<input disabled={!canWrite} required minLength={2} maxLength={160} value={name} onChange={e=>setName(e.target.value)} style={{display:'block',width:'100%',padding:10,color:'#111',background:'#fff'}}/></label>
         <label>E-mail do colaborador<input disabled={!canWrite} required type="email" maxLength={254} value={email} onChange={e=>setEmail(e.target.value)} style={{display:'block',width:'100%',padding:10,color:'#111',background:'#fff'}}/></label>

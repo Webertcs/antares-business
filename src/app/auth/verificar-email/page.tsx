@@ -14,9 +14,9 @@ function VerificarEmailContent() {
   const [sendState, sendAction, sending] = useActionState(enviarCodigo, null);
   const [verifyState, verifyAction, verifying] = useActionState(confirmarCodigo, null);
   return <main style={box}>
-    <h1 style={{fontSize:24,fontWeight:750}}>{query?'Etapa 2 de 4 — Confirmar e-mail':'Confirmar e-mail'}</h1>
+    <h1 style={{fontSize:24,fontWeight:750}}>{query?'Etapa 2 de 3 — Confirmar e-mail':'Confirmar e-mail'}</h1>
     <p>Informe o e-mail usado no cadastro. Confira sua caixa de entrada e a pasta de spam. Se ainda não recebeu o código de seis dígitos, solicite um abaixo.</p>
-    {verifyState?.ok ? <><p role="status" style={{color:'#15803d'}}>E-mail confirmado com sucesso!</p><Link href={"/auth/sign-in"+query}>{query?'Continuar para a etapa 3 · Entrar na conta':'Ir para o login'}</Link></> : <>
+    {verifyState?.ok ? <><p role="status" style={{color:'#15803d'}}>E-mail confirmado com sucesso!</p><Link href={"/auth/sign-in"+query}>{query?'Continuar para a etapa 3 · Entrar e aceitar convite':'Ir para o login'}</Link></> : <>
       <form action={sendAction} style={{display:'grid',gap:12}}>
         <label>E-mail<input style={field} type="email" name="email" autoComplete="email" required value={email} onChange={e=>setEmail(e.target.value)}/></label>
         <button style={button} disabled={sending}>{sending?'Enviando...':'Solicitar código de verificação'}</button>
