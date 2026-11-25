@@ -1,7 +1,7 @@
 'use client';
 import { useEffect, useState } from 'react';
 type Invitation = { id: string; invited_name: string; invited_email: string; expires_at: string };
-type Member = { id: string; full_name: string; email: string | null; role: string; active: boolean };
+type Member = { id: string; full_name: string; email: string | null; role: string; active: boolean; archived_at?: string | null; technical?: boolean };
 export default function EquipeClient({ writesEnabled }: { writesEnabled: boolean }) {
   const [members, setMembers] = useState<Member[]>([]);
   const [invitations, setInvitations] = useState<Invitation[]>([]);
@@ -14,12 +14,16 @@ export default function EquipeClient({ writesEnabled }: { writesEnabled: boolean
   const [feedback, setFeedback] = useState('');
   const [securityReady, setSecurityReady] = useState(false);
   const [checkingSecurity, setCheckingSecurity] = useState(true);
+  const [managementReady, setManagementReady] = useState(false);
+  const [busyMember, setBusyMember] = useState<string | null>(null);
   const canWrite = writesEnabled && securityReady;
+  const visibleMembers = members.filter(m => !m.archived_at);
+  const archivedMembers = members.filter(m => m.archived_at);
   useEffect(() => {
     let alive = true;
     fetch('/api/equipe/preflight', {cache:'no-store'})
       .then(async r => {const data=await r.json();if(!r.ok)throw Error(data.error||'Verificação indisponível');return data;})
-      .then(data => {if(alive)setSecurityReady(data.readyForControlledTest===true);})
+      .then(data => {if(alive){setSecurityReady(data.readyForControlledTest===true);setManagementReady(data.managementReady===true);}})
       .catch(()=>{if(alive)setSecurityReady(false);})
       .finally(()=>{if(alive)setCheckingSecurity(false);});
     return ()=>{alive=false};
@@ -69,6 +73,27 @@ export default function EquipeClient({ writesEnabled }: { writesEnabled: boolean
       setFeedback('Acesso suspenso. O cadastro continua disponível para consulta.');
     } catch (error) { setFeedback(error instanceof Error ? error.message : 'Falha ao suspender acesso'); }
   }
+  async function manage(member: Member, action: 'reactivate' | 'archive') {
+    if (!canWrite || !managementReady || busyMember || member.role !== 'collaborator' || member.active) return;
+    const message = action === 'archive'
+      ? 'Remover ' + member.full_name + ' da lista da equipe? O acesso continuará bloqueado e o histórico será preservado.'
+      : 'Restabelecer o acesso de ' + member.full_name + '?';
+    if (!window.confirm(message)) return;
+    setBusyMember(member.id); setFeedback('');
+    try {
+      const response = await fetch('/api/equipe/gerenciar', {
+        method: 'POST', headers: {'Content-Type':'application/json'}, cache:'no-store',
+        body: JSON.stringify({memberId:member.id, action})
+      });
+      const result = await response.json();
+      if (!response.ok) throw new Error(result.error || 'Não foi possível atualizar o acesso.');
+      const refreshed = await fetch('/api/equipe', {cache:'no-store'});
+      if (!refreshed.ok) { setFeedback('Alteração registrada. Atualize a página para conferir.'); return; }
+      const data = await refreshed.json(); setMembers(data.members ?? []);
+      setFeedback(action === 'archive' ? 'Colaborador removido da lista principal. Histórico preservado.' : 'Acesso reativado.');
+    } catch (e) { setFeedback(e instanceof Error ? e.message : 'Falha ao gerenciar acesso.'); }
+    finally { setBusyMember(null); }
+  }
   async function invite(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (!canWrite) return;
@@ -90,13 +115,18 @@ export default function EquipeClient({ writesEnabled }: { writesEnabled: boolean
   return <main className="team-refined team-premium">
     <header className="team-premium-header"><span className="team-premium-eyebrow">GESTÃO DE ACESSOS</span><h1>Equipe e permissões</h1></header>
     <div className="team-premium-body">
-    <div className="team-premium-summary"><div><strong>{members.length}</strong><span>Integrantes</span></div><div><strong>{members.filter(m=>m.active).length}</strong><span>Ativos</span></div><div><strong>{invitations.length}</strong><span>Convites pendentes</span></div></div>
+    <div className="team-premium-summary"><div><strong>{visibleMembers.length}</strong><span>Integrantes</span></div><div><strong>{visibleMembers.filter(m=>m.active).length}</strong><span>Ativos</span></div><div><strong>{invitations.length}</strong><span>Convites pendentes</span></div></div>
     <h2 className="team-section-title">Pessoas com acesso</h2>
     {loading ? <p>Carregando...</p> : error ? <p role="alert">{error}</p> : <table className="team-table">
       <thead><tr><th>Nome</th><th>E-mail</th><th>Perfil</th><th>Situação</th><th>Ações</th></tr></thead>
-      <tbody>{members.map(m => <tr key={m.id}><td>{m.full_name}</td><td>{m.email||'—'}</td>
-        <td>{m.role==='owner'?'Proprietário':'Colaborador'}</td><td>{m.active?'Ativo':'Inativo'}</td><td>{canWrite && m.role==='collaborator' && m.active ? <button onClick={()=>suspend(m)} style={{padding:8,borderRadius:8,color:'#fff',background:'#9f1239'}}>Suspender</button> : '—'}</td></tr>)}</tbody>
+      <tbody>{visibleMembers.map(m => <tr key={m.id}><td>{m.full_name}</td><td>{m.email||'—'}</td>
+        <td>{m.technical?'Administrador técnico':m.role==='owner'?'Proprietário':'Colaborador'}</td><td>{m.active?'Ativo':'Inativo'}</td><td>{canWrite && m.role==='collaborator' ? m.active ? <button disabled={!!busyMember} onClick={()=>suspend(m)} style={{padding:8,borderRadius:8,color:'#fff',background:'#9f1239'}}>Suspender</button> : managementReady ? <div style={{display:'flex',gap:8,flexWrap:'wrap'}}><button disabled={!!busyMember} onClick={()=>manage(m,'reactivate')} style={{padding:8,borderRadius:8,color:'#fff',background:'#2563eb'}}>Reativar</button><button disabled={!!busyMember} onClick={()=>manage(m,'archive')} style={{padding:8,borderRadius:8,color:'#fff',background:'#9f1239'}}>Remover da equipe</button></div> : '—' : '—'}</td></tr>)}</tbody>
     </table>}
+    {archivedMembers.length > 0 && <details className="team-panel team-premium-panel">
+      <summary>Ex-colaboradores ({archivedMembers.length})</summary>
+      <p>Sem acesso ao sistema. O histórico das apresentações é preservado.</p>
+      {archivedMembers.map(m=><div key={m.id} style={{display:'flex',alignItems:'center',gap:12,flexWrap:'wrap',marginTop:10}}><strong>{m.full_name}</strong>{canWrite && managementReady && <button disabled={!!busyMember} onClick={()=>manage(m,'reactivate')} style={{padding:8,borderRadius:8,color:'#fff',background:'#2563eb'}}>Reativar</button>}</div>)}
+    </details>}
     <section className="team-panel team-premium-panel">
       <h2>Convidar colaborador</h2>
       {!canWrite && <p role="status" style={{color:'#92400e',fontWeight:700}}>{checkingSecurity ? 'Verificando permissões de segurança...' : 'Não é possível enviar convites neste momento.'}</p>}

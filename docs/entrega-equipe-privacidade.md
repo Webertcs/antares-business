@@ -1,0 +1,10 @@
+# Entrega — equipe e privacidade
+PR preparado para homologação; não publicar automaticamente.
+1. Aplicar scripts/65a-equipe-gestao.sql em homologação como neondb_owner. É aditivo: nenhuma conta é desativada nesta etapa.
+2. Validar com proprietário e colaborador reais de teste: convite, aceite verificado, suspensão, bloqueio após F5, reativação, remoção da lista, reativação de ex-colaborador. Conferir que proprietário, outro tenant e requisição de origem diferente não podem ser alvos ou autores indevidos. Testar auditoria, convites pendentes e vínculo de evento preservado. Validar build e preview. 
+3. Conferir /oficina e /api/oficina/snapshot: somente subject técnico configurado que ainda é proprietário ativo tem acesso; proprietário real deve receber sem-acesso/403. A oficina atualmente consulta dados comerciais: não manter acesso técnico ativo após a entrega.
+4. Aplicar 65A em production após backup. Só então publicar a alteração.
+5. Proprietário real confirma pessoalmente login, e-mail, acesso à equipe e aos demais módulos no domínio oficial. Conferir IDs exatos e papéis com SELECT somente leitura.
+6. Executar 65B em production como manutenção autorizada, com três UUIDs verificados. Primeiro ROLLBACK, conferir, depois COMMIT. Não remover a conta técnica antes do login real do proprietário. Testar que as contas retiradas não acessam o CRM, inclusive oficina/API e sessão anterior. O proprietário permanece ativo. O acesso técnico por infraestrutura não é uma conta comercial; não usar para consultar dados sem autorização. 
+7. A remoção da equipe é arquivamento reversível, não DELETE: preserva relações e auditoria. O TESTADOR e o administrador técnico arquivados não aparecem na lista operacional. Ex-colaboradores ficam em seção própria para reativação. Não apagar credenciais Better Auth nem históricos automaticamente.
+8. Pendências existentes: rotação de credenciais expostas e auditoria de dependências; o PR não as resolve. Não copiar segredos para logs, commits ou prints. 
