@@ -1,5 +1,5 @@
 import {NextRequest,NextResponse} from 'next/server';
-import {requireOwner,getDb} from '@/lib/equipe/auth';
+import {requireOwner,getDb,getTeamWriteDb} from '@/lib/equipe/auth';
 export const runtime='nodejs';
 export const dynamic='force-dynamic';
 const uuid=/^[a-f0-9]{8}(-[a-f0-9]{4}){3}-[a-f0-9]{12}$/i;
@@ -28,18 +28,31 @@ export async function POST(req:NextRequest){
  const b=await req.json();
  if(!b||typeof b!=='object'||!['provider','contractor'].includes(b.kind)||typeof b.clientId!=='string'||!uuid.test(b.clientId)||
  ![['legal_name',240],['document_number',30],['full_address',500],['representative',180]].every(([k,max])=>typeof b[k as string]==='string'&&(b[k as string] as string).length<=Number(max)))return fail('Dados inválidos.');
- const db=getDb();
- const exists=await db`SELECT 1 FROM public.crm_clients WHERE id=${b.clientId}::uuid AND organization_id=${owner.organizationId} LIMIT 1`;
- if(!exists.length)return fail('Cliente não autorizado.',403);
- const rows=b.kind==='provider'
- ?await db`INSERT INTO public.antares_legal_profiles(organization_id,client_id,legal_name,document_number,full_address,representative)
- VALUES(${owner.organizationId}::uuid,NULL,${b.legal_name.trim()},${b.document_number.trim()},${b.full_address.trim()},${b.representative.trim()})
- ON CONFLICT (organization_id) WHERE client_id IS NULL DO UPDATE
- SET legal_name=excluded.legal_name,document_number=excluded.document_number,full_address=excluded.full_address,representative=excluded.representative,updated_at=now() RETURNING id`
- :await db`INSERT INTO public.antares_legal_profiles(organization_id,client_id,legal_name,document_number,full_address,representative)
- VALUES(${owner.organizationId}::uuid,${b.clientId}::uuid,${b.legal_name.trim()},${b.document_number.trim()},${b.full_address.trim()},${b.representative.trim()})
- ON CONFLICT (organization_id,client_id) WHERE client_id IS NOT NULL DO UPDATE
- SET legal_name=excluded.legal_name,document_number=excluded.document_number,full_address=excluded.full_address,representative=excluded.representative,updated_at=now() RETURNING id`;
- return NextResponse.json({id:rows[0]?.id},{headers:{'Cache-Control':'no-store'}});
+ if(process.env.ANTARES_LEGAL_PROFILE_WRITES_ENABLED!=='true' ||
+    process.env.ANTARES_DB_RUNTIME_ROLE!=='antares_team_runtime' ||
+    !process.env.DATABASE_URL_TEAM_RUNTIME)
+  return fail('Gravação de dados jurídicos aguardando homologação.',503);
+ const db=getTeamWriteDb();
+ const checks=await db`SELECT
+   current_user='antares_team_runtime'
+   AND r.rolcanlogin AND NOT r.rolsuper AND NOT r.rolbypassrls
+   AND NOT has_table_privilege(current_user,'public.antares_legal_profiles','INSERT')
+   AND NOT has_table_privilege(current_user,'public.antares_legal_profiles','UPDATE')
+   AND p.prosecdef AND pg_get_userbyid(p.proowner)='neondb_owner'
+   AND has_function_privilege(current_user,p.oid,'EXECUTE')
+   AND NOT EXISTS (
+     SELECT 1 FROM aclexplode(coalesce(p.proacl,acldefault('f',p.proowner))) acl
+     WHERE acl.grantee=0 AND acl.privilege_type='EXECUTE'
+   ) AS ok
+   FROM pg_roles r JOIN pg_proc p
+     ON p.oid=to_regprocedure('public.antares_save_legal_profile(text,uuid,text,uuid,text,text,text,text)')
+   WHERE r.rolname=current_user`;
+ if(checks[0]?.ok!==true)return fail('Gravação restrita de dados jurídicos não homologada.',503);
+ const rows=await db`SELECT public.antares_save_legal_profile(
+   ${owner.user.id},${owner.organizationId}::uuid,${b.kind},${b.clientId}::uuid,
+   ${b.legal_name.trim()},${b.document_number.trim()},${b.full_address.trim()},${b.representative.trim()}
+ ) AS id`;
+ if(!rows[0]?.id)return fail('Cliente não autorizado.',403);
+ return NextResponse.json({id:rows[0].id},{headers:{'Cache-Control':'no-store'}});
  }catch(e){console.error('[ANTARES][legal-profile]',e instanceof Error?e.message:'Erro');return fail('Não foi possível salvar os dados jurídicos.',503);}
 }

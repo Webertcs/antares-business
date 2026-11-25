@@ -10,6 +10,7 @@ export async function signInAction(_previous: { error: string } | null, form: Fo
     if (error) return { error: 'Não foi possível entrar. Confira seus dados e a verificação do e-mail.' };
   } catch { return { error: 'Falha no serviço de autenticação.' }; }
   const token=String(form.get('inviteToken')||'');
-  if(/^[a-f0-9]{64}$/.test(token))redirect('/convite?token='+encodeURIComponent(token));
+  // O formulário com convite conclui o aceite via API após a sessão ser gravada.
+  if(/^[a-f0-9]{64}$/.test(token))return { error: '', inviteReady: true };
   redirect('/');
 }

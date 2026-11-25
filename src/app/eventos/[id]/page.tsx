@@ -53,7 +53,7 @@ export default async function Page({params}:{params:Promise<{id:string}>}){
    {([
     ['Instituição',String(event.client_name)],
     ['Cúpula',String(event.dome_name||'A definir')],
-    ['Alunos previstos',event.expected_attendees==null?'A definir':String(event.expected_attendees)]
+    ['Alunos previstos no evento',event.expected_attendees==null?'A definir':String(event.expected_attendees)]
    ] as const).map(([label,value])=><div key={label} style={infoCard}>
      <div style={{fontSize:12,color:'#50709c',fontWeight:750,marginBottom:5}}>{label}</div>
      <strong style={{fontSize:18,color:'#153e7c',overflowWrap:'anywhere'}}>{value}</strong>
@@ -62,7 +62,7 @@ export default async function Page({params}:{params:Promise<{id:string}>}){
 
 
   {event.actual_students!=null&&<section aria-label="Público atendido" style={{border:'1px solid #b7dfc9',background:'#eaf8f0',borderRadius:12,padding:'14px 16px'}}>
-   <span style={{color:'#176647',fontSize:12,fontWeight:750}}>Alunos atendidos</span>
+   <span style={{color:'#176647',fontSize:12,fontWeight:750}}>Alunos atendidos no evento</span>
    <strong style={{display:'block',color:'#145a3e',fontSize:26}}>{Number(event.actual_students)}</strong>
   </section>}
   <p style={{fontSize:13,color:'#4c668b',margin:0}}>
