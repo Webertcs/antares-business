@@ -1,0 +1,27 @@
+/* Visual compartilhado do primeiro acesso. Sem alterações nas regras de autenticação. */
+.antares-onboarding{min-height:100dvh;display:grid;align-items:start;justify-items:center;padding:clamp(24px,7vh,72px) 16px 32px;background:linear-gradient(145deg,#e8f1ff,#f8fbff);color:#102b55;font-family:inherit}
+.antares-onboarding .onboard-card{width:100%;max-width:500px;background:#fff;border:1px solid #c7d9f3;border-radius:18px;overflow:hidden;box-shadow:0 16px 40px #123c8026}
+.antares-onboarding .onboard-header{padding:24px 26px;background:linear-gradient(110deg,#12366d,#2467c8);color:#fff}
+.antares-onboarding .onboard-eyebrow{font-size:11px;letter-spacing:1px;font-weight:700}
+.antares-onboarding .onboard-header h1{font-size:clamp(21px,5vw,27px);font-weight:800;line-height:1.2;margin:9px 0 4px;color:#fff}
+.antares-onboarding .onboard-header p{color:#e9f3ff;margin:8px 0 0}
+.antares-onboarding .onboard-body{display:grid;gap:16px;padding:26px;font-size:15px;line-height:1.55}
+.antares-onboarding .onboard-body p{margin:0}
+.antares-onboarding .onboard-actions{display:grid;gap:10px;margin-top:14px}
+.antares-onboarding .onboard-footer{margin-top:4px;padding-top:14px;border-top:1px solid #dbe7f7}
+.antares-onboarding .onboard-button{box-sizing:border-box;width:100%;min-height:48px;display:flex;align-items:center;justify-content:center;text-align:center;padding:12px 14px;border-radius:10px;border:1px solid transparent;font:inherit;font-weight:700;line-height:1.35;text-decoration:none;cursor:pointer;white-space:normal}
+.antares-onboarding .onboard-primary{background:#205cc9;border-color:#205cc9;color:#fff;box-shadow:0 3px 9px #205cc933}
+.antares-onboarding .onboard-primary:hover:not(:disabled){background:#174ba9}
+.antares-onboarding .onboard-secondary{background:#eff5ff;border-color:#a9c5ee;color:#174a93}
+.antares-onboarding .onboard-secondary:hover:not(:disabled){background:#e0edff}
+.antares-onboarding .onboard-tertiary{background:#fff;border-color:#d0dced;color:#35577e}
+.antares-onboarding .onboard-tertiary:hover{background:#f0f5fc}
+.antares-onboarding .onboard-button:disabled{opacity:.55;cursor:not-allowed}
+.antares-onboarding .onboard-button:focus-visible{outline:3px solid #3b82f6;outline-offset:3px}
+.antares-onboarding .onboard-steps{display:grid;gap:8px;list-style:decimal;padding:14px 16px 14px 36px;margin:0;background:#f0f6ff;border:1px solid #d6e5fa;border-radius:12px}
+.antares-onboarding .onboard-steps li{padding-left:4px}
+.antares-onboarding .onboard-steps li::marker{color:#205cc9;font-weight:800}
+.antares-onboarding .onboard-success{display:block;padding:12px 14px;border:1px solid #b5dfc7;border-radius:10px;background:#eefaf2;color:#17613a;font-size:16px;font-weight:750;margin:0 0 10px}
+.antares-onboarding .onboard-note{padding:10px 12px;border-radius:8px;background:#eff5ff;color:#174985;font-size:14px}
+.antares-onboarding input{box-sizing:border-box;min-height:44px}
+@media(max-width:480px){.antares-onboarding .onboard-body,.antares-onboarding .onboard-header{padding:20px}.antares-onboarding .onboard-button{font-size:14px}}

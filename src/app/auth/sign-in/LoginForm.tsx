@@ -38,7 +38,7 @@ function LoginFormContent(){
  const [state,action,pending]=useActionState<LoginState,FormData>(valid?signInAndAccept:signInAction,null);
  const [showPassword,setShowPassword]=useState(false);
  return <main className="antares-login-scene">
-  <form action={action} className="antares-login-card">
+  <form action={action} className={valid?'antares-login-card antares-login-onboarding':'antares-login-card'}>
    <div className="antares-login-brand" aria-label="ANTARES BUSINESS — Planetário Móvel Digital">
     <div className="antares-login-mark" aria-hidden="true">✦<span>◌</span></div>
     <div className="antares-login-wordmark">ANTARES</div>
