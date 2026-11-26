@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { requireOwner, getDb } from '@/lib/equipe/auth';
+import { requireOwner, getDb, isDeveloperSubject } from '@/lib/equipe/auth';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -10,11 +10,16 @@ export async function GET() {
     if (!ctx) return NextResponse.json({ error: 'Sem autorização' }, { status: 403 });
     const sql = getDb();
     const members = await sql`
-      SELECT id, full_name, email, role, active, created_at
-      FROM public.team_members WHERE organization_id = ${ctx.organizationId}
-      ORDER BY created_at ASC
+      SELECT t.id, t.full_name, t.email, t.role, t.active, t.created_at, t.auth_subject,
+        to_jsonb(t)->>'archived_at' AS archived_at
+      FROM public.team_members t WHERE t.organization_id = ${ctx.organizationId}
+        AND (t.role = 'collaborator' OR to_jsonb(t)->>'archived_at' IS NULL)
+      ORDER BY t.created_at ASC
     `;
-    return NextResponse.json({ members }, { headers: { 'Cache-Control': 'no-store' } });
+    const visible = members.map(({auth_subject, ...member}) => ({
+      ...member, technical: isDeveloperSubject(String(auth_subject ?? '')),
+    }));
+    return NextResponse.json({ members: visible }, { headers: { 'Cache-Control': 'no-store' } });
   } catch {
     return NextResponse.json({ error: 'Falha ao carregar equipe' }, { status: 500 });
   }

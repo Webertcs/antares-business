@@ -13,7 +13,7 @@ export async function GET(){
   let originConfigured=false;
   try{if(configured){const url=new URL(configured);originConfigured=(url.protocol==='http:'||url.protocol==='https:')&&url.pathname==='/'&&url.search===''&&url.hash==='';}}catch{}
   const roleConfigured=process.env.ANTARES_DB_RUNTIME_ROLE==='antares_team_runtime'&&!!process.env.DATABASE_URL_TEAM_RUNTIME;
-  let roleOk=false,tablesRestricted=false,functionsOk=false;
+  let roleOk=false,tablesRestricted=false,functionsOk=false,managementReady=false;
   if(roleConfigured){
    const sql=getTeamWriteDb();
    const rows=await sql`SELECT
@@ -40,10 +40,16 @@ export async function GET(){
    roleOk=!!x&&x.runtime_role==='antares_team_runtime'&&x.rolcanlogin===true&&x.rolsuper===false&&x.rolbypassrls===false;
    tablesRestricted=Number(x?.restricted_count)===4;
    functionsOk=Number(x?.function_count)===4;
+   const extra=await sql`SELECT p.prosecdef AND pg_get_userbyid(p.proowner)='neondb_owner'
+    AND has_function_privilege(current_user,p.oid,'EXECUTE')
+    AND NOT EXISTS(SELECT 1 FROM aclexplode(coalesce(p.proacl,acldefault('f',p.proowner))) a
+      WHERE a.grantee=0 AND a.privilege_type='EXECUTE') AS safe
+    FROM pg_proc p WHERE p.oid=to_regprocedure('public.antares_manage_collaborator(text,uuid,uuid,text)')`;
+   managementReady=extra[0]?.safe===true;
   }
   const readyForControlledTest=originConfigured&&roleConfigured&&roleOk&&tablesRestricted&&functionsOk;
   return NextResponse.json({authenticatedOwner:true,originConfigured,roleConfigured,roleOk,
-   tablesRestricted,functionsOk,writesEnabled:process.env.ANTARES_TEAM_WRITES_ENABLED==='true',
+   tablesRestricted,functionsOk,managementReady:readyForControlledTest&&managementReady,writesEnabled:process.env.ANTARES_TEAM_WRITES_ENABLED==='true',
    readyForControlledTest,
    note:readyForControlledTest?'Pré-requisitos verificados apenas por leitura. Convite real ainda não homologado.':'Convites bloqueados até sanar os pré-requisitos.'},{headers});
  }catch{return NextResponse.json({error:'Pré-voo de equipe indisponível; nenhuma alteração realizada.'},{status:503,headers})}
