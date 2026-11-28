@@ -2,7 +2,7 @@ import { assertSensitiveWriteAllowed } from '@/lib/equipe/write-guard';
 import { NextRequest, NextResponse } from 'next/server';
 import { createHash } from 'node:crypto';
 import { auth } from '@/lib/auth/server';
-import { getTeamWriteDb } from '@/lib/equipe/auth';
+import { getTeamWriteDb, isDeveloperSubject } from '@/lib/equipe/auth';
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export async function POST(request: NextRequest) {
@@ -12,6 +12,8 @@ export async function POST(request: NextRequest) {
   const user = session?.user;
   if (!user?.id || !user.email || user.emailVerified !== true)
     return NextResponse.json({ error: 'Entre com a conta convidada e confirme o e-mail antes de aceitar.' }, { status: 403 });
+  if (isDeveloperSubject(user.id))
+    return NextResponse.json({ error: 'A conta técnica não pode ingressar na equipe por convite.' }, { status: 403 });
   try {
     if (Number(request.headers.get('content-length') || '0') > 1024)
       return NextResponse.json({ error: 'Requisição muito grande' }, { status: 413 });
