@@ -56,8 +56,23 @@ export function isDeveloperSubject(subject: string) {
   return Boolean(configured) && configured === subject;
 }
 
-/** Não basta ser proprietário: a oficina é exclusiva do desenvolvedor. */
+/** A oficina não concede vínculo comercial. A identidade precisa ser
+ *  explicitamente configurada e possuir um único registro de proprietário
+ *  ativo (transição) ou arquivado (suporte após a entrega).
+ *  Não retorna organização, identificador de membro ou dados comerciais.
+ */
 export async function requireDeveloper() {
-  const owner = await requireOwner();
-  return owner && isDeveloperSubject(owner.user.id) ? owner : null;
+  const { data: session } = await auth.getSession();
+  const user = session?.user;
+  if (!user?.id || user.emailVerified !== true || !isDeveloperSubject(user.id)) return null;
+  const sql = getDb();
+  const rows = await sql`
+    SELECT role, active, archived_at IS NOT NULL AS archived
+    FROM public.team_members WHERE auth_subject = ${user.id} LIMIT 2
+  `;
+  if (rows.length !== 1 || rows[0].role !== 'owner') return null;
+  const row = rows[0];
+  if (row.active === false && row.archived === true) return { user, technicalOnly: true };
+  if (row.active === true && row.archived === false) return { user, technicalOnly: false };
+  return null;
 }

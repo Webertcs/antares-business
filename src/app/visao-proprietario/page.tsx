@@ -1,14 +1,8 @@
-import {redirect} from 'next/navigation';
-import {requireDeveloper} from '@/lib/equipe/auth';
-import DashboardClient from '../DashboardClient';
+import { redirect } from 'next/navigation';
+import { requireDeveloper } from '@/lib/equipe/auth';
 export const dynamic='force-dynamic';
-
-/**
- * Prévia visual do painel do proprietário, para refinamento.
- * NÃO cria usuário, sessão de outro usuário, nem altera privilégios.
- */
-export default async function VisaoProprietarioPage(){
- const owner=await requireDeveloper();
- if(!owner)redirect('/sem-acesso');
- return <DashboardClient accountLabel="Proprietário" profileKey={owner.memberId} ownerPreview/>;
+// A prévia comercial foi retirada: o painel técnico não imita o proprietário.
+export default async function Page(){
+  if(!await requireDeveloper())redirect('/sem-acesso');
+  redirect('/oficina');
 }
